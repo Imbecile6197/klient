@@ -21,7 +21,9 @@ import (
 	"github.com/Imbecile6197/klient/internal/secrets"
 )
 
-func (a *App) openPreferences() {
+func (a *App) openPreferences() { a.preferencesDialog() }
+
+func (a *App) preferencesDialog() *adw.PreferencesDialog {
 	d := adw.NewPreferencesDialog()
 	d.SetTitle(i18n.T("Preferences"))
 	// Same order for every account: general settings first, then mail
@@ -34,6 +36,7 @@ func (a *App) openPreferences() {
 		d.Add(a.pgpPage(d))
 	}
 	d.Present(a.win)
+	return d
 }
 
 func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {

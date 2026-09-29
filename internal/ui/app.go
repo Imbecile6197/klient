@@ -130,7 +130,11 @@ func Run(cfg config.Config) int {
 		}
 		args = append(args, arg)
 	}
-	a.app = adw.NewApplication(AppID, gio.ApplicationHandlesOpen)
+	appID := AppID
+	if demoMode() {
+		appID += ".Demo" // runs next to the user's Klient
+	}
+	a.app = adw.NewApplication(appID, gio.ApplicationHandlesOpen)
 	a.app.ConnectActivate(a.activate)
 	// `klient mailto:…` (and the desktop's mailto: handler) end up here.
 	a.app.ConnectOpen(func(files []gio.Filer, _ string) {
@@ -212,6 +216,11 @@ func (a *App) activate() {
 		a.win.SetVisible(false)
 		return true
 	})
+	if demoMode() {
+		a.win.Present()
+		a.startDemo()
+		return
+	}
 	if a.cfg.RunInBackground {
 		a.startTray()
 	}

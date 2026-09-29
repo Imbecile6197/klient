@@ -4,6 +4,15 @@
 
 [English](README.md) · [Dokumentace](docs/index.cs.html) · [Vydání](https://github.com/Imbecile6197/klient/releases) · GPL-3.0
 
+![Hlavní okno Klienta](docs/screenshots/cs/main.png)
+
+| | |
+|---|---|
+| ![Psaní odpovědi](docs/screenshots/cs/compose.png) | ![Spamfiltr s AI přesunul podvod do Spamu](docs/screenshots/cs/spam.png) |
+| ![Předvolby s lokální AI](docs/screenshots/cs/preferences.png) | ![Tmavý vzhled](docs/screenshots/cs/main-dark.png) |
+
+<sub>Snímky ukázkového režimu – všichni lidé i zprávy jsou vymyšlení. Vyzkoušet ho můžete sami: `KLIENT_DEMO=1 klient`.</sub>
+
 Klient je napsaný v Go s GTK4 a libadwaita. Připojuje se přímo k Proton Mailu (bez Proton Bridge), ke Gmailu, k Seznam.cz a k libovolné schránce IMAP/SMTP. Každou novou zprávu nejdřív posoudí spamfiltr a teprve potom ji ukáže a ohlásí. Rozhraní je česky a anglicky.
 
 ## Funkce

@@ -118,7 +118,7 @@ nav.toc {
 .brand svg { width: 34px; height: 34px; flex: none; }
 .brand b { font-size: 1.15rem; }
 .brand span { display: block; font-size: .8rem; color: var(--muted); }
-.brand span a { color: var(--accent); }
+nav.toc .brand span a { display: inline; padding: 0; color: var(--accent); }
 nav.toc ol { list-style: none; margin: 0; padding: 0; }
 nav.toc a {
   display: block;
@@ -240,6 +240,9 @@ td.c, th.c { text-align: center; }
 }
 .flow i { font-style: normal; color: var(--muted); }
 
+.shot { margin: 18px 0 8px; }
+.shot img { width: 100%; height: auto; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: 0 6px 24px rgba(0,0,0,.08); }
+.shot figcaption { font-size: .85rem; color: var(--muted); margin-top: 6px; }
 footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--border); padding-top: 18px; }
 
 /* ---- Mobile ---- */
@@ -289,7 +292,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
       <rect x="4" y="12" width="56" height="40" rx="9" fill="#1c71d8"/>
       <path d="M10 20l22 16 22-16" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <div><b>Klient</b><span>Dokumentace · verze 0.7.1 · <a href="index.html" hreflang="en" lang="en">English</a></span></div>
+    <div><b>Klient</b><span>Dokumentace · verze 0.7.2 · <a href="index.html" hreflang="en" lang="en">English</a></span></div>
   </div>
   <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc">Obsah</button>
   <ol>
@@ -336,6 +339,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
 <!-- ============================================================ -->
 <section id="prehled">
   <h2>Přehled</h2>
+  <figure class="shot"><img src="screenshots/cs/main.png" alt="Hlavní okno Klienta" loading="lazy"><figcaption>Ukázkový režim – všichni lidé i zprávy jsou vymyšlení. Vyzkoušíte ho příkazem <code>KLIENT_DEMO=1 klient</code>.</figcaption></figure>
   <p>Klient je desktopová poštovní aplikace pro Linux s prostředím GNOME. Připojuje se přímo k Proton Mailu (bez Proton Bridge) i ke klasickým schránkám přes IMAP a SMTP. Každou novou zprávu nejdřív posoudí spamfiltr a teprve potom ji ukáže a ohlásí.</p>
   <div class="cards">
     <div class="card"><a href="#ucty"><h4>Více služeb v jednom okně</h4></a><p>Proton Mail, Gmail, Seznam.cz a libovolná IMAP/SMTP schránka, přepínání v postranním panelu.</p></div>
@@ -371,7 +375,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
 make build      # první sestavení trvá dlouho (CGo bindingy GTK)
 make run
 make install    # do ~/.local včetně .desktop souboru a ikony
-make rpm VERSION=0.7.1</code></pre>
+make rpm VERSION=0.7.2</code></pre>
 </section>
 
 <!-- ============================================================ -->
@@ -715,7 +719,7 @@ make rpm VERSION=0.7.1</code></pre>
   <p>Postaveno na GTK4, libadwaita, WebKitGTK, go-proton-api, gopenpgp a knihovnách go-imap/go-smtp.</p>
 </section>
 
-<footer>Dokumentace k verzi 0.7.1 · září 2026 · <a href="index.html" hreflang="en" lang="en">English version</a></footer>
+<footer>Dokumentace k verzi 0.7.2 · září 2026 · <a href="index.html" hreflang="en" lang="en">English version</a></footer>
 
 </div>
 </main>

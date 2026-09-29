@@ -29,6 +29,38 @@
       <li xml:lang="cs">Česky a anglicky; aktualizuje se sám z GitHubu</li>
     </ul>
   </description>
+  <screenshots>
+    <screenshot type="default">
+      <caption>The main window with a conversation</caption>
+      <caption xml:lang="cs">Hlavní okno s konverzací</caption>
+      <image>https://raw.githubusercontent.com/Imbecile6197/klient/main/docs/screenshots/en/main.png</image>
+      <image xml:lang="cs">https://raw.githubusercontent.com/Imbecile6197/klient/main/docs/screenshots/cs/main.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>The AI spam filter moved a scam to Spam</caption>
+      <caption xml:lang="cs">Spamfiltr s AI přesunul podvod do Spamu</caption>
+      <image>https://raw.githubusercontent.com/Imbecile6197/klient/main/docs/screenshots/en/spam.png</image>
+      <image xml:lang="cs">https://raw.githubusercontent.com/Imbecile6197/klient/main/docs/screenshots/cs/spam.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Writing a reply</caption>
+      <caption xml:lang="cs">Psaní odpovědi</caption>
+      <image>https://raw.githubusercontent.com/Imbecile6197/klient/main/docs/screenshots/en/compose.png</image>
+      <image xml:lang="cs">https://raw.githubusercontent.com/Imbecile6197/klient/main/docs/screenshots/cs/compose.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Preferences with local AI</caption>
+      <caption xml:lang="cs">Předvolby s lokální AI</caption>
+      <image>https://raw.githubusercontent.com/Imbecile6197/klient/main/docs/screenshots/en/preferences.png</image>
+      <image xml:lang="cs">https://raw.githubusercontent.com/Imbecile6197/klient/main/docs/screenshots/cs/preferences.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Dark style</caption>
+      <caption xml:lang="cs">Tmavý vzhled</caption>
+      <image>https://raw.githubusercontent.com/Imbecile6197/klient/main/docs/screenshots/en/main-dark.png</image>
+      <image xml:lang="cs">https://raw.githubusercontent.com/Imbecile6197/klient/main/docs/screenshots/cs/main-dark.png</image>
+    </screenshot>
+  </screenshots>
   <launchable type="desktop-id">eu.libormacak.Klient.desktop</launchable>
   <provides>
     <binary>klient</binary>
@@ -50,6 +82,12 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.7.2" date="2026-09-29">
+      <description>
+        <p>Fixes empty one-line messages and dates in the English interface; adds screenshots and a demo mode.</p>
+        <p xml:lang="cs">Opravuje prázdné jednořádkové zprávy a data v anglickém rozhraní; přidává snímky obrazovky a ukázkový režim.</p>
+      </description>
+    </release>
     <release version="0.7.1" date="2026-09-29">
       <description>
         <p>What's New after an update and before installing one.</p>

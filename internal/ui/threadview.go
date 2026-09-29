@@ -448,7 +448,7 @@ func (m *mainView) messageCard(meta protonmail.Summary) *messageCard {
 	} else if meta.NumAttachments > 0 {
 		c.preview.SetText(attachmentsText(meta.NumAttachments))
 	}
-	date := gtk.NewLabel(time.Unix(meta.Time, 0).Format("2. 1. 2006 15:04"))
+	date := gtk.NewLabel(time.Unix(meta.Time, 0).Format(i18n.T("Jan 2, 2006 15:04")))
 	date.AddCSSClass("dim-label")
 	date.AddCSSClass("caption")
 	header.Append(name)
@@ -615,6 +615,12 @@ func plainBody(text string) *gtk.TextView {
 	body.SetWrapMode(gtk.WrapWordChar)
 	body.AddCSSClass("inline")
 	body.SetTopMargin(6)
+	// A text view outside a scrolled window leaves a single wrapped line
+	// blank (GTK sizes it before the width is known); a trailing newline
+	// gives it a second line and it lays out like any longer message.
+	if !strings.Contains(strings.TrimRight(text, "\n"), "\n") {
+		text = strings.TrimRight(text, "\n") + "\n"
+	}
 	body.Buffer().SetText(text)
 	return body
 }

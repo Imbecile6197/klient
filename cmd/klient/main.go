@@ -11,6 +11,12 @@ import (
 )
 
 func main() {
+	// KLIENT_DEMO=1: a made-up account in temporary settings (screenshots).
+	if os.Getenv("KLIENT_DEMO") != "" {
+		if err := ui.PrepareDemo(); err != nil {
+			log.Fatal(err)
+		}
+	}
 	cfg, err := config.Load()
 	if err != nil {
 		log.Printf("config: %v (using the default settings)", err)

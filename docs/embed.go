@@ -4,10 +4,10 @@ package docs
 
 import "embed"
 
-// Files contains index.html (English) and index.cs.html (Czech); the two
-// pages link to each other.
+// Files contains index.html (English) and index.cs.html (Czech), which
+// link to each other, and the main screenshot shown in them.
 //
-//go:embed index.html index.cs.html
+//go:embed index.html index.cs.html screenshots/en/main.png screenshots/cs/main.png
 var Files embed.FS
 
 // Page is the file name of the documentation in a language.

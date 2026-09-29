@@ -820,9 +820,9 @@ func formatTime(unix int64) string {
 	case t.YearDay() == now.YearDay() && t.Year() == now.Year():
 		return t.Format("15:04")
 	case t.Year() == now.Year():
-		return t.Format("2. 1.")
+		return t.Format(i18n.T("Jan 2"))
 	default:
-		return t.Format("2. 1. 2006")
+		return t.Format(i18n.T("Jan 2, 2006"))
 	}
 }
 

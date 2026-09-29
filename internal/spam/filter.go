@@ -284,6 +284,9 @@ func (f *Filter) Evaluate(ctx context.Context, msg *protonmail.Message) Decision
 	return d
 }
 
+// Remember stores a decision made elsewhere (the demo account).
+func (f *Filter) Remember(d Decision) { f.store(d) }
+
 func (f *Filter) store(d Decision) {
 	f.mu.Lock()
 	f.st.Decisions[d.MessageID] = d

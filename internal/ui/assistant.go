@@ -309,7 +309,7 @@ func (a *App) askMail() {
 					if s.Sender != nil {
 						from = mailparse.DisplayName(s.Sender)
 					}
-					r.SetSubtitle(from + " · " + time.Unix(s.Time, 0).Format("2. 1. 2006"))
+					r.SetSubtitle(from + " · " + time.Unix(s.Time, 0).Format(i18n.T("Jan 2, 2006")))
 					r.SetActivatable(true)
 					r.AddSuffix(gtk.NewImageFromIconName("go-next-symbolic"))
 					r.ConnectActivated(func() {

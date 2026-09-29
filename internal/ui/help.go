@@ -35,7 +35,7 @@ func (a *App) showHelp() {
 		if old, err := os.ReadFile(path); err == nil && bytes.Equal(old, data) {
 			return nil
 		}
-		if err := os.MkdirAll(dir, 0o755); err != nil {
+		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 			return err
 		}
 		return os.WriteFile(path, data, 0o644)

@@ -66,6 +66,12 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Tue Sep 29 2026 Libor Macák <jsem@libormacak.eu> - 0.7.2-1
+- Fix messages with a one-line plain-text body shown empty
+- Fix Czech date formats in the English interface
+- Demo mode (KLIENT_DEMO=1) with made-up mail; screenshots generated from
+  it (packaging/screenshots.sh) in README, docs and metainfo
+
 * Tue Sep 29 2026 Libor Macák <jsem@libormacak.eu> - 0.7.1-1
 - "What's New" after an update (changes since the last used version), before
   installing an update and in the main menu; release notes are embedded

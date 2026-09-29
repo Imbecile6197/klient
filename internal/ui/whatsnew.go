@@ -92,11 +92,11 @@ func (a *App) showUpdateNotes() {
 
 // notesDialog lists release notes, newest first. action (may be empty)
 // adds a suggested button that runs do and closes the dialog.
-func (a *App) notesDialog(title string, rels []relnotes.Release, action string, do func()) {
+func (a *App) notesDialog(title string, rels []relnotes.Release, action string, do func()) *adw.Dialog {
 	d := adw.NewDialog()
 	d.SetTitle(title)
 	d.SetContentWidth(520)
-	d.SetContentHeight(560)
+	d.SetContentHeight(460)
 	tv := adw.NewToolbarView()
 	tv.AddTopBar(adw.NewHeaderBar())
 
@@ -110,7 +110,7 @@ func (a *App) notesDialog(title string, rels []relnotes.Release, action string, 
 		l.SetMarkup(markup)
 		l.SetWrap(true)
 		l.SetXAlign(0)
-		l.SetSelectable(true)
+		l.SetHExpand(true)
 		for _, c := range classes {
 			l.AddCSSClass(c)
 		}
@@ -160,4 +160,5 @@ func (a *App) notesDialog(title string, rels []relnotes.Release, action string, 
 	}
 	d.SetChild(tv)
 	d.Present(a.win)
+	return d
 }

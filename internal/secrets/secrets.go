@@ -18,6 +18,10 @@ const keyProtonSession = "proton-session"
 
 // apiKeyName maps an AI provider ID to its keyring entry. The Claude entry
 // keeps its original name so existing keys keep working.
+// UseMemory keeps every secret in memory for this process instead of the
+// system keyring (the demo mode must not touch the user's keyring).
+func UseMemory() { keyring.MockInit() }
+
 func apiKeyName(provider string) string {
 	if provider == "claude" {
 		return "anthropic-api-key"
