@@ -494,6 +494,7 @@ func (a *App) showShortcuts() {
 			{"<Control><Shift>k", "Kontakty"},
 			{"F5", "Obnovit"},
 			{"<Control>comma", "Předvolby"},
+			{"F1", "Nápověda"},
 			{"<Control>question", "Klávesové zkratky"},
 			{"<Control>q", "Ukončit"},
 		}},

@@ -62,6 +62,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Tue Sep 29 2026 Libor Macák <jsem@libormacak.eu> - 0.6.6-1
+- Help (F1, main menu) opens the built-in user documentation
+
 * Mon Sep 28 2026 Libor Macák <jsem@libormacak.eu> - 0.6.5-1
 - Sidebar spam-filter status follows model changes and names the provider
 

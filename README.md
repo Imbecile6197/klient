@@ -1,6 +1,6 @@
 # Klient
 
-Kompletní uživatelská dokumentace: [`docs/index.html`](docs/index.html).
+Kompletní uživatelská dokumentace: [`docs/index.html`](docs/index.html). V aplikaci ji otevře hlavní nabídka → Nápověda nebo klávesa F1.
 
 E-mailový klient pro GNOME (GTK4 + libadwaita) napsaný v Go. Umí:
 
@@ -58,7 +58,7 @@ make rpm          # balíček pro Fedoru do build/rpm/RPMS/x86_64/
 Instalace balíčku:
 
 ```bash
-sudo dnf install ./build/rpm/RPMS/x86_64/klient-0.6.5-1.fc44.x86_64.rpm
+sudo dnf install ./build/rpm/RPMS/x86_64/klient-0.6.6-1.fc44.x86_64.rpm
 ```
 
 ## První spuštění

@@ -477,6 +477,7 @@ func (a *App) setupActions() {
 	add("show", nil, a.showWindow)
 	add("restart", nil, a.restartApp)
 	add("about", nil, a.showAbout)
+	add("help", []string{"F1"}, a.showHelp)
 	add("shortcuts", []string{"<Control>question", "<Control>slash"}, a.showShortcuts)
 	add("quit", []string{"<Control>q"}, a.quit)
 }
@@ -496,6 +497,7 @@ func (a *App) primaryMenu() *gio.Menu {
 	menu.AppendSection("", s3)
 	s2 := gio.NewMenu()
 	s2.Append("Předvolby", "app.preferences")
+	s2.Append("Nápověda", "app.help")
 	s2.Append("Klávesové zkratky", "app.shortcuts")
 	s2.Append("Přidat účet…", "app.add-account")
 	s2.Append("Odhlásit tento účet", "app.logout")
