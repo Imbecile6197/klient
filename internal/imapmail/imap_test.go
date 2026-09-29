@@ -28,9 +28,9 @@ import (
 	"github.com/emersion/go-smtp"
 	"github.com/zalando/go-keyring"
 
-	"github.com/libormacak/klient/internal/cache"
-	"github.com/libormacak/klient/internal/config"
-	"github.com/libormacak/klient/internal/protonmail"
+	"github.com/Imbecile6197/klient/internal/cache"
+	"github.com/Imbecile6197/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/protonmail"
 )
 
 // ---- test servers ---------------------------------------------------------------

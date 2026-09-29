@@ -14,8 +14,8 @@ import (
 
 	"github.com/ProtonMail/go-proton-api"
 
-	"github.com/libormacak/klient/internal/cache"
-	"github.com/libormacak/klient/internal/protonmail"
+	"github.com/Imbecile6197/klient/internal/cache"
+	"github.com/Imbecile6197/klient/internal/protonmail"
 )
 
 // CanSnooze and CanSchedule: offered by the server or by Klient itself.

@@ -13,7 +13,7 @@ import (
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
 	"github.com/ProtonMail/gopenpgp/v2/helper"
 
-	"github.com/libormacak/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/config"
 )
 
 func keyDir() string { return filepath.Join(config.DataDir(), "keys") }

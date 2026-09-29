@@ -16,10 +16,10 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 
-	"github.com/libormacak/klient/internal/mailbox"
-	"github.com/libormacak/klient/internal/mailparse"
-	"github.com/libormacak/klient/internal/protonmail"
-	"github.com/libormacak/klient/internal/rules"
+	"github.com/Imbecile6197/klient/internal/mailbox"
+	"github.com/Imbecile6197/klient/internal/mailparse"
+	"github.com/Imbecile6197/klient/internal/protonmail"
+	"github.com/Imbecile6197/klient/internal/rules"
 )
 
 // ---- Unsubscribe --------------------------------------------------------

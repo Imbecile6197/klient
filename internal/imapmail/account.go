@@ -25,12 +25,12 @@ import (
 	"github.com/emersion/go-imap/v2/imapclient"
 	"github.com/emersion/go-message/charset"
 
-	"github.com/libormacak/klient/internal/cache"
-	"github.com/libormacak/klient/internal/config"
-	"github.com/libormacak/klient/internal/mailbox"
-	"github.com/libormacak/klient/internal/pgp"
-	"github.com/libormacak/klient/internal/protonmail"
-	"github.com/libormacak/klient/internal/secrets"
+	"github.com/Imbecile6197/klient/internal/cache"
+	"github.com/Imbecile6197/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/mailbox"
+	"github.com/Imbecile6197/klient/internal/pgp"
+	"github.com/Imbecile6197/klient/internal/protonmail"
+	"github.com/Imbecile6197/klient/internal/secrets"
 )
 
 var _ mailbox.Account = (*Account)(nil)

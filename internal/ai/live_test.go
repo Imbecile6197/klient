@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/libormacak/klient/internal/config"
-	"github.com/libormacak/klient/internal/ollama"
+	"github.com/Imbecile6197/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/ollama"
 )
 
 // go test -tags live -run TestLocalSpam -v ./internal/ai  (synthetic mail only)

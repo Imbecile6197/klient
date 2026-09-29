@@ -10,10 +10,10 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 
-	"github.com/libormacak/klient/internal/mailbox"
-	"github.com/libormacak/klient/internal/mailparse"
-	"github.com/libormacak/klient/internal/power"
-	"github.com/libormacak/klient/internal/protonmail"
+	"github.com/Imbecile6197/klient/internal/mailbox"
+	"github.com/Imbecile6197/klient/internal/mailparse"
+	"github.com/Imbecile6197/klient/internal/power"
+	"github.com/Imbecile6197/klient/internal/protonmail"
 )
 
 // AI results are kept in the account's encrypted cache, so a summary is

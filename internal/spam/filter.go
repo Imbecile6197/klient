@@ -15,10 +15,10 @@ import (
 
 	"github.com/ProtonMail/go-proton-api"
 
-	"github.com/libormacak/klient/internal/ai"
-	"github.com/libormacak/klient/internal/config"
-	"github.com/libormacak/klient/internal/mailparse"
-	"github.com/libormacak/klient/internal/protonmail"
+	"github.com/Imbecile6197/klient/internal/ai"
+	"github.com/Imbecile6197/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/mailparse"
+	"github.com/Imbecile6197/klient/internal/protonmail"
 )
 
 // Decision is the stored outcome for one message.

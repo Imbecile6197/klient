@@ -1,4 +1,4 @@
-module github.com/libormacak/klient
+module github.com/Imbecile6197/klient
 
 go 1.26.8
 

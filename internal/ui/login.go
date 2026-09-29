@@ -10,8 +10,8 @@ import (
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 
-	"github.com/libormacak/klient/internal/mailbox"
-	"github.com/libormacak/klient/internal/protonmail"
+	"github.com/Imbecile6197/klient/internal/mailbox"
+	"github.com/Imbecile6197/klient/internal/protonmail"
 )
 
 // showLogin shows the login form. username prefills the login name (for an

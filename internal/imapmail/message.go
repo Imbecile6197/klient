@@ -14,11 +14,11 @@ import (
 	"github.com/emersion/go-imap/v2"
 	"github.com/emersion/go-imap/v2/imapclient"
 
-	"github.com/libormacak/klient/internal/mailbox"
-	"github.com/libormacak/klient/internal/mailparse"
-	"github.com/libormacak/klient/internal/pgp"
-	"github.com/libormacak/klient/internal/pgpmime"
-	"github.com/libormacak/klient/internal/protonmail"
+	"github.com/Imbecile6197/klient/internal/mailbox"
+	"github.com/Imbecile6197/klient/internal/mailparse"
+	"github.com/Imbecile6197/klient/internal/pgp"
+	"github.com/Imbecile6197/klient/internal/pgpmime"
+	"github.com/Imbecile6197/klient/internal/protonmail"
 )
 
 // raw returns the full RFC 822 message and its summary, from the cache when

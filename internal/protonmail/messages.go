@@ -13,8 +13,8 @@ import (
 	"github.com/ProtonMail/go-proton-api"
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
 
-	"github.com/libormacak/klient/internal/mailparse"
-	"github.com/libormacak/klient/internal/pgp"
+	"github.com/Imbecile6197/klient/internal/mailparse"
+	"github.com/Imbecile6197/klient/internal/pgp"
 )
 
 // FolderByID returns the system folder with the given ID.

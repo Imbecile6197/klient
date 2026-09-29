@@ -16,10 +16,10 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 	"github.com/diamondburned/gotk4/pkg/pango"
 
-	"github.com/libormacak/klient/internal/ical"
-	"github.com/libormacak/klient/internal/mailparse"
-	"github.com/libormacak/klient/internal/pgp"
-	"github.com/libormacak/klient/internal/protonmail"
+	"github.com/Imbecile6197/klient/internal/ical"
+	"github.com/Imbecile6197/klient/internal/mailparse"
+	"github.com/Imbecile6197/klient/internal/pgp"
+	"github.com/Imbecile6197/klient/internal/protonmail"
 )
 
 // ---- Calendar invitations --------------------------------------------------------

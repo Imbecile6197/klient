@@ -11,7 +11,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 	"github.com/diamondburned/gotk4/pkg/pango"
 
-	"github.com/libormacak/klient/internal/richtext"
+	"github.com/Imbecile6197/klient/internal/richtext"
 )
 
 func TestEditorProbe(t *testing.T) {

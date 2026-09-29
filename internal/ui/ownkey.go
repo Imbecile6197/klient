@@ -9,7 +9,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 
-	"github.com/libormacak/klient/internal/pgp"
+	"github.com/Imbecile6197/klient/internal/pgp"
 )
 
 // ownKeyGroup manages the PGP key of a non-Proton account: create, import,

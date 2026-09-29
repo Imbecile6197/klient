@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/libormacak/klient/internal/config"
-	"github.com/libormacak/klient/internal/secrets"
+	"github.com/Imbecile6197/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/secrets"
 )
 
 // Live check against the logged-in account; prints counts only.

@@ -8,8 +8,8 @@ import (
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 
-	"github.com/libormacak/klient/internal/mailbox"
-	"github.com/libormacak/klient/internal/protonmail"
+	"github.com/Imbecile6197/klient/internal/mailbox"
+	"github.com/Imbecile6197/klient/internal/protonmail"
 )
 
 // ---- Time helpers -------------------------------------------------------------

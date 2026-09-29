@@ -9,7 +9,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 	"golang.org/x/text/unicode/norm"
 
-	"github.com/libormacak/klient/internal/protonmail"
+	"github.com/Imbecile6197/klient/internal/protonmail"
 )
 
 // fold lowercases and strips diacritics, so "macak" finds "Macák".

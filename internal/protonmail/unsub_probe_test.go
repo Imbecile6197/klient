@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/libormacak/klient/internal/config"
-	"github.com/libormacak/klient/internal/mailparse"
-	"github.com/libormacak/klient/internal/secrets"
+	"github.com/Imbecile6197/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/mailparse"
+	"github.com/Imbecile6197/klient/internal/secrets"
 )
 
 // Counts how many recent messages carry List-Unsubscribe in the raw header,

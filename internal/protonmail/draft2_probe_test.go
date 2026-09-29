@@ -9,8 +9,8 @@ import (
 
 	"github.com/ProtonMail/go-proton-api"
 
-	"github.com/libormacak/klient/internal/config"
-	"github.com/libormacak/klient/internal/secrets"
+	"github.com/Imbecile6197/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/secrets"
 )
 
 // Re-saves the user's failed test draft unchanged to get the exact API error.

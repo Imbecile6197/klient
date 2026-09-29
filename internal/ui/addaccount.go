@@ -11,10 +11,10 @@ import (
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 
-	"github.com/libormacak/klient/internal/config"
-	"github.com/libormacak/klient/internal/imapmail"
-	"github.com/libormacak/klient/internal/mailbox"
-	"github.com/libormacak/klient/internal/secrets"
+	"github.com/Imbecile6197/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/imapmail"
+	"github.com/Imbecile6197/klient/internal/mailbox"
+	"github.com/Imbecile6197/klient/internal/secrets"
 )
 
 // showAddAccount lets the user pick the service of a new account.

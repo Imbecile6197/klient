@@ -1,7 +1,7 @@
 PREFIX ?= $(HOME)/.local
 APP_ID = eu.libormacak.Klient
 VERSION ?= 0.1.0
-LDFLAGS = -s -w -X github.com/libormacak/klient/internal/ui.Version=$(VERSION)
+LDFLAGS = -s -w -X github.com/Imbecile6197/klient/internal/ui.Version=$(VERSION)
 RPMTOP = $(CURDIR)/build/rpm
 PKG = klient-$(VERSION)
 

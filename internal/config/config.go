@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/libormacak/klient/internal/rules"
+	"github.com/Imbecile6197/klient/internal/rules"
 )
 
 const appName = "klient"

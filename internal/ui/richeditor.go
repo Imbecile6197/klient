@@ -10,7 +10,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 	"github.com/diamondburned/gotk4/pkg/pango"
 
-	"github.com/libormacak/klient/internal/richtext"
+	"github.com/Imbecile6197/klient/internal/richtext"
 )
 
 // richEditor is a GtkTextView with a formatting toolbar. Styles live in

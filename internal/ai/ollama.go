@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/libormacak/klient/internal/ollama"
-	"github.com/libormacak/klient/internal/power"
+	"github.com/Imbecile6197/klient/internal/ollama"
+	"github.com/Imbecile6197/klient/internal/power"
 )
 
 // LocalBackend is the managed Ollama server (started on demand).

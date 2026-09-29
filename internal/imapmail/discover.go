@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/libormacak/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/config"
 )
 
 // Known services (checked first, no network needed).

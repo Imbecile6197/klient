@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/libormacak/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/config"
 )
 
 func TestParseFeeds(t *testing.T) {

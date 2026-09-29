@@ -2,7 +2,7 @@
 
 package protonmail
 
-import "github.com/libormacak/klient/internal/config"
+import "github.com/Imbecile6197/klient/internal/config"
 
 // probeUser is the first account logged in to Klient.
 func probeUser() string {

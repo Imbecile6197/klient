@@ -14,7 +14,7 @@ import (
 	"github.com/emersion/go-imap/v2"
 	"github.com/emersion/go-imap/v2/imapclient"
 
-	"github.com/libormacak/klient/internal/protonmail"
+	"github.com/Imbecile6197/klient/internal/protonmail"
 )
 
 // ---- Threads -----------------------------------------------------------------------

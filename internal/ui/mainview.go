@@ -13,8 +13,8 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 	"github.com/diamondburned/gotk4/pkg/pango"
 
-	aipkg "github.com/libormacak/klient/internal/ai"
-	"github.com/libormacak/klient/internal/protonmail"
+	aipkg "github.com/Imbecile6197/klient/internal/ai"
+	"github.com/Imbecile6197/klient/internal/protonmail"
 )
 
 const pageSize = 50

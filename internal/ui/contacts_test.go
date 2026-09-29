@@ -4,14 +4,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/libormacak/klient/internal/protonmail"
+	"github.com/Imbecile6197/klient/internal/protonmail"
 )
 
 func TestMatchContacts(t *testing.T) {
 	all := []protonmail.Contact{
 		{Name: "Jan Novák", Email: "jan@example.cz"},
 		{Name: "Libor Macák", Email: "jsem@libormacak.eu"},
-		{Name: "", Email: "info@macak-shop.cz", Recent: true},
+		{Name: "", Email: "info@macak.example", Recent: true},
 	}
 	got := matchContacts(all, "macak", 10)
 	if len(got) != 2 || got[0].Name != "Libor Macák" {

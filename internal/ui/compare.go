@@ -10,11 +10,11 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 	"github.com/diamondburned/gotk4/pkg/pango"
 
-	"github.com/libormacak/klient/internal/ai"
-	"github.com/libormacak/klient/internal/mailbox"
-	"github.com/libormacak/klient/internal/mailparse"
-	"github.com/libormacak/klient/internal/ollama"
-	"github.com/libormacak/klient/internal/protonmail"
+	"github.com/Imbecile6197/klient/internal/ai"
+	"github.com/Imbecile6197/klient/internal/mailbox"
+	"github.com/Imbecile6197/klient/internal/mailparse"
+	"github.com/Imbecile6197/klient/internal/ollama"
+	"github.com/Imbecile6197/klient/internal/protonmail"
 )
 
 type sample struct {

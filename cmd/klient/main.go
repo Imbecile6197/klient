@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/libormacak/klient/internal/config"
-	"github.com/libormacak/klient/internal/ui"
+	"github.com/Imbecile6197/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/ui"
 )
 
 func main() {

@@ -18,11 +18,11 @@ import (
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 
-	"github.com/libormacak/klient/internal/ai"
-	"github.com/libormacak/klient/internal/mailbox"
-	"github.com/libormacak/klient/internal/mailparse"
-	"github.com/libormacak/klient/internal/protonmail"
-	"github.com/libormacak/klient/internal/richtext"
+	"github.com/Imbecile6197/klient/internal/ai"
+	"github.com/Imbecile6197/klient/internal/mailbox"
+	"github.com/Imbecile6197/klient/internal/mailparse"
+	"github.com/Imbecile6197/klient/internal/protonmail"
+	"github.com/Imbecile6197/klient/internal/richtext"
 )
 
 func parseAddrs(s string) ([]*mail.Address, error) {

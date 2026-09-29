@@ -8,9 +8,9 @@ import (
 
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
 
-	"github.com/libormacak/klient/internal/pgp"
-	"github.com/libormacak/klient/internal/pgpmime"
-	"github.com/libormacak/klient/internal/protonmail"
+	"github.com/Imbecile6197/klient/internal/pgp"
+	"github.com/Imbecile6197/klient/internal/pgpmime"
+	"github.com/Imbecile6197/klient/internal/protonmail"
 )
 
 var keyServer atomic.Bool

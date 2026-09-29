@@ -18,7 +18,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/libormacak/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/config"
 )
 
 // Blocklists is the in-memory index of all downloaded feeds.

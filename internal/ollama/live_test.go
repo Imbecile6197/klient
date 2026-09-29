@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/libormacak/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/config"
 )
 
 // go test -tags live -run TestLive -v ./internal/ollama

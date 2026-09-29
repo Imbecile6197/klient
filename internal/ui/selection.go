@@ -6,7 +6,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 
-	"github.com/libormacak/klient/internal/protonmail"
+	"github.com/Imbecile6197/klient/internal/protonmail"
 )
 
 // Selection mode: checkboxes on the rows and an action bar for bulk actions,

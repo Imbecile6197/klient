@@ -9,7 +9,7 @@ import (
 	webkit "github.com/diamondburned/gotk4-webkitgtk/pkg/webkit/v6"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 
-	"github.com/libormacak/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/config"
 )
 
 // Version is set at build time (-ldflags "-X .../internal/ui.Version=…").

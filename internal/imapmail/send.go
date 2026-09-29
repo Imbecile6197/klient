@@ -19,9 +19,9 @@ import (
 	"github.com/emersion/go-sasl"
 	"github.com/emersion/go-smtp"
 
-	"github.com/libormacak/klient/internal/pgp"
-	"github.com/libormacak/klient/internal/pgpmime"
-	"github.com/libormacak/klient/internal/protonmail"
+	"github.com/Imbecile6197/klient/internal/pgp"
+	"github.com/Imbecile6197/klient/internal/pgpmime"
+	"github.com/Imbecile6197/klient/internal/protonmail"
 )
 
 // content writes the body of a draft as a standalone MIME entity (its own

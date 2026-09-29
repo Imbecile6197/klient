@@ -17,9 +17,9 @@ import (
 	"github.com/ProtonMail/go-proton-api"
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
 
-	"github.com/libormacak/klient/internal/cache"
-	"github.com/libormacak/klient/internal/config"
-	"github.com/libormacak/klient/internal/secrets"
+	"github.com/Imbecile6197/klient/internal/cache"
+	"github.com/Imbecile6197/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/secrets"
 )
 
 func NewManager(cfg config.Config) *proton.Manager {

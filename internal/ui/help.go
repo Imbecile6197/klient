@@ -9,7 +9,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 
-	"github.com/libormacak/klient/docs"
+	"github.com/Imbecile6197/klient/docs"
 )
 
 // showHelp opens the user documentation in the default web browser. The

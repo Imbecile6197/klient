@@ -11,13 +11,13 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 
-	"github.com/libormacak/klient/internal/ai"
-	"github.com/libormacak/klient/internal/imapmail"
-	"github.com/libormacak/klient/internal/mailbox"
-	"github.com/libormacak/klient/internal/ollama"
-	"github.com/libormacak/klient/internal/pgp"
-	"github.com/libormacak/klient/internal/rules"
-	"github.com/libormacak/klient/internal/secrets"
+	"github.com/Imbecile6197/klient/internal/ai"
+	"github.com/Imbecile6197/klient/internal/imapmail"
+	"github.com/Imbecile6197/klient/internal/mailbox"
+	"github.com/Imbecile6197/klient/internal/ollama"
+	"github.com/Imbecile6197/klient/internal/pgp"
+	"github.com/Imbecile6197/klient/internal/rules"
+	"github.com/Imbecile6197/klient/internal/secrets"
 )
 
 func (a *App) openPreferences() {

@@ -11,8 +11,8 @@ import (
 
 	"github.com/ProtonMail/go-proton-api"
 
-	"github.com/libormacak/klient/internal/config"
-	"github.com/libormacak/klient/internal/secrets"
+	"github.com/Imbecile6197/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/secrets"
 )
 
 // Reproduces the draft update error: creates a draft to self with a small
