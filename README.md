@@ -38,7 +38,7 @@ make install      # into ~/.local, including the .desktop file and the icon
 make rpm          # a Fedora package in build/rpm/RPMS/x86_64/
 ```
 
-Publishing a release (needs `gh` and a committed tree): `git tag -a vX.Y.Z -m "Klient X.Y.Z" && make release VERSION=X.Y.Z`.
+Publishing a release (needs `gh` and a committed tree): write the notes to `packaging/release-notes/X.Y.Z.md` (an “## English” and a “## Česky” section – they are shown in Klient as What's New and published on GitHub), then `git tag -a vX.Y.Z -m "Klient X.Y.Z" && make release VERSION=X.Y.Z`.
 
 ## First start
 

@@ -38,7 +38,7 @@ make install      # do ~/.local včetně .desktop souboru a ikony
 make rpm          # balíček pro Fedoru do build/rpm/RPMS/x86_64/
 ```
 
-Vydání nové verze (potřebuje `gh` a commitnutý strom): `git tag -a vX.Y.Z -m "Klient X.Y.Z" && make release VERSION=X.Y.Z`.
+Vydání nové verze (potřebuje `gh` a commitnutý strom): poznámky zapište do `packaging/release-notes/X.Y.Z.md` (oddíly „## English“ a „## Česky“ – Klient je ukáže v okně Co je nového a zveřejní se na GitHubu), pak `git tag -a vX.Y.Z -m "Klient X.Y.Z" && make release VERSION=X.Y.Z`.
 
 ## První spuštění
 
