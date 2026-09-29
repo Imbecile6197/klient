@@ -17,6 +17,7 @@ import (
 
 	"github.com/Imbecile6197/klient/internal/ai"
 	"github.com/Imbecile6197/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/mailparse"
 	"github.com/Imbecile6197/klient/internal/protonmail"
 )
@@ -194,12 +195,12 @@ func (f *Filter) Evaluate(ctx context.Context, msg *protonmail.Message) Decision
 	// Evidence from blocklists.
 	for _, ip := range receivedIPs(msg.Headers) {
 		if feed := f.Lists.CheckIP(ip); feed != "" {
-			d.Hits = append(d.Hits, fmt.Sprintf("IP %s v %s", ip, feed))
+			d.Hits = append(d.Hits, fmt.Sprintf(i18n.T("IP %s in %s"), ip, feed))
 		}
 	}
 	if i := strings.LastIndexByte(from, '@'); i >= 0 {
 		if feed := f.Lists.CheckDomain(from[i+1:]); feed != "" {
-			d.Hits = append(d.Hits, fmt.Sprintf("doména odesílatele %s v %s", from[i+1:], feed))
+			d.Hits = append(d.Hits, fmt.Sprintf(i18n.T("sender domain %s in %s"), from[i+1:], feed))
 		}
 	}
 	seen := map[string]bool{}
@@ -210,7 +211,7 @@ func (f *Filter) Evaluate(ctx context.Context, msg *protonmail.Message) Decision
 		}
 		seen[u.Hostname()] = true
 		if feed := f.Lists.CheckDomain(u.Hostname()); feed != "" {
-			d.Hits = append(d.Hits, fmt.Sprintf("odkaz na %s v %s", u.Hostname(), feed))
+			d.Hits = append(d.Hits, fmt.Sprintf(i18n.T("link to %s in %s"), u.Hostname(), feed))
 		}
 	}
 
@@ -220,12 +221,12 @@ func (f *Filter) Evaluate(ctx context.Context, msg *protonmail.Message) Decision
 		f    proton.MessageFlag
 		name string
 	}{
-		{proton.MessageFlagSpamAuto, "Proton: spam"},
-		{proton.MessageFlagPhishingAuto, "Proton: phishing"},
-		{proton.MessageFlagSPFFail, "SPF selhal"},
-		{proton.MessageFlagDKIMFail, "DKIM selhal"},
-		{proton.MessageFlagDMARCFail, "DMARC selhal"},
-		{proton.MessageFlagDMARCPass, "DMARC v pořádku"},
+		{proton.MessageFlagSpamAuto, i18n.T("Proton: spam")},
+		{proton.MessageFlagPhishingAuto, i18n.T("Proton: phishing")},
+		{proton.MessageFlagSPFFail, i18n.T("SPF failed")},
+		{proton.MessageFlagDKIMFail, i18n.T("DKIM failed")},
+		{proton.MessageFlagDMARCFail, i18n.T("DMARC failed")},
+		{proton.MessageFlagDMARCPass, i18n.T("DMARC passed")},
 	} {
 		if fl.Has(x.f) {
 			flags = append(flags, x.name)
@@ -235,7 +236,7 @@ func (f *Filter) Evaluate(ctx context.Context, msg *protonmail.Message) Decision
 	if aiCli.HasSpam() && cfg.SpamFilterEnabled {
 		body := msg.Text
 		if r := []rune(body); len(r) > cfg.SpamBodyChars {
-			body = string(r[:cfg.SpamBodyChars]) + "\n[… zkráceno …]"
+			body = string(r[:cfg.SpamBodyChars]) + i18n.T("\n[… shortened …]")
 		}
 		to := ""
 		for i, a := range msg.Meta.ToList {
@@ -265,7 +266,7 @@ func (f *Filter) Evaluate(ctx context.Context, msg *protonmail.Message) Decision
 			f.store(d)
 			return d
 		}
-		d.Verdict.Reason = "AI nedostupná: " + err.Error()
+		d.Verdict.Reason = i18n.T("AI unavailable: ") + err.Error()
 	}
 
 	// Fallback without AI.

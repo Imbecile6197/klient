@@ -2,6 +2,7 @@ package ui
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -11,6 +12,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/pango"
 
 	"github.com/Imbecile6197/klient/internal/ai"
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/mailbox"
 	"github.com/Imbecile6197/klient/internal/mailparse"
 	"github.com/Imbecile6197/klient/internal/ollama"
@@ -29,20 +31,20 @@ func (a *App) compareModels(parent gtk.Widgetter) {
 		return
 	}
 	d := adw.NewDialog()
-	d.SetTitle("Porovnání lokálních modelů")
+	d.SetTitle(i18n.T("Local Model Comparison"))
 	d.SetContentWidth(760)
 	d.SetContentHeight(720)
 	tv := adw.NewToolbarView()
 	hb := adw.NewHeaderBar()
-	start := gtk.NewButtonWithLabel("Spustit")
+	start := gtk.NewButtonWithLabel(i18n.T("Start"))
 	start.AddCSSClass("suggested-action")
 	hb.PackEnd(start)
 	tv.AddTopBar(hb)
 
 	page := adw.NewPreferencesPage()
 	pick := adw.NewPreferencesGroup()
-	pick.SetTitle("Modely")
-	pick.SetDescription("Každý model posoudí 5 nejnovějších zpráv z doručené pošty a 3 ze spamu a shrne jednu zprávu. Vše běží v tomto počítači; na procesoru to zabere zhruba 5–15 minut a modely se nejdřív stáhnou.")
+	pick.SetTitle(i18n.T("Models"))
+	pick.SetDescription(i18n.T("Each model judges the 5 newest messages in the inbox and 3 from spam and summarizes one message. Everything runs on this computer; on a processor it takes roughly 5–15 minutes, and the models are downloaded first."))
 	var checks []*gtk.CheckButton
 	for _, m := range localModels {
 		row := adw.NewActionRow()
@@ -87,7 +89,7 @@ func (a *App) compareModels(parent gtk.Widgetter) {
 			}
 		}
 		if len(chosen) == 0 {
-			status.SetText("Vyberte alespoň jeden model")
+			status.SetText(i18n.T("Choose at least one model"))
 			return
 		}
 		start.SetSensitive(false)
@@ -117,7 +119,7 @@ func (a *App) compareModels(parent gtk.Widgetter) {
 				pick.SetSensitive(true)
 				bar.SetVisible(false)
 				if err != nil && ctx.Err() == nil {
-					status.SetText("Porovnání selhalo: " + err.Error())
+					status.SetText(i18n.T("The comparison failed: ") + err.Error())
 				}
 			})
 		}()
@@ -128,21 +130,24 @@ func (a *App) compareModels(parent gtk.Widgetter) {
 func (a *App) runComparison(ctx context.Context, acc mailbox.Account, models []string, threshold float64,
 	setStatus func(string, float64), addResult func(*adw.PreferencesGroup), all []string, d *adw.Dialog) error {
 	if a.ollama.Installed() == "" {
-		setStatus("Instaluji Ollamu…", -1)
+		setStatus(i18n.T("Installing Ollama…"), -1)
 		errc := make(chan string, 1)
 		a.updateOllama(true, func(s string, f float64) {
-			setStatus(s, f)
-			if strings.HasPrefix(s, "Hotovo s chybou") {
-				errc <- s
+			setStatus(strings.TrimPrefix(s, doneMark), f)
+			if strings.HasPrefix(s, doneMark) {
+				select {
+				case errc <- strings.TrimPrefix(s, doneMark):
+				default:
+				}
 			}
 		})
-		select {
-		case e := <-errc:
-			return fmt.Errorf("%s", strings.TrimPrefix(e, "Hotovo s chybou – "))
-		default:
-		}
 		if a.ollama.Installed() == "" {
-			return fmt.Errorf("Ollamu se nepodařilo nainstalovat")
+			select {
+			case e := <-errc:
+				return errors.New(e)
+			default:
+			}
+			return errors.New(i18n.T("Ollama could not be installed"))
 		}
 	}
 	release, err := a.ollama.Acquire(ctx)
@@ -165,18 +170,18 @@ func (a *App) runComparison(ctx context.Context, acc mailbox.Account, models []s
 		}
 		err := cl.Pull(ctx, m, func(st string, done, total int64) {
 			if total > 0 {
-				setStatus(fmt.Sprintf("Stahuji %s: %s z %s", m, humanSize(done), humanSize(total)), float64(done)/float64(total))
+				setStatus(fmt.Sprintf(i18n.T("Downloading %s: %s of %s"), m, humanSize(done), humanSize(total)), float64(done)/float64(total))
 			} else {
-				setStatus("Stahuji "+m+": "+st, -1)
+				setStatus(fmt.Sprintf(i18n.T("Downloading %s: %s"), m, st), -1)
 			}
 		})
 		if err != nil {
-			return fmt.Errorf("stažení %s: %w", m, err)
+			return fmt.Errorf(i18n.T("downloading %s: %w"), m, err)
 		}
 	}
 
 	// Messages from the user's mailbox (decrypted locally).
-	setStatus("Vybírám zprávy ze schránky…", -1)
+	setStatus(i18n.T("Picking messages from the mailbox…"), -1)
 	var samples []sample
 	for _, src := range []struct {
 		folder string
@@ -199,7 +204,7 @@ func (a *App) runComparison(ctx context.Context, acc mailbox.Account, models []s
 		}
 	}
 	if len(samples) == 0 {
-		return fmt.Errorf("ve schránce nejsou žádné zprávy k porovnání")
+		return errors.New(i18n.T("there are no messages in the mailbox to compare on"))
 	}
 
 	steps := float64(len(models) * (len(samples) + 1))
@@ -217,7 +222,7 @@ func (a *App) runComparison(ctx context.Context, acc mailbox.Account, models []s
 		}
 		var verdicts []verdict
 		for i, s := range samples {
-			setStatus(fmt.Sprintf("%s posuzuje zprávu %d z %d…", model, i+1, len(samples)), step/steps)
+			setStatus(fmt.Sprintf(i18n.T("%s is judging message %d of %d…"), model, i+1, len(samples)), step/steps)
 			from := ""
 			if s.msg.Meta.Sender != nil {
 				from = mailparse.DisplayAddress(s.msg.Meta.Sender)
@@ -230,7 +235,7 @@ func (a *App) runComparison(ctx context.Context, acc mailbox.Account, models []s
 				return ctx.Err()
 			}
 		}
-		setStatus(model+" píše shrnutí…", step/steps)
+		setStatus(fmt.Sprintf(i18n.T("%s is writing a summary…"), model), step/steps)
 		first := samples[0].msg
 		from := ""
 		if first.Meta.Sender != nil {
@@ -257,9 +262,9 @@ func (a *App) runComparison(ctx context.Context, acc mailbox.Account, models []s
 		ui(func() {
 			g := adw.NewPreferencesGroup()
 			g.SetTitle(model)
-			g.SetDescription(fmt.Sprintf("Správně %d z %d · %.0f s na zprávu · shrnutí za %.0f s",
+			g.SetDescription(fmt.Sprintf(i18n.T("Correct: %d of %d · %.0f s per message · summary in %.0f s"),
 				correct, len(samples), total.Seconds()/float64(len(samples)), sumDur.Seconds()))
-			use := gtk.NewButtonWithLabel("Použít")
+			use := gtk.NewButtonWithLabel(i18n.T("Use"))
 			use.AddCSSClass("suggested-action")
 			use.SetVAlign(gtk.AlignCenter)
 			use.ConnectClicked(func() { a.chooseComparedModel(model, all, d) })
@@ -267,16 +272,16 @@ func (a *App) runComparison(ctx context.Context, acc mailbox.Account, models []s
 			for i, v := range verdicts {
 				s := samples[i]
 				row := adw.NewActionRow()
-				row.SetTitle(orDefault(s.msg.Meta.Subject, "(bez předmětu)"))
+				row.SetTitle(orDefault(s.msg.Meta.Subject, i18n.T("(no subject)")))
 				row.SetTitleLines(1)
-				where := "Doručená pošta"
+				where := i18n.T("Inbox")
 				if s.isSpam {
-					where = "Spam"
+					where = i18n.T("Spam")
 				}
 				icon := "object-select-symbolic"
 				switch {
 				case v.err != nil:
-					row.SetSubtitle(where + " → chyba: " + ai.Explain(ai.ProviderOllama, v.err).Text)
+					row.SetSubtitle(fmt.Sprintf(i18n.T("%s → error: %s"), where, ai.Explain(ai.ProviderOllama, v.err).Text))
 					icon = "dialog-error-symbolic"
 				default:
 					row.SetSubtitle(fmt.Sprintf("%s → %s %.0f %% · %.0f s · %s", where, categoryName(v.v.Category),
@@ -296,10 +301,10 @@ func (a *App) runComparison(ctx context.Context, acc mailbox.Account, models []s
 				g.Add(row)
 			}
 			sum := adw.NewExpanderRow()
-			sum.SetTitle("Shrnutí zprávy „" + orDefault(first.Meta.Subject, "(bez předmětu)") + "“")
+			sum.SetTitle(fmt.Sprintf(i18n.T("Summary of “%s”"), orDefault(first.Meta.Subject, i18n.T("(no subject)"))))
 			text := summary
 			if serr != nil {
-				text = "Chyba: " + ai.Explain(ai.ProviderOllama, serr).Text
+				text = i18n.T("Error: ") + ai.Explain(ai.ProviderOllama, serr).Text
 			}
 			l := gtk.NewLabel(strings.TrimSpace(text))
 			l.SetWrap(true)
@@ -314,7 +319,7 @@ func (a *App) runComparison(ctx context.Context, acc mailbox.Account, models []s
 			addResult(g)
 		})
 	}
-	setStatus(fmt.Sprintf("Hotovo. Posouzeno %d zpráv; vyberte model tlačítkem Použít. (Za „správně“ se považuje shoda se složkou, ve které zpráva leží.)", len(samples)), 1)
+	setStatus(fmt.Sprintf(i18n.N("Done. %d message judged; choose a model with the Use button. (“Correct” means the verdict matches the folder the message is in.)", "Done. %d messages judged; choose a model with the Use button. (“Correct” means the verdict matches the folder the message is in.)", len(samples)), len(samples)), 1)
 	return nil
 }
 
@@ -330,12 +335,12 @@ func (a *App) chooseComparedModel(model string, compared []string, d *adw.Dialog
 	}
 	if len(others) == 0 {
 		d.Close()
-		a.toast("Lokální AI používá " + model)
+		a.toast(fmt.Sprintf(i18n.T("Local AI now uses %s"), model))
 		return
 	}
-	q := adw.NewAlertDialog("Používá se "+model, "Smazat ostatní porovnávané modely, ať nezabírají místo na disku?\n\n"+strings.Join(others, "\n"))
-	q.AddResponse("keep", "Ponechat")
-	q.AddResponse("delete", "Smazat")
+	q := adw.NewAlertDialog(fmt.Sprintf(i18n.T("Now Using %s"), model), i18n.T("Delete the other compared models so they do not take up disk space?")+"\n\n"+strings.Join(others, "\n"))
+	q.AddResponse("keep", i18n.T("Keep"))
+	q.AddResponse("delete", i18n.T("Delete"))
 	q.SetResponseAppearance("delete", adw.ResponseDestructive)
 	q.SetCloseResponse("keep")
 	q.ConnectResponse(func(r string) {
@@ -352,7 +357,7 @@ func (a *App) chooseComparedModel(model string, compared []string, d *adw.Dialog
 			}()
 		}
 		d.Close()
-		a.toast("Lokální AI používá " + model)
+		a.toast(fmt.Sprintf(i18n.T("Local AI now uses %s"), model))
 	})
 	q.Present(d)
 }

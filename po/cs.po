@@ -1,0 +1,3503 @@
+# Czech translation of Klient.
+# Copyright (C) 2026 Libor Macák
+# This file is distributed under the same license as Klient (GPL-3.0).
+msgid ""
+msgstr ""
+"Project-Id-Version: klient\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+
+#: internal/ai/claude.go
+msgid "the model refused to process the request"
+msgstr "model odmítl požadavek zpracovat"
+
+#: internal/ai/claude.go
+msgid "the model's answer was cut off (max_tokens)"
+msgstr "odpověď modelu byla oříznuta (max_tokens)"
+
+#: internal/ai/errors.go
+msgid "Local AI is not ready yet. In Preferences → AI, click “Install” next to Ollama and download a model."
+msgstr "Lokální AI ještě není připravená. V Předvolbách → AI klikněte u Ollamy na „Nainstalovat“ a stáhněte model."
+
+#: internal/ai/errors.go internal/ollama/runtime.go
+msgid "Ollama is not installed"
+msgstr "Ollama není nainstalovaná"
+
+#: internal/ai/errors.go
+msgid "The Anthropic account has no credit. Add some in the Billing section."
+msgstr "Na účtu Anthropic není kredit. Nahrajte ho v sekci Billing."
+
+#: internal/ai/errors.go
+msgid "The Gemini API is not enabled in the Google Cloud project the key belongs to. Enable it (the Enable button) and try again in a few minutes – or create a new key in Google AI Studio, which enables the API automatically."
+msgstr "V projektu Google Cloud, ke kterému klíč patří, není zapnuté Gemini API. Zapněte ho (tlačítko Povolit) a za pár minut to zkuste znovu – nebo si vytvořte nový klíč v Google AI Studiu, kde se API zapne samo."
+
+#: internal/ai/errors.go
+msgid "The Mistral account has no active plan or credit. Choose a plan (the free “Experiment” plan works too) in the Mistral console."
+msgstr "Účet Mistral nemá aktivní platební tarif nebo kredit. Zvolte tarif (i bezplatný „Experiment“) v konzoli Mistral."
+
+#: internal/ai/errors.go
+msgid "The OpenAI account has no credit. The API is billed separately from a ChatGPT subscription – add credit in the billing settings."
+msgstr "Na účtu OpenAI není kredit. API se platí zvlášť od předplatného ChatGPT – nahrajte kredit v nastavení fakturace."
+
+#: internal/ai/errors.go
+msgid "The key is invalid or has been revoked. Create a new one and paste it again."
+msgstr "Klíč je neplatný nebo byl zrušen. Vytvořte nový a vložte ho znovu."
+
+#: internal/ai/errors.go
+msgid "The local model did not answer in time. It is slow on a processor without a graphics card – try a shorter text or a smaller model."
+msgstr "Lokální model nestihl odpovědět. Na procesoru bez grafické karty je pomalý – zkuste kratší text nebo menší model."
+
+#: internal/ai/errors.go
+msgid "The request limit or quota has been exceeded. Try again later, or check the limits of your account."
+msgstr "Překročen limit požadavků nebo kvóta. Zkuste to později, případně zkontrolujte limity účtu."
+
+#: internal/ai/errors.go
+msgid "The selected local model is not downloaded. Download it in Preferences → AI (Local AI)."
+msgstr "Zvolený lokální model není stažený. Stáhněte ho v Předvolbách → AI (Lokální AI)."
+
+#: internal/ai/errors.go
+msgid "The selected model no longer exists or your account has no access to it. Choose another one in Preferences → AI with the model list button."
+msgstr "Zvolený model už neexistuje nebo k němu váš účet nemá přístup. Vyberte jiný v Předvolbách → AI tlačítkem se seznamem modelů."
+
+#: internal/ai/errors.go
+msgid "There is not enough memory left for the local model. Close demanding applications or choose a smaller model."
+msgstr "Na lokální model nezbývá dost paměti. Zavřete náročné aplikace nebo zvolte menší model."
+
+#: internal/ai/extra.go
+msgid "invalid answer from the AI: %w"
+msgstr "neplatná odpověď AI: %w"
+
+#: internal/ai/gemini.go
+msgid "Gemini blocked the request: "
+msgstr "Gemini požadavek zablokoval: "
+
+#: internal/ai/gemini.go
+msgid "Gemini returned an empty answer"
+msgstr "Gemini vrátil prázdnou odpověď"
+
+#: internal/ai/mistral.go
+msgid "the model did not return valid JSON"
+msgstr "model nevrátil platný JSON"
+
+#: internal/ai/mistral.go
+msgid "the model returned an empty answer"
+msgstr "prázdná odpověď modelu"
+
+#: internal/ai/mistral.go
+msgid "the model's answer is incomplete (max_output_tokens)"
+msgstr "odpověď modelu je neúplná (max_output_tokens)"
+
+#: internal/ai/models.go
+msgid "unknown provider %q"
+msgstr "neznámý poskytovatel %q"
+
+#: internal/ai/ollama.go
+msgid "local AI (Ollama) is not available"
+msgstr "lokální AI (Ollama) není k dispozici"
+
+#: internal/ai/openai.go
+msgid "the model's answer is incomplete ("
+msgstr "odpověď modelu je neúplná ("
+
+#: internal/ai/provider.go
+msgid "%w for %s"
+msgstr "%w pro %s"
+
+#: internal/ai/provider.go
+msgid "Local AI (Ollama, on this computer)"
+msgstr "Lokální AI (Ollama, v počítači)"
+
+#: internal/ai/provider.go
+msgid "Mistral (EU servers)"
+msgstr "Mistral (servery v EU)"
+
+#: internal/ai/provider.go
+msgid "empty answer"
+msgstr "prázdná odpověď"
+
+#: internal/ai/provider.go
+msgid "unknown AI provider %q"
+msgstr "neznámý AI poskytovatel %q"
+
+#: internal/ai/tasks.go
+msgid "invalid answer from the classifier: %w"
+msgstr "neplatná odpověď klasifikátoru: %w"
+
+#: internal/ai/tasks.go
+msgid "no API key is set"
+msgstr "není nastaven API klíč"
+
+#: internal/ical/ical.go
+msgid "invalid event start: %w"
+msgstr "neplatný začátek události: %w"
+
+#: internal/ical/ical.go
+msgid "the invitation contains no event"
+msgstr "pozvánka neobsahuje událost"
+
+#: internal/imapmail/account.go
+msgid "folder %s does not exist on the server"
+msgstr "složka %s na serveru neexistuje"
+
+#: internal/imapmail/account.go
+msgid "invalid message ID"
+msgstr "neplatné ID zprávy"
+
+#: internal/imapmail/account.go
+msgid "server unavailable: "
+msgstr "server není dostupný: "
+
+#: internal/imapmail/account.go
+msgid "the server rejected the login – check the password"
+msgstr "server odmítl přihlášení – zkontrolujte heslo"
+
+#: internal/imapmail/discover.go
+msgid "could not find the server settings for %s – check the suggested ones"
+msgstr "nastavení serverů pro %s se nepodařilo zjistit – zkontrolujte odhad"
+
+#: internal/imapmail/discover.go
+msgid "invalid email address"
+msgstr "neplatná e-mailová adresa"
+
+#: internal/imapmail/local.go internal/protonmail/messages.go
+msgid "Scheduled"
+msgstr "Naplánované"
+
+#: internal/imapmail/local.go internal/protonmail/messages.go
+msgid "Snoozed"
+msgstr "Odložené"
+
+#: internal/imapmail/local.go
+msgid "cannot create folder %s on the server: %w"
+msgstr "složku %s nejde na serveru vytvořit: %w"
+
+#: internal/imapmail/local.go
+msgid "scheduling failed: %w"
+msgstr "naplánování selhalo: %w"
+
+#: internal/imapmail/local.go
+msgid "the server did not return the ID of the saved message (no UIDPLUS support), so it cannot be scheduled"
+msgstr "server nevrátil ID uložené zprávy (chybí UIDPLUS), naplánovat nejde"
+
+#: internal/imapmail/local.go
+msgid "without the offline cache Klient cannot remember the time – turn it on in Preferences"
+msgstr "bez offline cache si Klient nemůže pamatovat čas – zapněte ji v Předvolbách"
+
+#: internal/imapmail/message.go
+msgid "Not end-to-end encrypted – the provider stores the message readably (TLS protects it in transit)"
+msgstr "Bez šifrování end-to-end – zpráva je u poskytovatele uložená čitelně (na cestě chráněná TLS)"
+
+#: internal/imapmail/message.go
+msgid "the attachment has no data"
+msgstr "příloha nemá data"
+
+#: internal/imapmail/message.go
+msgid "the message is no longer on the server"
+msgstr "zpráva už na serveru není"
+
+#: internal/imapmail/message.go
+msgid "the message is no longer on the server (the folder has changed); refresh the list"
+msgstr "zpráva už na serveru není (složka byla změněna), obnovte seznam"
+
+#: internal/imapmail/message.go internal/protonmail/messages.go
+msgid "the message is not saved for offline reading and the server is unavailable"
+msgstr "zpráva není uložená pro offline čtení a server je nedostupný"
+
+#: internal/imapmail/pgp.go internal/protonmail/messages.go
+msgid "End-to-end encrypted (PGP)"
+msgstr "End-to-end šifrováno (PGP)"
+
+#: internal/imapmail/send.go
+msgid "preparing the message failed: %w"
+msgstr "příprava zprávy selhala: %w"
+
+#: internal/imapmail/send.go
+msgid "saving the draft failed: %w"
+msgstr "uložení konceptu selhalo: %w"
+
+#: internal/imapmail/send.go
+msgid "sending failed: %w"
+msgstr "odeslání selhalo: %w"
+
+#: internal/imapmail/send.go
+msgid "the SMTP server rejected the login: %w"
+msgstr "SMTP server odmítl přihlášení: %w"
+
+#: internal/imapmail/send.go
+msgid "the encrypted copy was sent, but the other recipients' copy was not: %w"
+msgstr "šifrovaná část odešla, ale ostatním příjemcům ne: %w"
+
+#: internal/imapmail/send.go
+msgid "the mailbox has no Drafts folder"
+msgstr "schránka nemá složku Koncepty"
+
+#: internal/imapmail/send.go
+msgid "the message was sent, but saving a copy to Sent failed: %w"
+msgstr "zpráva odešla, ale kopii se nepodařilo uložit do Odeslaných: %w"
+
+#: internal/mailbox/mailbox.go
+msgid "this service does not support it"
+msgstr "tato služba to nepodporuje"
+
+#: internal/mailparse/mailparse.go
+msgid "[image: "
+msgstr "[obrázek: "
+
+#: internal/ollama/client.go
+msgid "Ollama cloud models are not used"
+msgstr "cloudové modely Ollamy se nepoužívají"
+
+#: internal/ollama/client.go
+msgid "Ollama cloud models run outside this computer, so they are not used"
+msgstr "cloudové modely Ollamy běží mimo počítač – nepoužívají se"
+
+#: internal/ollama/runtime.go internal/update/update.go
+msgid "GitHub responded with %s"
+msgstr "GitHub odpověděl %s"
+
+#: internal/ollama/runtime.go
+msgid "Ollama cannot be started: %w"
+msgstr "Ollamu nejde spustit: %w"
+
+#: internal/ollama/runtime.go
+msgid "Ollama did not start (details in ~/.local/share/klient/ollama/server.log)"
+msgstr "Ollama se nespustila (podrobnosti v ~/.local/share/klient/ollama/server.log)"
+
+#: internal/ollama/runtime.go
+msgid "downloading Ollama failed: %s"
+msgstr "stažení Ollamy selhalo: %s"
+
+#: internal/ollama/runtime.go
+msgid "downloading Ollama failed: %w"
+msgstr "stažení Ollamy selhalo: %w"
+
+#: internal/ollama/runtime.go
+msgid "no free port for Ollama"
+msgstr "není volný port pro Ollamu"
+
+#: internal/ollama/runtime.go
+msgid "release %s does not contain %s"
+msgstr "vydání %s neobsahuje %s"
+
+#: internal/ollama/runtime.go
+msgid "the Ollama release has no checksum"
+msgstr "k vydání Ollamy chybí kontrolní součet"
+
+#: internal/ollama/runtime.go
+msgid "the archive does not contain bin/ollama"
+msgstr "archiv neobsahuje bin/ollama"
+
+#: internal/ollama/runtime.go
+msgid "the checksum of the downloaded Ollama does not match – the file was discarded"
+msgstr "kontrolní součet stažené Ollamy nesouhlasí – soubor byl zahozen"
+
+#: internal/ollama/runtime.go
+msgid "the checksums of the Ollama release do not match"
+msgstr "kontrolní součty vydání Ollamy nesouhlasí"
+
+#: internal/ollama/runtime.go
+msgid "the new Ollama cannot be started: %v %s"
+msgstr "nová Ollama nejde spustit: %v %s"
+
+#: internal/ollama/runtime.go
+msgid "unpacking Ollama failed: %w"
+msgstr "rozbalení Ollamy selhalo: %w"
+
+#: internal/pgp/own.go
+msgid "cannot save the key passphrase to the keyring: %w"
+msgstr "heslo ke klíči nejde uložit do klíčenky: %w"
+
+#: internal/pgp/own.go
+msgid "invalid key: %w"
+msgstr "neplatný klíč: %w"
+
+#: internal/pgp/own.go
+msgid "the key does not belong to %s"
+msgstr "klíč nepatří adrese %s"
+
+#: internal/pgp/own.go
+msgid "the key passphrase is missing from the keyring: %w"
+msgstr "heslo ke klíči chybí v klíčence: %w"
+
+#: internal/pgp/own.go
+msgid "this is a public key – signing and decryption need the private key"
+msgstr "to je veřejný klíč – pro podepisování a dešifrování je potřeba soukromý klíč"
+
+#: internal/pgp/own.go
+msgid "wrong key passphrase"
+msgstr "nesprávné heslo ke klíči"
+
+#: internal/pgp/own.go
+msgid "you have no PGP key of your own for this address"
+msgstr "pro tuto adresu nemáte vlastní PGP klíč"
+
+#: internal/pgp/pgp.go
+msgid "Not signed"
+msgstr "Nepodepsáno"
+
+#: internal/pgp/pgp.go
+msgid "Sent from your account"
+msgstr "Odesláno z vašeho účtu"
+
+#: internal/pgp/pgp.go
+msgid "Signature INVALID"
+msgstr "Podpis NEPLATNÝ"
+
+#: internal/pgp/pgp.go
+msgid "Signature verified"
+msgstr "Podpis ověřen"
+
+#: internal/pgp/pgp.go
+msgid "The signature cannot be verified (the sender's key is missing)"
+msgstr "Podpis nelze ověřit (chybí klíč odesílatele)"
+
+#: internal/pgp/pgp.go
+msgid "invalid PGP key: %w"
+msgstr "neplatný PGP klíč: %w"
+
+#: internal/pgp/pgp.go
+msgid "the key contains no email address"
+msgstr "klíč neobsahuje žádnou e-mailovou adresu"
+
+#: internal/pgp/pgp.go
+msgid "the key has expired or been revoked"
+msgstr "klíč je expirovaný nebo revokovaný"
+
+#: internal/pgpmime/pgpmime.go
+msgid "damaged encrypted message"
+msgstr "poškozená šifrovaná zpráva"
+
+#: internal/pgpmime/pgpmime.go
+msgid "damaged encrypted message: %w"
+msgstr "poškozená šifrovaná zpráva: %w"
+
+#: internal/pgpmime/pgpmime.go
+msgid "damaged signature"
+msgstr "poškozený podpis"
+
+#: internal/pgpmime/pgpmime.go
+msgid "the message is encrypted, but you have no key that can open it"
+msgstr "zpráva je zašifrovaná, ale nemáte klíč, který by ji otevřel"
+
+#: internal/protonmail/account.go
+msgid ": the Proton server is unavailable"
+msgstr ": server Protonu je nedostupný"
+
+#: internal/protonmail/account.go
+msgid "Incorrect username or password. Check the keyboard layout and Caps Lock."
+msgstr "Nesprávné uživatelské jméno nebo heslo. Zkontrolujte rozložení klávesnice a Caps Lock."
+
+#: internal/protonmail/account.go
+msgid "Proton rejected this client version (x-pm-appversion). Change proton_app_version in ~/.config/klient/config.json."
+msgstr "Proton odmítl tuto verzi klienta (x-pm-appversion). Upravte proton_app_version v ~/.config/klient/config.json."
+
+#: internal/protonmail/account.go
+msgid "Proton requires human verification"
+msgstr "Proton vyžaduje ověření člověka"
+
+#: internal/protonmail/account.go
+msgid "Too many login attempts. Try again later."
+msgstr "Příliš mnoho pokusů o přihlášení, zkuste to později."
+
+#: internal/protonmail/account.go
+msgid "could not unlock any address key"
+msgstr "nepodařilo se odemknout žádný klíč adresy"
+
+#: internal/protonmail/account.go
+msgid "could not unlock the keys (wrong mailbox password?): %w"
+msgstr "nepodařilo se odemknout klíče (špatné heslo schránky?): %w"
+
+#: internal/protonmail/account.go
+msgid "no key for address %s"
+msgstr "chybí klíč pro adresu %s"
+
+#: internal/protonmail/account.go
+msgid "offline and without a saved cache"
+msgstr "offline a bez uložené cache"
+
+#: internal/protonmail/account.go
+msgid "offline, and the cache does not contain the account keys yet"
+msgstr "offline a cache zatím neobsahuje klíče účtu"
+
+#: internal/protonmail/compose.go
+msgid "attachment %s has no data"
+msgstr "příloha %s nemá data"
+
+#: internal/protonmail/compose.go internal/protonmail/messages.go
+msgid "attachment %s: %w"
+msgstr "příloha %s: %w"
+
+#: internal/protonmail/compose.go
+msgid "encrypting the message failed: %w"
+msgstr "šifrování zprávy selhalo: %w"
+
+#: internal/protonmail/compose.go
+msgid "key of attachment %s: %w"
+msgstr "klíč přílohy %s: %w"
+
+#: internal/protonmail/compose.go
+msgid "saving the draft failed"
+msgstr "uložení konceptu selhalo"
+
+#: internal/protonmail/compose.go
+msgid "sender address not found"
+msgstr "adresa odesílatele nenalezena"
+
+#: internal/protonmail/compose.go
+msgid "sending failed"
+msgstr "odeslání selhalo"
+
+#: internal/protonmail/compose.go
+msgid "updating the draft failed"
+msgstr "aktualizace konceptu selhala"
+
+#: internal/protonmail/compose.go
+msgid "uploading attachment %s failed"
+msgstr "nahrání přílohy %s selhalo"
+
+#: internal/protonmail/messages.go
+msgid "All Mail"
+msgstr "Všechna pošta"
+
+#: internal/protonmail/messages.go internal/ui/extras.go internal/ui/mainview.go
+msgid "Archive"
+msgstr "Archiv"
+
+#: internal/protonmail/messages.go
+msgid "Drafts"
+msgstr "Koncepty"
+
+#: internal/protonmail/messages.go
+msgid "End-to-end encrypted (Proton)"
+msgstr "End-to-end šifrováno (Proton)"
+
+#: internal/protonmail/messages.go internal/ui/extras.go internal/ui/mainview.go
+msgid "Inbox"
+msgstr "Doručená pošta"
+
+#: internal/protonmail/messages.go
+msgid "Received unencrypted, stored encrypted (zero-access)"
+msgstr "Přijato nešifrovaně, uloženo šifrovaně (zero-access)"
+
+#: internal/protonmail/messages.go
+msgid "Sent"
+msgstr "Odeslané"
+
+#: internal/protonmail/messages.go
+msgid "Sent message, stored encrypted (zero-access)"
+msgstr "Odeslaná zpráva, uložena šifrovaně (zero-access)"
+
+#: internal/protonmail/messages.go internal/ui/extras.go internal/ui/mainview.go
+msgid "Spam"
+msgstr "Spam"
+
+#: internal/protonmail/messages.go
+msgid "Starred"
+msgstr "Označené hvězdičkou"
+
+#: internal/protonmail/messages.go
+msgid "Stored encrypted"
+msgstr "Uloženo šifrovaně"
+
+#: internal/protonmail/messages.go internal/ui/extras.go internal/ui/mainview.go
+msgid "Trash"
+msgstr "Koš"
+
+#: internal/protonmail/messages.go
+msgid "decryption failed: %w"
+msgstr "dešifrování selhalo: %w"
+
+#: internal/protonmail/messages.go
+msgid "invalid message body: %w"
+msgstr "neplatné tělo zprávy: %w"
+
+#: internal/protonmail/organize.go
+msgid "the contact was not saved: %s"
+msgstr "kontakt nebyl uložen: %s"
+
+#: internal/protonmail/schedule.go
+msgid "cancelling the scheduled sending failed"
+msgstr "zrušení naplánovaného odeslání selhalo"
+
+#: internal/protonmail/schedule.go
+msgid "loading the automatic reply failed"
+msgstr "načtení automatické odpovědi selhalo"
+
+#: internal/protonmail/schedule.go
+msgid "saving the automatic reply failed"
+msgstr "uložení automatické odpovědi selhalo"
+
+#: internal/protonmail/schedule.go
+msgid "snoozing failed"
+msgstr "odložení selhalo"
+
+#: internal/protonmail/schedule.go
+msgid "the message cannot be snoozed (the conversation ID is missing)"
+msgstr "zprávu nejde odložit (chybí ID konverzace)"
+
+#: internal/protonmail/schedule.go
+msgid "unsnoozing failed"
+msgstr "zrušení odložení selhalo"
+
+#: internal/rules/rules.go
+msgid "Add label"
+msgstr "Přidat štítek"
+
+#: internal/rules/rules.go
+msgid "Add star"
+msgstr "Přidat hvězdičku"
+
+#: internal/rules/rules.go
+msgid "Mark as read"
+msgstr "Označit jako přečtené"
+
+#: internal/rules/rules.go
+msgid "Move to"
+msgstr "Přesunout do"
+
+#: internal/rules/rules.go
+msgid "Recipient"
+msgstr "Příjemce"
+
+#: internal/rules/rules.go
+msgid "Sender"
+msgstr "Odesílatel"
+
+#: internal/rules/rules.go internal/ui/compose.go internal/ui/invites.go
+msgid "Subject"
+msgstr "Předmět"
+
+#: internal/spam/blocklist.go
+msgid "some feeds could not be downloaded: %s"
+msgstr "některé feedy se nepodařilo stáhnout: %s"
+
+#: internal/spam/filter.go
+msgid "\n[… shortened …]"
+msgstr "\n[… zkráceno …]"
+
+#: internal/spam/filter.go
+msgid "AI unavailable: "
+msgstr "AI nedostupná: "
+
+#: internal/spam/filter.go
+msgid "DKIM failed"
+msgstr "DKIM selhal"
+
+#: internal/spam/filter.go
+msgid "DMARC failed"
+msgstr "DMARC selhal"
+
+#: internal/spam/filter.go
+msgid "DMARC passed"
+msgstr "DMARC v pořádku"
+
+#: internal/spam/filter.go
+msgid "IP %s in %s"
+msgstr "IP %s v %s"
+
+#: internal/spam/filter.go
+msgid "Proton: phishing"
+msgstr "Proton: phishing"
+
+#: internal/spam/filter.go
+msgid "Proton: spam"
+msgstr "Proton: spam"
+
+#: internal/spam/filter.go
+msgid "SPF failed"
+msgstr "SPF selhal"
+
+#: internal/spam/filter.go
+msgid "link to %s in %s"
+msgstr "odkaz na %s v %s"
+
+#: internal/spam/filter.go
+msgid "sender domain %s in %s"
+msgstr "doména odesílatele %s v %s"
+
+#: internal/ui/about.go
+msgid "<p>Klient speaks English and Czech.</p>\n<ul>\n<li>The interface follows the system language; it can be changed in Preferences → Messages</li>\n<li>Automatic updates from GitHub, verified by a checksum</li>\n<li>Mistral (EU servers) as an AI provider, Ministral 3 as a local model</li>\n<li>Help with the complete documentation (F1)</li>\n</ul>"
+msgstr "<p>Klient mluví anglicky a česky.</p>\n<ul>\n<li>Rozhraní se řídí jazykem systému, změnit ho jde v Předvolbách → Zprávy</li>\n<li>Automatické aktualizace z GitHubu ověřené kontrolním součtem</li>\n<li>Mistral (servery v EU) jako poskytovatel AI, Ministral 3 jako lokální model</li>\n<li>Nápověda s kompletní dokumentací (F1)</li>\n</ul>"
+
+#: internal/ui/about.go
+msgid "An email client for GNOME and Proton Mail with native PGP, an AI assistant and a local AI-driven spam filter."
+msgstr "E-mailový klient pro GNOME a Proton Mail s nativním PGP, AI asistentem a lokálním spamfiltrem řízeným AI."
+
+#: internal/ui/about.go internal/ui/preferences.go
+msgid "Blocklists"
+msgstr "Blocklisty"
+
+#: internal/ui/about.go
+msgid "Built With"
+msgstr "Postaveno na"
+
+#: internal/ui/about.go
+msgid "GTK 4 and libadwaita https://gnome.org"
+msgstr "GTK 4 a libadwaita https://gnome.org"
+
+#: internal/ui/about.go
+msgid "Google Gemini API Privacy Terms"
+msgstr "Zásady ochrany soukromí Google Gemini API"
+
+#: internal/ui/about.go
+msgid "Source Code on GitHub"
+msgstr "Zdrojový kód na GitHubu"
+
+#: internal/ui/about.go
+msgid "The blocklist data is subject to the terms of its providers and is downloaded for personal, non-commercial use."
+msgstr "Data blocklistů podléhají podmínkám jejich poskytovatelů a jsou stahována pro osobní, nekomerční použití."
+
+#: internal/ui/about.go
+msgid "Write to the author: jsem@libormacak.eu"
+msgstr "Napsat autorovi: jsem@libormacak.eu"
+
+#: internal/ui/about.go
+msgid "go-proton-api and GopenPGP (Proton AG) https://github.com/ProtonMail"
+msgstr "go-proton-api a GopenPGP (Proton AG) https://github.com/ProtonMail"
+
+#: internal/ui/accounts.go
+msgid "Accounts"
+msgstr "Účty"
+
+#: internal/ui/accounts.go
+msgid "Accounts – %s in the other accounts"
+msgstr "Účty – v ostatních účtech: %s"
+
+#: internal/ui/accounts.go internal/ui/app.go
+msgid "Add Account…"
+msgstr "Přidat účet…"
+
+#: internal/ui/accounts.go
+msgid "Added: %s"
+msgstr "Přidáno: %s"
+
+#: internal/ui/accounts.go
+msgid "Messages cannot be moved to the folder %s"
+msgstr "Do složky %s nejde zprávy přesunout"
+
+#: internal/ui/accounts.go
+msgid "Moved to the folder %s"
+msgstr "Přesunuto do složky %s"
+
+#: internal/ui/accounts.go internal/ui/app.go internal/ui/threadview.go
+msgid "Moving failed: "
+msgstr "Přesun selhal: "
+
+#: internal/ui/addaccount.go
+msgid "Add Account"
+msgstr "Přidat účet"
+
+#: internal/ui/addaccount.go
+msgid "Any mailbox with IMAP and SMTP"
+msgstr "Libovolná schránka s IMAP a SMTP"
+
+#: internal/ui/addaccount.go
+msgid "App password (16 characters)"
+msgstr "Heslo pro aplikace (16 znaků)"
+
+#: internal/ui/addaccount.go
+msgid "Create an App Password"
+msgstr "Vytvořit heslo pro aplikace"
+
+#: internal/ui/addaccount.go
+msgid "Detected automatically"
+msgstr "Zjistí se automaticky"
+
+#: internal/ui/addaccount.go
+msgid "Email address"
+msgstr "E-mailová adresa"
+
+#: internal/ui/addaccount.go
+msgid "Encrypted mail, full support"
+msgstr "Šifrovaná pošta, plná podpora"
+
+#: internal/ui/addaccount.go
+msgid "Fill in the address and password"
+msgstr "Vyplňte adresu a heslo"
+
+#: internal/ui/addaccount.go
+msgid "Gmail does not allow logging in with your normal password. Turn on two-step verification in your Google account and create an app password. IMAP access must be enabled in Gmail (Settings → Forwarding and POP/IMAP)."
+msgstr "Gmail nepovoluje přihlášení běžným heslem. V účtu Google zapněte dvoufázové ověření a vytvořte heslo pro aplikace. V Gmailu musí být zapnutý přístup přes IMAP (Nastavení → Přeposílání a POP/IMAP)."
+
+#: internal/ui/addaccount.go
+msgid "Google rejected the login. Use an app password, not your Google account password, and check that IMAP is enabled in Gmail."
+msgstr "Google odmítl přihlášení. Použijte heslo pro aplikace, ne heslo k účtu Google, a zkontrolujte, že je v Gmailu zapnutý IMAP."
+
+#: internal/ui/addaccount.go
+msgid "IMAP security"
+msgstr "Zabezpečení IMAP"
+
+#: internal/ui/addaccount.go
+msgid "Klient looks up the servers from the address (in the Thunderbird database – only the domain is sent). If that fails, fill them in below."
+msgstr "Klient dohledá servery podle adresy (databáze Thunderbirdu – posílá se jen doména). Pokud se to nepodaří, doplňte je níže."
+
+#: internal/ui/addaccount.go
+msgid "Logging in…"
+msgstr "Přihlašuji…"
+
+#: internal/ui/addaccount.go
+msgid "Looking up the settings…"
+msgstr "Hledám nastavení…"
+
+#: internal/ui/addaccount.go
+msgid "Open the Seznam Account"
+msgstr "Otevřít účet Seznamu"
+
+#: internal/ui/addaccount.go
+msgid "Other Service"
+msgstr "Jiná služba"
+
+#: internal/ui/addaccount.go internal/ui/login.go
+msgid "Password"
+msgstr "Heslo"
+
+#: internal/ui/addaccount.go
+msgid "Password (an app password with two-factor authentication)"
+msgstr "Heslo (s dvoufázovým ověřením heslo pro aplikace)"
+
+#: internal/ui/addaccount.go
+msgid "SMTP security"
+msgstr "Zabezpečení SMTP"
+
+#: internal/ui/addaccount.go
+msgid "Server response: %s"
+msgstr "Odpověď serveru: %s"
+
+#: internal/ui/addaccount.go
+msgid "Server settings"
+msgstr "Nastavení serverů"
+
+#: internal/ui/addaccount.go
+msgid "Servers"
+msgstr "Servery"
+
+#: internal/ui/addaccount.go
+msgid "Seznam rejected the password. If you have two-factor authentication turned on, enter an app password (Seznam account → Security → Two-factor authentication → App password). After a failed attempt Seznam usually sends you an email with instructions."
+msgstr "Seznam odmítl heslo. Máte-li zapnuté dvoufázové ověření, zadejte heslo pro aplikace (účet Seznamu → Zabezpečení → Dvoufázové ověření → Heslo pro aplikace). Po neúspěšném pokusu vám Seznam obvykle pošle e-mail s návodem."
+
+#: internal/ui/addaccount.go
+msgid "The password cannot be saved to the keyring: "
+msgstr "Heslo nejde uložit do klíčenky: "
+
+#: internal/ui/addaccount.go
+msgid "Username"
+msgstr "Uživatelské jméno"
+
+#: internal/ui/addaccount.go
+msgid "With an app password"
+msgstr "Přes heslo pro aplikace"
+
+#: internal/ui/addaccount.go
+msgid "Without two-factor authentication, log in with the same password as on the web. With two-factor authentication turned on, Seznam does not let mail programs in with your normal password: in your Seznam account open Security → Two-factor authentication → App password → Set up and enter that password here (it works for IMAP, SMTP and the calendar and must differ from your login password)."
+msgstr "Bez dvoufázového ověření se přihlaste stejným heslem jako na webu. Máte-li dvoufázové ověření zapnuté, Seznam poštovní programy běžným heslem nepustí: v účtu Seznamu otevřete Zabezpečení → Dvoufázové ověření → Heslo pro aplikace → Nastavit a to heslo zadejte sem (platí pro IMAP, SMTP i kalendář, nesmí být stejné jako přihlašovací)."
+
+#: internal/ui/addaccount.go
+msgid "Your name (as recipients will see it)"
+msgstr "Vaše jméno (jak ho uvidí příjemci)"
+
+#: internal/ui/addaccount.go
+msgid "receiving works, but sending does not: %w"
+msgstr "příjem funguje, ale odesílání ne: %w"
+
+#: internal/ui/addaccount.go
+msgid "the port must be a number"
+msgstr "port musí být číslo"
+
+#: internal/ui/addaccount.go
+msgid "the settings of account %s are missing"
+msgstr "nastavení účtu %s chybí"
+
+#: internal/ui/aicache.go
+msgid "the thread contains only drafts"
+msgstr "vlákno obsahuje jen koncepty"
+
+#: internal/ui/app.go
+msgid "AI is not set up – choose local AI or enter an API key"
+msgstr "AI není nastavená – zvolte lokální AI nebo vložte API klíč"
+
+#: internal/ui/app.go
+msgid "AI label %s"
+msgstr "AI štítek %s"
+
+#: internal/ui/app.go
+msgid "About Klient"
+msgstr "O aplikaci Klient"
+
+#: internal/ui/app.go
+msgid "Account %s could not be opened: %s"
+msgstr "Účet %s se nepodařilo otevřít: %s"
+
+#: internal/ui/app.go
+msgid "Account %s: the server rejected the password"
+msgstr "Účet %s: server odmítl heslo"
+
+#: internal/ui/app.go
+msgid "Account %s: the session has ended; please log in again"
+msgstr "Účet %s: relace skončila, přihlaste se znovu"
+
+#: internal/ui/app.go
+msgid "Account %s: the session has expired; please log in again"
+msgstr "Účet %s: relace vypršela, přihlaste se znovu"
+
+#: internal/ui/app.go
+msgid "Apply Rules to the Inbox"
+msgstr "Použít pravidla na doručenou poštu"
+
+#: internal/ui/app.go internal/ui/mainview.go internal/ui/selection.go
+msgid "Archived"
+msgstr "Archivováno"
+
+#: internal/ui/app.go internal/ui/assistant.go
+msgid "Ask Your Mail (AI)"
+msgstr "Zeptat se pošty (AI)"
+
+#: internal/ui/app.go
+msgid "Automatic Reply…"
+msgstr "Automatická odpověď…"
+
+#: internal/ui/app.go
+msgid "Blocklist update: "
+msgstr "Aktualizace blocklistů: "
+
+#: internal/ui/app.go internal/ui/compose.go internal/ui/contacts.go internal/ui/extras.go internal/ui/login.go internal/ui/ownkey.go internal/ui/preferences.go internal/ui/richeditor.go internal/ui/schedule.go
+msgid "Cancel"
+msgstr "Zrušit"
+
+#: internal/ui/app.go
+msgid "Check the Inbox with AI"
+msgstr "Prověřit doručenou poštu pomocí AI"
+
+#: internal/ui/app.go
+msgid "Connecting…"
+msgstr "Připojování…"
+
+#: internal/ui/app.go internal/ui/assistant.go internal/ui/contacts.go internal/ui/mainview.go
+msgid "Contacts"
+msgstr "Kontakty"
+
+#: internal/ui/app.go
+msgid "Enter Password"
+msgstr "Zadat heslo"
+
+#: internal/ui/app.go internal/ui/assistant.go
+msgid "Help"
+msgstr "Nápověda"
+
+#: internal/ui/app.go internal/ui/assistant.go
+msgid "Keyboard Shortcuts"
+msgstr "Klávesové zkratky"
+
+#: internal/ui/app.go
+msgid "Klient Has Been Updated"
+msgstr "Klient byl aktualizován"
+
+#: internal/ui/app.go
+msgid "Klient has been updated – restart it to use the new version"
+msgstr "Klient byl aktualizován – restartujte ho pro novou verzi"
+
+#: internal/ui/app.go
+msgid "Log Out"
+msgstr "Odhlásit"
+
+#: internal/ui/app.go
+msgid "Log Out of %s?"
+msgstr "Odhlásit účet %s?"
+
+#: internal/ui/app.go
+msgid "Log Out of This Account"
+msgstr "Odhlásit tento účet"
+
+#: internal/ui/app.go
+msgid "Logging out on the server failed: "
+msgstr "Odhlášení na serveru selhalo: "
+
+#: internal/ui/app.go
+msgid "Logging out…"
+msgstr "Odhlašování…"
+
+#: internal/ui/app.go
+msgid "Move Back"
+msgstr "Vrátit"
+
+#: internal/ui/app.go
+msgid "Moved"
+msgstr "Přesunuto"
+
+#: internal/ui/app.go internal/ui/mainview.go internal/ui/selection.go
+msgid "Moved to Trash"
+msgstr "Přesunuto do koše"
+
+#: internal/ui/app.go
+msgid "Moved to spam; the sender has been added to the blocked senders"
+msgstr "Přesunuto do spamu, odesílatel přidán mezi blokované"
+
+#: internal/ui/app.go
+msgid "Moved to the inbox; the sender has been added to the allowed senders"
+msgstr "Přesunuto do doručené pošty, odesílatel přidán mezi povolené"
+
+#: internal/ui/app.go internal/ui/assistant.go internal/ui/compose.go internal/ui/mainview.go internal/ui/tray.go
+msgid "New Message"
+msgstr "Nová zpráva"
+
+#: internal/ui/app.go internal/ui/assistant.go internal/ui/preferences.go
+msgid "Preferences"
+msgstr "Předvolby"
+
+#: internal/ui/app.go internal/ui/assistant.go internal/ui/tray.go
+msgid "Quit"
+msgstr "Ukončit"
+
+#: internal/ui/app.go internal/ui/preferences.go
+msgid "Restart"
+msgstr "Restartovat"
+
+#: internal/ui/app.go
+msgid "Restart it to use the new version."
+msgstr "Restartujte ho, aby se použila nová verze."
+
+#: internal/ui/app.go
+msgid "Rules: %s – %s"
+msgstr "Pravidla: %s – %s"
+
+#: internal/ui/app.go internal/ui/assistant.go internal/ui/mainview.go internal/ui/threadview.go
+msgid "Set Up"
+msgstr "Nastavit"
+
+#: internal/ui/app.go
+msgid "The AI moved to spam: %s"
+msgstr "AI přesunula do spamu: %s"
+
+#: internal/ui/app.go
+msgid "The Proton session has ended (for example after logging out on the web or in another app). Please log in again."
+msgstr "Relace u Protonu skončila (například po odhlášení na webu nebo v jiné aplikaci). Přihlaste se prosím znovu."
+
+#: internal/ui/app.go
+msgid "The session has expired; please log in again. (%s)"
+msgstr "Relace vypršela, přihlaste se znovu. (%s)"
+
+#: internal/ui/app.go
+msgid "The session will be ended on the server and removed from the keyring, and the offline cache of this account will be deleted."
+msgstr "Relace bude ukončena na serveru a odstraněna z klíčenky, offline cache tohoto účtu se smaže."
+
+#: internal/ui/app.go
+msgid "The settings could not be saved: "
+msgstr "Nastavení se nepodařilo uložit: "
+
+#: internal/ui/app.go
+msgid "The system keyring is not available: "
+msgstr "Klíčenka systému není dostupná: "
+
+#: internal/ui/app.go
+msgid "Unknown sender"
+msgstr "Neznámý odesílatel"
+
+#: internal/ui/app.go
+msgid "Unread Mail Overview (AI)"
+msgstr "Přehled nepřečtené pošty (AI)"
+
+#: internal/ui/app.go
+msgid "Watching for new mail could not be started: "
+msgstr "Nepodařilo se spustit sledování nové pošty: "
+
+#: internal/ui/app.go
+msgid "the session has ended"
+msgstr "relace ukončena"
+
+#: internal/ui/assistant.go internal/ui/compare.go internal/ui/threadview.go
+msgid "(no subject)"
+msgstr "(bez předmětu)"
+
+#: internal/ui/assistant.go
+msgid "Adding the label failed: "
+msgstr "Přidání štítku selhalo: "
+
+#: internal/ui/assistant.go
+msgid "Apply"
+msgstr "Použít"
+
+#: internal/ui/assistant.go internal/ui/selection.go
+msgctxt "action"
+msgid "Archive"
+msgstr "Archivovat"
+
+#: internal/ui/assistant.go
+msgid "Ask"
+msgstr "Zeptat se"
+
+#: internal/ui/assistant.go
+msgid "Ask Your Mail"
+msgstr "Zeptat se pošty"
+
+#: internal/ui/assistant.go
+msgid "Attach the files"
+msgstr "Přiložit soubory"
+
+#: internal/ui/assistant.go
+msgid "Bold"
+msgstr "Tučně"
+
+#: internal/ui/assistant.go
+msgid "Cancel Selection"
+msgstr "Zrušit výběr"
+
+#: internal/ui/assistant.go
+msgid "Close (the draft is saved)"
+msgstr "Zavřít (koncept se uloží)"
+
+#: internal/ui/assistant.go
+msgid "Ctrl/Shift + click"
+msgstr "Ctrl/Shift + klik"
+
+#: internal/ui/assistant.go
+msgid "Drag a message onto a folder"
+msgstr "Přetažení zprávy na složku"
+
+#: internal/ui/assistant.go
+msgid "Drag files into the message window"
+msgstr "Přetažení souborů do okna zprávy"
+
+#: internal/ui/assistant.go
+msgid "E.g. “How much was the last electricity bill?”"
+msgstr "Např. „Kolik byla poslední faktura za elektřinu?“"
+
+#: internal/ui/assistant.go
+msgid "Forward"
+msgstr "Přeposlat"
+
+#: internal/ui/assistant.go
+msgid "General"
+msgstr "Obecné"
+
+#: internal/ui/assistant.go
+msgid "Italic"
+msgstr "Kurzíva"
+
+#: internal/ui/assistant.go internal/ui/threadview.go
+msgid "Label %s added"
+msgstr "Přidán štítek %s"
+
+#: internal/ui/assistant.go
+msgid "Link"
+msgstr "Odkaz"
+
+#: internal/ui/assistant.go internal/ui/selection.go
+msgid "Mark as Unread"
+msgstr "Označit jako nepřečtené"
+
+#: internal/ui/assistant.go internal/ui/preferences.go
+msgid "Message List"
+msgstr "Seznam zpráv"
+
+#: internal/ui/assistant.go internal/ui/mainview.go internal/ui/preferences.go
+msgid "Messages"
+msgstr "Zprávy"
+
+#: internal/ui/assistant.go
+msgid "Morning overview: %s"
+msgstr "Ranní přehled: %s"
+
+#: internal/ui/assistant.go
+msgid "Mouse"
+msgstr "Myš"
+
+#: internal/ui/assistant.go
+msgid "Move to the folder"
+msgstr "Přesunout do složky"
+
+#: internal/ui/assistant.go
+msgid "No messages found (searched for: %s). Try rephrasing the question, for example with the sender's name."
+msgstr "Nenašel jsem žádné zprávy (hledáno: %s). Zkuste otázku formulovat jinak, třeba se jménem odesílatele."
+
+#: internal/ui/assistant.go
+msgid "No unread mail. 🎉"
+msgstr "Žádná nepřečtená pošta. 🎉"
+
+#: internal/ui/assistant.go
+msgid "Prepare Again"
+msgstr "Připravit znovu"
+
+#: internal/ui/assistant.go
+msgid "Refresh"
+msgstr "Obnovit"
+
+#: internal/ui/assistant.go
+msgid "Reply"
+msgstr "Odpovědět"
+
+#: internal/ui/assistant.go
+msgid "Reply to All"
+msgstr "Odpovědět všem"
+
+#: internal/ui/assistant.go
+msgid "Save Draft"
+msgstr "Uložit koncept"
+
+#: internal/ui/assistant.go
+msgid "Search"
+msgstr "Hledat"
+
+#: internal/ui/assistant.go
+msgid "Searching: %s…"
+msgstr "Hledám: %s…"
+
+#: internal/ui/assistant.go
+msgid "Select All Messages"
+msgstr "Vybrat všechny zprávy"
+
+#: internal/ui/assistant.go
+msgid "Select several messages"
+msgstr "Výběr více zpráv"
+
+#: internal/ui/assistant.go internal/ui/compose.go
+msgid "Send"
+msgstr "Odeslat"
+
+#: internal/ui/assistant.go
+msgid "Snooze"
+msgstr "Odložit"
+
+#: internal/ui/assistant.go
+msgid "Something went wrong: "
+msgstr "Nepovedlo se: "
+
+#: internal/ui/assistant.go
+msgid "Sources"
+msgstr "Zdroje"
+
+#: internal/ui/assistant.go internal/ui/selection.go
+msgid "Star"
+msgstr "Hvězdička"
+
+#: internal/ui/assistant.go
+msgid "Suggesting a label failed: "
+msgstr "Návrh štítku selhal: "
+
+#: internal/ui/assistant.go internal/ui/threadview.go
+msgid "The AI assistant is not set up"
+msgstr "AI asistent není nastavený"
+
+#: internal/ui/assistant.go
+msgid "The AI found no suitable label: "
+msgstr "AI nenašla vhodný štítek: "
+
+#: internal/ui/assistant.go
+msgid "The AI is choosing a label…"
+msgstr "AI vybírá štítek…"
+
+#: internal/ui/assistant.go
+msgid "The AI suggests the label “%s” – %s"
+msgstr "AI navrhuje štítek „%s“ – %s"
+
+#: internal/ui/assistant.go
+msgid "The AI suggests what to search for, Klient finds and decrypts the messages on your computer, and the AI answers from them. The content of the messages found is sent to the chosen AI provider."
+msgstr "AI navrhne, co hledat, Klient zprávy najde a dešifruje u vás a AI z nich odpoví. Obsah nalezených zpráv se pošle zvolenému poskytovateli AI."
+
+#: internal/ui/assistant.go
+msgid "The AI suggests what to search for, Klient finds and decrypts the messages, and the local model answers from them – everything stays on your computer. On a processor this can take several minutes."
+msgstr "AI navrhne, co hledat, Klient zprávy najde a dešifruje a lokální model z nich odpoví – vše zůstává ve vašem počítači. Na procesoru to může trvat několik minut."
+
+#: internal/ui/assistant.go
+msgid "The message already has the label %s"
+msgstr "Zpráva už má štítek %s"
+
+#: internal/ui/assistant.go
+msgid "The overview could not be prepared: "
+msgstr "Přehled se nepodařilo připravit: "
+
+#: internal/ui/assistant.go
+msgid "Underline"
+msgstr "Podtržení"
+
+#: internal/ui/assistant.go
+msgid "Unread Mail Overview"
+msgstr "Přehled nepřečtené pošty"
+
+#: internal/ui/assistant.go
+msgid "Working out what to search for…"
+msgstr "Vymýšlím, co hledat…"
+
+#: internal/ui/assistant.go
+msgid "Writing a Message"
+msgstr "Psaní zprávy"
+
+#: internal/ui/assistant.go
+msgid "Writing the answer…"
+msgstr "Píšu odpověď…"
+
+#: internal/ui/assistant.go
+msgid "you have no labels – create them on the Proton website"
+msgstr "nemáte žádné štítky – vytvořte je na webu Protonu"
+
+#: internal/ui/compare.go
+msgid "%s is judging message %d of %d…"
+msgstr "%s posuzuje zprávu %d z %d…"
+
+#: internal/ui/compare.go
+msgid "%s is writing a summary…"
+msgstr "%s píše shrnutí…"
+
+#: internal/ui/compare.go
+msgid "%s → error: %s"
+msgstr "%s → chyba: %s"
+
+#: internal/ui/compare.go
+msgid "Choose at least one model"
+msgstr "Vyberte alespoň jeden model"
+
+#: internal/ui/compare.go
+msgid "Correct: %d of %d · %.0f s per message · summary in %.0f s"
+msgstr "Správně %d z %d · %.0f s na zprávu · shrnutí za %.0f s"
+
+#: internal/ui/compare.go internal/ui/contacts.go
+msgid "Delete"
+msgstr "Smazat"
+
+#: internal/ui/compare.go
+msgid "Delete the other compared models so they do not take up disk space?"
+msgstr "Smazat ostatní porovnávané modely, ať nezabírají místo na disku?"
+
+#: internal/ui/compare.go
+msgid "Downloading %s: %s"
+msgstr "Stahuji %s: %s"
+
+#: internal/ui/compare.go
+msgid "Downloading %s: %s of %s"
+msgstr "Stahuji %s: %s z %s"
+
+#: internal/ui/compare.go
+msgid "Each model judges the 5 newest messages in the inbox and 3 from spam and summarizes one message. Everything runs on this computer; on a processor it takes roughly 5–15 minutes, and the models are downloaded first."
+msgstr "Každý model posoudí 5 nejnovějších zpráv z doručené pošty a 3 ze spamu a shrne jednu zprávu. Vše běží v tomto počítači; na procesoru to zabere zhruba 5–15 minut a modely se nejdřív stáhnou."
+
+#: internal/ui/compare.go
+msgid "Error: "
+msgstr "Chyba: "
+
+#: internal/ui/compare.go
+msgid "Installing Ollama…"
+msgstr "Instaluji Ollamu…"
+
+#: internal/ui/compare.go
+msgid "Keep"
+msgstr "Ponechat"
+
+#: internal/ui/compare.go
+msgid "Local AI now uses %s"
+msgstr "Lokální AI používá %s"
+
+#: internal/ui/compare.go
+msgid "Local Model Comparison"
+msgstr "Porovnání lokálních modelů"
+
+#: internal/ui/compare.go
+msgid "Models"
+msgstr "Modely"
+
+#: internal/ui/compare.go
+msgid "Now Using %s"
+msgstr "Používá se %s"
+
+#: internal/ui/compare.go
+msgid "Ollama could not be installed"
+msgstr "Ollamu se nepodařilo nainstalovat"
+
+#: internal/ui/compare.go
+msgid "Picking messages from the mailbox…"
+msgstr "Vybírám zprávy ze schránky…"
+
+#: internal/ui/compare.go
+msgid "Start"
+msgstr "Spustit"
+
+#: internal/ui/compare.go
+msgid "Summary of “%s”"
+msgstr "Shrnutí zprávy „%s“"
+
+#: internal/ui/compare.go
+msgid "The comparison failed: "
+msgstr "Porovnání selhalo: "
+
+#: internal/ui/compare.go internal/ui/localai.go
+msgid "Use"
+msgstr "Použít"
+
+#: internal/ui/compare.go
+msgid "downloading %s: %w"
+msgstr "stažení %s: %w"
+
+#: internal/ui/compare.go
+msgid "there are no messages in the mailbox to compare on"
+msgstr "ve schránce nejsou žádné zprávy k porovnání"
+
+#: internal/ui/compose.go
+msgid "\n\n---------- Forwarded message ----------\nFrom: %s\nDate: %s\nSubject: %s\nTo: %s\n\n%s"
+msgstr "\n\n---------- Přeposlaná zpráva ----------\nOd: %s\nDatum: %s\nPředmět: %s\nKomu: %s\n\n%s"
+
+#: internal/ui/compose.go
+msgid "\n\nOn %s, %s wrote:\n"
+msgstr "\n\nDne %s napsal(a) %s:\n"
+
+#: internal/ui/compose.go
+msgid " · recent correspondence"
+msgstr " · nedávná korespondence"
+
+#: internal/ui/compose.go
+msgid "%s in total – exceeds the Proton limit of 25 MB!"
+msgstr "Celkem %s – překračuje limit Protonu 25 MB!"
+
+#: internal/ui/compose.go
+msgid "%s in total, encrypted just like the message text"
+msgstr "Celkem %s, šifrují se stejně jako text zprávy"
+
+#: internal/ui/compose.go
+msgid "%s is a folder – only files can be attached"
+msgstr "%s je složka – přiložit jde jen soubory"
+
+#: internal/ui/compose.go
+msgid "%s: NOT ENCRYPTED (no known key)"
+msgstr "%s: BEZ ŠIFROVÁNÍ (není znám klíč)"
+
+#: internal/ui/compose.go
+msgid "%s: encrypted with PGP (%s)"
+msgstr "%s: šifrováno PGP (%s)"
+
+#: internal/ui/compose.go
+msgid "%s: end-to-end encrypted (Proton)"
+msgstr "%s: šifrováno end-to-end (Proton)"
+
+#: internal/ui/compose.go
+msgid "A recipient with PGP can then send you encrypted replies"
+msgstr "Příjemce s PGP vám pak může odpovědět šifrovaně"
+
+#: internal/ui/compose.go
+msgid "Attach Files"
+msgstr "Přiložit soubory"
+
+#: internal/ui/compose.go
+msgid "Attach my public key"
+msgstr "Přiložit můj veřejný klíč"
+
+#: internal/ui/compose.go
+msgid "Attachments"
+msgstr "Přílohy"
+
+#: internal/ui/compose.go
+msgid "Bcc"
+msgstr "Skrytá kopie"
+
+#: internal/ui/compose.go
+msgid "Both the unfinished text and the saved draft will be deleted."
+msgstr "Rozepsaný text i uložený koncept budou smazány."
+
+#: internal/ui/compose.go
+msgid "Cc"
+msgstr "Kopie"
+
+#: internal/ui/compose.go internal/ui/selfupdate.go
+msgid "Check"
+msgstr "Zkontrolovat"
+
+#: internal/ui/compose.go
+msgid "Discard"
+msgstr "Zahodit"
+
+#: internal/ui/compose.go
+msgid "Discard the Message?"
+msgstr "Zahodit zprávu?"
+
+#: internal/ui/compose.go
+msgid "Draft"
+msgstr "Koncept"
+
+#: internal/ui/compose.go
+msgid "Draft saved"
+msgstr "Koncept uložen"
+
+#: internal/ui/compose.go
+msgid "Enter at least one recipient"
+msgstr "Zadejte alespoň jednoho příjemce"
+
+#: internal/ui/compose.go
+msgid "Enter the recipients"
+msgstr "Zadejte příjemce"
+
+#: internal/ui/compose.go
+msgctxt "compose-title"
+msgid "Forward"
+msgstr "Přeposlání"
+
+#: internal/ui/compose.go
+msgid "From"
+msgstr "Od"
+
+#: internal/ui/compose.go
+msgid "Instruction for the AI, e.g. “politely decline” or “translate into German”"
+msgstr "Pokyn pro AI, např. „zdvořile odmítni“ nebo „přelož do angličtiny“"
+
+#: internal/ui/compose.go
+msgid "Jan 2, 2006 at 15:04"
+msgstr "2. 1. 2006 v 15:04"
+
+#: internal/ui/compose.go
+msgid "Loading the attachments of the forwarded message…"
+msgstr "Načítám přílohy přeposílané zprávy…"
+
+#: internal/ui/compose.go
+msgid "Looking up the recipients' keys…"
+msgstr "Zjišťuji klíče příjemců…"
+
+#: internal/ui/compose.go
+msgid "Message sent"
+msgstr "Zpráva odeslána"
+
+#: internal/ui/compose.go
+msgid "Recipients with PGP can verify that the message is from you and has not been changed"
+msgstr "Příjemci s PGP ověří, že zpráva je od vás a nebyla změněna"
+
+#: internal/ui/compose.go
+msgid "Remove"
+msgstr "Odebrat"
+
+#: internal/ui/compose.go
+msgctxt "compose-title"
+msgid "Reply"
+msgstr "Odpověď"
+
+#: internal/ui/compose.go
+msgctxt "compose-title"
+msgid "Reply to All"
+msgstr "Odpověď všem"
+
+#: internal/ui/compose.go
+msgid "Save Draft (Ctrl+S)"
+msgstr "Uložit koncept (Ctrl+S)"
+
+#: internal/ui/compose.go
+msgid "Schedule Sending"
+msgstr "Naplánovat odeslání"
+
+#: internal/ui/compose.go
+msgid "Scheduled – it will be sent %s (%s)"
+msgstr "Naplánováno – odejde %s (%s)"
+
+#: internal/ui/compose.go
+msgid "Scheduled – it will be sent %s if Klient is running (the background is enough)"
+msgstr "Naplánováno – odejde %s, pokud Klient poběží (třeba na pozadí)"
+
+#: internal/ui/compose.go
+msgid "Security"
+msgstr "Zabezpečení"
+
+#: internal/ui/compose.go
+msgid "Send (Ctrl+Enter)"
+msgstr "Odeslat (Ctrl+Enter)"
+
+#: internal/ui/compose.go
+msgid "Send Anyway"
+msgstr "Přesto odeslat"
+
+#: internal/ui/compose.go
+msgid "Send Without Encryption?"
+msgstr "Odeslat bez šifrování?"
+
+#: internal/ui/compose.go
+msgid "Sending failed; the message has been reopened"
+msgstr "Odeslání selhalo, zpráva je znovu otevřená"
+
+#: internal/ui/compose.go
+msgid "Sending…"
+msgstr "Odesílám…"
+
+#: internal/ui/compose.go
+msgid "Sign unencrypted messages with PGP too"
+msgstr "Podepsat PGP i nešifrované zprávy"
+
+#: internal/ui/compose.go
+msgid "Some recipients have no known public key, so the message will reach them unencrypted:"
+msgstr "Někteří příjemci nemají známý veřejný klíč, zpráva jim dorazí nešifrovaně:"
+
+#: internal/ui/compose.go
+msgid "Suggest a Reply"
+msgstr "Navrhnout odpověď"
+
+#: internal/ui/compose.go
+msgid "The AI assistant is not set up (Preferences → AI)"
+msgstr "AI asistent není nastavený (Předvolby → AI)"
+
+#: internal/ui/compose.go
+msgid "The AI failed: "
+msgstr "AI selhala: "
+
+#: internal/ui/compose.go
+msgid "The attachments could not be loaded: "
+msgstr "Přílohy se nepodařilo načíst: "
+
+#: internal/ui/compose.go
+msgid "The attachments exceed the 25 MB limit"
+msgstr "Přílohy překračují limit 25 MB"
+
+#: internal/ui/compose.go
+msgid "The draft could not be opened: "
+msgstr "Koncept se nepodařilo otevřít: "
+
+#: internal/ui/compose.go
+msgid "The draft could not be saved: "
+msgstr "Koncept se nepodařilo uložit: "
+
+#: internal/ui/compose.go
+msgid "The earliest possible time is 2 minutes from now"
+msgstr "Naplánovat jde nejdřív za 2 minuty"
+
+#: internal/ui/compose.go
+msgid "The message will be sent"
+msgstr "Zpráva se odešle"
+
+#: internal/ui/compose.go
+msgid "To"
+msgstr "Komu"
+
+#: internal/ui/compose.go
+msgid "Write an instruction for the AI"
+msgstr "Napište pokyn pro AI"
+
+#: internal/ui/compose.go
+msgid "Write with AI"
+msgstr "Napsat s AI"
+
+#: internal/ui/compose.go
+msgid "Writing…"
+msgstr "Píšu…"
+
+#: internal/ui/compose.go
+msgid "choose the sender address"
+msgstr "vyberte adresu odesílatele"
+
+#: internal/ui/compose.go
+msgid "invalid address in “%s”"
+msgstr "neplatná adresa v „%s“"
+
+#: internal/ui/compose.go
+msgid "the file cannot be attached (it is not local)"
+msgstr "soubor nejde přiložit (není místní)"
+
+#: internal/ui/contacts.go
+msgid "%s will be removed from the Proton address book."
+msgstr "%s bude odstraněn z adresáře Protonu."
+
+#: internal/ui/contacts.go
+msgid "Contact saved"
+msgstr "Kontakt uložen"
+
+#: internal/ui/contacts.go
+msgid "Delete Contact"
+msgstr "Smazat kontakt"
+
+#: internal/ui/contacts.go
+msgid "Delete the Contact?"
+msgstr "Smazat kontakt?"
+
+#: internal/ui/contacts.go
+msgid "Deleting failed: "
+msgstr "Smazání selhalo: "
+
+#: internal/ui/contacts.go
+msgid "Invalid email address"
+msgstr "Neplatná e-mailová adresa"
+
+#: internal/ui/contacts.go
+msgid "Name"
+msgstr "Jméno"
+
+#: internal/ui/contacts.go
+msgid "New Contact"
+msgstr "Nový kontakt"
+
+#: internal/ui/contacts.go
+msgid "No Contacts"
+msgstr "Žádné kontakty"
+
+#: internal/ui/contacts.go internal/ui/extras.go internal/ui/invites.go internal/ui/threadview.go
+msgid "Save"
+msgstr "Uložit"
+
+#: internal/ui/contacts.go
+msgid "Search for a name or address"
+msgstr "Hledat jméno nebo adresu"
+
+#: internal/ui/contacts.go
+msgid "The contact could not be saved: "
+msgstr "Kontakt se nepodařilo uložit: "
+
+#: internal/ui/contacts.go
+msgid "The contact is saved to the Proton address book (as a signed vCard)."
+msgstr "Kontakt se uloží do adresáře Protonu (podepsaná vCard)."
+
+#: internal/ui/contacts.go
+msgid "The contacts could not be loaded: "
+msgstr "Kontakty se nepodařilo načíst: "
+
+#: internal/ui/contacts.go
+msgid "Write a Message"
+msgstr "Napsat zprávu"
+
+#: internal/ui/extras.go
+msgid "%v: %s (install the application with make install)"
+msgstr "%v: %s (nainstalujte aplikaci příkazem make install)"
+
+#: internal/ui/extras.go
+msgid "A prefilled unsubscribe request opens for you to send."
+msgstr "Otevře se předvyplněná zpráva s žádostí o odhlášení, kterou odešlete."
+
+#: internal/ui/extras.go
+msgid "Add the Sender to Contacts…"
+msgstr "Přidat odesílatele do kontaktů…"
+
+#: internal/ui/extras.go
+msgid "Applying the rules to the inbox…"
+msgstr "Používám pravidla na doručenou poštu…"
+
+#: internal/ui/extras.go
+msgid "Create a Rule for the Sender…"
+msgstr "Vytvořit pravidlo pro odesílatele…"
+
+#: internal/ui/extras.go
+msgid "Date:"
+msgstr "Datum:"
+
+#: internal/ui/extras.go
+msgid "Export failed: "
+msgstr "Export selhal: "
+
+#: internal/ui/extras.go
+msgid "From %s"
+msgstr "Od %s"
+
+#: internal/ui/extras.go
+msgid "From:"
+msgstr "Od:"
+
+#: internal/ui/extras.go
+msgid "It applies to every new message in the inbox."
+msgstr "Použije se na každou novou zprávu v doručené poště."
+
+#: internal/ui/extras.go
+msgid "Klient sends the sender an unsubscribe request (one click, as defined by RFC 8058). The sender will see your IP address, just as when you click a link."
+msgstr "Klient pošle odesílateli požadavek na odhlášení (jedno kliknutí podle RFC 8058). Odesílatel uvidí vaši IP adresu, podobně jako při kliknutí na odkaz."
+
+#: internal/ui/extras.go
+msgid "Message saved as %s"
+msgstr "Zpráva uložena jako %s"
+
+#: internal/ui/extras.go
+msgid "More Actions"
+msgstr "Další akce"
+
+#: internal/ui/extras.go
+msgctxt "rule"
+msgid "Name"
+msgstr "Název"
+
+#: internal/ui/extras.go
+msgid "Print"
+msgstr "Tisk"
+
+#: internal/ui/extras.go
+msgctxt "button"
+msgid "Print…"
+msgstr "Tisknout…"
+
+#: internal/ui/extras.go
+msgid "Print…"
+msgstr "Tisk…"
+
+#: internal/ui/extras.go internal/ui/preferences.go
+msgid "Rule"
+msgstr "Pravidlo"
+
+#: internal/ui/extras.go
+msgid "Rule saved"
+msgstr "Pravidlo uloženo"
+
+#: internal/ui/extras.go
+msgid "Save as .eml…"
+msgstr "Uložit jako .eml…"
+
+#: internal/ui/extras.go
+msgid "Subject:"
+msgstr "Předmět:"
+
+#: internal/ui/extras.go
+msgid "Suggest a Label (AI)"
+msgstr "Navrhnout štítek (AI)"
+
+#: internal/ui/extras.go
+msgid "Target"
+msgstr "Kam"
+
+#: internal/ui/extras.go
+msgid "The rule needs a condition text and a target"
+msgstr "Pravidlo potřebuje text podmínky a cíl"
+
+#: internal/ui/extras.go
+msgid "The rules failed: "
+msgstr "Pravidla selhala: "
+
+#: internal/ui/extras.go
+msgid "The sender's unsubscribe page opens in the browser."
+msgstr "Otevře se stránka odesílatele pro odhlášení v prohlížeči."
+
+#: internal/ui/extras.go
+msgid "Then"
+msgstr "Pak"
+
+#: internal/ui/extras.go
+msgid "This message comes from a mailing list – you can unsubscribe from it"
+msgstr "Tato zpráva je z hromadné rozesílky – můžete se z ní odhlásit"
+
+#: internal/ui/extras.go
+msgid "To:"
+msgstr "Komu:"
+
+#: internal/ui/extras.go
+msgid "Unsubscribe"
+msgstr "Odhlásit odběr"
+
+#: internal/ui/extras.go
+msgid "Unsubscribe from %s?"
+msgstr "Odhlásit odběr od %s?"
+
+#: internal/ui/extras.go
+msgid "Unsubscribe request sent"
+msgstr "Požadavek na odhlášení odeslán"
+
+#: internal/ui/extras.go
+msgid "Unsubscribed"
+msgstr "Odhlášeno"
+
+#: internal/ui/extras.go
+msgid "Unsubscribing failed: "
+msgstr "Odhlášení selhalo: "
+
+#: internal/ui/extras.go
+msgid "When"
+msgstr "Když"
+
+#: internal/ui/extras.go
+msgid "You have no rules (Preferences → Rules)"
+msgstr "Nemáte žádná pravidla (Předvolby → Pravidla)"
+
+#: internal/ui/extras.go
+msgid "contains"
+msgstr "obsahuje"
+
+#: internal/ui/extras.go
+msgid "the server responded with %s"
+msgstr "server odpověděl %s"
+
+#: internal/ui/help.go
+msgid "The help could not be prepared: "
+msgstr "Nápovědu se nepodařilo připravit: "
+
+#: internal/ui/invites.go
+msgid " (all day)"
+msgstr " (celý den)"
+
+#: internal/ui/invites.go
+msgid " (sent to the organizer)"
+msgstr " (odesláno pořadateli)"
+
+#: internal/ui/invites.go
+msgid "%s has replied to the invitation “%s” (%s): %s."
+msgstr "%s odpověděl(a) na pozvánku „%s“ (%s): %s."
+
+#: internal/ui/invites.go
+msgid "(untitled)"
+msgstr "(bez názvu)"
+
+#: internal/ui/invites.go
+msgid "Accept"
+msgstr "Přijmout"
+
+#: internal/ui/invites.go
+msgid "Accepted"
+msgstr "Přijato"
+
+#: internal/ui/invites.go
+msgid "Add to Calendar"
+msgstr "Přidat do kalendáře"
+
+#: internal/ui/invites.go
+msgid "Automatic Reply"
+msgstr "Automatická odpověď"
+
+#: internal/ui/invites.go
+msgid "Decline"
+msgstr "Odmítnout"
+
+#: internal/ui/invites.go
+msgid "Declined"
+msgstr "Odmítnuto"
+
+#: internal/ui/invites.go
+msgid "Duration"
+msgstr "Doba"
+
+#: internal/ui/invites.go
+msgid "End automatically"
+msgstr "Ukončit automaticky"
+
+#: internal/ui/invites.go
+msgid "Event invitation"
+msgstr "Pozvánka na událost"
+
+#: internal/ui/invites.go
+msgid "Hello,\n\nI am away until %s and only read email occasionally. I will reply when I am back.\n\nThank you for your understanding."
+msgstr "Dobrý den,\n\ndo %s nejsem k zastižení a e-maily čtu jen občas. Odpovím po návratu.\n\nDěkuji za pochopení."
+
+#: internal/ui/invites.go
+msgid "Import the public key – messages to this sender will then be encrypted"
+msgstr "Importovat veřejný klíč – zprávy pro tohoto odesílatele se pak budou šifrovat"
+
+#: internal/ui/invites.go
+msgid "Importing the key failed: "
+msgstr "Import klíče selhal: "
+
+#: internal/ui/invites.go
+msgid "Key imported for %s"
+msgstr "Klíč importován pro %s"
+
+#: internal/ui/invites.go
+msgid "Last day"
+msgstr "Poslední den"
+
+#: internal/ui/invites.go
+msgid "Maybe"
+msgstr "Možná"
+
+#: internal/ui/invites.go
+msgid "Opens the event in the default calendar (e.g. GNOME Calendar)"
+msgstr "Otevře událost ve výchozím kalendáři (např. Kalendář GNOME)"
+
+#: internal/ui/invites.go
+msgid "Organized by %s"
+msgstr "Pořádá %s"
+
+#: internal/ui/invites.go
+msgid "Otherwise it stays on until you turn it off"
+msgstr "Jinak platí, dokud ji nevypnete"
+
+#: internal/ui/invites.go
+msgid "Out of office"
+msgstr "Nejsem k zastižení"
+
+#: internal/ui/invites.go
+msgid "Proton replies on its own on the server, even when your computer is off. Each sender gets the reply at most once in a while. This feature requires a paid Proton plan."
+msgstr "Proton odpovídá sám na serveru, i když máte počítač vypnutý. Odpověď dostane každý odesílatel nejvýš jednou za čas. Funkce vyžaduje placený tarif Proton."
+
+#: internal/ui/invites.go
+msgid "Reply Text"
+msgstr "Text odpovědi"
+
+#: internal/ui/invites.go
+msgid "Reply automatically"
+msgstr "Odpovídat automaticky"
+
+#: internal/ui/invites.go
+msgid "Sending the answer…"
+msgstr "Odesílám odpověď…"
+
+#: internal/ui/invites.go
+msgid "Tentative"
+msgstr "Možná"
+
+#: internal/ui/invites.go
+msgid "The answer could not be sent: "
+msgstr "Odpověď se nepodařilo odeslat: "
+
+#: internal/ui/invites.go
+msgid "The automatic reply is off"
+msgstr "Automatická odpověď je vypnutá"
+
+#: internal/ui/invites.go
+msgid "The automatic reply is on"
+msgstr "Automatická odpověď je zapnutá"
+
+#: internal/ui/invites.go
+msgid "The event has been cancelled"
+msgstr "Událost byla zrušena"
+
+#: internal/ui/invites.go
+msgid "The last day has already passed"
+msgstr "Poslední den už uplynul"
+
+#: internal/ui/invites.go
+msgid "You have not answered yet"
+msgstr "Zatím jste neodpověděli"
+
+#: internal/ui/invites.go
+msgid "Your answer to the invitation has been sent"
+msgstr "Odpověď na pozvánku odeslána"
+
+#: internal/ui/invites.go
+msgid "Your answer: accepted"
+msgstr "Vaše odpověď: přijato"
+
+#: internal/ui/invites.go
+msgid "Your answer: declined"
+msgstr "Vaše odpověď: odmítnuto"
+
+#: internal/ui/invites.go
+msgid "Your answer: maybe"
+msgstr "Vaše odpověď: možná"
+
+#: internal/ui/invites.go
+msgid "the attachment does not contain a public PGP key"
+msgstr "příloha neobsahuje veřejný PGP klíč"
+
+#: internal/ui/localai.go
+msgid " · in use"
+msgstr " · používá se"
+
+#: internal/ui/localai.go
+msgid "3.0 GB"
+msgstr "3,0 GB"
+
+#: internal/ui/localai.go
+msgid "3.4 GB"
+msgstr "3,4 GB"
+
+#: internal/ui/localai.go
+msgid "4.3 GB"
+msgstr "4,3 GB"
+
+#: internal/ui/localai.go
+msgid "6.0 GB"
+msgstr "6,0 GB"
+
+#: internal/ui/localai.go
+msgid "6.1 GB"
+msgstr "6,1 GB"
+
+#: internal/ui/localai.go
+msgid "Check for Updates"
+msgstr "Zkontrolovat aktualizace"
+
+#: internal/ui/localai.go
+msgid "Checking for updates failed: %s"
+msgstr "Kontrola aktualizací selhala: %s"
+
+#: internal/ui/localai.go
+msgid "Checking model %s for updates…"
+msgstr "Kontroluji aktualizace modelu %s…"
+
+#: internal/ui/localai.go
+msgid "Checks for a new version of Ollama and the models once a day (not on a metered connection)"
+msgstr "Jednou denně zkontroluje novou verzi Ollamy a modelů (ne na měřeném připojení)"
+
+#: internal/ui/localai.go
+msgid "Compare Models on My Mail…"
+msgstr "Porovnat modely na mé poště…"
+
+#: internal/ui/localai.go
+msgid "Delete Model"
+msgstr "Smazat model"
+
+#: internal/ui/localai.go
+msgid "Downloaded models"
+msgstr "Stažené modely"
+
+#: internal/ui/localai.go
+msgid "Downloading Ollama %s: %s of %s"
+msgstr "Stahuji Ollamu %s: %s z %s"
+
+#: internal/ui/localai.go internal/ui/selfupdate.go
+msgid "Finding the latest version…"
+msgstr "Zjišťuji nejnovější verzi…"
+
+#: internal/ui/localai.go
+msgid "Gemma 4 E4B (Google) – better at Czech, needs more memory"
+msgstr "Gemma 4 E4B (Google) – lepší čeština, potřebuje víc paměti"
+
+#: internal/ui/localai.go internal/ui/selfupdate.go
+msgid "Install"
+msgstr "Nainstalovat"
+
+#: internal/ui/localai.go
+msgid "Installation failed: %s"
+msgstr "Instalace selhala: %s"
+
+#: internal/ui/localai.go
+msgid "Local AI (Ollama)"
+msgstr "Lokální AI (Ollama)"
+
+#: internal/ui/localai.go
+msgid "Local AI updated to Ollama %s"
+msgstr "Lokální AI aktualizována na Ollamu %s"
+
+#: internal/ui/localai.go
+msgid "Local only"
+msgstr "Jen lokálně"
+
+#: internal/ui/localai.go
+msgid "Ministral 3 8B (Mistral AI) – smarter, slower"
+msgstr "Ministral 3 8B (Mistral AI) – chytřejší, pomalejší"
+
+#: internal/ui/localai.go
+msgid "New mail is summarized in the background, only on mains power and when the model is idle; the summary is ready as soon as you open the message"
+msgstr "Nová pošta se shrne na pozadí, jen při napájení ze sítě a když model nic jiného nedělá; při otevření zprávy je shrnutí hned"
+
+#: internal/ui/localai.go
+msgid "None yet – download one with the comparison below"
+msgstr "Zatím žádný – stáhněte ho porovnáním níže"
+
+#: internal/ui/localai.go
+msgid "Not installed. The official version is downloaded from GitHub (about 1.4 GB; only the part for the processor stays on disk)."
+msgstr "Není nainstalovaná. Stáhne se oficiální verze z GitHubu (asi 1,4 GB, na disku zůstane jen část pro procesor)."
+
+#: internal/ui/localai.go
+msgid "Nothing is sent to cloud AI (Gemini, ChatGPT, Claude, Mistral), even if keys are saved"
+msgstr "Nic se neposílá cloudové AI (Gemini, ChatGPT, Claude, Mistral), i když jsou uložené klíče"
+
+#: internal/ui/localai.go
+msgid "Ollama %s is installed"
+msgstr "Ollama %s je nainstalovaná"
+
+#: internal/ui/localai.go
+msgid "Ollama %s is up to date"
+msgstr "Ollama %s je aktuální"
+
+#: internal/ui/localai.go
+msgid "Ollama cannot be started: "
+msgstr "Ollamu nejde spustit: "
+
+#: internal/ui/localai.go
+msgid "Prepare summaries in advance"
+msgstr "Připravovat shrnutí předem"
+
+#: internal/ui/localai.go
+msgid "The assistant and the spam filter now use %s"
+msgstr "Asistent i spamfiltr teď používají %s"
+
+#: internal/ui/localai.go
+msgid "The model runs right on this computer; the content of your messages goes nowhere. Without a graphics card it is slower: judging a message takes tens of seconds."
+msgstr "Model běží přímo v tomto počítači, obsah zpráv nikam neodchází. Bez grafické karty je pomalejší: posouzení zprávy trvá desítky sekund."
+
+#: internal/ui/localai.go
+msgid "Update automatically"
+msgstr "Automaticky aktualizovat"
+
+#: internal/ui/localai.go
+msgid "Version %s · program %s, models %s"
+msgstr "Verze %s · program %s, modely %s"
+
+#: internal/ui/localai.go
+msgid "the new version %s will be used for the next request"
+msgstr "nová verze %s se použije při dalším dotazu"
+
+#: internal/ui/login.go
+msgid "Add a Proton Account"
+msgstr "Přidat účet Proton"
+
+#: internal/ui/login.go
+msgid "After the verification in the browser succeeds, click “Continue” and the login will be repeated."
+msgstr "Po úspěšném ověření v prohlížeči klikněte na „Pokračovat“ a přihlášení proběhne znovu."
+
+#: internal/ui/login.go
+msgid "Back"
+msgstr "Zpět"
+
+#: internal/ui/login.go
+msgid "Continue"
+msgstr "Pokračovat"
+
+#: internal/ui/login.go
+msgid "Did the page not open? Its address:"
+msgstr "Stránka se neotevřela? Adresa:"
+
+#: internal/ui/login.go
+msgid "Enter the six-digit code from your authenticator app."
+msgstr "Zadejte šestimístný kód z ověřovací aplikace."
+
+#: internal/ui/login.go
+msgid "Have You Completed the Verification?"
+msgstr "Dokončili jste ověření?"
+
+#: internal/ui/login.go
+msgid "Log In"
+msgstr "Přihlásit se"
+
+#: internal/ui/login.go
+msgid "Log in with your Proton account. The password is not stored anywhere; only the session token and a derived mailbox key stay in the system keyring."
+msgstr "Přihlaste se svým účtem Proton. Heslo se nikam neukládá, v klíčence systému zůstane jen token relace a odvozený klíč schránky."
+
+#: internal/ui/login.go
+msgid "Mailbox Password"
+msgstr "Heslo schránky"
+
+#: internal/ui/login.go
+msgid "Open Verification"
+msgstr "Otevřít ověření"
+
+#: internal/ui/login.go
+msgid "Other Service – Gmail, Seznam, IMAP…"
+msgstr "Jiná služba – Gmail, Seznam, IMAP…"
+
+#: internal/ui/login.go
+msgid "Proton Mail"
+msgstr "Proton Mail"
+
+#: internal/ui/login.go
+msgid "Proton wants to verify that a human is logging in. Its page verify.proton.me will open – complete the verification there, then come back and click “Continue”."
+msgstr "Proton chce ověřit, že se přihlašuje člověk. Otevře se jeho stránka verify.proton.me – vyřešte tam ověření a pak se sem vraťte a klikněte na „Pokračovat“."
+
+#: internal/ui/login.go
+msgid "Two-Factor Authentication"
+msgstr "Dvoufázové ověření"
+
+#: internal/ui/login.go
+msgid "Username or email"
+msgstr "Uživatelské jméno nebo e-mail"
+
+#: internal/ui/login.go
+msgid "Verification in the Browser"
+msgstr "Ověření v prohlížeči"
+
+#: internal/ui/login.go
+msgid "Your account uses a separate password to unlock the mailbox."
+msgstr "Váš účet používá samostatné heslo pro odemčení schránky."
+
+#: internal/ui/login.go
+msgid "invalid code: %w"
+msgstr "neplatný kód: %w"
+
+#: internal/ui/login.go
+msgid "login cancelled"
+msgstr "přihlášení zrušeno"
+
+#: internal/ui/login.go
+msgid "login cancelled – the verification was not completed"
+msgstr "přihlášení zrušeno – ověření nebylo dokončeno"
+
+#: internal/ui/mainview.go
+msgid "%s of %s (%.0f %%)"
+msgstr "%s z %s (%.0f %%)"
+
+#: internal/ui/mainview.go
+msgid "%s used"
+msgstr "Obsazeno %s"
+
+#: internal/ui/mainview.go
+msgid "AI turned off"
+msgstr "AI vypnuta"
+
+#: internal/ui/mainview.go
+msgid "Archive (Ctrl+E)"
+msgstr "Archivovat (Ctrl+E)"
+
+#: internal/ui/mainview.go
+msgid "Attachment saved"
+msgstr "Příloha uložena"
+
+#: internal/ui/mainview.go
+msgid "Checking the inbox…"
+msgstr "Prověřuji doručenou poštu…"
+
+#: internal/ui/mainview.go
+msgid "Done, moved to spam: %d"
+msgstr "Hotovo, do spamu přesunuto: %d"
+
+#: internal/ui/mainview.go
+msgid "Folders"
+msgstr "Složky"
+
+#: internal/ui/mainview.go
+msgid "Forward (Ctrl+L)"
+msgstr "Přeposlat (Ctrl+L)"
+
+#: internal/ui/mainview.go
+msgid "Jan 2 15:04"
+msgstr "2. 1. 15:04"
+
+#: internal/ui/mainview.go
+msgid "Labels"
+msgstr "Štítky"
+
+#: internal/ui/mainview.go
+msgid "Load Older Messages"
+msgstr "Načíst starší zprávy"
+
+#: internal/ui/mainview.go
+msgid "Loading the messages failed: "
+msgstr "Načtení zpráv selhalo: "
+
+#: internal/ui/mainview.go
+msgid "Mail takes up %s"
+msgstr "Pošta zabírá %s"
+
+#: internal/ui/mainview.go
+msgid "Main Menu"
+msgstr "Hlavní nabídka"
+
+#: internal/ui/mainview.go
+msgid "Mark as Unread (Ctrl+Shift+U)"
+msgstr "Označit jako nepřečtené (Ctrl+Shift+U)"
+
+#: internal/ui/mainview.go internal/ui/threadview.go
+msgid "Message"
+msgstr "Zpráva"
+
+#: internal/ui/mainview.go internal/ui/selection.go
+msgid "Move to Folder"
+msgstr "Přesunout do složky"
+
+#: internal/ui/mainview.go
+msgid "Move to Trash"
+msgstr "Přesunout do koše"
+
+#: internal/ui/mainview.go
+msgid "My Folders"
+msgstr "Moje složky"
+
+#: internal/ui/mainview.go
+msgid "New Message (Ctrl+N)"
+msgstr "Nová zpráva (Ctrl+N)"
+
+#: internal/ui/mainview.go
+msgid "New mail appears once the spam filter has judged it (this can be turned off in Preferences → Spam Filter)"
+msgstr "Nová pošta se zobrazí, až ji posoudí spamfiltr (lze vypnout v Předvolbách → Spamfiltr)"
+
+#: internal/ui/mainview.go
+msgid "No Message Selected"
+msgstr "Není vybrána žádná zpráva"
+
+#: internal/ui/mainview.go
+msgid "No Messages"
+msgstr "Žádné zprávy"
+
+#: internal/ui/mainview.go
+msgid "Offline – showing the mail saved in the encrypted cache"
+msgstr "Offline – zobrazuje se pošta uložená v šifrované cache"
+
+#: internal/ui/mainview.go
+msgid "Refresh (F5)"
+msgstr "Obnovit (F5)"
+
+#: internal/ui/mainview.go
+msgid "Reply (Ctrl+R)"
+msgstr "Odpovědět (Ctrl+R)"
+
+#: internal/ui/mainview.go
+msgid "Reply to All (Ctrl+Shift+R)"
+msgstr "Odpovědět všem (Ctrl+Shift+R)"
+
+#: internal/ui/mainview.go
+msgid "Return to the Inbox Now"
+msgstr "Vrátit do doručené pošty hned"
+
+#: internal/ui/mainview.go
+msgid "Saving the attachment failed: "
+msgstr "Uložení přílohy selhalo: "
+
+#: internal/ui/mainview.go
+msgid "Search (Ctrl+F)"
+msgstr "Hledat (Ctrl+F)"
+
+#: internal/ui/mainview.go
+msgid "Search failed: "
+msgstr "Hledání selhalo: "
+
+#: internal/ui/mainview.go
+msgid "Search the subject, sender and recipients"
+msgstr "Hledat v předmětu, odesílateli a příjemcích"
+
+#: internal/ui/mainview.go
+msgid "Search: %s"
+msgstr "Hledání: %s"
+
+#: internal/ui/mainview.go
+msgid "Spam filter: %s\nBlocklists: %s, %s · updated %s"
+msgstr "Spamfiltr: %s\nBlocklisty: %s, %s · aktualizace %s"
+
+#: internal/ui/mainview.go
+msgid "Star (Ctrl+D)"
+msgstr "Hvězdička (Ctrl+D)"
+
+#: internal/ui/mainview.go
+msgid "Storage for mail, calendar and contacts (without Drive).\nMail: %s\nDrive has its own storage: %s of %s"
+msgstr "Místo pro poštu, kalendář a kontakty (bez Drive).\nPošta: %s\nDrive má vlastní místo: %s z %s"
+
+#: internal/ui/mainview.go
+msgid "Storage shared by all Proton services.\nMail: %s\nDrive: %s"
+msgstr "Místo sdílené všemi službami Protonu.\nPošta: %s\nDrive: %s"
+
+#: internal/ui/mainview.go
+msgid "Summarize"
+msgstr "Shrnout"
+
+#: internal/ui/mainview.go
+msgid "Summarize the message or the whole thread with AI"
+msgstr "Shrnutí zprávy nebo celého vlákna pomocí AI"
+
+#: internal/ui/mainview.go
+msgid "Summary (AI)"
+msgstr "Shrnutí (AI)"
+
+#: internal/ui/mainview.go
+msgid "The AI spam filter is not set up"
+msgstr "AI spamfiltr není nastavený"
+
+#: internal/ui/mainview.go
+msgid "The check failed: "
+msgstr "Prověření selhalo: "
+
+#: internal/ui/mainview.go
+msgid "The total size of the messages in the folders; the server does not report a mailbox limit"
+msgstr "Součet velikosti zpráv ve složkách; server neuvádí limit schránky"
+
+#: internal/ui/mainview.go
+msgid "Unread Only"
+msgstr "Jen nepřečtené"
+
+#: internal/ui/mainview.go
+msgid "Updated %s"
+msgstr "Aktualizováno %s"
+
+#: internal/ui/mainview.go
+msgid "blocklists only (AI is not set up)"
+msgstr "jen blocklisty (AI není nastavená)"
+
+#: internal/ui/mainview.go
+msgid "in %s"
+msgstr "v %s"
+
+#: internal/ui/mainview.go
+msgid "legitimate"
+msgstr "legitimní"
+
+#: internal/ui/mainview.go
+msgid "local AI (%s, nothing leaves the computer)"
+msgstr "lokální AI (%s, nic neodchází)"
+
+#: internal/ui/mainview.go
+msgid "scam"
+msgstr "podvod"
+
+#: internal/ui/ownkey.go
+msgid "Back Up the Private Key…"
+msgstr "Zálohovat soukromý klíč…"
+
+#: internal/ui/ownkey.go
+msgid "Backup Password"
+msgstr "Heslo zálohy"
+
+#: internal/ui/ownkey.go
+msgid "Copy the Public Key"
+msgstr "Kopírovat veřejný klíč"
+
+#: internal/ui/ownkey.go
+msgid "Create a New Key"
+msgstr "Vytvořit nový klíč"
+
+#: internal/ui/ownkey.go
+msgid "Creating the key failed: "
+msgstr "Vytvoření klíče selhalo: "
+
+#: internal/ui/ownkey.go
+msgid "If the key has no passphrase, leave the field empty."
+msgstr "Pokud klíč heslo nemá, nechte pole prázdné."
+
+#: internal/ui/ownkey.go
+msgid "Import a Private Key…"
+msgstr "Importovat soukromý klíč…"
+
+#: internal/ui/ownkey.go
+msgid "Key Passphrase"
+msgstr "Heslo ke klíči"
+
+#: internal/ui/ownkey.go
+msgid "Key created – from now on your mail is encrypted and signed"
+msgstr "Klíč vytvořen – od teď se pošta šifruje a podepisuje"
+
+#: internal/ui/ownkey.go
+msgid "Key fingerprint"
+msgstr "Otisk klíče"
+
+#: internal/ui/ownkey.go
+msgid "Key imported"
+msgstr "Klíč importován"
+
+#: internal/ui/ownkey.go
+msgid "Messages to people with a known key are encrypted; the others are signed. Send your public key to your contacts (Klient also adds it to the Autocrypt header)."
+msgstr "Zprávy lidem se známým klíčem se šifrují, ostatním se podepisují. Veřejný klíč posílejte kontaktům (Klient ho přikládá i do hlavičky Autocrypt)."
+
+#: internal/ui/ownkey.go
+msgid "My Key – %s"
+msgstr "Můj klíč – %s"
+
+#: internal/ui/ownkey.go
+msgid "Private Key (.asc)"
+msgstr "Soukromý klíč (.asc)"
+
+#: internal/ui/ownkey.go internal/ui/preferences.go
+msgid "Public key copied"
+msgstr "Veřejný klíč zkopírován"
+
+#: internal/ui/ownkey.go
+msgctxt "key"
+msgid "Remove"
+msgstr "Odstranit"
+
+#: internal/ui/ownkey.go internal/ui/preferences.go
+msgid "Remove Key"
+msgstr "Odstranit klíč"
+
+#: internal/ui/ownkey.go
+msgid "Remove the Key?"
+msgstr "Odstranit klíč?"
+
+#: internal/ui/ownkey.go
+msgid "Save the Public Key"
+msgstr "Uložit veřejný klíč"
+
+#: internal/ui/ownkey.go
+msgid "Saved"
+msgstr "Uloženo"
+
+#: internal/ui/ownkey.go
+msgid "The backup is encrypted with this password. It cannot be restored without it."
+msgstr "Záloha se zašifruje tímto heslem. Bez něj ji nepůjde obnovit."
+
+#: internal/ui/ownkey.go
+msgid "Without a backup of the key, Klient will no longer open messages encrypted with it (including your drafts and sent mail)."
+msgstr "Zprávy zašifrované tímto klíčem (i vaše koncepty a odeslané) už Klient bez zálohy klíče neotevře."
+
+#: internal/ui/ownkey.go
+msgid "Without a key, mail from this account goes out unencrypted and unsigned. With a key, Klient encrypts messages to everyone whose key it knows (WKD, Autocrypt, imported keys) and signs them for everyone else. Drafts and copies in Sent are stored encrypted on the server."
+msgstr "Bez klíče chodí pošta z tohoto účtu nešifrovaně a nepodepsaná. S klíčem Klient šifruje zprávy všem, jejichž klíč zná (WKD, Autocrypt, importované klíče), ostatním je podepíše. Koncepty a kopie v Odeslaných se na serveru uloží zašifrované."
+
+#: internal/ui/preferences.go
+msgid "%s contains “%s” → %s"
+msgstr "%s obsahuje „%s“ → %s"
+
+#: internal/ui/preferences.go
+msgid "%s key removed"
+msgstr "Klíč %s odstraněn"
+
+#: internal/ui/preferences.go
+msgid "%s key saved"
+msgstr "Klíč %s uložen"
+
+#: internal/ui/preferences.go
+msgid "%s works (model %s)"
+msgstr "%s funguje (model %s)"
+
+#: internal/ui/preferences.go
+msgid "%s – saved"
+msgstr "%s – uložen"
+
+#: internal/ui/preferences.go
+msgid "%s, %s · last updated %s"
+msgstr "%s, %s · poslední aktualizace %s"
+
+#: internal/ui/preferences.go
+msgid "%s: Test Failed"
+msgstr "%s: test selhal"
+
+#: internal/ui/preferences.go
+msgid "0 = cache turned off"
+msgstr "0 = cache vypnutá"
+
+#: internal/ui/preferences.go
+msgid "A daily notification summarizing the unread mail of all accounts"
+msgstr "Jednou denně oznámení se shrnutím nepřečtené pošty ze všech účtů"
+
+#: internal/ui/preferences.go
+msgid "A new message appears in the inbox once the spam filter has judged it, so spam never flashes up. Mail is delayed by the time the check takes (about a minute with local AI, at most 6 minutes)."
+msgstr "Nová zpráva se v doručené poště objeví, až ji spamfiltr posoudí – spam tak vůbec neprobleskne. Pošta se tím zpozdí o dobu kontroly (s lokální AI asi minutu, nejvýš 6 minut)."
+
+#: internal/ui/preferences.go
+msgid "AI Decisions"
+msgstr "Rozhodování AI"
+
+#: internal/ui/preferences.go
+msgid "AI answers, summaries and suggested replies follow it too"
+msgstr "Řídí se jím i odpovědi AI, shrnutí a návrhy odpovědí"
+
+#: internal/ui/preferences.go
+msgid "API Keys"
+msgstr "API klíče"
+
+#: internal/ui/preferences.go
+msgid "Add Rule"
+msgstr "Přidat pravidlo"
+
+#: internal/ui/preferences.go
+msgid "Added below new messages, replies and forwards."
+msgstr "Připojí se pod nové zprávy, odpovědi a přeposlání."
+
+#: internal/ui/preferences.go
+msgid "Also search keys.openpgp.org"
+msgstr "Hledat i na keys.openpgp.org"
+
+#: internal/ui/preferences.go
+msgid "Always attach my public key"
+msgstr "Přikládat můj veřejný klíč"
+
+#: internal/ui/preferences.go
+msgid "Another application opens mailto: links"
+msgstr "Odkazy mailto: otevírá jiná aplikace"
+
+#: internal/ui/preferences.go
+msgid "Assistant"
+msgstr "Asistent"
+
+#: internal/ui/preferences.go
+msgid "Automatic Features"
+msgstr "Automatické funkce"
+
+#: internal/ui/preferences.go
+msgid "Background"
+msgstr "Na pozadí"
+
+#: internal/ui/preferences.go
+msgid "Blocklists updated"
+msgstr "Blocklisty aktualizovány"
+
+#: internal/ui/preferences.go
+msgid "Choose a Model"
+msgstr "Vyberte model"
+
+#: internal/ui/preferences.go
+msgid "Choose from the models available for your account"
+msgstr "Vybrat z modelů dostupných pro váš účet"
+
+#: internal/ui/preferences.go
+msgid "Clear"
+msgstr "Vymazat"
+
+#: internal/ui/preferences.go
+msgid "Close"
+msgstr "Zavřít"
+
+#: internal/ui/preferences.go
+msgid "Contact Keys"
+msgstr "Klíče kontaktů"
+
+#: internal/ui/preferences.go
+msgid "Copy to Clipboard"
+msgstr "Kopírovat do schránky"
+
+#: internal/ui/preferences.go
+msgid "Default email application"
+msgstr "Výchozí e-mailová aplikace"
+
+#: internal/ui/preferences.go
+msgid "Details"
+msgstr "Podrobnosti"
+
+#: internal/ui/preferences.go
+msgid "Downloading…"
+msgstr "Stahuji…"
+
+#: internal/ui/preferences.go
+msgid "During this time sending can be undone with the Undo button; 0 = send immediately"
+msgstr "Po tuto dobu jde odeslání vrátit tlačítkem Zpět; 0 = odeslat hned"
+
+#: internal/ui/preferences.go
+msgid "Filter incoming mail with AI"
+msgstr "Filtrovat příchozí poštu pomocí AI"
+
+#: internal/ui/preferences.go
+msgid "Finding Recipients' Keys"
+msgstr "Hledání klíčů příjemců"
+
+#: internal/ui/preferences.go
+msgid "Finds more keys, but the server learns the addresses you write to"
+msgstr "Najde víc klíčů, ale server se dozví adresy, kterým píšete"
+
+#: internal/ui/preferences.go
+msgid "Get a key: "
+msgstr "Získat klíč: "
+
+#: internal/ui/preferences.go
+msgid "Group messages into threads"
+msgstr "Seskupovat zprávy do vláken"
+
+#: internal/ui/preferences.go
+msgid "Hour"
+msgstr "Hodina"
+
+#: internal/ui/preferences.go
+msgid "Import Public Key"
+msgstr "Importovat veřejný klíč"
+
+#: internal/ui/preferences.go
+msgid "Import Public Key…"
+msgstr "Importovat veřejný klíč…"
+
+#: internal/ui/preferences.go
+msgid "Imported for: "
+msgstr "Importováno pro: "
+
+#: internal/ui/preferences.go
+msgid "In GNOME, the icon in the top bar requires the AppIndicator extension (the gnome-shell-extension-appindicator package)."
+msgstr "Ikona v horní liště vyžaduje v GNOME rozšíření AppIndicator (balíček gnome-shell-extension-appindicator)."
+
+#: internal/ui/preferences.go
+msgid "Interface language"
+msgstr "Jazyk rozhraní"
+
+#: internal/ui/preferences.go
+msgid "Jan 2, 2006 15:04"
+msgstr "2. 1. 2006 15:04"
+
+#: internal/ui/preferences.go
+msgid "Judges every new message – a cheaper and faster model is usually enough here."
+msgstr "Posuzuje každou novou zprávu – levnější a rychlejší model tu obvykle stačí."
+
+#: internal/ui/preferences.go
+msgid "Keys of recipients outside Proton who do not publish their key through WKD. Messages to them are encrypted with PGP."
+msgstr "Klíče adresátů mimo Proton, kteří nezveřejňují klíč přes WKD. Zprávy pro ně se zašifrují PGP."
+
+#: internal/ui/preferences.go
+msgid "Klient always asks the recipient's domain (Web Key Directory) and learns keys from the Autocrypt header of received mail."
+msgstr "Klient se vždy zeptá domény příjemce (Web Key Directory) a naučí se klíče z hlavičky Autocrypt v přijaté poště."
+
+#: internal/ui/preferences.go
+msgid "Klient is the default email application"
+msgstr "Klient je výchozí e-mailová aplikace"
+
+#: internal/ui/preferences.go
+msgid "Klient keeps watching your mail, filtering spam and showing notifications; the icon in the top bar opens the window again"
+msgstr "Klient dál hlídá poštu, filtruje spam a ukazuje oznámení; ikona v liště okno zase otevře"
+
+#: internal/ui/preferences.go
+msgid "Klient opens mailto: links throughout the system"
+msgstr "Klient otevírá odkazy mailto: v celém systému"
+
+#: internal/ui/preferences.go
+msgid "Klient starts hidden in the background, with just the icon in the top bar"
+msgstr "Klient se spustí skrytý na pozadí, jen s ikonou v liště"
+
+#: internal/ui/preferences.go
+msgid "Language"
+msgstr "Jazyk"
+
+#: internal/ui/preferences.go
+msgid "Make Default"
+msgstr "Nastavit"
+
+#: internal/ui/preferences.go
+msgid "Message summaries, reply suggestions and text editing."
+msgstr "Shrnutí zpráv, návrhy odpovědí a úpravy textu."
+
+#: internal/ui/preferences.go
+msgid "Messages kept for offline reading"
+msgstr "Počet zpráv pro offline čtení"
+
+#: internal/ui/preferences.go
+msgid "Model"
+msgstr "Model"
+
+#: internal/ui/preferences.go
+msgid "Model %s"
+msgstr "Model %s"
+
+#: internal/ui/preferences.go
+msgid "Model %s saved"
+msgstr "Model %s uložen"
+
+#: internal/ui/preferences.go
+msgid "Model list: "
+msgstr "Seznam modelů: "
+
+#: internal/ui/preferences.go
+msgid "Model saved"
+msgstr "Model uložen"
+
+#: internal/ui/preferences.go
+msgid "Morning mail overview"
+msgstr "Ranní přehled pošty"
+
+#: internal/ui/preferences.go
+msgid "My Public Keys"
+msgstr "Moje veřejné klíče"
+
+#: internal/ui/preferences.go
+msgid "No key is saved for %s"
+msgstr "Pro %s není uložen klíč"
+
+#: internal/ui/preferences.go
+msgid "No local model is downloaded – download one in the Local AI section"
+msgstr "Žádný stažený lokální model – stáhněte ho v sekci Lokální AI"
+
+#: internal/ui/preferences.go
+msgid "No rules yet"
+msgstr "Zatím žádná pravidla"
+
+#: internal/ui/preferences.go
+msgid "Offline"
+msgstr "Offline"
+
+#: internal/ui/preferences.go
+msgid "Offline cache cleared"
+msgstr "Offline cache vymazána"
+
+#: internal/ui/preferences.go
+msgid "Open Page"
+msgstr "Otevřít stránku"
+
+#: internal/ui/preferences.go
+msgid "Provider"
+msgstr "Poskytovatel"
+
+#: internal/ui/preferences.go
+msgid "Replies are shown together as a conversation, just like on the Proton website"
+msgstr "Odpovědi se zobrazí pohromadě jako konverzace, stejně jako na webu Protonu"
+
+#: internal/ui/preferences.go
+msgid "Rules"
+msgstr "Pravidla"
+
+#: internal/ui/preferences.go
+msgid "Rules for Incoming Mail"
+msgstr "Pravidla pro příchozí poštu"
+
+#: internal/ui/preferences.go
+msgid "Run in the background after closing the window"
+msgstr "Běžet na pozadí po zavření okna"
+
+#: internal/ui/preferences.go
+msgid "Save Signature"
+msgstr "Uložit podpis"
+
+#: internal/ui/preferences.go
+msgid "Save this provider's API key first"
+msgstr "Nejdřív uložte API klíč tohoto poskytovatele"
+
+#: internal/ui/preferences.go
+msgid "Save to File"
+msgstr "Uložit do souboru"
+
+#: internal/ui/preferences.go
+msgid "Saving failed: "
+msgstr "Uložení selhalo: "
+
+#: internal/ui/preferences.go
+msgid "Send delay (s)"
+msgstr "Zpoždění odeslání (s)"
+
+#: internal/ui/preferences.go
+msgid "Send them to contacts outside Proton so they can send you encrypted mail."
+msgstr "Pošlete je kontaktům mimo Proton, aby vám mohli psát šifrovaně."
+
+#: internal/ui/preferences.go
+msgid "Sending"
+msgstr "Odesílání"
+
+#: internal/ui/preferences.go
+msgid "Sends a short test request"
+msgstr "Pošle krátký testový dotaz"
+
+#: internal/ui/preferences.go
+msgid "Setting up automatic start failed: "
+msgstr "Nastavení automatického spuštění selhalo: "
+
+#: internal/ui/preferences.go
+msgid "Show new mail only after it is checked"
+msgstr "Zobrazovat novou poštu až po kontrole"
+
+#: internal/ui/preferences.go
+msgid "Signature"
+msgstr "Podpis"
+
+#: internal/ui/preferences.go
+msgid "Signature saved"
+msgstr "Podpis uložen"
+
+#: internal/ui/preferences.go
+msgid "Sort new mail into labels"
+msgstr "Třídit novou poštu do štítků"
+
+#: internal/ui/preferences.go
+msgid "Spam Filter"
+msgstr "Spamfiltr"
+
+#: internal/ui/preferences.go
+msgid "Start after login"
+msgstr "Spouštět po přihlášení"
+
+#: internal/ui/preferences.go
+msgid "Status"
+msgstr "Stav"
+
+#: internal/ui/preferences.go
+msgid "Stored"
+msgstr "Uloženo"
+
+#: internal/ui/preferences.go
+msgid "System language"
+msgstr "Jazyk systému"
+
+#: internal/ui/preferences.go
+msgid "Test"
+msgstr "Vyzkoušet"
+
+#: internal/ui/preferences.go
+msgid "Testing…"
+msgstr "Zkouším…"
+
+#: internal/ui/preferences.go
+msgid "The AI adds the best matching of your labels to a new message (only when it is confident and no rule has applied)"
+msgstr "AI přidá nové zprávě nejvhodnější z vašich štítků (jen když si je jistá a žádné pravidlo nezasáhlo)"
+
+#: internal/ui/preferences.go
+msgid "The AI judges every new message in the inbox. As evidence it gets the SPF/DKIM/DMARC results, blocklist hits and your lists of allowed and blocked senders."
+msgstr "Každou novou zprávu v doručené poště posoudí AI. Jako podklady dostane výsledky SPF/DKIM/DMARC, zásahy v blocklistech a vaše seznamy povolených a blokovaných odesílatelů."
+
+#: internal/ui/preferences.go
+msgid "The default state of the switch in the message window; recipients with PGP can then send you encrypted mail"
+msgstr "Výchozí stav přepínače v okně zprávy; příjemci s PGP vám pak mohou psát šifrovaně"
+
+#: internal/ui/preferences.go
+msgid "The icon disappears from the top bar after Klient restarts"
+msgstr "Ikona z lišty zmizí po restartu Klienta"
+
+#: internal/ui/preferences.go
+msgid "The keys are stored in the system keyring. The content of the messages the AI processes is sent to the chosen provider."
+msgstr "Klíče se ukládají do klíčenky systému. Obsah zpráv, které AI zpracovává, se posílá zvolenému poskytovateli."
+
+#: internal/ui/preferences.go
+msgid "The language changes after Klient restarts"
+msgstr "Jazyk se změní po restartu Klienta"
+
+#: internal/ui/preferences.go
+msgid "The newest messages are stored in an encrypted cache (AES-256 with the key in the keyring, bodies also PGP-encrypted as on the server), so you can read them without a connection."
+msgstr "Nejnovější zprávy se ukládají do cache zašifrované (AES-256 s klíčem v klíčence, těla navíc PGP jako na serveru), takže je lze číst i bez připojení."
+
+#: internal/ui/preferences.go
+msgid "The overview arrives in the first minute after this hour (Klient must be running, for example in the background)"
+msgstr "Přehled přijde první minutu po této hodině (Klient musí běžet, třeba na pozadí)"
+
+#: internal/ui/preferences.go
+msgid "The spam probability at which the AI moves a message"
+msgstr "Pravděpodobnost spamu, od které AI zprávu přesune"
+
+#: internal/ui/preferences.go
+msgid "They apply to every new message in the inbox (after the spam filter). You can also create a rule for a sender from the ⋯ menu of a message."
+msgstr "Použijí se na každou novou zprávu v doručené poště (po spamfiltru). Pravidlo pro odesílatele vytvoříte i z nabídky ⋯ u zprávy."
+
+#: internal/ui/preferences.go
+msgid "They are downloaded automatically every %s."
+msgstr "Stahují se automaticky každých %s."
+
+#: internal/ui/preferences.go
+msgid "They use the assistant model. With local AI the content of messages stays on this computer; with cloud AI it is sent to the provider."
+msgstr "Používají model asistenta. S lokální AI zůstává obsah zpráv v počítači, s cloudovou se posílá poskytovateli."
+
+#: internal/ui/preferences.go
+msgid "Threshold for moving to spam"
+msgstr "Práh pro přesun do spamu"
+
+#: internal/ui/preferences.go
+msgid "Update Now"
+msgstr "Aktualizovat nyní"
+
+#: internal/ui/preferences.go
+msgid "never"
+msgstr "nikdy"
+
+#: internal/ui/preferences.go
+msgid "the cache is not available"
+msgstr "cache není k dispozici"
+
+#: internal/ui/preferences.go
+msgid "“Local only” mode is on – cloud AI cannot be selected"
+msgstr "Je zapnutý režim „Jen lokálně“ – cloudovou AI nejde zvolit"
+
+#: internal/ui/richeditor.go
+msgid "Bold (Ctrl+B)"
+msgstr "Tučně (Ctrl+B)"
+
+#: internal/ui/richeditor.go
+msgid "Bulleted List"
+msgstr "Odrážkový seznam"
+
+#: internal/ui/richeditor.go
+msgid "Clear Formatting"
+msgstr "Zrušit formátování výběru"
+
+#: internal/ui/richeditor.go
+msgid "Insert"
+msgstr "Vložit"
+
+#: internal/ui/richeditor.go
+msgid "Insert Link"
+msgstr "Vložit odkaz"
+
+#: internal/ui/richeditor.go
+msgid "Italic (Ctrl+I)"
+msgstr "Kurzíva (Ctrl+I)"
+
+#: internal/ui/richeditor.go
+msgid "Link (Ctrl+K)"
+msgstr "Odkaz (Ctrl+K)"
+
+#: internal/ui/richeditor.go
+msgid "Link text"
+msgstr "Text odkazu"
+
+#: internal/ui/richeditor.go
+msgid "Strikethrough"
+msgstr "Přeškrtnutí"
+
+#: internal/ui/richeditor.go
+msgid "Underline (Ctrl+U)"
+msgstr "Podtržení (Ctrl+U)"
+
+#: internal/ui/schedule.go
+msgid " (if Klient is running)"
+msgstr " (pokud Klient poběží)"
+
+#: internal/ui/schedule.go
+msgid "%s at %s"
+msgstr "%s v %s"
+
+#: internal/ui/schedule.go
+msgid "Cancel Sending"
+msgstr "Zrušit odeslání"
+
+#: internal/ui/schedule.go
+msgid "Confirm"
+msgstr "Potvrdit"
+
+#: internal/ui/schedule.go
+msgid "Custom date and time…"
+msgstr "Vlastní datum a čas…"
+
+#: internal/ui/schedule.go
+msgid "Jan 2"
+msgstr "2. 1."
+
+#: internal/ui/schedule.go
+msgid "Jan 2, 2006"
+msgstr "2. 1. 2006"
+
+#: internal/ui/schedule.go
+msgid "Later today"
+msgstr "Později dnes"
+
+#: internal/ui/schedule.go
+msgid "Monday morning"
+msgstr "V pondělí ráno"
+
+#: internal/ui/schedule.go
+msgid "Next week"
+msgstr "Příští týden"
+
+#: internal/ui/schedule.go
+msgid "Returned to the inbox"
+msgstr "Vráceno do doručené pošty"
+
+#: internal/ui/schedule.go
+msgid "Scheduled: it will be sent %s (%s)"
+msgstr "Naplánováno: odejde %s (%s)"
+
+#: internal/ui/schedule.go
+msgid "Sending cancelled; the message is in Drafts"
+msgstr "Odeslání zrušeno, zpráva je v konceptech"
+
+#: internal/ui/schedule.go
+msgid "Snooze (Ctrl+H) – the message returns to the inbox at the chosen time"
+msgstr "Odložit (Ctrl+H) – zpráva se vrátí do doručené pošty v zadaný čas"
+
+#: internal/ui/schedule.go
+msgid "Snooze Until"
+msgstr "Odložit do"
+
+#: internal/ui/schedule.go
+msgid "Snoozed – it returns %s"
+msgstr "Odloženo – vrátí se %s"
+
+#: internal/ui/schedule.go
+msgid "The chosen time has already passed"
+msgstr "Zvolený čas už uplynul"
+
+#: internal/ui/schedule.go
+msgid "This evening"
+msgstr "Dnes večer"
+
+#: internal/ui/schedule.go
+msgid "This message cannot be snoozed"
+msgstr "Tuto zprávu nejde odložit"
+
+#: internal/ui/schedule.go
+msgid "This weekend"
+msgstr "O víkendu"
+
+#: internal/ui/schedule.go
+msgid "Tomorrow afternoon"
+msgstr "Zítra odpoledne"
+
+#: internal/ui/schedule.go
+msgid "Tomorrow morning"
+msgstr "Zítra ráno"
+
+#: internal/ui/schedule.go
+msgid "Undo"
+msgstr "Zpět"
+
+#: internal/ui/schedule.go
+msgid "in %d h"
+msgstr "za %d h"
+
+#: internal/ui/schedule.go
+msgid "in %d h %d min"
+msgstr "za %d h %d min"
+
+#: internal/ui/schedule.go
+msgid "in %d min"
+msgstr "za %d min"
+
+#: internal/ui/schedule.go
+msgid "in %d s"
+msgstr "za %d s"
+
+#: internal/ui/schedule.go
+msgid "right now"
+msgstr "právě teď"
+
+#: internal/ui/schedule.go
+msgid "today at %s"
+msgstr "dnes v %s"
+
+#: internal/ui/schedule.go
+msgid "tomorrow at %s"
+msgstr "zítra v %s"
+
+#: internal/ui/selection.go
+msgid "All"
+msgstr "Vše"
+
+#: internal/ui/selection.go
+msgid "Mark as Read"
+msgstr "Označit jako přečtené"
+
+#: internal/ui/selection.go internal/ui/threadview.go
+msgid "Marking failed: "
+msgstr "Označení selhalo: "
+
+#: internal/ui/selection.go
+msgid "Select All"
+msgstr "Vybrat vše"
+
+#: internal/ui/selection.go
+msgid "Select Several Messages"
+msgstr "Vybrat více zpráv"
+
+#: internal/ui/selection.go
+msgid "Selected: %d"
+msgstr "Vybráno: %d"
+
+#: internal/ui/selection.go
+msgid "Spam / Not Spam"
+msgstr "Spam / není spam"
+
+#: internal/ui/selfupdate.go
+msgid "A New Version of Klient Is Ready"
+msgstr "Je připravená nová verze Klienta"
+
+#: internal/ui/selfupdate.go
+msgid "A check is already running…"
+msgstr "Kontrola už probíhá…"
+
+#: internal/ui/selfupdate.go
+msgid "Check for updates automatically"
+msgstr "Automaticky kontrolovat aktualizace"
+
+#: internal/ui/selfupdate.go
+msgid "Downloading version %s…"
+msgstr "Stahuji verzi %s…"
+
+#: internal/ui/selfupdate.go
+msgid "Installed version %s"
+msgstr "Nainstalovaná verze %s"
+
+#: internal/ui/selfupdate.go
+msgid "Installing version %s…"
+msgstr "Instaluji verzi %s…"
+
+#: internal/ui/selfupdate.go
+msgid "Last checked %s"
+msgstr "Naposledy zkontrolováno %s"
+
+#: internal/ui/selfupdate.go
+msgid "New versions are downloaded from GitHub (%s). The package is verified by its checksum before installation, and installing asks for the administrator password."
+msgstr "Nové verze se stahují z GitHubu (%s). Balíček se před instalací ověří kontrolním součtem, instalace si vyžádá heslo správce."
+
+#: internal/ui/selfupdate.go
+msgid "Once a day, not on a metered connection; a new version is downloaded right away"
+msgstr "Jednou denně, ne na měřeném připojení; nová verze se rovnou stáhne"
+
+#: internal/ui/selfupdate.go
+msgid "The download failed: "
+msgstr "Stažení selhalo: "
+
+#: internal/ui/selfupdate.go
+msgid "The update check failed: "
+msgstr "Kontrola aktualizací selhala: "
+
+#: internal/ui/selfupdate.go
+msgid "Try Again"
+msgstr "Zkusit znovu"
+
+#: internal/ui/selfupdate.go
+msgid "Updates"
+msgstr "Aktualizace"
+
+#: internal/ui/selfupdate.go
+msgid "Version %s has been downloaded from GitHub and verified. Installing it will ask for the administrator password."
+msgstr "Verze %s je stažená z GitHubu a ověřená. Instalace si vyžádá heslo správce."
+
+#: internal/ui/selfupdate.go
+msgid "Version %s is available – this Klient was not installed from the package, so download it from GitHub"
+msgstr "Je dostupná verze %s – tento Klient není nainstalovaný z balíčku, stáhněte ji z GitHubu"
+
+#: internal/ui/selfupdate.go
+msgid "Version %s is downloaded and verified"
+msgstr "Verze %s je stažená a ověřená"
+
+#: internal/ui/selfupdate.go
+msgid "Version %s is ready"
+msgstr "Je připravená verze %s"
+
+#: internal/ui/selfupdate.go
+msgid "You have the latest version, %s"
+msgstr "Máte nejnovější verzi %s"
+
+#: internal/ui/threadview.go
+msgid " (cc)"
+msgstr " (kopie)"
+
+#: internal/ui/threadview.go
+msgid " (me)"
+msgstr " (já)"
+
+#: internal/ui/threadview.go
+msgid "%s (key %s)"
+msgstr "%s (klíč %s)"
+
+#: internal/ui/threadview.go
+msgid "(no sender)"
+msgstr "(bez odesílatele)"
+
+#: internal/ui/threadview.go
+msgid "AI spam filter: "
+msgstr "AI spamfiltr: "
+
+#: internal/ui/threadview.go
+msgid "AI spam filter: %s (%.0f %%) – %s"
+msgstr "AI spamfiltr: %s (%.0f %%) – %s"
+
+#: internal/ui/threadview.go
+msgid "Add Star (Ctrl+D)"
+msgstr "Přidat hvězdičku (Ctrl+D)"
+
+#: internal/ui/threadview.go
+msgid "Always From This Sender"
+msgstr "Vždy od tohoto odesílatele"
+
+#: internal/ui/threadview.go
+msgid "Changing the label failed: "
+msgstr "Změna štítku selhala: "
+
+#: internal/ui/threadview.go
+msgid "Draft – click to open"
+msgstr "Koncept – kliknutím otevřete"
+
+#: internal/ui/threadview.go
+msgid "Forward (This Message)"
+msgstr "Přeposlat tuto zprávu"
+
+#: internal/ui/threadview.go
+msgid "From: "
+msgstr "Od: "
+
+#: internal/ui/threadview.go
+msgid "Label %s removed"
+msgstr "Odebrán štítek %s"
+
+#: internal/ui/threadview.go
+msgid "Mark as Spam"
+msgstr "Označit jako spam"
+
+#: internal/ui/threadview.go
+msgid "Me"
+msgstr "Já"
+
+#: internal/ui/threadview.go
+msgid "Not Spam"
+msgstr "Není spam"
+
+#: internal/ui/threadview.go
+msgid "Open %s"
+msgstr "Otevřít %s"
+
+#: internal/ui/threadview.go
+msgid "Preparing the summary…"
+msgstr "Připravuji shrnutí…"
+
+#: internal/ui/threadview.go
+msgid "Remote images are blocked for privacy."
+msgstr "Vzdálené obrázky jsou zablokované kvůli soukromí."
+
+#: internal/ui/threadview.go
+msgid "Remove Star (Ctrl+D)"
+msgstr "Odebrat hvězdičku (Ctrl+D)"
+
+#: internal/ui/threadview.go
+msgid "Reply (This Message)"
+msgstr "Odpovědět na tuto zprávu"
+
+#: internal/ui/threadview.go
+msgid "Reply to All (This Message)"
+msgstr "Odpovědět všem na tuto zprávu"
+
+#: internal/ui/threadview.go
+msgid "Save…"
+msgstr "Uložit…"
+
+#: internal/ui/threadview.go
+msgid "Show"
+msgstr "Zobrazit"
+
+#: internal/ui/threadview.go
+msgid "Show as Plain Text"
+msgstr "Zobrazit jako prostý text"
+
+#: internal/ui/threadview.go
+msgid "Spam filter (%s): %s"
+msgstr "Spamfiltr (%s): %s"
+
+#: internal/ui/threadview.go
+msgid "The attachment cannot be opened: "
+msgstr "Přílohu nejde otevřít: "
+
+#: internal/ui/threadview.go
+msgid "The message could not be loaded: "
+msgstr "Zprávu se nepodařilo načíst: "
+
+#: internal/ui/threadview.go
+msgid "The message could not be opened: "
+msgstr "Zprávu se nepodařilo otevřít: "
+
+#: internal/ui/threadview.go
+msgid "The summary failed: "
+msgstr "Shrnutí selhalo: "
+
+#: internal/ui/threadview.go
+msgid "To: "
+msgstr "Komu: "
+
+#: internal/ui/threadview.go
+msgid "Will be sent %s"
+msgstr "Odejde %s"
+
+#: internal/ui/threadview.go
+msgid "You marked this as legitimate"
+msgstr "Označili jste jako legitimní"
+
+#: internal/ui/threadview.go
+msgid "You marked this as spam"
+msgstr "Označili jste jako spam"
+
+#: internal/ui/threadview.go
+msgid "attachment"
+msgstr "příloha"
+
+#: internal/ui/threadview.go
+msgid "returns %s"
+msgstr "vrátí se %s"
+
+#: internal/ui/threadview.go
+msgid "the attachment"
+msgstr "přílohu"
+
+#: internal/ui/tray.go
+msgid "Klient – no unread mail"
+msgstr "Klient – žádná nepřečtená pošta"
+
+#: internal/ui/tray.go
+msgid "Open Klient"
+msgstr "Otevřít Klient"
+
+#: internal/update/update.go
+msgid "SHA256SUMS does not contain %s"
+msgstr "SHA256SUMS neobsahuje %s"
+
+#: internal/update/update.go
+msgid "download: %s"
+msgstr "stahování: %s"
+
+#: internal/update/update.go
+msgid "installation failed: %s"
+msgstr "instalace selhala: %s"
+
+#: internal/update/update.go
+msgid "release %s does not contain an RPM package"
+msgstr "vydání %s neobsahuje balíček RPM"
+
+#: internal/update/update.go
+msgid "the downloaded package has a wrong checksum – it will not be installed"
+msgstr "stažený balíček má špatný kontrolní součet – nebude nainstalován"
+
+#: internal/update/update.go
+msgid "the installation was cancelled"
+msgstr "instalace byla zrušena"
+
+#: internal/update/update.go
+msgid "the release checksums do not match"
+msgstr "kontrolní součty vydání nesouhlasí"
+
+#: internal/update/update.go
+msgid "the release has no checksum – for security reasons it will not be downloaded"
+msgstr "vydání nemá kontrolní součet – z bezpečnostních důvodů se nestáhne"
+
+#: internal/update/update.go
+msgid "there is no release on GitHub yet"
+msgstr "na GitHubu zatím není žádné vydání"
+
+#: internal/ui/preferences.go
+msgid "%d model is available for your account"
+msgid_plural "%d models are available for your account"
+msgstr[0] "%d model je dostupný pro váš účet"
+msgstr[1] "%d modely jsou dostupné pro váš účet"
+msgstr[2] "%d modelů je dostupných pro váš účet"
+
+#: internal/ui/preferences.go
+msgid "%d message, %d of them with content"
+msgid_plural "%d messages, %d of them with content"
+msgstr[0] "%d zpráva, z toho %d i s obsahem"
+msgstr[1] "%d zprávy, z toho %d i s obsahem"
+msgstr[2] "%d zpráv, z toho %d i s obsahem"
+
+#: internal/ui/preferences.go
+msgid "%d IP range"
+msgid_plural "%d IP ranges"
+msgstr[0] "%d IP rozsah"
+msgstr[1] "%d IP rozsahy"
+msgstr[2] "%d IP rozsahů"
+
+#: internal/ui/preferences.go
+msgid "%d domain"
+msgid_plural "%d domains"
+msgstr[0] "%d doména"
+msgstr[1] "%d domény"
+msgstr[2] "%d domén"
+
+#: internal/ui/assistant.go
+msgid "Reading %d message…"
+msgid_plural "Reading %d messages…"
+msgstr[0] "Čtu %d zprávu…"
+msgstr[1] "Čtu %d zprávy…"
+msgstr[2] "Čtu %d zpráv…"
+
+#: internal/ui/assistant.go
+msgid "Answer from %d message found"
+msgid_plural "Answer from %d messages found"
+msgstr[0] "Odpověď z %d nalezené zprávy"
+msgstr[1] "Odpověď ze %d nalezených zpráv"
+msgstr[2] "Odpověď z %d nalezených zpráv"
+
+#: internal/ui/mainview.go
+msgid "%d network"
+msgid_plural "%d networks"
+msgstr[0] "%d síť"
+msgstr[1] "%d sítě"
+msgstr[2] "%d sítí"
+
+#: internal/ui/mainview.go
+msgid "%d unread"
+msgid_plural "%d unread"
+msgstr[0] "%d nepřečtená"
+msgstr[1] "%d nepřečtené"
+msgstr[2] "%d nepřečtených"
+
+#: internal/ui/mainview.go
+msgid "%d result in %s"
+msgid_plural "%d results in %s"
+msgstr[0] "%d výsledek v %s"
+msgstr[1] "%d výsledky v %s"
+msgstr[2] "%d výsledků v %s"
+
+#: internal/ui/threadview.go
+msgid "The spam filter is checking %d new message…"
+msgid_plural "The spam filter is checking %d new messages…"
+msgstr[0] "Spamfiltr kontroluje %d novou zprávu…"
+msgstr[1] "Spamfiltr kontroluje %d nové zprávy…"
+msgstr[2] "Spamfiltr kontroluje %d nových zpráv…"
+
+#: internal/ui/threadview.go
+msgid "%d attachment"
+msgid_plural "%d attachments"
+msgstr[0] "%d příloha"
+msgstr[1] "%d přílohy"
+msgstr[2] "%d příloh"
+
+#: internal/ui/threadview.go
+msgid "%d conversation is loaded in this folder"
+msgid_plural "%d conversations are loaded in this folder"
+msgstr[0] "V této složce je načtena %d konverzace"
+msgstr[1] "V této složce jsou načteny %d konverzace"
+msgstr[2] "V této složce je načteno %d konverzací"
+
+#: internal/ui/threadview.go
+msgid "%d message in the thread"
+msgid_plural "%d messages in the thread"
+msgstr[0] "%d zpráva ve vlákně"
+msgstr[1] "%d zprávy ve vlákně"
+msgstr[2] "%d zpráv ve vlákně"
+
+#: internal/ui/schedule.go
+msgid "in %d day"
+msgid_plural "in %d days"
+msgstr[0] "za %d den"
+msgstr[1] "za %d dny"
+msgstr[2] "za %d dní"
+
+#: internal/ui/invites.go
+msgid "%d person invited"
+msgid_plural "%d people invited"
+msgstr[0] "Pozvána %d osoba"
+msgstr[1] "Pozvány %d osoby"
+msgstr[2] "Pozváno %d osob"
+
+#: internal/ui/extras.go
+msgid "Rules applied to %d message"
+msgid_plural "Rules applied to %d messages"
+msgstr[0] "Pravidla použita na %d zprávu"
+msgstr[1] "Pravidla použita na %d zprávy"
+msgstr[2] "Pravidla použita na %d zpráv"
+
+#: internal/ui/localai.go
+msgid "%d downloaded"
+msgid_plural "%d downloaded"
+msgstr[0] "%d stažený"
+msgstr[1] "%d stažené"
+msgstr[2] "%d stažených"
+
+#: internal/ui/compare.go
+msgid "Done. %d message judged; choose a model with the Use button. (“Correct” means the verdict matches the folder the message is in.)"
+msgid_plural "Done. %d messages judged; choose a model with the Use button. (“Correct” means the verdict matches the folder the message is in.)"
+msgstr[0] "Hotovo. Posouzena %d zpráva; vyberte model tlačítkem Použít. (Za „správně“ se považuje shoda se složkou, ve které zpráva leží.)"
+msgstr[1] "Hotovo. Posouzeny %d zprávy; vyberte model tlačítkem Použít. (Za „správně“ se považuje shoda se složkou, ve které zpráva leží.)"
+msgstr[2] "Hotovo. Posouzeno %d zpráv; vyberte model tlačítkem Použít. (Za „správně“ se považuje shoda se složkou, ve které zpráva leží.)"
+
+#: internal/ui/tray.go
+msgid "%d unread message"
+msgid_plural "%d unread messages"
+msgstr[0] "%d nepřečtená zpráva"
+msgstr[1] "%d nepřečtené zprávy"
+msgstr[2] "%d nepřečtených zpráv"

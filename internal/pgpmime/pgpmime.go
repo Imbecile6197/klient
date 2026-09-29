@@ -16,6 +16,8 @@ import (
 	"strings"
 
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
+
+	"github.com/Imbecile6197/klient/internal/i18n"
 )
 
 func boundary() string {
@@ -160,7 +162,7 @@ func parts(body []byte, b string) [][]byte {
 }
 
 // ErrNoKey means the message is encrypted but no private key can open it.
-var ErrNoKey = errors.New("zpráva je zašifrovaná, ale nemáte klíč, který by ji otevřel")
+var ErrNoKey = errors.New(i18n.T("the message is encrypted, but you have no key that can open it"))
 
 // Decrypt opens a multipart/encrypted message and returns the inner MIME
 // entity. verify is the sender's key (may be nil); verr is the result of
@@ -170,12 +172,12 @@ func Decrypt(raw []byte, own, verify *crypto.KeyRing) (entity []byte, verr error
 	_, params := contentType(h)
 	ps := parts(body, params["boundary"])
 	if len(ps) < 2 {
-		return nil, nil, errors.New("poškozená šifrovaná zpráva")
+		return nil, nil, errors.New(i18n.T("damaged encrypted message"))
 	}
 	_, data := split(ps[1])
 	msg, err := crypto.NewPGPMessageFromArmored(string(data))
 	if err != nil {
-		return nil, nil, fmt.Errorf("poškozená šifrovaná zpráva: %w", err)
+		return nil, nil, fmt.Errorf(i18n.T("damaged encrypted message: %w"), err)
 	}
 	if own == nil {
 		return nil, nil, ErrNoKey
@@ -205,7 +207,7 @@ func Verify(raw []byte, verify *crypto.KeyRing) ([]byte, error) {
 	_, params := contentType(h)
 	ps := parts(body, params["boundary"])
 	if len(ps) < 2 {
-		return raw, errors.New("poškozený podpis")
+		return raw, errors.New(i18n.T("damaged signature"))
 	}
 	if verify == nil {
 		return ps[0], errors.New("no key")

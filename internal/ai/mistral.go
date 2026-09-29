@@ -9,6 +9,8 @@ import (
 	"github.com/openai/openai-go/v3"
 	"github.com/openai/openai-go/v3/option"
 	"github.com/openai/openai-go/v3/shared"
+
+	"github.com/Imbecile6197/klient/internal/i18n"
 )
 
 // mistralBaseURL is Mistral's OpenAI-compatible API (servers in the EU).
@@ -53,21 +55,21 @@ func (m *mistralProvider) Complete(ctx context.Context, req Request) (string, er
 			return "", err
 		}
 		if len(resp.Choices) == 0 {
-			last = errors.New("prázdná odpověď modelu")
+			last = errors.New(i18n.T("the model returned an empty answer"))
 			continue
 		}
 		c := resp.Choices[0]
 		out := strings.TrimSpace(c.Message.Content)
 		if c.FinishReason == "length" {
-			last = errors.New("odpověď modelu je neúplná (max_output_tokens)")
+			last = errors.New(i18n.T("the model's answer is incomplete (max_output_tokens)"))
 			continue
 		}
 		if out == "" {
-			last = errors.New("prázdná odpověď modelu")
+			last = errors.New(i18n.T("the model returned an empty answer"))
 			continue
 		}
 		if req.Schema != nil && !json.Valid([]byte(out)) {
-			last = errors.New("model nevrátil platný JSON")
+			last = errors.New(i18n.T("the model did not return valid JSON"))
 			continue
 		}
 		return out, nil

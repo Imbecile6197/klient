@@ -13,7 +13,7 @@ import (
 func main() {
 	cfg, err := config.Load()
 	if err != nil {
-		log.Printf("config: %v (používám výchozí nastavení)", err)
+		log.Printf("config: %v (using the default settings)", err)
 	}
 	os.Exit(ui.Run(cfg))
 }

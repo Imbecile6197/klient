@@ -1,9 +1,12 @@
 package ai
 
 import (
+	"strconv"
+
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"strings"
 )
 
@@ -14,7 +17,7 @@ type LabelChoice struct {
 	Reason     string  `json:"reason"`
 }
 
-const noLabel = "(žádný)"
+const noLabel = "(none)"
 
 // SuggestLabel picks the best fitting label for a message from the user's
 // labels (by name). An empty Label means none fits.
@@ -25,17 +28,17 @@ func (c *Client) SuggestLabel(ctx context.Context, labels []string, from, subjec
 	schema := map[string]any{
 		"type": "object",
 		"properties": map[string]any{
-			"label":      map[string]any{"type": "string", "enum": append([]string{noLabel}, labels...), "description": "Přesný název štítku, nebo „(žádný)“, pokud se žádný nehodí."},
+			"label":      map[string]any{"type": "string", "enum": append([]string{noLabel}, labels...), "description": "The exact label name, or \"(none)\" if none fits."},
 			"confidence": map[string]any{"type": "number", "description": "0.0–1.0"},
-			"reason":     map[string]any{"type": "string", "description": "Krátké zdůvodnění česky, jedna věta."},
+			"reason":     map[string]any{"type": "string", "description": "A short reason in " + i18n.LanguageName() + ", one sentence."},
 		},
 		"required":             []string{"label", "confidence", "reason"},
 		"additionalProperties": false,
 	}
-	prompt := fmt.Sprintf("Roztřiď e-mail do jednoho ze štítků uživatele. Vyber štítek jen tehdy, když zpráva do něj zjevně patří; jinak vrať label „(žádný)“.\n\nŠtítky: %s\n\n<email>\nOd: %s\nPředmět: %s\n\n%s\n</email>\n\nOdpověz výhradně JSON objektem.",
+	prompt := fmt.Sprintf("Sort the e-mail into one of the user's labels. Pick a label only if the message clearly belongs to it; otherwise return the label \"(none)\".\n\nLabels: %s\n\n<email>\nFrom: %s\nSubject: %s\n\n%s\n</email>\n\nAnswer only with a JSON object.",
 		strings.Join(quoteAll(labels), ", "), from, subject, truncate(body, c.limit(4000, 2000)))
 	out, err := c.assistant.Complete(ctx, Request{
-		Model: c.assistantModel, System: assistantSystem, User: prompt,
+		Model: c.assistantModel, System: assistantSystem(), User: prompt,
 		Schema: schema, Effort: EffortLow, MaxTokens: 4000,
 	})
 	if err != nil {
@@ -43,7 +46,7 @@ func (c *Client) SuggestLabel(ctx context.Context, labels []string, from, subjec
 	}
 	var ch LabelChoice
 	if err := json.Unmarshal([]byte(stripFence(out)), &ch); err != nil {
-		return LabelChoice{}, fmt.Errorf("neplatná odpověď AI: %w", err)
+		return LabelChoice{}, fmt.Errorf(i18n.T("invalid answer from the AI: %w"), err)
 	}
 	// Models occasionally invent a label despite the enum.
 	for _, l := range labels {
@@ -70,7 +73,7 @@ func (c *Client) MaxDocs(cloud, local int) int { return c.limit(cloud, local) }
 func quoteAll(in []string) []string {
 	out := make([]string, len(in))
 	for i, s := range in {
-		out[i] = "„" + s + "“"
+		out[i] = strconv.Quote(s)
 	}
 	return out
 }
@@ -94,19 +97,19 @@ func (c *Client) SearchPlan(ctx context.Context, question, today string) ([]stri
 		"properties": map[string]any{
 			"queries": map[string]any{
 				"type": "array", "items": map[string]any{"type": "string"},
-				"description": "1–4 krátké vyhledávací dotazy (1–2 slova), od nejslibnějšího",
+				"description": "1–4 short search queries (1–2 words each), most promising first",
 			},
 		},
 		"required":             []string{"queries"},
 		"additionalProperties": false,
 	}
-	prompt := fmt.Sprintf(`Uživatel se ptá na svou e-mailovou schránku. Vyhledávání umí hledat jen slova v předmětu, jménu a adrese odesílatele a příjemců (ne v textu zprávy), všechna slova dotazu musí být nalezena. Navrhni 1–4 krátké dotazy (typicky jméno firmy/osoby, doména, nebo klíčové slovo předmětu, bez diakritiky i s ní podle toho, jak se to obvykle píše), které nejspíš najdou relevantní zprávy. Dnes je %s.
+	prompt := fmt.Sprintf(`The user asks about their mailbox. The search can only match words in the subject and in the names and addresses of the sender and recipients (not in the message text), and every word of a query must match. Suggest 1–4 short queries (typically the name of a company or person, a domain, or a keyword from the subject, with or without diacritics depending on how it is usually written) that are most likely to find the relevant messages. Today is %s.
 
-Otázka: %s
+Question: %s
 
-Odpověz výhradně JSON objektem.`, today, question)
+Answer only with a JSON object.`, today, question)
 	out, err := c.assistant.Complete(ctx, Request{
-		Model: c.assistantModel, System: assistantSystem, User: prompt,
+		Model: c.assistantModel, System: assistantSystem(), User: prompt,
 		Schema: schema, Effort: EffortLow, MaxTokens: 4000,
 	})
 	if err != nil {
@@ -116,7 +119,7 @@ Odpověz výhradně JSON objektem.`, today, question)
 		Queries []string `json:"queries"`
 	}
 	if err := json.Unmarshal([]byte(stripFence(out)), &res); err != nil {
-		return nil, fmt.Errorf("neplatná odpověď AI: %w", err)
+		return nil, fmt.Errorf(i18n.T("invalid answer from the AI: %w"), err)
 	}
 	var q []string
 	for _, s := range res.Queries {
@@ -137,11 +140,11 @@ type MailDoc struct {
 func (c *Client) AnswerFromMail(ctx context.Context, question, today string, docs []MailDoc) (string, error) {
 	var sb strings.Builder
 	for i, d := range docs {
-		fmt.Fprintf(&sb, "<email id=\"%d\">\nOd: %s\nDatum: %s\nPředmět: %s\n\n%s\n</email>\n\n", i+1, d.From, d.Date, d.Subject, truncate(d.Body, c.limit(2500, 1000)))
+		fmt.Fprintf(&sb, "<email id=\"%d\">\nFrom: %s\nDate: %s\nSubject: %s\n\n%s\n</email>\n\n", i+1, d.From, d.Date, d.Subject, truncate(d.Body, c.limit(2500, 1000)))
 	}
-	return c.assist(ctx, fmt.Sprintf(`Odpověz na otázku uživatele o jeho poště, a to pouze na základě níže uvedených e-mailů. Uváděj zdroje jako [1], [2] podle id e-mailu. Pokud odpověď v e-mailech není, řekni to na rovinu a navrhni, co hledat jinak. Buď stručný. Dnes je %s.
+	return c.assist(ctx, fmt.Sprintf(`Answer the user's question about their mail using only the e-mails below. Cite the sources as [1], [2] by the e-mail id. If the answer is not in the e-mails, say so plainly and suggest what to search for instead. Be brief. Today is %s.
 
-Otázka: %s
+Question: %s
 
 %s`, today, question, sb.String()))
 }
@@ -150,9 +153,9 @@ Otázka: %s
 func (c *Client) Digest(ctx context.Context, today string, docs []MailDoc) (string, error) {
 	var sb strings.Builder
 	for i, d := range docs {
-		fmt.Fprintf(&sb, "<email id=\"%d\">\nOd: %s\nDatum: %s\nPředmět: %s\n\n%s\n</email>\n\n", i+1, d.From, d.Date, d.Subject, truncate(d.Body, c.limit(800, 350)))
+		fmt.Fprintf(&sb, "<email id=\"%d\">\nFrom: %s\nDate: %s\nSubject: %s\n\n%s\n</email>\n\n", i+1, d.From, d.Date, d.Subject, truncate(d.Body, c.limit(800, 350)))
 	}
-	return c.assist(ctx, fmt.Sprintf(`Připrav ranní přehled nepřečtené pošty (dnes je %s). Nejdřív jednou větou celkový stav, pak odrážky seřazené podle důležitosti: co vyžaduje reakci nebo má termín (uveď ho), potom ostatní ve zkratce. Newslettery a reklamu shrň jedním řádkem. Piš stručně, bez úvodních frází.
+	return c.assist(ctx, fmt.Sprintf(`Prepare a morning overview of the unread mail (today is %s). Start with one sentence on the overall state, then bullet points ordered by importance: first what needs a response or has a deadline (give the deadline), then everything else in brief. Sum up newsletters and advertising in one line. Keep it short, without introductory phrases.
 
 %s`, today, sb.String()))
 }

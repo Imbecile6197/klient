@@ -16,6 +16,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/mailbox"
 	"github.com/Imbecile6197/klient/internal/mailparse"
 	"github.com/Imbecile6197/klient/internal/protonmail"
@@ -24,7 +25,7 @@ import (
 
 // ---- Unsubscribe --------------------------------------------------------
 
-// unsubscribeButton returns an "Odhlásit odběr" button for mailing-list
+// unsubscribeButton returns an i18n.T("Unsubscribe") button for mailing-list
 // messages, or nil.
 func (m *mainView) unsubscribeButton(msg *protonmail.Message) gtk.Widgetter {
 	u := mailparse.ParseUnsubscribe(msg.Headers)
@@ -34,10 +35,10 @@ func (m *mainView) unsubscribeButton(msg *protonmail.Message) gtk.Widgetter {
 	b := gtk.NewButton()
 	content := adw.NewButtonContent()
 	content.SetIconName("mail-mark-junk-symbolic")
-	content.SetLabel("Odhlásit odběr")
+	content.SetLabel(i18n.T("Unsubscribe"))
 	b.SetChild(content)
 	b.AddCSSClass("unsubscribe-button")
-	b.SetTooltipText("Tato zpráva je z hromadné rozesílky – můžete se z ní odhlásit")
+	b.SetTooltipText(i18n.T("This message comes from a mailing list – you can unsubscribe from it"))
 	b.SetHAlign(gtk.AlignStart)
 	b.ConnectClicked(func() { m.a.unsubscribe(msg, u, b) })
 	return b
@@ -51,15 +52,15 @@ func (a *App) unsubscribe(msg *protonmail.Message, u mailparse.Unsubscribe, b *g
 	var body string
 	switch {
 	case u.OneClick:
-		body = "Klient pošle odesílateli požadavek na odhlášení (jedno kliknutí podle RFC 8058). Odesílatel uvidí vaši IP adresu, podobně jako při kliknutí na odkaz."
+		body = i18n.T("Klient sends the sender an unsubscribe request (one click, as defined by RFC 8058). The sender will see your IP address, just as when you click a link.")
 	case u.Mailto != "":
-		body = "Otevře se předvyplněná zpráva s žádostí o odhlášení, kterou odešlete."
+		body = i18n.T("A prefilled unsubscribe request opens for you to send.")
 	default:
-		body = "Otevře se stránka odesílatele pro odhlášení v prohlížeči."
+		body = i18n.T("The sender's unsubscribe page opens in the browser.")
 	}
-	d := adw.NewAlertDialog("Odhlásit odběr od "+sender+"?", body)
-	d.AddResponse("cancel", "Zrušit")
-	d.AddResponse("ok", "Odhlásit")
+	d := adw.NewAlertDialog(fmt.Sprintf(i18n.T("Unsubscribe from %s?"), sender), body)
+	d.AddResponse("cancel", i18n.T("Cancel"))
+	d.AddResponse("ok", i18n.T("Unsubscribe"))
 	d.SetResponseAppearance("ok", adw.ResponseSuggested)
 	d.SetCloseResponse("cancel")
 	d.ConnectResponse(func(r string) {
@@ -74,11 +75,11 @@ func (a *App) unsubscribe(msg *protonmail.Message, u mailparse.Unsubscribe, b *g
 				ui(func() {
 					if err != nil {
 						b.SetSensitive(true)
-						a.toast("Odhlášení selhalo: " + err.Error())
+						a.toast(i18n.T("Unsubscribing failed: ") + err.Error())
 						return
 					}
-					b.SetLabel("Odhlášeno")
-					a.toast("Požadavek na odhlášení odeslán")
+					b.SetLabel(i18n.T("Unsubscribed"))
+					a.toast(i18n.T("Unsubscribe request sent"))
 				})
 			}()
 		case u.Mailto != "":
@@ -104,7 +105,7 @@ func oneClickUnsubscribe(ctx context.Context, target string) error {
 	}
 	res.Body.Close()
 	if res.StatusCode >= 400 {
-		return fmt.Errorf("server odpověděl %s", res.Status)
+		return fmt.Errorf(i18n.T("the server responded with %s"), res.Status)
 	}
 	return nil
 }
@@ -120,10 +121,12 @@ func (a *App) printMessage(msg *protonmail.Message) {
 		to = append(to, mailparse.DisplayAddress(r))
 	}
 	head := fmt.Sprintf(`<table style="font-family:sans-serif;font-size:12px;margin-bottom:12px">
-<tr><td><b>Od:</b></td><td>%s</td></tr><tr><td><b>Komu:</b></td><td>%s</td></tr>
-<tr><td><b>Datum:</b></td><td>%s</td></tr><tr><td><b>Předmět:</b></td><td>%s</td></tr></table><hr>`,
-		html.EscapeString(mailparse.DisplayAddress(meta.Sender)), html.EscapeString(strings.Join(to, ", ")),
-		time.Unix(meta.Time, 0).Format("2. 1. 2006 15:04"), html.EscapeString(meta.Subject))
+<tr><td><b>%s</b></td><td>%s</td></tr><tr><td><b>%s</b></td><td>%s</td></tr>
+<tr><td><b>%s</b></td><td>%s</td></tr><tr><td><b>%s</b></td><td>%s</td></tr></table><hr>`,
+		i18n.T("From:"), html.EscapeString(mailparse.DisplayAddress(meta.Sender)),
+		i18n.T("To:"), html.EscapeString(strings.Join(to, ", ")),
+		i18n.T("Date:"), time.Unix(meta.Time, 0).Format(i18n.T("Jan 2, 2006 15:04")),
+		i18n.T("Subject:"), html.EscapeString(meta.Subject))
 	body := msg.HTML
 	if body == "" {
 		body = mailparse.PlainToHTML(msg.Text)
@@ -135,12 +138,12 @@ func (a *App) printMessage(msg *protonmail.Message) {
 	doc := mailparse.PrepareHTML(head+body, nil, a.remoteAllowed(sender))
 
 	d := adw.NewDialog()
-	d.SetTitle("Tisk")
+	d.SetTitle(i18n.T("Print"))
 	d.SetContentWidth(760)
 	d.SetContentHeight(820)
 	tv := adw.NewToolbarView()
 	hb := adw.NewHeaderBar()
-	printBtn := gtk.NewButtonWithLabel("Tisknout…")
+	printBtn := gtk.NewButtonWithLabel(i18n.C("button", "Print…"))
 	printBtn.AddCSSClass("suggested-action")
 	hb.PackEnd(printBtn)
 	tv.AddTopBar(hb)
@@ -189,10 +192,10 @@ func (a *App) exportMessage(msg *protonmail.Message) {
 			}
 			ui(func() {
 				if err != nil {
-					a.toast("Export selhal: " + err.Error())
+					a.toast(i18n.T("Export failed: ") + err.Error())
 					return
 				}
-				a.toast("Zpráva uložena jako " + path)
+				a.toast(fmt.Sprintf(i18n.T("Message saved as %s"), path))
 			})
 		}()
 	})
@@ -216,11 +219,11 @@ func (m *mainView) messageMenu(msg *protonmail.Message) gtk.Widgetter {
 		})
 		box.Append(b)
 	}
-	item("document-print-symbolic", "Tisk…", func() { m.a.printMessage(msg) })
-	item("document-save-as-symbolic", "Uložit jako .eml…", func() { m.a.exportMessage(msg) })
-	item("bookmark-new-symbolic", "Navrhnout štítek (AI)", func() { m.suggestLabelFor(msg) })
+	item("document-print-symbolic", i18n.T("Print…"), func() { m.a.printMessage(msg) })
+	item("document-save-as-symbolic", i18n.T("Save as .eml…"), func() { m.a.exportMessage(msg) })
+	item("bookmark-new-symbolic", i18n.T("Suggest a Label (AI)"), func() { m.suggestLabelFor(msg) })
 	if m.a.acc.Caps().Contacts {
-		item("contact-new-symbolic", "Přidat odesílatele do kontaktů…", func() {
+		item("contact-new-symbolic", i18n.T("Add the Sender to Contacts…"), func() {
 			name, email := "", ""
 			if msg.Meta.Sender != nil {
 				name, email = mailparse.DisplayName(msg.Meta.Sender), msg.Meta.Sender.Address
@@ -231,17 +234,17 @@ func (m *mainView) messageMenu(msg *protonmail.Message) gtk.Widgetter {
 			m.a.addContactDialog(m.a.win, name, email, nil)
 		})
 	}
-	item("edit-find-replace-symbolic", "Vytvořit pravidlo pro odesílatele…", func() {
+	item("edit-find-replace-symbolic", i18n.T("Create a Rule for the Sender…"), func() {
 		from := ""
 		if msg.Meta.Sender != nil {
 			from = msg.Meta.Sender.Address
 		}
-		m.a.editRule(-1, rules.Rule{Name: "Od " + from, Field: rules.FieldFrom, Contains: from, Action: rules.ActionMove, Enabled: true}, nil)
+		m.a.editRule(-1, rules.Rule{Name: fmt.Sprintf(i18n.T("From %s"), from), Field: rules.FieldFrom, Contains: from, Action: rules.ActionMove, Enabled: true}, nil)
 	})
 	pop.SetChild(box)
 	btn := gtk.NewMenuButton()
 	btn.SetIconName("view-more-symbolic")
-	btn.SetTooltipText("Další akce")
+	btn.SetTooltipText(i18n.T("More Actions"))
 	btn.AddCSSClass("flat")
 	btn.SetPopover(pop)
 	return btn
@@ -278,10 +281,10 @@ func (a *App) applyRules(ctx context.Context, acc mailbox.Account, meta protonma
 // applyRulesToInbox runs the rules over the newest inbox messages.
 func (a *App) applyRulesToInbox() {
 	if len(a.cfg.Rules) == 0 {
-		a.toast("Nemáte žádná pravidla (Předvolby → Pravidla)")
+		a.toast(i18n.T("You have no rules (Preferences → Rules)"))
 		return
 	}
-	a.toast("Používám pravidla na doručenou poštu…")
+	a.toast(i18n.T("Applying the rules to the inbox…"))
 	acc := a.acc
 	go func() {
 		msgs, err := acc.List(a.ctx, protonmail.InboxID, 0, 150)
@@ -295,10 +298,10 @@ func (a *App) applyRulesToInbox() {
 		}
 		ui(func() {
 			if err != nil {
-				a.toast("Pravidla selhala: " + err.Error())
+				a.toast(i18n.T("The rules failed: ") + err.Error())
 				return
 			}
-			a.toast(fmt.Sprintf("Pravidla použita na %d zpráv", n))
+			a.toast(fmt.Sprintf(i18n.N("Rules applied to %d message", "Rules applied to %d messages", n), n))
 			if a.mv != nil {
 				a.mv.scheduleRefresh()
 			}
@@ -314,7 +317,7 @@ func (a *App) editRule(index int, r rules.Rule, saved func()) {
 	}
 	type target struct{ id, name string }
 	var folders, labelTargets []target
-	for _, f := range []target{{protonmail.InboxID, "Doručená pošta"}, {protonmail.ArchiveID, "Archiv"}, {protonmail.SpamID, "Spam"}, {protonmail.TrashID, "Koš"}} {
+	for _, f := range []target{{protonmail.InboxID, i18n.T("Inbox")}, {protonmail.ArchiveID, i18n.T("Archive")}, {protonmail.SpamID, i18n.T("Spam")}, {protonmail.TrashID, i18n.T("Trash")}} {
 		folders = append(folders, f)
 	}
 	for _, l := range labels {
@@ -325,14 +328,14 @@ func (a *App) editRule(index int, r rules.Rule, saved func()) {
 		}
 	}
 
-	d := adw.NewAlertDialog("Pravidlo", "Použije se na každou novou zprávu v doručené poště.")
+	d := adw.NewAlertDialog(i18n.T("Rule"), i18n.T("It applies to every new message in the inbox."))
 	group := adw.NewPreferencesGroup()
 	name := adw.NewEntryRow()
-	name.SetTitle("Název")
+	name.SetTitle(i18n.C("rule", "Name"))
 	name.SetText(r.Name)
 	fields := []rules.Field{rules.FieldFrom, rules.FieldTo, rules.FieldSubject}
 	fieldRow := adw.NewComboRow()
-	fieldRow.SetTitle("Když")
+	fieldRow.SetTitle(i18n.T("When"))
 	var fieldNames []string
 	for i, f := range fields {
 		fieldNames = append(fieldNames, rules.FieldName(f))
@@ -342,18 +345,18 @@ func (a *App) editRule(index int, r rules.Rule, saved func()) {
 	}
 	fieldRow.SetModel(gtk.NewStringList(fieldNames))
 	contains := adw.NewEntryRow()
-	contains.SetTitle("obsahuje")
+	contains.SetTitle(i18n.T("contains"))
 	contains.SetText(r.Contains)
 	actions := []rules.Action{rules.ActionMove, rules.ActionLabel, rules.ActionRead, rules.ActionStar}
 	actionRow := adw.NewComboRow()
-	actionRow.SetTitle("Pak")
+	actionRow.SetTitle(i18n.T("Then"))
 	var actionNames []string
 	for _, ac := range actions {
 		actionNames = append(actionNames, rules.ActionName(ac))
 	}
 	actionRow.SetModel(gtk.NewStringList(actionNames))
 	targetRow := adw.NewComboRow()
-	targetRow.SetTitle("Kam")
+	targetRow.SetTitle(i18n.T("Target"))
 	var current []target
 	setTargets := func() {
 		switch actions[actionRow.Selected()] {
@@ -387,8 +390,8 @@ func (a *App) editRule(index int, r rules.Rule, saved func()) {
 		group.Add(w)
 	}
 	d.SetExtraChild(group)
-	d.AddResponse("cancel", "Zrušit")
-	d.AddResponse("save", "Uložit")
+	d.AddResponse("cancel", i18n.T("Cancel"))
+	d.AddResponse("save", i18n.T("Save"))
 	d.SetResponseAppearance("save", adw.ResponseSuggested)
 	d.SetCloseResponse("cancel")
 	d.ConnectResponse(func(resp string) {
@@ -405,7 +408,7 @@ func (a *App) editRule(index int, r rules.Rule, saved func()) {
 			}
 		}
 		if nr.Contains == "" || ((nr.Action == rules.ActionMove || nr.Action == rules.ActionLabel) && nr.Target == "") {
-			a.toast("Pravidlo potřebuje text podmínky a cíl")
+			a.toast(i18n.T("The rule needs a condition text and a target"))
 			return
 		}
 		if index >= 0 && index < len(a.cfg.Rules) {
@@ -414,7 +417,7 @@ func (a *App) editRule(index int, r rules.Rule, saved func()) {
 			a.cfg.Rules = append(a.cfg.Rules, nr)
 		}
 		a.saveConfig()
-		a.toast("Pravidlo uloženo")
+		a.toast(i18n.T("Rule saved"))
 		if saved != nil {
 			saved()
 		}
@@ -436,7 +439,7 @@ func isDefaultMailApp() bool {
 func setDefaultMailApp() error {
 	out, err := exec.Command("gio", "mime", "x-scheme-handler/mailto", desktopID).CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("%v: %s (nainstalujte aplikaci příkazem make install)", err, strings.TrimSpace(string(out)))
+		return fmt.Errorf(i18n.T("%v: %s (install the application with make install)"), err, strings.TrimSpace(string(out)))
 	}
 	return nil
 }

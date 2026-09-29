@@ -8,6 +8,8 @@ import (
 	"strings"
 
 	"fyne.io/systray"
+
+	"github.com/Imbecile6197/klient/internal/i18n"
 )
 
 //go:embed icons/tray.png
@@ -35,10 +37,10 @@ func (a *App) startTray() {
 		systray.SetTitle("Klient")
 		systray.SetTooltip("Klient")
 		systray.SetOnTapped(func() { ui(a.showWindow) })
-		open := systray.AddMenuItem("Otevřít Klient", "")
-		a.tray.compose = systray.AddMenuItem("Nová zpráva", "")
+		open := systray.AddMenuItem(i18n.T("Open Klient"), "")
+		a.tray.compose = systray.AddMenuItem(i18n.T("New Message"), "")
 		systray.AddSeparator()
-		quit := systray.AddMenuItem("Ukončit", "")
+		quit := systray.AddMenuItem(i18n.T("Quit"), "")
 		go func() {
 			for {
 				select {
@@ -75,19 +77,13 @@ func (a *App) setTrayUnread(n int) {
 		systray.SetTooltip(fmt.Sprintf("Klient – %s", unreadText(n)))
 	} else {
 		systray.SetIcon(trayIcon)
-		systray.SetTooltip("Klient – žádná nepřečtená pošta")
+		systray.SetTooltip(i18n.T("Klient – no unread mail"))
 	}
 }
 
-// unreadText is "1 nepřečtená zpráva", "2–4 nepřečtené zprávy", "5+ nepřečtených zpráv".
+// unreadText is "1 unread message", "5 unread messages".
 func unreadText(n int) string {
-	switch {
-	case n == 1:
-		return "1 nepřečtená zpráva"
-	case n >= 2 && n <= 4:
-		return fmt.Sprintf("%d nepřečtené zprávy", n)
-	}
-	return fmt.Sprintf("%d nepřečtených zpráv", n)
+	return fmt.Sprintf(i18n.N("%d unread message", "%d unread messages", n), n)
 }
 
 func (a *App) showWindow() {
@@ -130,7 +126,8 @@ func setAutostart(on bool) error {
 	entry := fmt.Sprintf(`[Desktop Entry]
 Type=Application
 Name=Klient
-Comment=Pošta Proton na pozadí
+Comment=Klient mail in the background
+Comment[cs]=Klient – pošta na pozadí
 Exec=%s --background
 Icon=%s
 X-GNOME-Autostart-enabled=true

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Klient – dokumentace</title>
-<meta name="description" content="Kompletní dokumentace e-mailového klienta Klient pro GNOME: účty, čtení a psaní pošty, PGP, spamfiltr, AI a lokální AI.">
+<title>Klient Documentation</title>
+<meta name="description" content="Complete documentation of Klient, a mail client for GNOME: accounts, reading and writing mail, PGP, the spam filter, AI and local AI.">
 <style>
 :root {
   --bg: #fafafb;
@@ -118,6 +118,7 @@ nav.toc {
 .brand svg { width: 34px; height: 34px; flex: none; }
 .brand b { font-size: 1.15rem; }
 .brand span { display: block; font-size: .8rem; color: var(--muted); }
+.brand span a { color: var(--accent); }
 nav.toc ol { list-style: none; margin: 0; padding: 0; }
 nav.toc a {
   display: block;
@@ -282,38 +283,38 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
 <body>
 <div class="layout">
 
-<nav class="toc" id="toc" aria-label="Obsah">
+<nav class="toc" id="toc" aria-label="Contents">
   <div class="brand">
     <svg viewBox="0 0 64 64" aria-hidden="true">
       <rect x="4" y="12" width="56" height="40" rx="9" fill="#1c71d8"/>
       <path d="M10 20l22 16 22-16" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <div><b>Klient</b><span>Dokumentace · verze 0.6.8</span></div>
+    <div><b>Klient</b><span>Documentation · version 0.7.0 · <a href="index.cs.html" hreflang="cs" lang="cs">Česky</a></span></div>
   </div>
-  <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc">Obsah</button>
+  <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc">Contents</button>
   <ol>
-    <li><a href="#prehled">Přehled</a></li>
-    <li><a href="#instalace">Instalace</a></li>
-    <li><a href="#ucty">Účty a služby</a></li>
-    <li><a href="#cteni">Čtení pošty</a></li>
-    <li><a href="#psani">Psaní a odesílání</a></li>
-    <li><a href="#organizace">Organizace pošty</a></li>
-    <li><a href="#pgp">Šifrování a PGP</a></li>
-    <li><a href="#spam">Spamfiltr</a></li>
-    <li><a href="#ai">AI asistent</a></li>
-    <li><a href="#lokalni-ai">Lokální AI</a></li>
-    <li><a href="#kalendar">Pozvánky a nepřítomnost</a></li>
-    <li><a href="#pozadi">Běh na pozadí</a></li>
-    <li><a href="#zkratky">Klávesové zkratky</a></li>
-    <li><a href="#predvolby">Předvolby</a></li>
-    <li><a href="#soukromi">Soukromí a data</a></li>
-    <li><a href="#omezeni">Známá omezení</a></li>
-    <li><a href="#autor">O aplikaci</a></li>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#installation">Installation</a></li>
+    <li><a href="#accounts">Accounts and Services</a></li>
+    <li><a href="#reading">Reading Mail</a></li>
+    <li><a href="#writing">Writing and Sending</a></li>
+    <li><a href="#organizing">Organizing Mail</a></li>
+    <li><a href="#pgp">Encryption and PGP</a></li>
+    <li><a href="#spam">Spam Filter</a></li>
+    <li><a href="#ai">AI Assistant</a></li>
+    <li><a href="#local-ai">Local AI</a></li>
+    <li><a href="#calendar">Invitations and Away Replies</a></li>
+    <li><a href="#background">Running in the Background</a></li>
+    <li><a href="#shortcuts">Keyboard Shortcuts</a></li>
+    <li><a href="#preferences">Preferences</a></li>
+    <li><a href="#privacy">Privacy and Data</a></li>
+    <li><a href="#limitations">Known Limitations</a></li>
+    <li><a href="#about">About</a></li>
   </ol>
-  <div class="theme-switch" role="group" aria-label="Vzhled">
+  <div class="theme-switch" role="group" aria-label="Appearance">
     <button type="button" data-theme-set="auto">Auto</button>
-    <button type="button" data-theme-set="light">Světlý</button>
-    <button type="button" data-theme-set="dark">Tmavý</button>
+    <button type="button" data-theme-set="light">Light</button>
+    <button type="button" data-theme-set="dark">Dark</button>
   </div>
 </nav>
 
@@ -322,7 +323,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
 
 <header class="hero">
   <h1>Klient</h1>
-  <p>E-mailový klient pro GNOME s nativní podporou Proton Mailu, PGP šifrováním a spamfiltrem řízeným umělou inteligencí – v cloudu i přímo v počítači.</p>
+  <p>A mail client for GNOME with native Proton Mail support, PGP encryption and a spam filter driven by artificial intelligence – in the cloud or right on your computer.</p>
   <div class="badges">
     <span class="badge">GTK4 + libadwaita</span>
     <span class="badge">Go</span>
@@ -333,385 +334,387 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
 </header>
 
 <!-- ============================================================ -->
-<section id="prehled">
-  <h2>Přehled</h2>
-  <p>Klient je desktopová poštovní aplikace pro Linux s prostředím GNOME. Připojuje se přímo k Proton Mailu (bez Proton Bridge) i ke klasickým schránkám přes IMAP a SMTP. Každou novou zprávu nejdřív posoudí spamfiltr a teprve potom ji ukáže a ohlásí.</p>
+<section id="overview">
+  <h2>Overview</h2>
+  <p>Klient is a desktop mail application for Linux with the GNOME desktop. It connects directly to Proton Mail (without Proton Bridge) as well as to ordinary mailboxes over IMAP and SMTP. Every new message is judged by the spam filter first; only then is it shown and announced.</p>
   <div class="cards">
-    <div class="card"><a href="#ucty"><h4>Více služeb v jednom okně</h4></a><p>Proton Mail, Gmail, Seznam.cz a libovolná IMAP/SMTP schránka, přepínání v postranním panelu.</p></div>
-    <div class="card"><a href="#pgp"><h4>Šifrování všude</h4></a><p>End-to-end šifrování Protonu a PGP/MIME pro ostatní služby, automatické hledání klíčů příjemců.</p></div>
-    <div class="card"><a href="#spam"><h4>Spamfiltr s AI</h4></a><p>SPF/DKIM/DMARC, blocklisty a vaše seznamy jako podklady pro rozhodnutí AI.</p></div>
-    <div class="card"><a href="#ai"><h4>AI asistent</h4></a><p>Shrnutí, návrhy odpovědí, „Zeptat se pošty“, třídění do štítků a ranní přehled.</p></div>
-    <div class="card"><a href="#lokalni-ai"><h4>Lokální AI</h4></a><p>Model běží v počítači přes spravovanou Ollamu – obsah zpráv nikam neodchází.</p></div>
-    <div class="card"><a href="#psani"><h4>Pohodlné odesílání</h4></a><p>Zpoždění s tlačítkem Zpět, naplánované odeslání, formátovaný editor, přílohy.</p></div>
+    <div class="card"><a href="#accounts"><h4>Several services in one window</h4></a><p>Proton Mail, Gmail, Seznam.cz and any IMAP/SMTP mailbox, switched in the sidebar.</p></div>
+    <div class="card"><a href="#pgp"><h4>Encryption everywhere</h4></a><p>Proton's end-to-end encryption and PGP/MIME for the other services, with automatic lookup of recipients' keys.</p></div>
+    <div class="card"><a href="#spam"><h4>AI spam filter</h4></a><p>SPF/DKIM/DMARC, blocklists and your own lists as evidence for the AI's decision.</p></div>
+    <div class="card"><a href="#ai"><h4>AI assistant</h4></a><p>Summaries, reply suggestions, “Ask Your Mail”, sorting into labels and a morning overview.</p></div>
+    <div class="card"><a href="#local-ai"><h4>Local AI</h4></a><p>The model runs on your computer through a managed Ollama – the content of your messages goes nowhere.</p></div>
+    <div class="card"><a href="#writing"><h4>Comfortable sending</h4></a><p>Undo send, scheduled sending, a rich-text editor and attachments.</p></div>
   </div>
 </section>
 
 <!-- ============================================================ -->
-<section id="instalace">
-  <h2>Instalace</h2>
-  <h3>Z GitHubu (Fedora)</h3>
-  <p>Nejnovější verzi nainstalujete jedním příkazem přímo z GitHubu:</p>
+<section id="installation">
+  <h2>Installation</h2>
+  <h3>From GitHub (Fedora)</h3>
+  <p>Install the latest version straight from GitHub with a single command:</p>
 <pre><code>sudo dnf install https://github.com/Imbecile6197/klient/releases/latest/download/klient.x86_64.rpm</code></pre>
-  <p>Další verze si Klient stáhne sám – viz <a href="#aktualizace">Automatické aktualizace</a>.</p>
-  <p>Tuto dokumentaci otevřete kdykoli z Klienta: hlavní nabídka → <b>Nápověda</b> nebo klávesa <kbd>F1</kbd>.</p>
-  <p>Balíček doporučuje rozšíření <code>gnome-shell-extension-appindicator</code>, bez kterého GNOME nezobrazí ikonu v horní liště.</p>
-  <h3 id="aktualizace">Automatické aktualizace</h3>
-  <p>Klient jednou denně zkontroluje <a href="https://github.com/Imbecile6197/klient/releases">vydání na GitHubu</a> (ne na měřeném připojení). Novou verzi na pozadí stáhne a ověří kontrolním součtem SHA-256 – musí souhlasit se souborem <code>SHA256SUMS</code> i s otiskem, který uvádí GitHub. Pak přijde oznámení <b>Je připravená nová verze Klienta</b>; tlačítko <b>Nainstalovat</b> si vyžádá heslo správce, balíček nainstaluje a Klient se sám restartuje.</p>
-  <p>Kontrolu jde vypnout nebo spustit ručně v Předvolbách → Zprávy → <b>Aktualizace</b>. Klient sestavený ze zdrojového kódu novou verzi jen ohlásí.</p>
+  <p>Klient downloads later versions by itself – see <a href="#updates">Automatic updates</a>.</p>
+  <p>You can open this documentation from Klient at any time: main menu → <b>Help</b>, or the <kbd>F1</kbd> key.</p>
+  <h3 id="language">Language</h3>
+  <p>Klient speaks English and Czech. The language follows your system settings; you can change it in Preferences → Messages → <b>Interface language</b>, and it takes effect after a restart. The AI answers in the same language – summaries, reply suggestions, “Ask Your Mail” and the spam filter's reasons.</p>
+  <p>The package recommends the <code>gnome-shell-extension-appindicator</code> extension; without it, GNOME does not show the icon in the top bar.</p>
+  <h3 id="updates">Automatic updates</h3>
+  <p>Once a day, Klient checks the <a href="https://github.com/Imbecile6197/klient/releases">releases on GitHub</a> (not on a metered connection). It downloads a new version in the background and verifies its SHA-256 checksum, which must match both the <code>SHA256SUMS</code> file and the digest that GitHub reports. You then get the notification <b>A New Version of Klient Is Ready</b>; the <b>Install</b> button asks for the administrator password, installs the package and restarts Klient.</p>
+  <p>You can turn the check off or run it by hand in Preferences → Messages → <b>Updates</b>. A Klient built from source only announces a new version.</p>
   <div class="note">
-    <b>Aktualizace za běhu</b>
-    <p>Pokud Klient při ruční instalaci nové verze běží (třeba na pozadí), do minuty to pozná a nabídne restart. Nemusíte ho hledat a ukončovat ručně.</p>
+    <b>Updating while running</b>
+    <p>If Klient is running (for example in the background) while you install a new version by hand, it notices within a minute and offers a restart. You do not have to find it and quit it yourself.</p>
   </div>
-  <h3>Sestavení ze zdrojového kódu</h3>
+  <h3>Building from source</h3>
 <pre><code>sudo dnf install golang gcc gtk4-devel libadwaita-devel gobject-introspection-devel webkitgtk6.0-devel
-make build      # první sestavení trvá dlouho (CGo bindingy GTK)
+make build      # the first build takes a while (CGo bindings of GTK)
 make run
-make install    # do ~/.local včetně .desktop souboru a ikony
-make rpm VERSION=0.6.8</code></pre>
+make install    # into ~/.local, including the .desktop file and the icon
+make rpm VERSION=0.7.0</code></pre>
 </section>
 
 <!-- ============================================================ -->
-<section id="ucty">
-  <h2>Účty a služby</h2>
-  <p>První účet přidáte na přihlašovací obrazovce, další v postranním panelu přes přepínač účtů → <b>Přidat účet</b>. Nová pošta, spamfiltr a oznámení fungují pro všechny účty současně, i pro ty, které právě nemáte otevřené.</p>
+<section id="accounts">
+  <h2>Accounts and Services</h2>
+  <p>You add the first account on the login screen and more accounts in the sidebar with the account switcher → <b>Add Account</b>. New mail, the spam filter and notifications work for all accounts at once, including those that are not open right now.</p>
 
   <h3>Proton Mail</h3>
-  <p>Přihlášení přímo přes Proton API včetně dvoufázového ověření a režimu dvou hesel. Heslo se neukládá – v klíčence GNOME zůstane jen token relace a odvozený klíč pro odemčení schránky.</p>
+  <p>Klient logs in directly through the Proton API, including two-factor authentication and two-password mode. The password is not stored – only the session token and a derived key for unlocking the mailbox stay in the GNOME keyring.</p>
 
   <h3>Gmail</h3>
   <ol class="steps">
-    <li>V účtu Google zapněte dvoufázové ověření (bez něj Google hesla pro aplikace nenabízí).</li>
-    <li>Vytvořte <b>heslo pro aplikace</b> – tlačítko v přihlašovacím okně Klienta otevře přímo <a href="https://myaccount.google.com/apppasswords">myaccount.google.com/apppasswords</a>.</li>
-    <li>V nastavení Gmailu musí být povolený IMAP.</li>
-    <li>V Klientovi zvolte <b>Jiná služba → Gmail</b> a zadejte adresu a heslo pro aplikace.</li>
+    <li>Turn on two-step verification in your Google account (without it, Google does not offer app passwords).</li>
+    <li>Create an <b>app password</b> – a button in Klient's login window opens <a href="https://myaccount.google.com/apppasswords">myaccount.google.com/apppasswords</a> directly.</li>
+    <li>IMAP must be enabled in the Gmail settings.</li>
+    <li>In Klient, choose <b>Other Service → Gmail</b> and enter your address and the app password.</li>
   </ol>
-  <p>Štítky Gmailu se chovají jako na webu: přidání štítku zprávu jen označí (zůstane v doručené poště), odebrání sundá jen štítek. Archivace přesune zprávu do „Všech zpráv“, složka „S hvězdičkou“ odpovídá hvězdičce a složka „Důležité“ je skrytá.</p>
+  <p>Gmail labels behave as on the web: adding a label only tags the message (it stays in the inbox), and removing it takes off just the label. Archiving moves a message to “All Mail”, the “Starred” folder matches the star, and the “Important” folder is hidden.</p>
 
   <h3>Seznam.cz</h3>
-  <p>Podporované domény: <code>seznam.cz</code>, <code>email.cz</code>, <code>post.cz</code>, <code>spoluzaci.cz</code> a vlastní domény vedené na Seznamu. Máte-li zapnuté dvoufázové ověření, vytvořte si v <a href="https://ucet.seznam.cz/">nastavení účtu Seznam</a> heslo pro aplikace a přihlaste se jím.</p>
+  <p>Supported domains: <code>seznam.cz</code>, <code>email.cz</code>, <code>post.cz</code>, <code>spoluzaci.cz</code> and custom domains hosted at Seznam. If you have two-factor authentication turned on, create an app password in your <a href="https://ucet.seznam.cz/">Seznam account settings</a> and log in with it.</p>
 
-  <h3>Jiná schránka (IMAP/SMTP)</h3>
-  <p>Klient servery dohledá sám – podle známých poskytovatelů, databáze Thunderbirdu (ISPDB) a MX záznamů domény. Pokud se to nepovede, zadáte je ručně. Při chybě přihlášení se ukáže celé hlášení serveru.</p>
+  <h3>Other mailbox (IMAP/SMTP)</h3>
+  <p>Klient finds the servers by itself – from the known providers, the Thunderbird database (ISPDB) and the MX records of the domain. If that fails, you enter them by hand. When a login fails, the complete message from the server is shown.</p>
 
-  <h3>Co která služba umí</h3>
+  <h3>What each service supports</h3>
   <div class="table-wrap">
   <table>
-    <thead><tr><th>Funkce</th><th class="c">Proton</th><th class="c">Gmail</th><th class="c">Seznam / IMAP</th></tr></thead>
+    <thead><tr><th>Feature</th><th class="c">Proton</th><th class="c">Gmail</th><th class="c">Seznam / IMAP</th></tr></thead>
     <tbody>
-      <tr><td>Nová pošta okamžitě</td><td class="c"><span class="y">ano</span></td><td class="c"><span class="y">IMAP IDLE</span></td><td class="c"><span class="y">IMAP IDLE</span></td></tr>
-      <tr><td>Složky</td><td class="c"><span class="y">ano</span></td><td class="c"><span class="y">ano</span></td><td class="c"><span class="y">ano</span></td></tr>
-      <tr><td>Štítky</td><td class="c"><span class="y">ano</span></td><td class="c"><span class="y">ano</span></td><td class="c"><span class="n">ne</span></td></tr>
-      <tr><td>Vlákna</td><td class="c"><span class="y">server</span></td><td class="c"><span class="y">References</span></td><td class="c"><span class="y">References</span></td></tr>
-      <tr><td>Hledání v textu zpráv</td><td class="c"><span class="n">ne</span></td><td class="c"><span class="y">ano</span></td><td class="c"><span class="y">ano</span></td></tr>
-      <tr><td>Odložení konverzace</td><td class="c"><span class="y">server</span></td><td class="c"><span class="p">Klient</span></td><td class="c"><span class="p">Klient</span></td></tr>
-      <tr><td>Naplánované odeslání</td><td class="c"><span class="y">server</span></td><td class="c"><span class="p">Klient</span></td><td class="c"><span class="p">Klient</span></td></tr>
-      <tr><td>Šifrování</td><td class="c"><span class="y">E2E Protonu</span></td><td class="c"><span class="y">PGP/MIME</span></td><td class="c"><span class="y">PGP/MIME</span></td></tr>
-      <tr><td>Kontakty pro našeptávání</td><td class="c"><span class="y">kontakty Protonu</span></td><td class="c"><span class="p">nedávné adresy</span></td><td class="c"><span class="p">nedávné adresy</span></td></tr>
-      <tr><td>Automatická odpověď</td><td class="c"><span class="y">placený tarif</span></td><td class="c"><span class="n">ne</span></td><td class="c"><span class="n">ne</span></td></tr>
-      <tr><td>Zaplnění schránky</td><td class="c"><span class="y">ano</span></td><td class="c"><span class="y">kvóta</span></td><td class="c"><span class="p">kvóta nebo jen obsazeno</span></td></tr>
+      <tr><td>New mail right away</td><td class="c"><span class="y">yes</span></td><td class="c"><span class="y">IMAP IDLE</span></td><td class="c"><span class="y">IMAP IDLE</span></td></tr>
+      <tr><td>Folders</td><td class="c"><span class="y">yes</span></td><td class="c"><span class="y">yes</span></td><td class="c"><span class="y">yes</span></td></tr>
+      <tr><td>Labels</td><td class="c"><span class="y">yes</span></td><td class="c"><span class="y">yes</span></td><td class="c"><span class="n">no</span></td></tr>
+      <tr><td>Threads</td><td class="c"><span class="y">server</span></td><td class="c"><span class="y">References</span></td><td class="c"><span class="y">References</span></td></tr>
+      <tr><td>Searching the message text</td><td class="c"><span class="n">no</span></td><td class="c"><span class="y">yes</span></td><td class="c"><span class="y">yes</span></td></tr>
+      <tr><td>Snoozing conversations</td><td class="c"><span class="y">server</span></td><td class="c"><span class="p">Klient</span></td><td class="c"><span class="p">Klient</span></td></tr>
+      <tr><td>Scheduled sending</td><td class="c"><span class="y">server</span></td><td class="c"><span class="p">Klient</span></td><td class="c"><span class="p">Klient</span></td></tr>
+      <tr><td>Encryption</td><td class="c"><span class="y">Proton E2E</span></td><td class="c"><span class="y">PGP/MIME</span></td><td class="c"><span class="y">PGP/MIME</span></td></tr>
+      <tr><td>Address suggestions from</td><td class="c"><span class="y">Proton contacts</span></td><td class="c"><span class="p">recent addresses</span></td><td class="c"><span class="p">recent addresses</span></td></tr>
+      <tr><td>Automatic reply</td><td class="c"><span class="y">paid plan</span></td><td class="c"><span class="n">no</span></td><td class="c"><span class="n">no</span></td></tr>
+      <tr><td>Mailbox usage</td><td class="c"><span class="y">yes</span></td><td class="c"><span class="y">quota</span></td><td class="c"><span class="p">quota or space used</span></td></tr>
     </tbody>
   </table>
   </div>
-  <p class="lead">„Klient“ znamená, že funkci obstarává sama aplikace přes složky <b>Odložené</b> a <b>Naplánované</b> na serveru. Funguje, když Klient běží (stačí na pozadí); co se mezitím zmeškalo, provede hned po spuštění.</p>
+  <p class="lead">“Klient” means that the application itself provides the feature through the <b>Snoozed</b> and <b>Scheduled</b> folders on the server. It works while Klient is running (the background is enough); anything missed in the meantime is done right after it starts.</p>
 </section>
 
 <!-- ============================================================ -->
-<section id="cteni">
-  <h2>Čtení pošty</h2>
+<section id="reading">
+  <h2>Reading Mail</h2>
   <ul>
-    <li><b>Trojpanelové rozvržení</b> (složky – seznam – zpráva), které se na úzkém okně přizpůsobí.</li>
-    <li><b>Vlákna</b> – zprávy se seskupují do konverzací; starší zprávy vlákna se u Protonu dešifrují až po rozbalení. Vypnout jde v Předvolbách → Zprávy.</li>
-    <li><b>HTML zprávy</b> se zobrazují přes WebKitGTK bez JavaScriptu. Vzdálené obrázky a sledovací pixely jsou blokované; povolit je jde pro jednu zprávu nebo natrvalo pro odesílatele.</li>
-    <li><b>Přílohy</b> jsou jako čipy nahoře ve zprávě – kliknutí přílohu otevře, šipka ji uloží.</li>
-    <li><b>Hledání</b> (<kbd>Ctrl</kbd>+<kbd>F</kbd>) – u Protonu v předmětu, odesílateli a příjemcích, u IMAP služeb i v textu zpráv.</li>
-    <li><b>Offline čtení</b> – posledních 500 zpráv (nastavitelné) se ukládá do šifrované cache (AES-256-GCM, klíč v klíčence; těla Proton zpráv navíc zůstávají zašifrovaná PGP).</li>
-    <li><b>Ukazatel zaplnění</b> schránky vlevo dole. Když server limit neuvádí (Seznam), ukáže se aspoň obsazené místo.</li>
-    <li><b>Odhlásit odběr</b> – u hromadných zpráv tlačítko jedním kliknutím (RFC 8058).</li>
-    <li>Tisk a export zprávy do souboru <code>.eml</code>.</li>
+    <li>A <b>three-pane layout</b> (folders – list – message) that adapts to a narrow window.</li>
+    <li><b>Threads</b> – messages are grouped into conversations; on Proton, older messages of a thread are decrypted only when you expand them. You can turn this off in Preferences → Messages.</li>
+    <li><b>HTML mail</b> is shown through WebKitGTK without JavaScript. Remote images and tracking pixels are blocked; you can allow them for one message or permanently for a sender.</li>
+    <li><b>Attachments</b> appear as chips at the top of the message – a click opens the attachment, the arrow saves it.</li>
+    <li><b>Search</b> (<kbd>Ctrl</kbd>+<kbd>F</kbd>) – on Proton in the subject, sender and recipients; with IMAP services also in the message text.</li>
+    <li><b>Offline reading</b> – the latest 500 messages (adjustable) are kept in an encrypted cache (AES-256-GCM with the key in the keyring; bodies of Proton messages also stay PGP-encrypted).</li>
+    <li>A <b>mailbox usage indicator</b> in the bottom left corner. If the server does not report a limit (Seznam), at least the space used is shown.</li>
+    <li><b>Unsubscribe</b> – a one-click button for mailing-list messages (RFC 8058).</li>
+    <li>Printing and exporting a message to an <code>.eml</code> file.</li>
   </ul>
 </section>
 
 <!-- ============================================================ -->
-<section id="psani">
-  <h2>Psaní a odesílání</h2>
+<section id="writing">
+  <h2>Writing and Sending</h2>
   <ul>
-    <li><b>Formátovaný editor</b> – tučné, kurzíva, podtržení, seznamy, odkazy. Příjemci s PGP dostanou textovou verzi.</li>
-    <li><b>Odpovědět, odpovědět všem, přeposlat</b> (i s přílohami).</li>
-    <li><b>Přílohy</b> až do 25 MB – šifrují se stejně jako text. Soubory jde do zprávy přetáhnout myší.</li>
-    <li><b>Koncepty</b> se uloží automaticky při zavření okna (<kbd>Esc</kbd>) nebo ručně <kbd>Ctrl</kbd>+<kbd>S</kbd>.</li>
-    <li><b>Podpis</b> a <b>našeptávání adres</b> z kontaktů.</li>
-    <li><b>Výchozí aplikace pro odkazy <code>mailto:</code></b> – nastavíte v Předvolbách → Zprávy.</li>
+    <li>A <b>rich-text editor</b> – bold, italic, underline, lists, links. Recipients with PGP receive a plain-text version.</li>
+    <li><b>Reply, Reply to All, Forward</b> (including attachments).</li>
+    <li><b>Attachments</b> up to 25 MB – encrypted just like the text. You can drag files into the message.</li>
+    <li><b>Drafts</b> are saved automatically when you close the window (<kbd>Esc</kbd>) or by hand with <kbd>Ctrl</kbd>+<kbd>S</kbd>.</li>
+    <li>A <b>signature</b> and <b>address suggestions</b> from your contacts.</li>
+    <li><b>The default application for <code>mailto:</code> links</b> – set it in Preferences → Messages.</li>
   </ul>
 
-  <h3>Zpoždění odeslání</h3>
-  <p>Po odeslání zpráva ještě chvíli počká (výchozí 10 s) a v oznámení běží odpočet s tlačítkem <b>Zpět</b>. Délku nastavíte v Předvolbách → Zprávy.</p>
+  <h3>Send delay</h3>
+  <p>After you send a message, it waits a moment (10 s by default) while a notification counts down with an <b>Undo</b> button. You set the length in Preferences → Messages.</p>
 
-  <h3>Naplánované odeslání</h3>
-  <p>Šipka u tlačítka Odeslat nabídne předvolby (zítra ráno, zítra odpoledne, příští týden) nebo vlastní datum a čas. U Protonu zprávu odešle server i při vypnutém počítači, u ostatních služeb ji odešle Klient. Naplánované zprávy mají v zobrazení pruh s odpočtem a tlačítkem pro zrušení.</p>
+  <h3>Scheduled sending</h3>
+  <p>The arrow next to the Send button offers presets (tomorrow morning, tomorrow afternoon, Monday morning) or a custom date and time. On Proton the server sends the message even when your computer is off; for the other services Klient sends it. Scheduled messages show a bar with a countdown and a button to cancel sending.</p>
 </section>
 
 <!-- ============================================================ -->
-<section id="organizace">
-  <h2>Organizace pošty</h2>
+<section id="organizing">
+  <h2>Organizing Mail</h2>
   <ul>
-    <li><b>Složky a štítky</b> – vlastní složky a štítky Protonu, složky IMAP a štítky Gmailu. Zprávy jde do složek a na štítky přetáhnout.</li>
-    <li><b>Hvězdička, nepřečtené, archiv, koš.</b></li>
-    <li><b>Hromadný výběr</b> – tlačítkem, <kbd>Ctrl</kbd>/<kbd>Shift</kbd>+klik nebo <kbd>Ctrl</kbd>+<kbd>A</kbd>.</li>
-    <li><b>Odložení</b> (<kbd>Ctrl</kbd>+<kbd>H</kbd>) – konverzace zmizí a v zadaný čas se vrátí do doručené pošty.</li>
+    <li><b>Folders and labels</b> – your own Proton folders and labels, IMAP folders and Gmail labels. You can drag messages onto folders and labels.</li>
+    <li><b>Star, unread, archive, trash.</b></li>
+    <li><b>Selecting several messages</b> – with the button, <kbd>Ctrl</kbd>/<kbd>Shift</kbd>+click or <kbd>Ctrl</kbd>+<kbd>A</kbd>.</li>
+    <li><b>Snooze</b> (<kbd>Ctrl</kbd>+<kbd>H</kbd>) – the conversation disappears and returns to the inbox at the chosen time.</li>
   </ul>
-  <h3>Pravidla pro příchozí poštu</h3>
-  <p>V Předvolbách → Pravidla vytvoříte pravidla typu <i>„když Odesílatel / Příjemce / Předmět obsahuje text, pak…“</i> s akcemi <b>přesunout do složky</b>, <b>přidat štítek</b>, <b>označit jako přečtené</b> nebo <b>přidat hvězdičku</b>. Pravidla se použijí na novou poštu po kontrole spamfiltrem; položkou nabídky <b>Použít pravidla na doručenou poštu</b> je spustíte i nad stávající poštou.</p>
+  <h3>Rules for incoming mail</h3>
+  <p>In Preferences → Rules you create rules such as <i>“when the Sender / Recipient / Subject contains a text, then…”</i> with the actions <b>move to a folder</b>, <b>add a label</b>, <b>mark as read</b> or <b>add a star</b>. Rules are applied to new mail after the spam check; the menu item <b>Apply Rules to the Inbox</b> runs them on existing mail too.</p>
 </section>
 
 <!-- ============================================================ -->
 <section id="pgp">
-  <h2>Šifrování a PGP</h2>
+  <h2>Encryption and PGP</h2>
   <h3>Proton Mail</h3>
-  <p>Každá zpráva se dešifruje a ověří se podpis. Při odesílání se pro každého příjemce zvolí nejsilnější dostupná ochrana:</p>
+  <p>Every message is decrypted and its signature verified. When sending, the strongest available protection is chosen for each recipient:</p>
   <ul>
-    <li>Proton adresy – end-to-end šifrování Protonu,</li>
-    <li>externí adresy se známým klíčem (WKD nebo importovaným) – PGP,</li>
-    <li>ostatní – nešifrovaně, volitelně s PGP podpisem, a před odesláním se ukáže varování.</li>
+    <li>Proton addresses – Proton's end-to-end encryption,</li>
+    <li>external addresses with a known key (from WKD or imported) – PGP,</li>
+    <li>everyone else – unencrypted, optionally with a PGP signature, and a warning appears before sending.</li>
   </ul>
 
-  <h3>Gmail, Seznam a IMAP</h3>
-  <p>V Předvolbách → PGP si pro účet vytvoříte nový klíč nebo naimportujete svůj soukromý klíč. Klíč je v souboru zamčený náhodným heslem uloženým v klíčence. Potom:</p>
+  <h3>Gmail, Seznam and IMAP</h3>
+  <p>In Preferences → PGP you create a new key for the account or import your private key. The key file is locked with a random passphrase kept in the keyring. Then:</p>
   <ul>
-    <li>zprávy lidem se známým klíčem se šifrují ve formátu <b>PGP/MIME</b>, ostatním se podepisují,</li>
-    <li>smíšeným příjemcům odejdou dvě verze – šifrovaná a podepsaná,</li>
-    <li>koncepty, naplánované zprávy a kopie v Odeslaných se na serveru ukládají zašifrované jen pro vás,</li>
-    <li>příchozí PGP/MIME zprávy se dešifrují a ověří,</li>
-    <li>klíč jde zálohovat i odstranit.</li>
+    <li>messages to people with a known key are encrypted as <b>PGP/MIME</b>; messages to everyone else are signed,</li>
+    <li>mixed recipients get two versions – an encrypted one and a signed one,</li>
+    <li>drafts, scheduled messages and copies in Sent are stored on the server encrypted for you alone,</li>
+    <li>incoming PGP/MIME messages are decrypted and verified,</li>
+    <li>the key can be backed up and removed.</li>
   </ul>
 
-  <h3>Kde Klient hledá klíče příjemců</h3>
+  <h3>Where Klient looks for recipients' keys</h3>
   <ul>
-    <li><b>Web Key Directory</b> domény příjemce,</li>
-    <li>hlavička <b>Autocrypt</b> v přijatých zprávách (Klient ji do svých zpráv také přidává),</li>
-    <li>ručně <b>importované klíče</b> – i přímo z přílohy <code>.asc</code> tlačítkem ve zprávě,</li>
-    <li>volitelně <b>keys.openpgp.org</b> (Předvolby → PGP).</li>
+    <li>the <b>Web Key Directory</b> of the recipient's domain,</li>
+    <li>the <b>Autocrypt</b> header of received messages (Klient adds it to its own messages too),</li>
+    <li>manually <b>imported keys</b> – also straight from an <code>.asc</code> attachment with a button in the message,</li>
+    <li>optionally <b>keys.openpgp.org</b> (Preferences → PGP).</li>
   </ul>
-  <p>Do odchozích zpráv jde automaticky přikládat vlastní veřejný klíč (Předvolby → Zprávy).</p>
+  <p>Your own public key can be attached to outgoing messages automatically (Preferences → Messages).</p>
 </section>
 
 <!-- ============================================================ -->
 <section id="spam">
-  <h2>Spamfiltr</h2>
-  <p>Každou novou zprávu v doručené poště posoudí AI. Jako podklady dostane:</p>
+  <h2>Spam Filter</h2>
+  <p>The AI judges every new message in the inbox. As evidence it gets:</p>
   <ul>
-    <li>výsledky SPF, DKIM a DMARC,</li>
-    <li>značky Protonu,</li>
-    <li>zásahy IP adres, domén a odkazů v blocklistech,</li>
-    <li>vaše seznamy povolených a blokovaných odesílatelů.</li>
+    <li>the SPF, DKIM and DMARC results,</li>
+    <li>Proton's markers,</li>
+    <li>blocklist hits for IP addresses, domains and links,</li>
+    <li>your lists of allowed and blocked senders.</li>
   </ul>
-  <p>Zpráva s pravděpodobností spamu nad prahem (výchozí 0,7) se přesune do Spamu. Práh nastavíte v Předvolbách → Spamfiltr.</p>
+  <p>A message whose spam probability reaches the threshold (0.7 by default) is moved to Spam. You set the threshold in Preferences → Spam Filter.</p>
 
-  <h3>Nejdřív kontrola, pak oznámení</h3>
+  <h3>Check first, then notify</h3>
   <div class="flow">
-    <span>Nová zpráva</span><i>→</i><span>skrytá v seznamu</span><i>→</i><span>spamfiltr</span><i>→</i><span>pravidla a štítky</span><i>→</i><span>zobrazení a oznámení</span>
+    <span>New message</span><i>→</i><span>hidden in the list</span><i>→</i><span>spam filter</span><i>→</i><span>rules and labels</span><i>→</i><span>shown and announced</span>
   </div>
-  <p>Platí pro všechny služby. Nahoře v seznamu je během kontroly vidět pruh „Kontroluje se N nových zpráv…“. Kdyby se kontrola zasekla, zpráva se ukáže nejpozději po 6 minutách. Chování jde vypnout přepínačem <b>Zobrazovat novou poštu až po kontrole</b>.</p>
+  <p>This applies to all services. While the check runs, a bar at the top of the list says “The spam filter is checking N new messages…”. If the check got stuck, the message appears after 6 minutes at the latest. You can turn this behaviour off with the <b>Show new mail only after it is checked</b> switch.</p>
 
-  <h3>Blocklisty</h3>
-  <p>Stahují se automaticky každých 12 hodin: Spamhaus DROP (IPv4 a IPv6), URLhaus a OpenPhish. Stav je v Předvolbách → Spamfiltr.</p>
+  <h3>Blocklists</h3>
+  <p>They are downloaded automatically every 12 hours: Spamhaus DROP (IPv4 and IPv6), URLhaus and OpenPhish. Their status is in Preferences → Spam Filter.</p>
 
-  <h3>Prověření stávající pošty</h3>
-  <p>Položka nabídky <b>Prověřit doručenou poštu pomocí AI</b> spustí filtr nad posledními 50 zprávami.</p>
+  <h3>Checking existing mail</h3>
+  <p>The menu item <b>Check the Inbox with AI</b> runs the filter on the latest 50 messages.</p>
   <div class="note">
-    <b>Bez AI</b>
-    <p>Když AI filtr vypnete, Klient pozná spam jen podle blocklistů a vašich seznamů.</p>
+    <b>Without AI</b>
+    <p>If you turn the AI filter off, Klient recognizes spam only by the blocklists and your lists.</p>
   </div>
 </section>
 
 <!-- ============================================================ -->
 <section id="ai">
-  <h2>AI asistent</h2>
-  <h3>Funkce</h3>
+  <h2>AI Assistant</h2>
+  <h3>Features</h3>
   <ul>
-    <li><b>Shrnutí zprávy</b> a <b>návrh odpovědi</b>.</li>
-    <li><b>Úprava a překlad konceptu</b> přímo v editoru.</li>
-    <li><b>Zeptat se pošty</b> (<kbd>Ctrl</kbd>+<kbd>J</kbd>) – otázka v běžné řeči; AI najde související zprávy a odpoví s odkazy na zdroje.</li>
-    <li><b>Třídění do štítků</b> – nová pošta dostane vhodný štítek (Předvolby → AI → Automatické funkce).</li>
-    <li><b>Ranní přehled</b> nepřečtené pošty v nastavenou hodinu (výchozí 7:00); kdykoli ho vyvoláte položkou <b>Přehled nepřečtené pošty (AI)</b>.</li>
+    <li><b>Message summary</b> and <b>reply suggestion</b>.</li>
+    <li><b>Editing and translating a draft</b> right in the editor.</li>
+    <li><b>Ask Your Mail</b> (<kbd>Ctrl</kbd>+<kbd>J</kbd>) – a question in plain language; the AI finds the related messages and answers with references to its sources.</li>
+    <li><b>Sorting into labels</b> – new mail gets a suitable label (Preferences → AI → Automatic Features).</li>
+    <li>A <b>morning overview</b> of unread mail at a set hour (7:00 by default); you can open it at any time with <b>Unread Mail Overview (AI)</b>.</li>
   </ul>
 
-  <h3>Poskytovatelé</h3>
-  <p>Asistent a spamfiltr mají každý svého poskytovatele a model – spamfiltru obvykle stačí levnější a rychlejší model. Tlačítko se seznamem u modelu nabídne modely dostupné pro váš účet.</p>
+  <h3>Providers</h3>
+  <p>The assistant and the spam filter each have their own provider and model – a cheaper and faster model is usually enough for the spam filter. The list button next to the model offers the models available for your account.</p>
   <div class="table-wrap">
   <table>
-    <thead><tr><th>Poskytovatel</th><th>Výchozí model asistenta</th><th>Výchozí model spamfiltru</th><th>Klíč</th></tr></thead>
+    <thead><tr><th>Provider</th><th>Default assistant model</th><th>Default spam filter model</th><th>Key</th></tr></thead>
     <tbody>
       <tr><td>Claude (Anthropic)</td><td><code>claude-opus-5</code></td><td><code>claude-opus-5</code></td><td><a href="https://platform.claude.com">platform.claude.com</a></td></tr>
       <tr><td>ChatGPT (OpenAI)</td><td><code>gpt-5.5</code></td><td><code>gpt-5.4-mini</code></td><td><a href="https://platform.openai.com/api-keys">platform.openai.com</a></td></tr>
       <tr><td>Gemini (Google)</td><td><code>gemini-3.1-pro-preview</code></td><td><code>gemini-3-flash-preview</code></td><td><a href="https://aistudio.google.com/apikey">aistudio.google.com</a></td></tr>
-      <tr><td>Mistral (servery v EU)</td><td><code>mistral-medium-latest</code></td><td><code>mistral-small-latest</code></td><td><a href="https://console.mistral.ai/api-keys">console.mistral.ai</a></td></tr>
-      <tr><td>Lokální AI (Ollama)</td><td><code>qwen3.5:4b</code></td><td><code>qwen3.5:4b</code></td><td>není potřeba</td></tr>
+      <tr><td>Mistral (EU servers)</td><td><code>mistral-medium-latest</code></td><td><code>mistral-small-latest</code></td><td><a href="https://console.mistral.ai/api-keys">console.mistral.ai</a></td></tr>
+      <tr><td>Local AI (Ollama)</td><td><code>qwen3.5:4b</code></td><td><code>qwen3.5:4b</code></td><td>not needed</td></tr>
     </tbody>
   </table>
   </div>
-  <p>API klíče se ukládají do klíčenky systému. Když poskytovatel vrátí chybu (chybějící kredit, neplatný klíč, zrušený model), Klient ji vysvětlí česky a nabídne odkaz, kde ji opravit.</p>
+  <p>API keys are stored in the system keyring. When a provider returns an error (no credit, an invalid key, a retired model), Klient explains it in plain words and offers a link where you can fix it.</p>
 </section>
 
 <!-- ============================================================ -->
-<section id="lokalni-ai">
-  <h2>Lokální AI</h2>
-  <p>S lokální AI běží model přímo v počítači a obsah zpráv nikam neodchází. Nastavení je v Předvolbách → AI → Lokální AI (Ollama).</p>
+<section id="local-ai">
+  <h2>Local AI</h2>
+  <p>With local AI, the model runs right on your computer and the content of your messages goes nowhere. The settings are in Preferences → AI → Local AI (Ollama).</p>
   <ol class="steps">
-    <li><b>Nainstalovat Ollamu</b> – Klient stáhne oficiální verzi z GitHubu, ověří kontrolní součet a rozbalí jen část pro procesor do <code>~/.local/share/klient/ollama</code>. Nepotřebuje sudo.</li>
-    <li><b>Porovnat modely na mé poště</b> – každý vybraný model posoudí několik vašich zpráv a jednu shrne; uvidíte rychlost i kvalitu vedle sebe. Vše běží v počítači.</li>
-    <li>V rolích Asistent a Spamfiltr zvolte <b>Lokální AI</b> a vybraný model.</li>
+    <li><b>Install Ollama</b> – Klient downloads the official version from GitHub, verifies its checksum and unpacks only the part for the processor into <code>~/.local/share/klient/ollama</code>. No sudo is needed.</li>
+    <li><b>Compare Models on My Mail</b> – each chosen model judges several of your messages and summarizes one, so you see speed and quality side by side. Everything runs on your computer.</li>
+    <li>In the Assistant and Spam Filter roles, choose <b>Local AI</b> and the model you picked.</li>
   </ol>
 
-  <h3>Nabízené modely</h3>
+  <h3>Offered models</h3>
   <div class="table-wrap">
   <table>
-    <thead><tr><th>Model</th><th>Stažení</th><th>Poznámka</th></tr></thead>
+    <thead><tr><th>Model</th><th>Download</th><th>Note</th></tr></thead>
     <tbody>
-      <tr><td>Qwen 3.5 4B (Alibaba)</td><td>3,4 GB</td><td>výchozí</td></tr>
-      <tr><td>Gemma 4 E2B (Google)</td><td>4,3 GB</td><td></td></tr>
-      <tr><td>Gemma 4 E4B (Google)</td><td>6,1 GB</td><td>lepší čeština, víc paměti</td></tr>
-      <tr><td>Ministral 3 3B (Mistral AI)</td><td>3,0 GB</td><td></td></tr>
-      <tr><td>Ministral 3 8B (Mistral AI)</td><td>6,0 GB</td><td>chytřejší, pomalejší</td></tr>
+      <tr><td>Qwen 3.5 4B (Alibaba)</td><td>3.4 GB</td><td>default</td></tr>
+      <tr><td>Gemma 4 E2B (Google)</td><td>4.3 GB</td><td></td></tr>
+      <tr><td>Gemma 4 E4B (Google)</td><td>6.1 GB</td><td>better at Czech, needs more memory</td></tr>
+      <tr><td>Ministral 3 3B (Mistral AI)</td><td>3.0 GB</td><td></td></tr>
+      <tr><td>Ministral 3 8B (Mistral AI)</td><td>6.0 GB</td><td>smarter, slower</td></tr>
     </tbody>
   </table>
   </div>
 
-  <h3>Další možnosti</h3>
+  <h3>More options</h3>
   <ul>
-    <li><b>Jen lokálně</b> – nic se neposílá cloudové AI, i když jsou uložené klíče.</li>
-    <li><b>Automaticky aktualizovat</b> – jednou denně zkontroluje novou verzi Ollamy a modelů (ne na měřeném připojení).</li>
-    <li><b>Připravovat shrnutí předem</b> – nová pošta se shrne na pozadí, jen při napájení ze sítě a když model nic jiného nedělá. Po otevření zprávy je shrnutí hned.</li>
-    <li>Výsledky AI se ukládají do cache, takže opakované shrnutí stejné zprávy je okamžité. Při napájení ze sítě zůstává model načtený v paměti 30 minut, na baterii 5 minut.</li>
+    <li><b>Local only</b> – nothing is sent to cloud AI, even if keys are saved.</li>
+    <li><b>Update automatically</b> – checks for a new version of Ollama and the models once a day (not on a metered connection).</li>
+    <li><b>Prepare summaries in advance</b> – new mail is summarized in the background, only on mains power and when the model is idle. The summary is ready as soon as you open the message.</li>
+    <li>AI results are cached, so summarizing the same message again is instant. On mains power the model stays loaded in memory for 30 minutes, on battery for 5 minutes.</li>
   </ul>
   <div class="note warn">
-    <b>Rychlost</b>
-    <p>Bez grafické karty je lokální model pomalý: posouzení jedné zprávy trvá desítky sekund (na notebooku s procesorem Intel i5 10. generace zhruba minutu u modelu Qwen 3.5 4B).</p>
+    <b>Speed</b>
+    <p>Without a graphics card, a local model is slow: judging one message takes tens of seconds (about a minute with Qwen 3.5 4B on a laptop with a 10th-generation Intel i5).</p>
   </div>
 </section>
 
 <!-- ============================================================ -->
-<section id="kalendar">
-  <h2>Pozvánky a nepřítomnost</h2>
-  <h3>Pozvánky do kalendáře</h3>
-  <p>Zpráva s pozvánkou (<code>.ics</code>) ukáže kartu s termínem a místem. Tlačítka <b>Přijmout</b>, <b>Možná</b> a <b>Odmítnout</b> pošlou organizátorovi odpověď; událost jde přidat do kalendáře.</p>
-  <h3>Automatická odpověď</h3>
-  <p>Pouze Proton Mail s placeným tarifem. Odpovídá server, i když je počítač vypnutý; každý odesílatel dostane odpověď nejvýš jednou za čas. Nastavíte předmět, text a volitelně poslední den platnosti.</p>
+<section id="calendar">
+  <h2>Invitations and Away Replies</h2>
+  <h3>Calendar invitations</h3>
+  <p>A message with an invitation (<code>.ics</code>) shows a card with the time and place. The <b>Accept</b>, <b>Maybe</b> and <b>Decline</b> buttons send your answer to the organizer; the event can be added to your calendar.</p>
+  <h3>Automatic reply</h3>
+  <p>Proton Mail with a paid plan only. The server replies even when your computer is off; each sender gets the reply at most once in a while. You set the subject, the text and, optionally, the last day.</p>
 </section>
 
 <!-- ============================================================ -->
-<section id="pozadi">
-  <h2>Běh na pozadí</h2>
+<section id="background">
+  <h2>Running in the Background</h2>
   <ul>
-    <li>Po zavření okna Klient běží dál, hlídá novou poštu a ukazuje černobílou ikonu v horní liště (GNOME potřebuje rozšíření AppIndicator). Červená tečka na ikoně znamená nepřečtenou poštu. Nabídka ikony obsahuje Otevřít Klient, Nová zpráva a Ukončit; ukončit ho můžete také klávesami <kbd>Ctrl</kbd>+<kbd>Q</kbd>.</li>
-    <li><b>Spouštět po přihlášení</b> – Klient se spustí rovnou na pozadí.</li>
-    <li>Oznámení o nové poště přijde až po kontrole spamfiltrem.</li>
+    <li>After you close the window, Klient keeps running, watches for new mail and shows a monochrome icon in the top bar (GNOME needs the AppIndicator extension). A red dot on the icon means unread mail. The icon menu offers Open Klient, New Message and Quit; you can also quit with <kbd>Ctrl</kbd>+<kbd>Q</kbd>.</li>
+    <li><b>Start after login</b> – Klient starts straight in the background.</li>
+    <li>The new-mail notification arrives only after the spam check.</li>
   </ul>
 </section>
 
 <!-- ============================================================ -->
-<section id="zkratky">
-  <h2>Klávesové zkratky</h2>
-  <p>Přehled je i přímo v aplikaci: <kbd>Ctrl</kbd>+<kbd>?</kbd>.</p>
+<section id="shortcuts">
+  <h2>Keyboard Shortcuts</h2>
+  <p>The list is also available in the application: <kbd>Ctrl</kbd>+<kbd>?</kbd>.</p>
   <div class="table-wrap">
   <table>
-    <thead><tr><th>Zkratka</th><th>Akce</th></tr></thead>
+    <thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
     <tbody>
-      <tr><th colspan="2">Obecné</th></tr>
-      <tr><td><kbd>Ctrl</kbd>+<kbd>N</kbd></td><td>Nová zpráva</td></tr>
-      <tr><td><kbd>Ctrl</kbd>+<kbd>F</kbd></td><td>Hledat</td></tr>
-      <tr><td><kbd>Ctrl</kbd>+<kbd>J</kbd></td><td>Zeptat se pošty (AI)</td></tr>
-      <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd></td><td>Kontakty</td></tr>
-      <tr><td><kbd>F5</kbd></td><td>Obnovit</td></tr>
-      <tr><td><kbd>Ctrl</kbd>+<kbd>,</kbd></td><td>Předvolby</td></tr>
-      <tr><td><kbd>F1</kbd></td><td>Nápověda (tato dokumentace)</td></tr>
-      <tr><td><kbd>Ctrl</kbd>+<kbd>?</kbd></td><td>Klávesové zkratky</td></tr>
-      <tr><td><kbd>Ctrl</kbd>+<kbd>Q</kbd></td><td>Ukončit</td></tr>
-      <tr><th colspan="2">Zprávy</th></tr>
-      <tr><td><kbd>Ctrl</kbd>+<kbd>R</kbd></td><td>Odpovědět</td></tr>
-      <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd></td><td>Odpovědět všem</td></tr>
-      <tr><td><kbd>Ctrl</kbd>+<kbd>L</kbd></td><td>Přeposlat</td></tr>
-      <tr><td><kbd>Ctrl</kbd>+<kbd>E</kbd></td><td>Archivovat</td></tr>
-      <tr><td><kbd>Delete</kbd></td><td>Do koše</td></tr>
-      <tr><td><kbd>Ctrl</kbd>+<kbd>D</kbd></td><td>Hvězdička</td></tr>
-      <tr><td><kbd>Ctrl</kbd>+<kbd>H</kbd></td><td>Odložit</td></tr>
-      <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>U</kbd></td><td>Označit jako nepřečtené</td></tr>
-      <tr><th colspan="2">Seznam zpráv</th></tr>
-      <tr><td><kbd>Ctrl</kbd>+<kbd>A</kbd></td><td>Vybrat všechny zprávy</td></tr>
-      <tr><td><kbd>Esc</kbd></td><td>Zrušit výběr</td></tr>
-      <tr><th colspan="2">Psaní zprávy</th></tr>
-      <tr><td><kbd>Ctrl</kbd>+<kbd>Enter</kbd></td><td>Odeslat</td></tr>
-      <tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>Uložit koncept</td></tr>
-      <tr><td><kbd>Ctrl</kbd>+<kbd>B</kbd> / <kbd>I</kbd> / <kbd>U</kbd></td><td>Tučně / kurzíva / podtržení</td></tr>
-      <tr><td><kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>Odkaz</td></tr>
-      <tr><td><kbd>Esc</kbd></td><td>Zavřít (koncept se uloží)</td></tr>
+      <tr><th colspan="2">General</th></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>N</kbd></td><td>New message</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>F</kbd></td><td>Search</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>J</kbd></td><td>Ask your mail (AI)</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd></td><td>Contacts</td></tr>
+      <tr><td><kbd>F5</kbd></td><td>Refresh</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>,</kbd></td><td>Preferences</td></tr>
+      <tr><td><kbd>F1</kbd></td><td>Help (this documentation)</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>?</kbd></td><td>Keyboard shortcuts</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Q</kbd></td><td>Quit</td></tr>
+      <tr><th colspan="2">Messages</th></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>R</kbd></td><td>Reply</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd></td><td>Reply to all</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>L</kbd></td><td>Forward</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>E</kbd></td><td>Archive</td></tr>
+      <tr><td><kbd>Delete</kbd></td><td>Move to trash</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>D</kbd></td><td>Star</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>H</kbd></td><td>Snooze</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>U</kbd></td><td>Mark as unread</td></tr>
+      <tr><th colspan="2">Message list</th></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>A</kbd></td><td>Select all messages</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>Cancel the selection</td></tr>
+      <tr><th colspan="2">Writing a message</th></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Enter</kbd></td><td>Send</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>Save the draft</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>B</kbd> / <kbd>I</kbd> / <kbd>U</kbd></td><td>Bold / italic / underline</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>Link</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>Close (the draft is saved)</td></tr>
     </tbody>
   </table>
   </div>
 </section>
 
 <!-- ============================================================ -->
-<section id="predvolby">
-  <h2>Předvolby</h2>
-  <p>Otevřou se přes <kbd>Ctrl</kbd>+<kbd>,</kbd>. Stránky jsou pro všechny účty ve stejném pořadí.</p>
+<section id="preferences">
+  <h2>Preferences</h2>
+  <p>Open them with <kbd>Ctrl</kbd>+<kbd>,</kbd>. The pages are in the same order for all accounts.</p>
   <div class="table-wrap">
   <table>
-    <thead><tr><th>Stránka</th><th>Co obsahuje</th></tr></thead>
+    <thead><tr><th>Page</th><th>What it contains</th></tr></thead>
     <tbody>
-      <tr><td><b>AI</b></td><td>Lokální AI (Ollama, Jen lokálně, aktualizace, shrnutí předem, porovnání modelů), poskytovatel a model pro asistenta a spamfiltr, API klíče, automatické funkce (třídění do štítků, ranní přehled)</td></tr>
-      <tr><td><b>Spamfiltr</b></td><td>Zapnutí AI filtru, práh pro přesun do spamu, zobrazování pošty až po kontrole, stav blocklistů</td></tr>
-      <tr><td><b>Zprávy</b></td><td>Vlákna, zpoždění odeslání, přikládání veřejného klíče, výchozí e-mailová aplikace, běh na pozadí a spouštění po přihlášení, aktualizace, offline cache, podpis</td></tr>
-      <tr><td><b>Pravidla</b></td><td>Pravidla pro příchozí poštu</td></tr>
-      <tr><td><b>PGP</b></td><td>Vlastní klíče (vytvořit, importovat, zálohovat, odstranit), klíče kontaktů, hledání na keys.openpgp.org</td></tr>
+      <tr><td><b>AI</b></td><td>Local AI (Ollama, Local only, updates, summaries in advance, model comparison), the provider and model for the assistant and the spam filter, API keys, automatic features (sorting into labels, morning overview)</td></tr>
+      <tr><td><b>Spam Filter</b></td><td>Turning the AI filter on, the threshold for moving to spam, showing mail only after the check, blocklist status</td></tr>
+      <tr><td><b>Messages</b></td><td>Interface language, threads, send delay, attaching your public key, default email application, running in the background and starting after login, updates, offline cache, signature</td></tr>
+      <tr><td><b>Rules</b></td><td>Rules for incoming mail</td></tr>
+      <tr><td><b>PGP</b></td><td>Your own keys (create, import, back up, remove), contact keys, searching keys.openpgp.org</td></tr>
     </tbody>
   </table>
   </div>
 </section>
 
 <!-- ============================================================ -->
-<section id="soukromi">
-  <h2>Soukromí a data</h2>
-  <h3>Co odchází k AI</h3>
+<section id="privacy">
+  <h2>Privacy and Data</h2>
+  <h3>What is sent to the AI</h3>
   <ul>
-    <li>S cloudovým poskytovatelem odchází obsah zpráv, které AI zpracovává (spamfiltr, shrnutí, návrhy). Spamfiltr posílá jen prvních 6000 znaků těla.</li>
-    <li>U OpenAI se posílá se <code>store: false</code>. Mistral zpracovává data v EU.</li>
-    <li>S lokální AI nebo v režimu <b>Jen lokálně</b> nic neodchází.</li>
+    <li>With a cloud provider, the content of the messages the AI processes is sent to it (spam filter, summaries, suggestions). The spam filter sends only the first 6,000 characters of the body.</li>
+    <li>Requests to OpenAI are sent with <code>store: false</code>. Mistral processes data in the EU.</li>
+    <li>With local AI or in <b>Local only</b> mode, nothing leaves your computer.</li>
   </ul>
-  <h3>Kde jsou data</h3>
+  <h3>Where the data is</h3>
   <div class="table-wrap">
   <table>
-    <thead><tr><th>Co</th><th>Kde</th></tr></thead>
+    <thead><tr><th>What</th><th>Where</th></tr></thead>
     <tbody>
-      <tr><td>Nastavení</td><td><code>~/.config/klient/config.json</code></td></tr>
-      <tr><td>Blocklisty, rozhodnutí filtru, klíče, cache, Ollama</td><td><code>~/.local/share/klient/</code></td></tr>
-      <tr><td>Relace, hesla IMAP, API klíče, klíče cache a PGP</td><td>klíčenka GNOME (Secret Service)</td></tr>
+      <tr><td>Settings</td><td><code>~/.config/klient/config.json</code></td></tr>
+      <tr><td>Blocklists, filter decisions, keys, cache, Ollama</td><td><code>~/.local/share/klient/</code></td></tr>
+      <tr><td>Sessions, IMAP passwords, API keys, cache and PGP keys</td><td>GNOME keyring (Secret Service)</td></tr>
     </tbody>
   </table>
   </div>
 </section>
 
 <!-- ============================================================ -->
-<section id="omezeni">
-  <h2>Známá omezení</h2>
+<section id="limitations">
+  <h2>Known Limitations</h2>
   <ul>
-    <li>Proton API není pro aplikace třetích stran oficiálně dokumentované a může se změnit. Proton může přihlášení odmítnout nebo vyžádat CAPTCHA – pak se jednou přihlaste přes web ze stejné sítě.</li>
-    <li>U Protonu hledání neprochází text zpráv (těla jsou na serveru šifrovaná).</li>
-    <li>Odložení a naplánované odeslání u IMAP služeb fungují jen, když Klient běží.</li>
-    <li>U Gmailu Klient při čtení doručené pošty neví, jaké štítky už zpráva má – pozná to až ve složce štítku.</li>
-    <li>Outlook / Hotmail není podporovaný.</li>
-    <li>Přílohy se do offline cache neukládají.</li>
-    <li>Pravidla jsou společná pro všechny účty (cílové složky a štítky patří účtu, ve kterém vznikly).</li>
+    <li>The Proton API is not officially documented for third-party applications and may change. Proton may reject a login or ask for a CAPTCHA – then log in once on the web from the same network.</li>
+    <li>On Proton, search does not cover the message text (the bodies are encrypted on the server).</li>
+    <li>With IMAP services, snoozing and scheduled sending work only while Klient is running.</li>
+    <li>With Gmail, Klient does not know which labels a message already has while you read the inbox – it learns that only in the label's folder.</li>
+    <li>Outlook / Hotmail is not supported.</li>
+    <li>Attachments are not stored in the offline cache.</li>
+    <li>Rules are shared by all accounts (their target folders and labels belong to the account they were created in).</li>
   </ul>
 </section>
 
 <!-- ============================================================ -->
-<section id="autor">
-  <h2>O aplikaci</h2>
-  <p><b>Klient</b> vyvíjí Libor Macák – <a href="https://libormacak.eu">libormacak.eu</a>, <a href="mailto:jsem@libormacak.eu">jsem@libormacak.eu</a>.</p>
-  <p>Zdrojový kód je veřejně na GitHubu: <a href="https://github.com/Imbecile6197/klient">github.com/Imbecile6197/klient</a> (licence GPL-3.0).</p>
-  <p>Postaveno na GTK4, libadwaita, WebKitGTK, go-proton-api, gopenpgp a knihovnách go-imap/go-smtp.</p>
+<section id="about">
+  <h2>About</h2>
+  <p><b>Klient</b> is developed by Libor Macák – <a href="https://libormacak.eu">libormacak.eu</a>, <a href="mailto:jsem@libormacak.eu">jsem@libormacak.eu</a>.</p>
+  <p>The source code is public on GitHub: <a href="https://github.com/Imbecile6197/klient">github.com/Imbecile6197/klient</a> (GPL-3.0 license). Bug reports and ideas are welcome in <a href="https://github.com/Imbecile6197/klient/issues">Issues</a>.</p>
+  <p>Built with GTK4, libadwaita, WebKitGTK, go-proton-api, GopenPGP and the go-imap/go-smtp libraries.</p>
 </section>
 
-<footer>Dokumentace k verzi 0.6.8 · září 2026</footer>
+<footer>Documentation for version 0.7.0 · September 2026 · <a href="index.cs.html" hreflang="cs" lang="cs">Česká verze</a></footer>
 
 </div>
 </main>

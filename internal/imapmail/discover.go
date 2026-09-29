@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/Imbecile6197/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/i18n"
 )
 
 // Known services (checked first, no network needed).
@@ -51,7 +52,7 @@ func Discover(ctx context.Context, email string) (config.MailServer, error) {
 	email = strings.TrimSpace(email)
 	domain := domainOf(email)
 	if domain == "" {
-		return config.MailServer{}, errors.New("neplatná e-mailová adresa")
+		return config.MailServer{}, errors.New(i18n.T("invalid email address"))
 	}
 	base := config.MailServer{Email: email, Username: email, Kind: KindForEmail(email)}
 	for _, p := range presets {
@@ -90,7 +91,7 @@ func Discover(ctx context.Context, email string) (config.MailServer, error) {
 	s := base
 	s.IMAPHost, s.IMAPPort, s.IMAPSecurity = "imap."+domain, 993, "ssl"
 	s.SMTPHost, s.SMTPPort, s.SMTPSecurity = "smtp."+domain, 465, "ssl"
-	return s, fmt.Errorf("nastavení serverů pro %s se nepodařilo zjistit – zkontrolujte odhad", domain)
+	return s, fmt.Errorf(i18n.T("could not find the server settings for %s – check the suggested ones"), domain)
 }
 
 type clientConfig struct {

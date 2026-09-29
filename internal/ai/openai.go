@@ -8,6 +8,8 @@ import (
 	"github.com/openai/openai-go/v3/option"
 	"github.com/openai/openai-go/v3/responses"
 	"github.com/openai/openai-go/v3/shared"
+
+	"github.com/Imbecile6197/klient/internal/i18n"
 )
 
 type openaiProvider struct{ api openai.Client }
@@ -47,7 +49,7 @@ func (o *openaiProvider) Complete(ctx context.Context, req Request) (string, err
 		return "", err
 	}
 	if resp.Status == responses.ResponseStatusIncomplete {
-		return "", errors.New("odpověď modelu je neúplná (" + string(resp.IncompleteDetails.Reason) + ")")
+		return "", errors.New(i18n.T("the model's answer is incomplete (") + string(resp.IncompleteDetails.Reason) + ")")
 	}
 	return resp.OutputText(), nil
 }

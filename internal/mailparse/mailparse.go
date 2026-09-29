@@ -13,6 +13,8 @@ import (
 	"github.com/emersion/go-message"
 	_ "github.com/emersion/go-message/charset"
 	"golang.org/x/net/html"
+
+	"github.com/Imbecile6197/klient/internal/i18n"
 )
 
 type Part struct {
@@ -160,7 +162,7 @@ func HTMLToText(src string) (string, []string) {
 					var k, v []byte
 					k, v, hasAttr = z.TagAttr()
 					if string(k) == "alt" && len(v) > 0 {
-						sb.WriteString("[obrázek: " + string(v) + "]")
+						sb.WriteString(i18n.T("[image: ") + string(v) + "]")
 					}
 				}
 			}

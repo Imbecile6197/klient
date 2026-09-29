@@ -11,6 +11,8 @@ import (
 
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
 	"github.com/zalando/go-keyring"
+
+	"github.com/Imbecile6197/klient/internal/i18n"
 )
 
 // Own keys of non-Proton accounts. The private key is stored on disk locked
@@ -48,7 +50,7 @@ func storeOwn(email string, key *crypto.Key) error {
 		return err
 	}
 	if err := keyring.Set("klient", passName(email), passStr); err != nil {
-		return fmt.Errorf("heslo ke klíči nejde uložit do klíčenky: %w", err)
+		return fmt.Errorf(i18n.T("cannot save the key passphrase to the keyring: %w"), err)
 	}
 	return os.WriteFile(ownFile(email), []byte(armored), 0o600)
 }
@@ -67,14 +69,14 @@ func GenerateOwnKey(name, email string) error {
 func ImportOwnKey(armored, passphrase, email string) error {
 	key, err := crypto.NewKeyFromArmored(armored)
 	if err != nil {
-		return fmt.Errorf("neplatný klíč: %w", err)
+		return fmt.Errorf(i18n.T("invalid key: %w"), err)
 	}
 	if !key.IsPrivate() {
-		return errors.New("to je veřejný klíč – pro podepisování a dešifrování je potřeba soukromý klíč")
+		return errors.New(i18n.T("this is a public key – signing and decryption need the private key"))
 	}
 	if locked, _ := key.IsLocked(); locked {
 		if key, err = key.Unlock([]byte(passphrase)); err != nil {
-			return errors.New("nesprávné heslo ke klíči")
+			return errors.New(i18n.T("wrong key passphrase"))
 		}
 	}
 	found := false
@@ -84,7 +86,7 @@ func ImportOwnKey(armored, passphrase, email string) error {
 		}
 	}
 	if !found {
-		return fmt.Errorf("klíč nepatří adrese %s", email)
+		return fmt.Errorf(i18n.T("the key does not belong to %s"), email)
 	}
 	return storeOwn(email, key)
 }
@@ -93,11 +95,11 @@ func ImportOwnKey(armored, passphrase, email string) error {
 func OwnKeyRing(email string) (*crypto.KeyRing, error) {
 	b, err := os.ReadFile(ownFile(email))
 	if err != nil {
-		return nil, errors.New("pro tuto adresu nemáte vlastní PGP klíč")
+		return nil, errors.New(i18n.T("you have no PGP key of your own for this address"))
 	}
 	pass, err := keyring.Get("klient", passName(email))
 	if err != nil {
-		return nil, fmt.Errorf("heslo ke klíči chybí v klíčence: %w", err)
+		return nil, fmt.Errorf(i18n.T("the key passphrase is missing from the keyring: %w"), err)
 	}
 	key, err := crypto.NewKeyFromArmored(string(b))
 	if err != nil {

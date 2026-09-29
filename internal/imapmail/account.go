@@ -27,6 +27,7 @@ import (
 
 	"github.com/Imbecile6197/klient/internal/cache"
 	"github.com/Imbecile6197/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/mailbox"
 	"github.com/Imbecile6197/klient/internal/pgp"
 	"github.com/Imbecile6197/klient/internal/protonmail"
@@ -36,7 +37,7 @@ import (
 var _ mailbox.Account = (*Account)(nil)
 
 // ErrAuth means the server rejected the login (wrong or revoked password).
-var ErrAuth = errors.New("server odmítl přihlášení – zkontrolujte heslo")
+var ErrAuth = errors.New(i18n.T("the server rejected the login – check the password"))
 
 // Account is one IMAP/SMTP account.
 type Account struct {
@@ -107,7 +108,7 @@ func (a *Account) dialWith(handler *imapclient.UnilateralDataHandler) (*imapclie
 // netErr marks connection problems (offline) as opposed to server answers.
 type netErr struct{ err error }
 
-func (e *netErr) Error() string { return "server " + "není dostupný: " + e.err.Error() }
+func (e *netErr) Error() string { return i18n.T("server unavailable: ") + e.err.Error() }
 func (e *netErr) Unwrap() error { return e.err }
 
 // IsOffline reports whether err means the server was unreachable.
@@ -368,7 +369,7 @@ func (a *Account) mailboxOf(id string) (string, error) {
 		// Gmail archives by removing the Inbox label: moving to All Mail.
 		return a.roles[protonmail.AllMailID], nil
 	}
-	return "", fmt.Errorf("složka %s na serveru neexistuje", protonmail.FolderByID(id).Name)
+	return "", fmt.Errorf(i18n.T("folder %s does not exist on the server"), protonmail.FolderByID(id).Name)
 }
 
 // folderOf is the folder ID of a mailbox.
@@ -426,7 +427,7 @@ type msgRef struct {
 func parseID(id string) (msgRef, error) {
 	parts := strings.Split(id, ".")
 	if len(parts) != 3 {
-		return msgRef{}, fmt.Errorf("neplatné ID zprávy")
+		return msgRef{}, errors.New(i18n.T("invalid message ID"))
 	}
 	mb, err := base64.RawURLEncoding.DecodeString(parts[0])
 	if err != nil {
@@ -435,7 +436,7 @@ func parseID(id string) (msgRef, error) {
 	v, err1 := strconv.ParseUint(parts[1], 10, 32)
 	u, err2 := strconv.ParseUint(parts[2], 10, 32)
 	if err1 != nil || err2 != nil {
-		return msgRef{}, fmt.Errorf("neplatné ID zprávy")
+		return msgRef{}, errors.New(i18n.T("invalid message ID"))
 	}
 	return msgRef{string(mb), uint32(v), imap.UID(u)}, nil
 }

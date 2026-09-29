@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"testing"
 	"time"
 
@@ -26,6 +27,8 @@ func TestMatchContacts(t *testing.T) {
 }
 
 func TestCountdownTexts(t *testing.T) {
+	defer i18n.Set(i18n.Lang())
+	i18n.Set("cs")
 	now := time.Now()
 	cases := map[time.Duration]string{
 		30 * time.Second:                             "za 29 s",
@@ -48,6 +51,24 @@ func TestCountdownTexts(t *testing.T) {
 	tomorrow := at(now.AddDate(0, 0, 1), 8)
 	if got := formatWhen(tomorrow); got != "zítra v 8:00" {
 		t.Errorf("formatWhen = %q", got)
+	}
+	// The same texts in English.
+	i18n.Set("en")
+	if got := countdown(now.Add(3*24*time.Hour + time.Hour)); got != "in 3 days" {
+		t.Errorf("en countdown = %q", got)
+	}
+	if got := unreadText(1); got != "1 unread message" {
+		t.Errorf("en unreadText = %q", got)
+	}
+	if got := formatWhen(tomorrow); got != "tomorrow at 8:00" {
+		t.Errorf("en formatWhen = %q", got)
+	}
+	if got := dayDate(time.Date(2026, 10, 5, 0, 0, 0, 0, time.Local)); got != "Mon Oct 5, 2026" {
+		t.Errorf("en dayDate = %q", got)
+	}
+	i18n.Set("cs")
+	if got := dayDate(time.Date(2026, 10, 5, 0, 0, 0, 0, time.Local)); got != "po 5. 10. 2026" {
+		t.Errorf("cs dayDate = %q", got)
 	}
 	if nm := nextMonday(now); nm.Weekday() != time.Monday || !nm.After(now) {
 		t.Errorf("nextMonday = %v", nm)

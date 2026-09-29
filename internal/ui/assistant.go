@@ -2,6 +2,7 @@ package ui
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -13,6 +14,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/pango"
 
 	"github.com/Imbecile6197/klient/internal/ai"
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/mailbox"
 	"github.com/Imbecile6197/klient/internal/mailparse"
 	"github.com/Imbecile6197/klient/internal/protonmail"
@@ -47,7 +49,7 @@ func labelNames(ls []protonmail.UserLabel) []string {
 func (a *App) suggestLabel(ctx context.Context, acc mailbox.Account, msg *protonmail.Message) (protonmail.UserLabel, ai.LabelChoice, error) {
 	labels := tagLabels(ctx, acc)
 	if len(labels) == 0 {
-		return protonmail.UserLabel{}, ai.LabelChoice{}, fmt.Errorf("nemáte žádné štítky – vytvořte je na webu Protonu")
+		return protonmail.UserLabel{}, ai.LabelChoice{}, errors.New(i18n.T("you have no labels – create them on the Proton website"))
 	}
 	from := ""
 	if msg.Meta.Sender != nil {
@@ -104,34 +106,34 @@ func (a *App) autoLabel(acc mailbox.Account, meta protonmail.Summary) string {
 	return l.Name
 }
 
-// suggestLabelFor is the "AI: navrhnout štítek" message action.
+// suggestLabelFor is the "Suggest a Label (AI)" message action.
 func (m *mainView) suggestLabelFor(msg *protonmail.Message) {
 	if !m.a.ai.HasAssistant() {
-		m.a.toastWithAction("AI asistent není nastavený", "Nastavit", m.a.openPreferences)
+		m.a.toastWithAction(i18n.T("The AI assistant is not set up"), i18n.T("Set Up"), m.a.openPreferences)
 		return
 	}
-	m.a.toast("AI vybírá štítek…")
+	m.a.toast(i18n.T("The AI is choosing a label…"))
 	acc := m.a.acc
 	go func() {
 		l, ch, err := m.a.suggestLabel(m.a.ctx, acc, msg)
 		ui(func() {
 			switch {
 			case err != nil:
-				m.a.toast("Návrh štítku selhal: " + ai.Explain(m.a.cfg.AssistantProvider, err).Text)
+				m.a.toast(i18n.T("Suggesting a label failed: ") + ai.Explain(m.a.cfg.AssistantProvider, err).Text)
 			case l.ID == "":
-				m.a.toast("AI nenašla vhodný štítek: " + ch.Reason)
+				m.a.toast(i18n.T("The AI found no suitable label: ") + ch.Reason)
 			case hasLabel(msg.Meta, l.ID):
-				m.a.toast("Zpráva už má štítek " + l.Name)
+				m.a.toast(fmt.Sprintf(i18n.T("The message already has the label %s"), l.Name))
 			default:
-				m.a.toastWithAction(fmt.Sprintf("AI navrhuje štítek „%s“ – %s", l.Name, ch.Reason), "Použít", func() {
+				m.a.toastWithAction(fmt.Sprintf(i18n.T("The AI suggests the label “%s” – %s"), l.Name, ch.Reason), i18n.T("Apply"), func() {
 					go func() {
 						err := acc.SetLabel(m.a.ctx, l.ID, true, msg.Meta.ID)
 						ui(func() {
 							if err != nil {
-								m.a.toast("Přidání štítku selhalo: " + err.Error())
+								m.a.toast(i18n.T("Adding the label failed: ") + err.Error())
 								return
 							}
-							m.a.toast("Přidán štítek " + l.Name)
+							m.a.toast(fmt.Sprintf(i18n.T("Label %s added"), l.Name))
 							m.scheduleRefresh()
 						})
 					}()
@@ -144,9 +146,8 @@ func (m *mainView) suggestLabelFor(msg *protonmail.Message) {
 // ---- Ask your mail -------------------------------------------------------------
 
 func today() string {
-	days := []string{"neděle", "pondělí", "úterý", "středa", "čtvrtek", "pátek", "sobota"}
-	now := time.Now()
-	return days[now.Weekday()] + " " + now.Format("2. 1. 2006")
+	// For the AI prompts; the model answers in the interface language anyway.
+	return time.Now().Format("Monday, January 2, 2006")
 }
 
 func docOf(msg *protonmail.Message) ai.MailDoc {
@@ -154,7 +155,7 @@ func docOf(msg *protonmail.Message) ai.MailDoc {
 	if msg.Meta.Sender != nil {
 		from = mailparse.DisplayAddress(msg.Meta.Sender)
 	}
-	return ai.MailDoc{From: from, Date: time.Unix(msg.Meta.Time, 0).Format("2. 1. 2006 15:04"), Subject: msg.Meta.Subject, Body: msg.Text}
+	return ai.MailDoc{From: from, Date: time.Unix(msg.Meta.Time, 0).Format("2006-01-02 15:04"), Subject: msg.Meta.Subject, Body: msg.Text}
 }
 
 // askMail answers questions about the mailbox: the AI picks search terms,
@@ -164,28 +165,28 @@ func (a *App) askMail() {
 		return
 	}
 	if !a.ai.HasAssistant() {
-		a.toastWithAction("AI asistent není nastavený", "Nastavit", a.openPreferences)
+		a.toastWithAction(i18n.T("The AI assistant is not set up"), i18n.T("Set Up"), a.openPreferences)
 		return
 	}
 	d := adw.NewDialog()
-	d.SetTitle("Zeptat se pošty")
+	d.SetTitle(i18n.T("Ask Your Mail"))
 	d.SetContentWidth(640)
 	d.SetContentHeight(620)
 	tv := adw.NewToolbarView()
 	tv.AddTopBar(adw.NewHeaderBar())
 
 	entry := gtk.NewEntry()
-	entry.SetPlaceholderText("Např. „Kolik byla poslední faktura za elektřinu?“")
+	entry.SetPlaceholderText(i18n.T("E.g. “How much was the last electricity bill?”"))
 	entry.SetHExpand(true)
-	ask := gtk.NewButtonWithLabel("Zeptat se")
+	ask := gtk.NewButtonWithLabel(i18n.T("Ask"))
 	ask.AddCSSClass("suggested-action")
 	row := gtk.NewBox(gtk.OrientationHorizontal, 6)
 	row.Append(entry)
 	row.Append(ask)
 
-	noteText := "AI navrhne, co hledat, Klient zprávy najde a dešifruje u vás a AI z nich odpoví. Obsah nalezených zpráv se pošle zvolenému poskytovateli AI."
+	noteText := i18n.T("The AI suggests what to search for, Klient finds and decrypts the messages on your computer, and the AI answers from them. The content of the messages found is sent to the chosen AI provider.")
 	if a.ai.AssistantLocal() {
-		noteText = "AI navrhne, co hledat, Klient zprávy najde a dešifruje a lokální model z nich odpoví – vše zůstává ve vašem počítači. Na procesoru to může trvat několik minut."
+		noteText = i18n.T("The AI suggests what to search for, Klient finds and decrypts the messages, and the local model answers from them – everything stays on your computer. On a processor this can take several minutes.")
 	}
 	note := gtk.NewLabel(noteText)
 	note.SetWrap(true)
@@ -212,7 +213,7 @@ func (a *App) askMail() {
 	card.SetVisible(false)
 
 	sources := adw.NewPreferencesGroup()
-	sources.SetTitle("Zdroje")
+	sources.SetTitle(i18n.T("Sources"))
 	sources.SetVisible(false)
 	var sourceRows []gtk.Widgetter
 
@@ -246,14 +247,14 @@ func (a *App) askMail() {
 		}
 		sourceRows = nil
 		sources.SetVisible(false)
-		status.SetText("Vymýšlím, co hledat…")
+		status.SetText(i18n.T("Working out what to search for…"))
 		go func() {
 			ctx, cancel := context.WithTimeout(a.ctx, 15*time.Minute)
 			defer cancel()
 			queries, err := a.ai.SearchPlan(ctx, q, today())
 			var found []protonmail.Summary
 			if err == nil {
-				ui(func() { status.SetText("Hledám: " + strings.Join(queries, ", ") + "…") })
+				ui(func() { status.SetText(fmt.Sprintf(i18n.T("Searching: %s…"), strings.Join(queries, ", "))) })
 				seen := map[string]bool{}
 				for _, sq := range queries {
 					res, _ := acc.Search(ctx, protonmail.AllMailID, sq, 3000)
@@ -272,7 +273,9 @@ func (a *App) askMail() {
 			var docs []ai.MailDoc
 			var used []protonmail.Summary
 			if err == nil && len(found) > 0 {
-				ui(func() { status.SetText(fmt.Sprintf("Čtu %d zpráv…", len(found))) })
+				ui(func() {
+					status.SetText(fmt.Sprintf(i18n.N("Reading %d message…", "Reading %d messages…", len(found)), len(found)))
+				})
 				for _, s := range found {
 					if msg, e := acc.Get(ctx, s.ID); e == nil {
 						docs = append(docs, docOf(msg))
@@ -282,26 +285,26 @@ func (a *App) askMail() {
 			}
 			out := ""
 			if err == nil && len(docs) > 0 {
-				ui(func() { status.SetText("Píšu odpověď…") })
+				ui(func() { status.SetText(i18n.T("Writing the answer…")) })
 				out, err = a.ai.AnswerFromMail(ctx, q, today(), docs)
 			}
 			ui(func() {
 				ask.SetSensitive(true)
 				switch {
 				case err != nil:
-					status.SetText("Nepovedlo se: " + ai.Explain(a.cfg.AssistantProvider, err).Text)
+					status.SetText(i18n.T("Something went wrong: ") + ai.Explain(a.cfg.AssistantProvider, err).Text)
 					return
 				case len(docs) == 0:
-					status.SetText("Nenašel jsem žádné zprávy (hledáno: " + strings.Join(queries, ", ") + "). Zkuste otázku formulovat jinak, třeba se jménem odesílatele.")
+					status.SetText(fmt.Sprintf(i18n.T("No messages found (searched for: %s). Try rephrasing the question, for example with the sender's name."), strings.Join(queries, ", ")))
 					return
 				}
-				status.SetText(fmt.Sprintf("Odpověď z %d nalezených zpráv", len(docs)))
+				status.SetText(fmt.Sprintf(i18n.N("Answer from %d message found", "Answer from %d messages found", len(docs)), len(docs)))
 				answer.SetText(strings.TrimSpace(out))
 				card.SetVisible(true)
 				for i, s := range used {
 					s := s
 					r := adw.NewActionRow()
-					r.SetTitle(fmt.Sprintf("[%d] %s", i+1, orDefault(s.Subject, "(bez předmětu)")))
+					r.SetTitle(fmt.Sprintf("[%d] %s", i+1, orDefault(s.Subject, i18n.T("(no subject)"))))
 					from := ""
 					if s.Sender != nil {
 						from = mailparse.DisplayName(s.Sender)
@@ -357,7 +360,7 @@ func (a *App) digestLoop() {
 				return
 			}
 			a.digest = text
-			note := gio.NewNotification("Ranní přehled: " + unreadText(n))
+			note := gio.NewNotification(fmt.Sprintf(i18n.T("Morning overview: %s"), unreadText(n)))
 			first, _, _ := strings.Cut(strings.TrimSpace(text), "\n")
 			note.SetBody(first)
 			note.SetDefaultAction("app.digest")
@@ -396,7 +399,7 @@ func (a *App) buildDigest() (string, int, error) {
 			if msg, err := acc.Get(ctx, s.ID); err == nil {
 				doc := docOf(msg)
 				if len(a.cfg.Accounts) > 1 {
-					doc.Subject += " (účet " + acc.Email() + ")"
+					doc.Subject += " (account " + acc.Email() + ")"
 				}
 				docs = append(docs, doc)
 				n++
@@ -404,7 +407,7 @@ func (a *App) buildDigest() (string, int, error) {
 		}
 	}
 	if len(docs) == 0 {
-		return "Žádná nepřečtená pošta. 🎉", 0, nil
+		return i18n.T("No unread mail. 🎉"), 0, nil
 	}
 	out, err := a.ai.Digest(ctx, today(), docs)
 	return out, len(docs), err
@@ -414,17 +417,17 @@ func (a *App) buildDigest() (string, int, error) {
 func (a *App) showDigest(generate bool) {
 	a.showWindow()
 	if !a.ai.HasAssistant() {
-		a.toastWithAction("AI asistent není nastavený", "Nastavit", a.openPreferences)
+		a.toastWithAction(i18n.T("The AI assistant is not set up"), i18n.T("Set Up"), a.openPreferences)
 		return
 	}
 	d := adw.NewDialog()
-	d.SetTitle("Přehled nepřečtené pošty")
+	d.SetTitle(i18n.T("Unread Mail Overview"))
 	d.SetContentWidth(620)
 	d.SetContentHeight(560)
 	tv := adw.NewToolbarView()
 	hb := adw.NewHeaderBar()
 	refresh := gtk.NewButtonFromIconName("view-refresh-symbolic")
-	refresh.SetTooltipText("Připravit znovu")
+	refresh.SetTooltipText(i18n.T("Prepare Again"))
 	hb.PackStart(refresh)
 	tv.AddTopBar(hb)
 	label := gtk.NewLabel("")
@@ -454,7 +457,7 @@ func (a *App) showDigest(generate bool) {
 			ui(func() {
 				refresh.SetSensitive(true)
 				if err != nil {
-					text = "Přehled se nepodařilo připravit: " + ai.Explain(a.cfg.AssistantProvider, err).Text
+					text = i18n.T("The overview could not be prepared: ") + ai.Explain(a.cfg.AssistantProvider, err).Text
 				} else {
 					a.digest = text
 				}
@@ -477,7 +480,7 @@ func (a *App) showDigest(generate bool) {
 
 func (a *App) showShortcuts() {
 	d := adw.NewDialog()
-	d.SetTitle("Klávesové zkratky")
+	d.SetTitle(i18n.T("Keyboard Shortcuts"))
 	d.SetContentWidth(520)
 	d.SetContentHeight(680)
 	tv := adw.NewToolbarView()
@@ -487,39 +490,39 @@ func (a *App) showShortcuts() {
 		title string
 		keys  [][2]string
 	}{
-		{"Obecné", [][2]string{
-			{"<Control>n", "Nová zpráva"},
-			{"<Control>f", "Hledat"},
-			{"<Control>j", "Zeptat se pošty (AI)"},
-			{"<Control><Shift>k", "Kontakty"},
-			{"F5", "Obnovit"},
-			{"<Control>comma", "Předvolby"},
-			{"F1", "Nápověda"},
-			{"<Control>question", "Klávesové zkratky"},
-			{"<Control>q", "Ukončit"},
+		{i18n.T("General"), [][2]string{
+			{"<Control>n", i18n.T("New Message")},
+			{"<Control>f", i18n.T("Search")},
+			{"<Control>j", i18n.T("Ask Your Mail (AI)")},
+			{"<Control><Shift>k", i18n.T("Contacts")},
+			{"F5", i18n.T("Refresh")},
+			{"<Control>comma", i18n.T("Preferences")},
+			{"F1", i18n.T("Help")},
+			{"<Control>question", i18n.T("Keyboard Shortcuts")},
+			{"<Control>q", i18n.T("Quit")},
 		}},
-		{"Zprávy", [][2]string{
-			{"<Control>r", "Odpovědět"},
-			{"<Control><Shift>r", "Odpovědět všem"},
-			{"<Control>l", "Přeposlat"},
-			{"<Control>e", "Archivovat"},
-			{"Delete", "Do koše"},
-			{"<Control>d", "Hvězdička"},
-			{"<Control>h", "Odložit"},
-			{"<Control><Shift>u", "Označit jako nepřečtené"},
+		{i18n.T("Messages"), [][2]string{
+			{"<Control>r", i18n.T("Reply")},
+			{"<Control><Shift>r", i18n.T("Reply to All")},
+			{"<Control>l", i18n.T("Forward")},
+			{"<Control>e", i18n.C("action", "Archive")},
+			{"Delete", i18n.T("Move to Trash")},
+			{"<Control>d", i18n.T("Star")},
+			{"<Control>h", i18n.T("Snooze")},
+			{"<Control><Shift>u", i18n.T("Mark as Unread")},
 		}},
-		{"Seznam zpráv", [][2]string{
-			{"<Control>a", "Vybrat všechny zprávy"},
-			{"Escape", "Zrušit výběr"},
+		{i18n.T("Message List"), [][2]string{
+			{"<Control>a", i18n.T("Select All Messages")},
+			{"Escape", i18n.T("Cancel Selection")},
 		}},
-		{"Psaní zprávy", [][2]string{
-			{"<Control>Return", "Odeslat"},
-			{"<Control>s", "Uložit koncept"},
-			{"<Control>b", "Tučně"},
-			{"<Control>i", "Kurzíva"},
-			{"<Control>u", "Podtržení"},
-			{"<Control>k", "Odkaz"},
-			{"Escape", "Zavřít (koncept se uloží)"},
+		{i18n.T("Writing a Message"), [][2]string{
+			{"<Control>Return", i18n.T("Send")},
+			{"<Control>s", i18n.T("Save Draft")},
+			{"<Control>b", i18n.T("Bold")},
+			{"<Control>i", i18n.T("Italic")},
+			{"<Control>u", i18n.T("Underline")},
+			{"<Control>k", i18n.T("Link")},
+			{"Escape", i18n.T("Close (the draft is saved)")},
 		}},
 	}
 	for _, g := range groups {
@@ -536,11 +539,11 @@ func (a *App) showShortcuts() {
 		p.Add(grp)
 	}
 	mouse := adw.NewPreferencesGroup()
-	mouse.SetTitle("Myš")
+	mouse.SetTitle(i18n.T("Mouse"))
 	for _, t := range [][2]string{
-		{"Ctrl/Shift + klik", "Výběr více zpráv"},
-		{"Přetažení zprávy na složku", "Přesunout do složky"},
-		{"Přetažení souborů do okna zprávy", "Přiložit soubory"},
+		{i18n.T("Ctrl/Shift + click"), i18n.T("Select several messages")},
+		{i18n.T("Drag a message onto a folder"), i18n.T("Move to the folder")},
+		{i18n.T("Drag files into the message window"), i18n.T("Attach the files")},
 	} {
 		r := adw.NewActionRow()
 		r.SetTitle(t[1])

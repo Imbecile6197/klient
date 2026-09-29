@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/Imbecile6197/klient/internal/i18n"
 )
 
 // Client talks to the Ollama HTTP API.
@@ -96,7 +98,7 @@ func (c *Client) Delete(ctx context.Context, model string) error {
 // for the current layer and a status text.
 func (c *Client) Pull(ctx context.Context, model string, progress func(status string, done, total int64)) error {
 	if IsCloud(model) {
-		return errors.New("cloudové modely Ollamy běží mimo počítač – nepoužívají se")
+		return errors.New(i18n.T("Ollama cloud models run outside this computer, so they are not used"))
 	}
 	b, _ := json.Marshal(map[string]any{"model": model, "stream": true})
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.base+"/api/pull", bytes.NewReader(b))
@@ -157,7 +159,7 @@ type Stats struct {
 
 func (c *Client) Chat(ctx context.Context, r ChatRequest) (string, Stats, error) {
 	if IsCloud(r.Model) {
-		return "", Stats{}, errors.New("cloudové modely Ollamy se nepoužívají")
+		return "", Stats{}, errors.New(i18n.T("Ollama cloud models are not used"))
 	}
 	body := map[string]any{
 		"model": r.Model,

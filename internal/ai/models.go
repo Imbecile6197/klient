@@ -11,6 +11,8 @@ import (
 	"github.com/openai/openai-go/v3"
 	openaiopt "github.com/openai/openai-go/v3/option"
 	"google.golang.org/genai"
+
+	"github.com/Imbecile6197/klient/internal/i18n"
 )
 
 // ListModels returns the text models the account can use right now, so the
@@ -69,7 +71,7 @@ func ListModels(ctx context.Context, provider, apiKey string) ([]string, error) 
 		}
 		out = slices.Compact(slices.Sorted(slices.Values(out)))
 	default:
-		return nil, fmt.Errorf("neznámý poskytovatel %q", provider)
+		return nil, fmt.Errorf(i18n.T("unknown provider %q"), provider)
 	}
 	slices.Sort(out)
 	slices.Reverse(out) // newest versions first for the usual naming schemes

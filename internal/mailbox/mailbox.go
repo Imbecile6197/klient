@@ -15,6 +15,7 @@ import (
 	"github.com/ProtonMail/go-proton-api"
 
 	"github.com/Imbecile6197/klient/internal/cache"
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/protonmail"
 )
 
@@ -23,7 +24,7 @@ func (c Caps) CanSnooze() bool   { return c.ServerSnooze || c.LocalSnooze }
 func (c Caps) CanSchedule() bool { return c.ServerSchedule || c.LocalSchedule }
 
 // ErrUnsupported is returned for features a service does not have.
-var ErrUnsupported = errors.New("tato služba to nepodporuje")
+var ErrUnsupported = errors.New(i18n.T("this service does not support it"))
 
 // Kind identifies the service (for logos and service specific texts).
 type Kind string

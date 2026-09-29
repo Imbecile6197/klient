@@ -10,13 +10,14 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 	"github.com/diamondburned/gotk4/pkg/pango"
 
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/protonmail"
 )
 
 // ---- Account switcher ----------------------------------------------------------
 
 // accountSwitcher is the sidebar title: name and address of the shown
-// account; with a click it lists all accounts and "Přidat účet".
+// account; with a click it lists all accounts and "Add Account".
 func (m *mainView) accountSwitcher() gtk.Widgetter {
 	title := adw.NewWindowTitle(m.a.acc.DisplayName(), m.a.acc.Email())
 	box := gtk.NewBox(gtk.OrientationHorizontal, 6)
@@ -26,7 +27,7 @@ func (m *mainView) accountSwitcher() gtk.Widgetter {
 	m.accountBtn = gtk.NewMenuButton()
 	m.accountBtn.SetChild(box)
 	m.accountBtn.AddCSSClass("flat")
-	m.accountBtn.SetTooltipText("Účty")
+	m.accountBtn.SetTooltipText(i18n.T("Accounts"))
 	m.accountBtn.SetCreatePopupFunc(func(b *gtk.MenuButton) { b.SetPopover(m.accountPopover()) })
 	m.updateAccountBadges()
 	return m.accountBtn
@@ -87,7 +88,7 @@ func (m *mainView) accountPopover() *gtk.Popover {
 	add.AddCSSClass("flat")
 	ac := adw.NewButtonContent()
 	ac.SetIconName("list-add-symbolic")
-	ac.SetLabel("Přidat účet…")
+	ac.SetLabel(i18n.T("Add Account…"))
 	ac.SetHAlign(gtk.AlignStart)
 	add.SetChild(ac)
 	add.ConnectClicked(func() {
@@ -112,10 +113,10 @@ func (m *mainView) updateAccountBadges() {
 	}
 	if others > 0 {
 		m.accountBtn.AddCSSClass("accounts-unread")
-		m.accountBtn.SetTooltipText(fmt.Sprintf("Účty – v ostatních účtech: %s", unreadText(others)))
+		m.accountBtn.SetTooltipText(fmt.Sprintf(i18n.T("Accounts – %s in the other accounts"), unreadText(others)))
 	} else {
 		m.accountBtn.RemoveCSSClass("accounts-unread")
-		m.accountBtn.SetTooltipText("Účty")
+		m.accountBtn.SetTooltipText(i18n.T("Accounts"))
 	}
 }
 
@@ -175,7 +176,7 @@ func (m *mainView) dropOn(f protonmail.Folder, ids []string) {
 	}
 	switch f.ID {
 	case protonmail.AllMailID, protonmail.DraftsID, protonmail.SentID, protonmail.ScheduledID, protonmail.SnoozedID:
-		m.a.toast("Do složky " + f.Name + " nejde zprávy přesunout")
+		m.a.toast(fmt.Sprintf(i18n.T("Messages cannot be moved to the folder %s"), f.Name))
 		return
 	}
 	isLabel := f.Icon == "label-dot"
@@ -194,13 +195,13 @@ func (m *mainView) dropOn(f protonmail.Folder, ids []string) {
 		}
 		ui(func() {
 			if err != nil {
-				m.a.toast("Přesun selhal: " + err.Error())
+				m.a.toast(i18n.T("Moving failed: ") + err.Error())
 				return
 			}
 			if isLabel || f.ID == protonmail.StarredID {
-				m.a.toast("Přidáno: " + f.Name)
+				m.a.toast(fmt.Sprintf(i18n.T("Added: %s"), f.Name))
 			} else {
-				m.a.toast("Přesunuto do složky " + f.Name)
+				m.a.toast(fmt.Sprintf(i18n.T("Moved to the folder %s"), f.Name))
 			}
 			m.scheduleRefresh()
 		})

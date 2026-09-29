@@ -19,6 +19,7 @@ import (
 
 	"github.com/Imbecile6197/klient/internal/cache"
 	"github.com/Imbecile6197/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/secrets"
 )
 
@@ -51,7 +52,7 @@ type HVRequiredError struct {
 	HV *proton.APIHVDetails
 }
 
-func (e *HVRequiredError) Error() string { return "Proton vyžaduje ověření člověka" }
+func (e *HVRequiredError) Error() string { return i18n.T("Proton requires human verification") }
 
 // URL is Proton's verification page for this token.
 func (e *HVRequiredError) URL() string {
@@ -76,11 +77,11 @@ func Login(ctx context.Context, mgr *proton.Manager, username string, password [
 		if errors.As(err, &apiErr) {
 			switch apiErr.Code {
 			case 8002:
-				return nil, errors.New("Nesprávné uživatelské jméno nebo heslo. Zkontrolujte rozložení klávesnice a Caps Lock.")
+				return nil, errors.New(i18n.T("Incorrect username or password. Check the keyboard layout and Caps Lock."))
 			case 2028:
-				return nil, errors.New("Příliš mnoho pokusů o přihlášení, zkuste to později.")
+				return nil, errors.New(i18n.T("Too many login attempts. Try again later."))
 			case 5003:
-				return nil, errors.New("Proton odmítl tuto verzi klienta (x-pm-appversion). Upravte proton_app_version v ~/.config/klient/config.json.")
+				return nil, errors.New(i18n.T("Proton rejected this client version (x-pm-appversion). Change proton_app_version in ~/.config/klient/config.json."))
 			}
 		}
 		return nil, err
@@ -187,7 +188,7 @@ func (a *Account) unlock(ctx context.Context, user proton.User) error {
 func (a *Account) unlockKeys(user proton.User, addrs []proton.Address) error {
 	userKR, err := user.Keys.Unlock(a.keyPass, nil)
 	if err != nil {
-		return fmt.Errorf("nepodařilo se odemknout klíče (špatné heslo schránky?): %w", err)
+		return fmt.Errorf(i18n.T("could not unlock the keys (wrong mailbox password?): %w"), err)
 	}
 	addrKRs := map[string]*crypto.KeyRing{}
 	for _, addr := range addrs {
@@ -196,7 +197,7 @@ func (a *Account) unlockKeys(user proton.User, addrs []proton.Address) error {
 		}
 	}
 	if len(addrKRs) == 0 {
-		return errors.New("nepodařilo se odemknout žádný klíč adresy")
+		return errors.New(i18n.T("could not unlock any address key"))
 	}
 	a.mu.Lock()
 	a.user, a.addrs, a.userKR, a.addrKRs = user, addrs, userKR, addrKRs
@@ -296,7 +297,7 @@ func (a *Account) addrKR(addressID string) (*crypto.KeyRing, error) {
 	defer a.mu.RUnlock()
 	kr := a.addrKRs[addressID]
 	if kr == nil {
-		return nil, fmt.Errorf("chybí klíč pro adresu %s", addressID)
+		return nil, fmt.Errorf(i18n.T("no key for address %s"), addressID)
 	}
 	return kr, nil
 }
@@ -336,7 +337,7 @@ func apiErr(prefix string, err error) error {
 		return &readableErr{msg: prefix + ": " + msg, err: err}
 	}
 	if IsOffline(err) {
-		return &readableErr{msg: prefix + ": server Protonu je nedostupný", err: err}
+		return &readableErr{msg: prefix + i18n.T(": the Proton server is unavailable"), err: err}
 	}
 	return fmt.Errorf("%s: %w", prefix, err)
 }
@@ -374,12 +375,12 @@ func resumeOffline(mgr *proton.Manager, s *secrets.ProtonSession, keyPass []byte
 	}
 	acc.openCache(s.UserID)
 	if acc.cache == nil {
-		return nil, errors.New("offline a bez uložené cache")
+		return nil, errors.New(i18n.T("offline and without a saved cache"))
 	}
 	var user proton.User
 	var addrs []proton.Address
 	if !acc.cache.Get("user", &user) || !acc.cache.Get("addresses", &addrs) {
-		return nil, errors.New("offline a cache zatím neobsahuje klíče účtu")
+		return nil, errors.New(i18n.T("offline, and the cache does not contain the account keys yet"))
 	}
 	if err := acc.unlockKeys(user, addrs); err != nil {
 		return nil, err

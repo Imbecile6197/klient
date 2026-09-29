@@ -5,6 +5,8 @@ package rules
 import (
 	"net/mail"
 	"strings"
+
+	"github.com/Imbecile6197/klient/internal/i18n"
 )
 
 type Field string
@@ -92,11 +94,11 @@ func Matching(rs []Rule, m Message) []Rule {
 func FieldName(f Field) string {
 	switch f {
 	case FieldFrom:
-		return "Odesílatel"
+		return i18n.T("Sender")
 	case FieldTo:
-		return "Příjemce"
+		return i18n.T("Recipient")
 	case FieldSubject:
-		return "Předmět"
+		return i18n.T("Subject")
 	}
 	return string(f)
 }
@@ -104,13 +106,13 @@ func FieldName(f Field) string {
 func ActionName(a Action) string {
 	switch a {
 	case ActionMove:
-		return "Přesunout do"
+		return i18n.T("Move to")
 	case ActionLabel:
-		return "Přidat štítek"
+		return i18n.T("Add label")
 	case ActionRead:
-		return "Označit jako přečtené"
+		return i18n.T("Mark as read")
 	case ActionStar:
-		return "Přidat hvězdičku"
+		return i18n.T("Add star")
 	}
 	return string(a)
 }

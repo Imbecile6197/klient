@@ -14,6 +14,7 @@ import (
 	"github.com/emersion/go-imap/v2"
 	"github.com/emersion/go-imap/v2/imapclient"
 
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/protonmail"
 )
 
@@ -120,8 +121,8 @@ func (a *Account) ThreadMessages(ctx context.Context, conversationID string, inc
 // ---- Local folders (snooze, scheduled) --------------------------------------------------
 
 var localFolderNames = map[string]string{
-	protonmail.SnoozedID:   "Odložené",
-	protonmail.ScheduledID: "Naplánované",
+	protonmail.SnoozedID:   i18n.T("Snoozed"),
+	protonmail.ScheduledID: i18n.T("Scheduled"),
 }
 
 // ensureFolder creates the mailbox of a Klient folder on first use.
@@ -144,7 +145,7 @@ func (a *Account) ensureFolder(id string) (string, error) {
 			err = c.Create(want, nil).Wait()
 		}
 		if err != nil {
-			return fmt.Errorf("složku %s nejde na serveru vytvořit: %w", localFolderNames[id], err)
+			return fmt.Errorf(i18n.T("cannot create folder %s on the server: %w"), localFolderNames[id], err)
 		}
 		if err := a.loadFolders(); err != nil {
 			return err
@@ -181,7 +182,7 @@ func (a *Account) loadLocal() localState {
 
 func (a *Account) saveLocal(st localState) error {
 	if a.cache == nil {
-		return errors.New("bez offline cache si Klient nemůže pamatovat čas – zapněte ji v Předvolbách")
+		return errors.New(i18n.T("without the offline cache Klient cannot remember the time – turn it on in Preferences"))
 	}
 	return a.cache.Set("imap-local", st)
 }
@@ -200,7 +201,7 @@ func (a *Account) inFolder(ctx context.Context, conversationID, folderID string)
 	return ids
 }
 
-// Snooze moves conversations from the inbox to "Odložené"; Klient moves
+// Snooze moves conversations from the inbox to i18n.T("Snoozed"); Klient moves
 // them back at t (if it runs then, otherwise as soon as it starts).
 func (a *Account) Snooze(ctx context.Context, conversationIDs []string, t time.Time) error {
 	if _, err := a.ensureFolder(protonmail.SnoozedID); err != nil {
@@ -245,7 +246,7 @@ func (a *Account) SnoozedUntil(conversationID string) time.Time {
 	return time.Time{}
 }
 
-// schedule stores the message in "Naplánované"; Klient sends it at its time.
+// schedule stores the message in i18n.T("Scheduled"); Klient sends it at its time.
 func (a *Account) schedule(ctx context.Context, d *protonmail.Draft) error {
 	if _, err := a.ensureFolder(protonmail.ScheduledID); err != nil {
 		return err
@@ -256,10 +257,10 @@ func (a *Account) schedule(ctx context.Context, d *protonmail.Draft) error {
 	}
 	id, err := a.appendTo(protonmail.ScheduledID, data, []imap.Flag{imap.FlagSeen})
 	if err != nil {
-		return fmt.Errorf("naplánování selhalo: %w", err)
+		return fmt.Errorf(i18n.T("scheduling failed: %w"), err)
 	}
 	if id == "" {
-		return errors.New("server nevrátil ID uložené zprávy (chybí UIDPLUS), naplánovat nejde")
+		return errors.New(i18n.T("the server did not return the ID of the saved message (no UIDPLUS support), so it cannot be scheduled"))
 	}
 	st := a.loadLocal()
 	st.Scheduled[id] = d.DeliveryTime.Unix()
@@ -311,7 +312,7 @@ func (a *Account) runDue(ctx context.Context, onChange func()) {
 	for conv, t := range st.Snoozed {
 		if t <= now {
 			if err := a.Unsnooze(ctx, []string{conv}); err != nil {
-				log.Printf("IMAP %s: vrácení odložené zprávy selhalo: %v", a.set.Email, err)
+				log.Printf("IMAP %s: returning a snoozed message failed: %v", a.set.Email, err)
 				continue
 			}
 			changed = true
@@ -324,11 +325,11 @@ func (a *Account) runDue(ctx context.Context, onChange func()) {
 		}
 		d, _, err := a.OpenDraft(ctx, id)
 		if err == nil {
-			d.ID = id // Send deletes it from "Naplánované" afterwards
+			d.ID = id // Send deletes it from i18n.T("Scheduled") afterwards
 			err = a.Send(ctx, d)
 		}
 		if err != nil {
-			log.Printf("IMAP %s: odeslání naplánované zprávy selhalo: %v", a.set.Email, err)
+			log.Printf("IMAP %s: sending a scheduled message failed: %v", a.set.Email, err)
 			continue // retried on the next tick
 		}
 		st = a.loadLocal()

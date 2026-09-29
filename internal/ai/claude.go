@@ -8,6 +8,8 @@ import (
 	"github.com/anthropics/anthropic-sdk-go"
 	"github.com/anthropics/anthropic-sdk-go/option"
 	"github.com/anthropics/anthropic-sdk-go/shared/constant"
+
+	"github.com/Imbecile6197/klient/internal/i18n"
 )
 
 type claudeProvider struct{ api anthropic.Client }
@@ -49,9 +51,9 @@ func (c *claudeProvider) Complete(ctx context.Context, req Request) (string, err
 	}
 	switch resp.StopReason {
 	case anthropic.BetaStopReasonRefusal:
-		return "", errors.New("model odmítl požadavek zpracovat")
+		return "", errors.New(i18n.T("the model refused to process the request"))
 	case anthropic.BetaStopReasonMaxTokens:
-		return "", errors.New("odpověď modelu byla oříznuta (max_tokens)")
+		return "", errors.New(i18n.T("the model's answer was cut off (max_tokens)"))
 	}
 	var sb strings.Builder
 	for _, block := range resp.Content {

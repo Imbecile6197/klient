@@ -4,9 +4,12 @@
 package ical
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/Imbecile6197/klient/internal/i18n"
 )
 
 type Attendee struct {
@@ -203,7 +206,7 @@ func Parse(data []byte) (*Event, error) {
 		case "DTSTART":
 			t, allDay, err := parseTime(p)
 			if err != nil {
-				return nil, fmt.Errorf("neplatný začátek události: %w", err)
+				return nil, fmt.Errorf(i18n.T("invalid event start: %w"), err)
 			}
 			ev.Start, ev.AllDay, ev.rawStart = t, allDay, p.raw
 		case "DTEND":
@@ -217,7 +220,7 @@ func Parse(data []byte) (*Event, error) {
 		}
 	}
 	if !seen {
-		return nil, fmt.Errorf("pozvánka neobsahuje událost")
+		return nil, errors.New(i18n.T("the invitation contains no event"))
 	}
 	if ev.End.IsZero() {
 		if ev.AllDay {

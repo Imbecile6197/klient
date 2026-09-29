@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/Imbecile6197/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/i18n"
 )
 
 // Blocklists is the in-memory index of all downloaded feeds.
@@ -141,7 +142,7 @@ func (b *Blocklists) Update(ctx context.Context, feeds []config.Feed) error {
 		return err
 	}
 	if len(errs) > 0 {
-		return fmt.Errorf("některé feedy se nepodařilo stáhnout: %s", strings.Join(errs, "; "))
+		return fmt.Errorf(i18n.T("some feeds could not be downloaded: %s"), strings.Join(errs, "; "))
 	}
 	return nil
 }

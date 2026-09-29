@@ -17,6 +17,8 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/Imbecile6197/klient/internal/i18n"
 )
 
 // Repo is the GitHub repository the releases come from.
@@ -46,10 +48,10 @@ func Latest(ctx context.Context) (Release, error) {
 	}
 	defer res.Body.Close()
 	if res.StatusCode == http.StatusNotFound {
-		return Release{}, errors.New("na GitHubu zatím není žádné vydání")
+		return Release{}, errors.New(i18n.T("there is no release on GitHub yet"))
 	}
 	if res.StatusCode != http.StatusOK {
-		return Release{}, fmt.Errorf("GitHub odpověděl %s", res.Status)
+		return Release{}, fmt.Errorf(i18n.T("GitHub responded with %s"), res.Status)
 	}
 	var rel struct {
 		TagName string `json:"tag_name"`
@@ -77,7 +79,7 @@ func Latest(ctx context.Context) (Release, error) {
 		}
 	}
 	if out.URL == "" {
-		return Release{}, fmt.Errorf("vydání %s neobsahuje balíček RPM", rel.TagName)
+		return Release{}, fmt.Errorf(i18n.T("release %s does not contain an RPM package"), rel.TagName)
 	}
 	// The published checksum list must agree with GitHub's own digest.
 	if sums != "" {
@@ -86,12 +88,12 @@ func Latest(ctx context.Context) (Release, error) {
 			return Release{}, err
 		}
 		if out.SHA256 != "" && !strings.EqualFold(out.SHA256, sum) {
-			return Release{}, errors.New("kontrolní součty vydání nesouhlasí")
+			return Release{}, errors.New(i18n.T("the release checksums do not match"))
 		}
 		out.SHA256 = sum
 	}
 	if len(out.SHA256) != 64 {
-		return Release{}, errors.New("vydání nemá kontrolní součet – z bezpečnostních důvodů se nestáhne")
+		return Release{}, errors.New(i18n.T("the release has no checksum – for security reasons it will not be downloaded"))
 	}
 	return out, nil
 }
@@ -113,7 +115,7 @@ func sumFor(ctx context.Context, url, name string) (string, error) {
 			return strings.ToLower(f[0]), nil
 		}
 	}
-	return "", fmt.Errorf("SHA256SUMS neobsahuje %s", name)
+	return "", fmt.Errorf(i18n.T("SHA256SUMS does not contain %s"), name)
 }
 
 // Newer reports whether version a is newer than b ("0.6.10" > "0.6.9").
@@ -154,7 +156,7 @@ func Download(ctx context.Context, rel Release, dir string, progress Progress) (
 	}
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("stahování: %s", res.Status)
+		return "", fmt.Errorf(i18n.T("download: %s"), res.Status)
 	}
 	tmp, err := os.CreateTemp(dir, ".download-*")
 	if err != nil {
@@ -189,7 +191,7 @@ func Download(ctx context.Context, rel Release, dir string, progress Progress) (
 		return "", err
 	}
 	if got := hex.EncodeToString(h.Sum(nil)); !strings.EqualFold(got, rel.SHA256) {
-		return "", errors.New("stažený balíček má špatný kontrolní součet – nebude nainstalován")
+		return "", errors.New(i18n.T("the downloaded package has a wrong checksum – it will not be installed"))
 	}
 	if err := os.Rename(tmp.Name(), path); err != nil {
 		return "", err
@@ -226,13 +228,13 @@ func Install(ctx context.Context, path string) error {
 	out, err := exec.CommandContext(ctx, "pkexec", "dnf", "install", "-y", path).CombinedOutput()
 	if err != nil {
 		if ee, ok := err.(*exec.ExitError); ok && (ee.ExitCode() == 126 || ee.ExitCode() == 127) {
-			return errors.New("instalace byla zrušena")
+			return errors.New(i18n.T("the installation was cancelled"))
 		}
 		msg := strings.TrimSpace(string(out))
 		if i := strings.LastIndexByte(msg, '\n'); i >= 0 {
 			msg = msg[i+1:]
 		}
-		return fmt.Errorf("instalace selhala: %s", msg)
+		return fmt.Errorf(i18n.T("installation failed: %s"), msg)
 	}
 	return nil
 }

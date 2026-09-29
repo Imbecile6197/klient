@@ -14,6 +14,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/pango"
 
 	aipkg "github.com/Imbecile6197/klient/internal/ai"
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/protonmail"
 )
 
@@ -96,8 +97,8 @@ func newMainView(a *App) *mainView {
 	m.inner.SetMinSidebarWidth(300)
 	m.inner.SetMaxSidebarWidth(440)
 	m.inner.SetSidebarWidthFraction(0.38)
-	m.listPage = adw.NewNavigationPage(m.buildList(), "Zprávy")
-	m.readerPage = adw.NewNavigationPage(m.buildReader(), "Zpráva")
+	m.listPage = adw.NewNavigationPage(m.buildList(), i18n.T("Messages"))
+	m.readerPage = adw.NewNavigationPage(m.buildReader(), i18n.T("Message"))
 	m.inner.SetSidebar(m.listPage)
 	m.inner.SetContent(m.readerPage)
 	m.root.SetContent(m.inner)
@@ -124,12 +125,12 @@ func (m *mainView) buildSidebar() gtk.Widgetter {
 	hb.SetTitleWidget(m.accountSwitcher())
 	menu := gtk.NewMenuButton()
 	menu.SetIconName("open-menu-symbolic")
-	menu.SetTooltipText("Hlavní nabídka")
+	menu.SetTooltipText(i18n.T("Main Menu"))
 	menu.SetMenuModel(m.a.primaryMenu())
 	menu.SetPrimary(true)
 	hb.PackEnd(menu)
 	contacts := gtk.NewButtonFromIconName("x-office-address-book-symbolic")
-	contacts.SetTooltipText("Kontakty")
+	contacts.SetTooltipText(i18n.T("Contacts"))
 	contacts.ConnectClicked(m.a.openContacts)
 	contacts.SetVisible(m.a.acc.Caps().Contacts)
 	hb.PackEnd(contacts)
@@ -167,7 +168,7 @@ func (m *mainView) buildSidebar() gtk.Widgetter {
 	compose := gtk.NewButton()
 	cc := adw.NewButtonContent()
 	cc.SetIconName("mail-message-new-symbolic")
-	cc.SetLabel("Nová zpráva")
+	cc.SetLabel(i18n.T("New Message"))
 	compose.SetChild(cc)
 	compose.AddCSSClass("suggested-action")
 	compose.AddCSSClass("compose-button")
@@ -175,7 +176,7 @@ func (m *mainView) buildSidebar() gtk.Widgetter {
 	compose.SetMarginBottom(6)
 	compose.SetMarginStart(12)
 	compose.SetMarginEnd(12)
-	compose.SetTooltipText("Nová zpráva (Ctrl+N)")
+	compose.SetTooltipText(i18n.T("New Message (Ctrl+N)"))
 	compose.ConnectClicked(func() { m.a.openCompose(nil) })
 	side := gtk.NewBox(gtk.OrientationVertical, 0)
 	side.Append(compose)
@@ -324,8 +325,8 @@ func (m *mainView) updateStorage() {
 		m.storageLabel.SetVisible(st.Used > 0)
 		if st.Used > 0 {
 			// The server does not report a limit (e.g. Seznam).
-			m.storageLabel.SetText("Obsazeno " + humanSize(int64(st.Used)))
-			m.storageLabel.SetTooltipText("Součet velikosti zpráv ve složkách; server neuvádí limit schránky")
+			m.storageLabel.SetText(fmt.Sprintf(i18n.T("%s used"), humanSize(int64(st.Used))))
+			m.storageLabel.SetTooltipText(i18n.T("The total size of the messages in the folders; the server does not report a mailbox limit"))
 		}
 		return
 	}
@@ -333,7 +334,7 @@ func (m *mainView) updateStorage() {
 	m.storageLabel.SetVisible(true)
 	frac := float64(st.Used) / float64(st.Max)
 	m.storageBar.SetFraction(min(frac, 1))
-	m.storageLabel.SetText(fmt.Sprintf("%s z %s (%.0f %%)", humanSize(int64(st.Used)), humanSize(int64(st.Max)), frac*100))
+	m.storageLabel.SetText(fmt.Sprintf(i18n.T("%s of %s (%.0f %%)"), humanSize(int64(st.Used)), humanSize(int64(st.Max)), frac*100))
 	for _, c := range []string{"storage-warning", "storage-full"} {
 		m.storageBar.RemoveCSSClass(c)
 	}
@@ -343,15 +344,15 @@ func (m *mainView) updateStorage() {
 	case frac >= 0.75:
 		m.storageBar.AddCSSClass("storage-warning")
 	}
-	tip := fmt.Sprintf("Pošta zabírá %s", humanSize(int64(st.Mail)))
+	tip := fmt.Sprintf(i18n.T("Mail takes up %s"), humanSize(int64(st.Mail)))
 	if st.Split {
-		tip = fmt.Sprintf("Místo pro poštu, kalendář a kontakty (bez Drive).\nPošta: %s\nDrive má vlastní místo: %s z %s",
+		tip = fmt.Sprintf(i18n.T("Storage for mail, calendar and contacts (without Drive).\nMail: %s\nDrive has its own storage: %s of %s"),
 			humanSize(int64(st.Mail)), humanSize(int64(st.Drive)), humanSize(int64(st.DriveMax)))
 	} else if st.Drive > 0 {
-		tip = fmt.Sprintf("Místo sdílené všemi službami Protonu.\nPošta: %s\nDrive: %s", humanSize(int64(st.Mail)), humanSize(int64(st.Drive)))
+		tip = fmt.Sprintf(i18n.T("Storage shared by all Proton services.\nMail: %s\nDrive: %s"), humanSize(int64(st.Mail)), humanSize(int64(st.Drive)))
 	}
 	if !st.Updated.IsZero() {
-		tip += "\nAktualizováno " + st.Updated.Format("2. 1. 15:04")
+		tip += "\n" + fmt.Sprintf(i18n.T("Updated %s"), st.Updated.Format(i18n.T("Jan 2 15:04")))
 	}
 	m.storageBar.SetTooltipText(tip)
 	m.storageLabel.SetTooltipText(tip)
@@ -365,8 +366,8 @@ func (m *mainView) rebuildOrganizeMenus() {
 	move := gio.NewMenu()
 	sys := gio.NewMenu()
 	for _, f := range []struct{ id, name string }{
-		{protonmail.InboxID, "Doručená pošta"}, {protonmail.ArchiveID, "Archiv"},
-		{protonmail.SpamID, "Spam"}, {protonmail.TrashID, "Koš"},
+		{protonmail.InboxID, i18n.T("Inbox")}, {protonmail.ArchiveID, i18n.T("Archive")},
+		{protonmail.SpamID, i18n.T("Spam")}, {protonmail.TrashID, i18n.T("Trash")},
 	} {
 		sys.AppendItem(gio.NewMenuItem(f.name, "app.move-to::"+f.id))
 	}
@@ -380,7 +381,7 @@ func (m *mainView) rebuildOrganizeMenus() {
 			labels.AppendItem(gio.NewMenuItem(l.Name, "app.toggle-label::"+l.ID))
 		}
 	}
-	move.AppendSection("Moje složky", user)
+	move.AppendSection(i18n.T("My Folders"), user)
 	m.moveBtn.SetMenuModel(move)
 	m.labelBtn.SetMenuModel(labels)
 	m.labelBtn.SetVisible(labels.NItems() > 0)
@@ -391,7 +392,7 @@ func (m *mainView) updateFilterStatus() {
 		return
 	}
 	nets, domains := m.a.lists.Stats()
-	ai := "AI vypnuta"
+	ai := i18n.T("AI turned off")
 	if m.a.ai.HasSpam() && m.a.cfg.SpamFilterEnabled {
 		name := m.a.cfg.SpamProvider
 		if p, ok := aipkg.ProviderByID(name); ok {
@@ -399,16 +400,16 @@ func (m *mainView) updateFilterStatus() {
 		}
 		ai = name + ", " + m.a.cfg.SpamModel
 		if aipkg.IsLocal(m.a.cfg.SpamProvider) {
-			ai = "lokální AI (" + m.a.cfg.SpamModel + ", nic neodchází)"
+			ai = fmt.Sprintf(i18n.T("local AI (%s, nothing leaves the computer)"), m.a.cfg.SpamModel)
 		}
 	} else if m.a.cfg.SpamFilterEnabled {
-		ai = "jen blocklisty (AI není nastavená)"
+		ai = i18n.T("blocklists only (AI is not set up)")
 	}
-	upd := "nikdy"
+	upd := i18n.T("never")
 	if !m.a.lists.LastUpdate.IsZero() {
-		upd = m.a.lists.LastUpdate.Format("2. 1. 15:04")
+		upd = m.a.lists.LastUpdate.Format(i18n.T("Jan 2 15:04"))
 	}
-	m.filterStatus.SetText(fmt.Sprintf("Spamfiltr: %s\nBlocklisty: %d sítí, %d domén · aktualizace %s", ai, nets, domains, upd))
+	m.filterStatus.SetText(fmt.Sprintf(i18n.T("Spam filter: %s\nBlocklists: %s, %s · updated %s"), ai, fmt.Sprintf(i18n.N("%d network", "%d networks", nets), nets), fmt.Sprintf(i18n.N("%d domain", "%d domains", domains), domains), upd))
 }
 
 func (m *mainView) buildList() gtk.Widgetter {
@@ -419,7 +420,7 @@ func (m *mainView) buildList() gtk.Widgetter {
 
 	sidebarBtn := gtk.NewToggleButton()
 	sidebarBtn.SetIconName("sidebar-show-symbolic")
-	sidebarBtn.SetTooltipText("Složky")
+	sidebarBtn.SetTooltipText(i18n.T("Folders"))
 	sidebarBtn.SetActive(m.root.ShowSidebar())
 	sidebarBtn.SetVisible(m.root.Collapsed())
 	sidebarBtn.ConnectToggled(func() {
@@ -436,17 +437,17 @@ func (m *mainView) buildList() gtk.Widgetter {
 	hb.PackStart(sidebarBtn)
 
 	compose := gtk.NewButtonFromIconName("mail-message-new-symbolic")
-	compose.SetTooltipText("Nová zpráva (Ctrl+N)")
+	compose.SetTooltipText(i18n.T("New Message (Ctrl+N)"))
 	compose.ConnectClicked(func() { m.a.openCompose(nil) })
 	hb.PackStart(compose)
 
 	refresh := gtk.NewButtonFromIconName("view-refresh-symbolic")
-	refresh.SetTooltipText("Obnovit (F5)")
+	refresh.SetTooltipText(i18n.T("Refresh (F5)"))
 	refresh.ConnectClicked(func() { m.openFolder(m.folder) })
 	hb.PackEnd(refresh)
 	unreadBtn := gtk.NewToggleButton()
 	unreadBtn.SetIconName("mail-unread-symbolic")
-	unreadBtn.SetTooltipText("Jen nepřečtené")
+	unreadBtn.SetTooltipText(i18n.T("Unread Only"))
 	unreadBtn.ConnectToggled(func() {
 		m.unreadOnly = unreadBtn.Active()
 		m.rebuildList()
@@ -454,12 +455,12 @@ func (m *mainView) buildList() gtk.Widgetter {
 	hb.PackEnd(unreadBtn)
 	searchBtn := gtk.NewToggleButton()
 	searchBtn.SetIconName("system-search-symbolic")
-	searchBtn.SetTooltipText("Hledat (Ctrl+F)")
+	searchBtn.SetTooltipText(i18n.T("Search (Ctrl+F)"))
 	hb.PackEnd(searchBtn)
 	tv.AddTopBar(hb)
 
 	m.searchEntry = gtk.NewSearchEntry()
-	m.searchEntry.SetPlaceholderText("Hledat v předmětu, odesílateli a příjemcích")
+	m.searchEntry.SetPlaceholderText(i18n.T("Search the subject, sender and recipients"))
 	m.searchEntry.SetHExpand(true)
 	m.searchBar = gtk.NewSearchBar()
 	clampS := adw.NewClamp()
@@ -480,7 +481,7 @@ func (m *mainView) buildList() gtk.Widgetter {
 	m.searchEntry.ConnectActivate(func() { m.runSearch(m.searchEntry.Text()) })
 	m.searchEntry.ConnectStopSearch(func() { m.stopSearch() })
 	tv.AddTopBar(m.searchBar)
-	m.offline = adw.NewBanner("Offline – zobrazuje se pošta uložená v šifrované cache")
+	m.offline = adw.NewBanner(i18n.T("Offline – showing the mail saved in the encrypted cache"))
 	tv.AddTopBar(m.offline)
 	cbox := gtk.NewBox(gtk.OrientationHorizontal, 8)
 	cbox.AddCSSClass("checking-bar")
@@ -493,7 +494,7 @@ func (m *mainView) buildList() gtk.Widgetter {
 	cbox.Append(m.checkLabel)
 	m.checking = gtk.NewRevealer()
 	m.checking.SetChild(cbox)
-	m.checking.SetTooltipText("Nová pošta se zobrazí, až ji posoudí spamfiltr (lze vypnout v Předvolbách → Spamfiltr)")
+	m.checking.SetTooltipText(i18n.T("New mail appears once the spam filter has judged it (this can be turned off in Preferences → Spam Filter)"))
 	tv.AddTopBar(m.checking)
 
 	m.msgList = gtk.NewListBox()
@@ -513,7 +514,7 @@ func (m *mainView) buildList() gtk.Widgetter {
 	m.selected = map[int]bool{}
 	m.lastToggled = -1
 
-	m.moreBtn = gtk.NewButtonWithLabel("Načíst starší zprávy")
+	m.moreBtn = gtk.NewButtonWithLabel(i18n.T("Load Older Messages"))
 	m.moreBtn.AddCSSClass("flat")
 	m.moreBtn.SetMarginTop(6)
 	m.moreBtn.SetMarginBottom(12)
@@ -529,7 +530,7 @@ func (m *mainView) buildList() gtk.Widgetter {
 
 	empty := adw.NewStatusPage()
 	empty.SetIconName("mail-read-symbolic")
-	empty.SetTitle("Žádné zprávy")
+	empty.SetTitle(i18n.T("No Messages"))
 
 	m.listStack = gtk.NewStack()
 	m.listStack.AddNamed(spinnerBox(), "loading")
@@ -547,7 +548,7 @@ func (m *mainView) buildList() gtk.Widgetter {
 			m.selectAll()
 		},
 		"Escape": m.leaveSelection,
-		"Delete": func() { m.moveCurrent(protonmail.TrashID, "Přesunuto do koše") },
+		"Delete": func() { m.moveCurrent(protonmail.TrashID, i18n.T("Moved to Trash")) },
 	})
 	return tv
 }
@@ -567,36 +568,36 @@ func (m *mainView) buildReader() gtk.Widgetter {
 	hb.SetShowTitle(false)
 
 	reply := gtk.NewButtonFromIconName("mail-reply-sender-symbolic")
-	reply.SetTooltipText("Odpovědět (Ctrl+R)")
+	reply.SetTooltipText(i18n.T("Reply (Ctrl+R)"))
 	reply.ConnectClicked(func() { m.reply(protonmail.ActionReply) })
 	replyAll := gtk.NewButtonFromIconName("mail-reply-all-symbolic")
-	replyAll.SetTooltipText("Odpovědět všem (Ctrl+Shift+R)")
+	replyAll.SetTooltipText(i18n.T("Reply to All (Ctrl+Shift+R)"))
 	replyAll.ConnectClicked(func() { m.reply(protonmail.ActionReplyAll) })
 	forward := gtk.NewButtonFromIconName("mail-forward-symbolic")
-	forward.SetTooltipText("Přeposlat (Ctrl+L)")
+	forward.SetTooltipText(i18n.T("Forward (Ctrl+L)"))
 	forward.ConnectClicked(func() { m.reply(protonmail.ActionForward) })
 	m.starBtn = gtk.NewButtonFromIconName("non-starred-symbolic")
-	m.starBtn.SetTooltipText("Hvězdička (Ctrl+D)")
+	m.starBtn.SetTooltipText(i18n.T("Star (Ctrl+D)"))
 	m.starBtn.ConnectClicked(m.toggleStar)
 	unread := gtk.NewButtonFromIconName("mail-unread-symbolic")
-	unread.SetTooltipText("Označit jako nepřečtené (Ctrl+Shift+U)")
+	unread.SetTooltipText(i18n.T("Mark as Unread (Ctrl+Shift+U)"))
 	unread.ConnectClicked(m.markUnread)
 	archive := gtk.NewButtonFromIconName("folder-documents-symbolic")
-	archive.SetTooltipText("Archivovat (Ctrl+E)")
-	archive.ConnectClicked(func() { m.moveCurrent(protonmail.ArchiveID, "Archivováno") })
+	archive.SetTooltipText(i18n.T("Archive (Ctrl+E)"))
+	archive.ConnectClicked(func() { m.moveCurrent(protonmail.ArchiveID, i18n.T("Archived")) })
 	m.moveBtn = gtk.NewMenuButton()
 	m.moveBtn.SetIconName("folder-open-symbolic")
-	m.moveBtn.SetTooltipText("Přesunout do složky")
+	m.moveBtn.SetTooltipText(i18n.T("Move to Folder"))
 	m.labelBtn = gtk.NewMenuButton()
 	m.labelBtn.SetIconName("bookmark-new-symbolic")
-	m.labelBtn.SetTooltipText("Štítky")
-	m.summaryBtn = gtk.NewButtonWithLabel("Shrnout")
-	m.summaryBtn.SetTooltipText("Shrnutí zprávy nebo celého vlákna pomocí AI")
+	m.labelBtn.SetTooltipText(i18n.T("Labels"))
+	m.summaryBtn = gtk.NewButtonWithLabel(i18n.T("Summarize"))
+	m.summaryBtn.SetTooltipText(i18n.T("Summarize the message or the whole thread with AI"))
 	m.summaryBtn.ConnectClicked(m.summarize)
 
 	m.snoozeBtn = m.snoozeButton()
 	m.unsnoozeBtn = gtk.NewButtonFromIconName("mail-send-receive-symbolic")
-	m.unsnoozeBtn.SetTooltipText("Vrátit do doručené pošty hned")
+	m.unsnoozeBtn.SetTooltipText(i18n.T("Return to the Inbox Now"))
 	m.unsnoozeBtn.ConnectClicked(m.unsnooze)
 	m.unsnoozeBtn.SetVisible(false)
 
@@ -604,8 +605,8 @@ func (m *mainView) buildReader() gtk.Widgetter {
 	m.spamBtn.ConnectClicked(m.toggleSpam)
 
 	trash := gtk.NewButtonFromIconName("user-trash-symbolic")
-	trash.SetTooltipText("Přesunout do koše")
-	trash.ConnectClicked(func() { m.moveCurrent(protonmail.TrashID, "Přesunuto do koše") })
+	trash.SetTooltipText(i18n.T("Move to Trash"))
+	trash.ConnectClicked(func() { m.moveCurrent(protonmail.TrashID, i18n.T("Moved to Trash")) })
 
 	hb.PackStart(reply)
 	hb.PackStart(replyAll)
@@ -654,7 +655,7 @@ func (m *mainView) buildReader() gtk.Widgetter {
 	m.summaryCard = gtk.NewBox(gtk.OrientationVertical, 6)
 	m.summaryCard.AddCSSClass("card")
 	m.summaryCard.AddCSSClass("summary-card")
-	title := gtk.NewLabel("Shrnutí (AI)")
+	title := gtk.NewLabel(i18n.T("Summary (AI)"))
 	title.AddCSSClass("heading")
 	title.SetXAlign(0)
 	m.summaryLabel = label()
@@ -686,7 +687,7 @@ func (m *mainView) buildReader() gtk.Widgetter {
 
 	empty := adw.NewStatusPage()
 	empty.SetIconName("mail-read-symbolic")
-	empty.SetTitle("Není vybrána žádná zpráva")
+	empty.SetTitle(i18n.T("No Message Selected"))
 	m.emptyTitle = empty
 
 	m.readerStack = gtk.NewStack()
@@ -697,7 +698,7 @@ func (m *mainView) buildReader() gtk.Widgetter {
 	m.setReaderActions(false)
 	m.rebuildOrganizeMenus()
 	localShortcuts(tv, map[string]func(){
-		"Delete": func() { m.moveCurrent(protonmail.TrashID, "Přesunuto do koše") },
+		"Delete": func() { m.moveCurrent(protonmail.TrashID, i18n.T("Moved to Trash")) },
 	})
 	return tv
 }
@@ -768,7 +769,7 @@ func (m *mainView) loadPage(page int) {
 			}
 			m.moreBtn.SetSensitive(true)
 			if err != nil {
-				m.a.toast("Načtení zpráv selhalo: " + err.Error())
+				m.a.toast(i18n.T("Loading the messages failed: ") + err.Error())
 				if page == 0 {
 					m.listStack.SetVisibleChildName("empty")
 				}
@@ -788,7 +789,7 @@ func (m *mainView) loadPage(page int) {
 				}
 			}
 			if unread > 0 {
-				m.listTitle.SetSubtitle(fmt.Sprintf("%d nepřečtených", unread))
+				m.listTitle.SetSubtitle(fmt.Sprintf(i18n.N("%d unread", "%d unread", unread), unread))
 			} else {
 				m.listTitle.SetSubtitle("")
 			}
@@ -835,7 +836,7 @@ func orDefault(s, def string) string {
 func categoryName(c string) string {
 	switch c {
 	case "ham":
-		return "legitimní"
+		return i18n.T("legitimate")
 	case "newsletter":
 		return "newsletter"
 	case "spam":
@@ -843,7 +844,7 @@ func categoryName(c string) string {
 	case "phishing":
 		return "phishing"
 	case "scam":
-		return "podvod"
+		return i18n.T("scam")
 	case "malware":
 		return "malware"
 	}
@@ -878,10 +879,10 @@ func (m *mainView) saveAttachment(att protonmail.Attachment) {
 			}
 			ui(func() {
 				if err != nil {
-					m.a.toast("Uložení přílohy selhalo: " + err.Error())
+					m.a.toast(i18n.T("Saving the attachment failed: ") + err.Error())
 					return
 				}
-				m.a.toast("Příloha uložena")
+				m.a.toast(i18n.T("Attachment saved"))
 			})
 		}()
 	})
@@ -891,10 +892,10 @@ func (m *mainView) saveAttachment(att protonmail.Attachment) {
 // messages that have no decision yet.
 func (m *mainView) scanInbox() {
 	if !m.a.ai.HasSpam() {
-		m.a.toastWithAction("AI spamfiltr není nastavený", "Nastavit", m.a.openPreferences)
+		m.a.toastWithAction(i18n.T("The AI spam filter is not set up"), i18n.T("Set Up"), m.a.openPreferences)
 		return
 	}
-	m.a.toast("Prověřuji doručenou poštu…")
+	m.a.toast(i18n.T("Checking the inbox…"))
 	go func() {
 		msgs, err := m.a.acc.List(m.a.ctx, protonmail.InboxID, 0, pageSize)
 		moved := 0
@@ -907,10 +908,10 @@ func (m *mainView) scanInbox() {
 		}
 		ui(func() {
 			if err != nil {
-				m.a.toast("Prověření selhalo: " + err.Error())
+				m.a.toast(i18n.T("The check failed: ") + err.Error())
 				return
 			}
-			m.a.toast(fmt.Sprintf("Hotovo, do spamu přesunuto: %d", moved))
+			m.a.toast(fmt.Sprintf(i18n.T("Done, moved to spam: %d"), moved))
 			m.scheduleRefresh()
 		})
 	}()
@@ -953,8 +954,8 @@ func (m *mainView) runSearch(query string) {
 	m.loadSeq++
 	seq := m.loadSeq
 	m.listStack.SetVisibleChildName("loading")
-	m.listTitle.SetTitle("Hledání: " + query)
-	m.listTitle.SetSubtitle("v " + scope.Name)
+	m.listTitle.SetTitle(fmt.Sprintf(i18n.T("Search: %s"), query))
+	m.listTitle.SetSubtitle(fmt.Sprintf(i18n.T("in %s"), scope.Name))
 	m.moreBtn.SetVisible(false)
 	go func() {
 		ctx, cancel := context.WithTimeout(m.a.ctx, 2*time.Minute)
@@ -965,11 +966,11 @@ func (m *mainView) runSearch(query string) {
 				return
 			}
 			if err != nil && len(res) == 0 {
-				m.a.toast("Hledání selhalo: " + err.Error())
+				m.a.toast(i18n.T("Search failed: ") + err.Error())
 			}
 			m.msgs = res
 			m.rebuildList()
-			m.listTitle.SetSubtitle(fmt.Sprintf("%d výsledků v %s", len(res), scope.Name))
+			m.listTitle.SetSubtitle(fmt.Sprintf(i18n.N("%d result in %s", "%d results in %s", len(res)), len(res), scope.Name))
 		})
 	}()
 }

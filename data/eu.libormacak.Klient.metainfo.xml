@@ -4,8 +4,8 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
   <name>Klient</name>
-  <summary>Proton Mail with PGP, an AI assistant and an AI spam filter</summary>
-  <summary xml:lang="cs">Proton Mail s PGP, AI asistentem a AI spamfiltrem</summary>
+  <summary>Mail client with PGP, an AI assistant and an AI spam filter</summary>
+  <summary xml:lang="cs">E-mailový klient s PGP, AI asistentem a AI spamfiltrem</summary>
   <developer id="eu.libormacak">
     <name>Libor Macák</name>
   </developer>
@@ -14,17 +14,19 @@
   <url type="bugtracker">https://github.com/Imbecile6197/klient/issues</url>
   <update_contact>jsem@libormacak.eu</update_contact>
   <description>
-    <p>A GNOME mail client that talks to Proton Mail directly over its API, without Proton Bridge.</p>
-    <p xml:lang="cs">E-mailový klient pro GNOME, který komunikuje s Proton Mail přímo přes jeho API, bez Proton Bridge.</p>
+    <p>A GNOME mail client for Proton Mail (directly over its API, without Proton Bridge), Gmail, Seznam.cz and any IMAP/SMTP mailbox.</p>
+    <p xml:lang="cs">E-mailový klient pro GNOME pro Proton Mail (přímo přes jeho API, bez Proton Bridge), Gmail, Seznam.cz a libovolnou schránku IMAP/SMTP.</p>
     <ul>
-      <li>End-to-end encryption and native PGP for external recipients</li>
-      <li xml:lang="cs">End-to-end šifrování a nativní PGP pro externí příjemce</li>
-      <li>Conversations, safe HTML mail with remote content blocked, rich-text editor</li>
-      <li xml:lang="cs">Vlákna, bezpečné HTML zprávy s blokovaným vzdáleným obsahem, formátovaný editor</li>
-      <li>AI assistant and AI-driven spam filter (Claude, ChatGPT or Gemini) with blocklists updated every 12 hours</li>
-      <li xml:lang="cs">AI asistent a spamfiltr řízený AI (Claude, ChatGPT nebo Gemini) s blocklisty aktualizovanými každých 12 hodin</li>
-      <li>Encrypted offline cache, rules, undo send, one-click unsubscribe, print and .eml export</li>
-      <li xml:lang="cs">Šifrovaná offline cache, pravidla, zpoždění odeslání, odhlášení odběru, tisk a export .eml</li>
+      <li>End-to-end encryption on Proton and PGP/MIME for the other services, with automatic key discovery</li>
+      <li xml:lang="cs">End-to-end šifrování u Protonu a PGP/MIME u ostatních služeb s automatickým hledáním klíčů</li>
+      <li>AI assistant and AI-driven spam filter with Claude, ChatGPT, Gemini, Mistral or a local model (Ollama); new mail appears only after the spam check</li>
+      <li xml:lang="cs">AI asistent a spamfiltr řízený AI s Claude, ChatGPT, Gemini, Mistralem nebo lokálním modelem (Ollama); nová pošta se ukáže až po kontrole spamu</li>
+      <li>Conversations, safe HTML mail with remote content blocked, rich-text editor, scheduled sending and snoozing</li>
+      <li xml:lang="cs">Vlákna, bezpečné HTML zprávy s blokovaným vzdáleným obsahem, formátovaný editor, naplánované odeslání a odkládání</li>
+      <li>Encrypted offline cache, rules, undo send, calendar invitations, background mode with a tray icon</li>
+      <li xml:lang="cs">Šifrovaná offline cache, pravidla, zpoždění odeslání, pozvánky do kalendáře, běh na pozadí s ikonou v liště</li>
+      <li>Available in English and Czech; updates itself from GitHub</li>
+      <li xml:lang="cs">Česky a anglicky; aktualizuje se sám z GitHubu</li>
     </ul>
   </description>
   <launchable type="desktop-id">eu.libormacak.Klient.desktop</launchable>
@@ -48,6 +50,12 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.7.0" date="2026-09-29">
+      <description>
+        <p>Klient speaks English and Czech; the AI answers in the interface language too.</p>
+        <p xml:lang="cs">Klient mluví anglicky a česky; stejným jazykem odpovídá i AI.</p>
+      </description>
+    </release>
     <release version="0.6.8" date="2026-09-29">
       <description>
         <p>Automatic updates from GitHub: new versions are downloaded and verified in the background and installed with one click.</p>

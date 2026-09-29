@@ -2,6 +2,7 @@ package ui
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/pgp"
 )
 
@@ -17,7 +19,7 @@ import (
 func (a *App) ownKeyGroup(d *adw.PreferencesDialog, page *adw.PreferencesPage) *adw.PreferencesGroup {
 	email := a.acc.Email()
 	g := adw.NewPreferencesGroup()
-	g.SetTitle("Můj klíč – " + email)
+	g.SetTitle(fmt.Sprintf(i18n.T("My Key – %s"), email))
 	var rows []gtk.Widgetter
 	var refresh func()
 	add := func(w gtk.Widgetter) {
@@ -44,7 +46,7 @@ func (a *App) ownKeyGroup(d *adw.PreferencesDialog, page *adw.PreferencesPage) *
 				d.AddToast(adw.NewToast(err.Error()))
 				return
 			}
-			d.AddToast(adw.NewToast("Uloženo"))
+			d.AddToast(adw.NewToast(i18n.T("Saved")))
 		})
 	}
 	refresh = func() {
@@ -53,9 +55,9 @@ func (a *App) ownKeyGroup(d *adw.PreferencesDialog, page *adw.PreferencesPage) *
 		}
 		rows = nil
 		if !pgp.HasOwnKey(email) {
-			g.SetDescription("Bez klíče chodí pošta z tohoto účtu nešifrovaně a nepodepsaná. S klíčem Klient šifruje zprávy všem, jejichž klíč zná (WKD, Autocrypt, importované klíče), ostatním je podepíše. Koncepty a kopie v Odeslaných se na serveru uloží zašifrované.")
+			g.SetDescription(i18n.T("Without a key, mail from this account goes out unencrypted and unsigned. With a key, Klient encrypts messages to everyone whose key it knows (WKD, Autocrypt, imported keys) and signs them for everyone else. Drafts and copies in Sent are stored encrypted on the server."))
 			create := adw.NewButtonRow()
-			create.SetTitle("Vytvořit nový klíč")
+			create.SetTitle(i18n.T("Create a New Key"))
 			create.SetStartIconName("list-add-symbolic")
 			create.ConnectActivated(func() {
 				create.SetSensitive(false)
@@ -64,21 +66,21 @@ func (a *App) ownKeyGroup(d *adw.PreferencesDialog, page *adw.PreferencesPage) *
 					ui(func() {
 						create.SetSensitive(true)
 						if err != nil {
-							d.AddToast(adw.NewToast("Vytvoření klíče selhalo: " + err.Error()))
+							d.AddToast(adw.NewToast(i18n.T("Creating the key failed: ") + err.Error()))
 							return
 						}
-						d.AddToast(adw.NewToast("Klíč vytvořen – od teď se pošta šifruje a podepisuje"))
+						d.AddToast(adw.NewToast(i18n.T("Key created – from now on your mail is encrypted and signed")))
 						refresh()
 					})
 				}()
 			})
 			add(create)
 			imp := adw.NewButtonRow()
-			imp.SetTitle("Importovat soukromý klíč…")
+			imp.SetTitle(i18n.T("Import a Private Key…"))
 			imp.SetStartIconName("document-open-symbolic")
 			imp.ConnectActivated(func() {
 				dlg := gtk.NewFileDialog()
-				dlg.SetTitle("Soukromý klíč (.asc)")
+				dlg.SetTitle(i18n.T("Private Key (.asc)"))
 				dlg.Open(context.Background(), a.gtkWindow(), func(res gio.AsyncResulter) {
 					file, err := dlg.OpenFinish(res)
 					if err != nil || file == nil {
@@ -89,7 +91,7 @@ func (a *App) ownKeyGroup(d *adw.PreferencesDialog, page *adw.PreferencesPage) *
 						d.AddToast(adw.NewToast(err.Error()))
 						return
 					}
-					a.askText("Heslo ke klíči", "Pokud klíč heslo nemá, nechte pole prázdné.", true, func(pass string, ok bool) {
+					a.askText(i18n.T("Key Passphrase"), i18n.T("If the key has no passphrase, leave the field empty."), true, func(pass string, ok bool) {
 						if !ok {
 							return
 						}
@@ -97,7 +99,7 @@ func (a *App) ownKeyGroup(d *adw.PreferencesDialog, page *adw.PreferencesPage) *
 							d.AddToast(adw.NewToast(err.Error()))
 							return
 						}
-						d.AddToast(adw.NewToast("Klíč importován"))
+						d.AddToast(adw.NewToast(i18n.T("Key imported")))
 						refresh()
 					})
 				})
@@ -105,27 +107,27 @@ func (a *App) ownKeyGroup(d *adw.PreferencesDialog, page *adw.PreferencesPage) *
 			add(imp)
 			return
 		}
-		g.SetDescription("Zprávy lidem se známým klíčem se šifrují, ostatním se podepisují. Veřejný klíč posílejte kontaktům (Klient ho přikládá i do hlavičky Autocrypt).")
+		g.SetDescription(i18n.T("Messages to people with a known key are encrypted; the others are signed. Send your public key to your contacts (Klient also adds it to the Autocrypt header)."))
 		pub, k, err := pgp.OwnPublicKey(email)
 		row := adw.NewActionRow()
-		row.SetTitle("Otisk klíče")
+		row.SetTitle(i18n.T("Key fingerprint"))
 		if err != nil {
 			row.SetSubtitle(err.Error())
 		} else {
 			row.SetSubtitle(formatFP(k.GetFingerprint()))
 			row.SetSubtitleSelectable(true)
-			row.AddSuffix(button("edit-copy-symbolic", "Kopírovat veřejný klíč", func() {
+			row.AddSuffix(button("edit-copy-symbolic", i18n.T("Copy the Public Key"), func() {
 				a.win.Clipboard().SetText(pub)
-				d.AddToast(adw.NewToast("Veřejný klíč zkopírován"))
+				d.AddToast(adw.NewToast(i18n.T("Public key copied")))
 			}))
-			row.AddSuffix(button("document-save-symbolic", "Uložit veřejný klíč", func() { saveFile(email+".asc", pub) }))
+			row.AddSuffix(button("document-save-symbolic", i18n.T("Save the Public Key"), func() { saveFile(email+".asc", pub) }))
 		}
 		add(row)
 		backup := adw.NewButtonRow()
-		backup.SetTitle("Zálohovat soukromý klíč…")
+		backup.SetTitle(i18n.T("Back Up the Private Key…"))
 		backup.SetStartIconName("drive-harddisk-symbolic")
 		backup.ConnectActivated(func() {
-			a.askText("Heslo zálohy", "Záloha se zašifruje tímto heslem. Bez něj ji nepůjde obnovit.", true, func(pass string, ok bool) {
+			a.askText(i18n.T("Backup Password"), i18n.T("The backup is encrypted with this password. It cannot be restored without it."), true, func(pass string, ok bool) {
 				if !ok || pass == "" {
 					return
 				}
@@ -139,13 +141,13 @@ func (a *App) ownKeyGroup(d *adw.PreferencesDialog, page *adw.PreferencesPage) *
 		})
 		add(backup)
 		del := adw.NewButtonRow()
-		del.SetTitle("Odstranit klíč")
+		del.SetTitle(i18n.T("Remove Key"))
 		del.SetStartIconName("user-trash-symbolic")
 		del.AddCSSClass("destructive-action")
 		del.ConnectActivated(func() {
-			q := adw.NewAlertDialog("Odstranit klíč?", "Zprávy zašifrované tímto klíčem (i vaše koncepty a odeslané) už Klient bez zálohy klíče neotevře.")
-			q.AddResponse("cancel", "Zrušit")
-			q.AddResponse("delete", "Odstranit")
+			q := adw.NewAlertDialog(i18n.T("Remove the Key?"), i18n.T("Without a backup of the key, Klient will no longer open messages encrypted with it (including your drafts and sent mail)."))
+			q.AddResponse("cancel", i18n.T("Cancel"))
+			q.AddResponse("delete", i18n.C("key", "Remove"))
 			q.SetResponseAppearance("delete", adw.ResponseDestructive)
 			q.SetCloseResponse("cancel")
 			q.ConnectResponse(func(r string) {

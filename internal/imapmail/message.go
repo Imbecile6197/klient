@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
-	"fmt"
+	"errors"
 	"net/mail"
 	"sort"
 	"strings"
@@ -14,6 +14,7 @@ import (
 	"github.com/emersion/go-imap/v2"
 	"github.com/emersion/go-imap/v2/imapclient"
 
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/mailbox"
 	"github.com/Imbecile6197/klient/internal/mailparse"
 	"github.com/Imbecile6197/klient/internal/pgp"
@@ -41,7 +42,7 @@ func (a *Account) raw(ctx context.Context, id string) ([]byte, protonmail.Summar
 			return err
 		}
 		if sel.UIDValidity != ref.uidValidity {
-			return fmt.Errorf("zpráva už na serveru není (složka byla změněna), obnovte seznam")
+			return errors.New(i18n.T("the message is no longer on the server (the folder has changed); refresh the list"))
 		}
 		opts := *fetchMeta
 		opts.BodySection = []*imap.FetchItemBodySection{{Peek: true}}
@@ -50,7 +51,7 @@ func (a *Account) raw(ctx context.Context, id string) ([]byte, protonmail.Summar
 			return err
 		}
 		if len(msgs) == 0 {
-			return fmt.Errorf("zpráva už na serveru není")
+			return errors.New(i18n.T("the message is no longer on the server"))
 		}
 		meta = a.summary(ref.mailbox, sel.UIDValidity, msgs[0])
 		if len(msgs[0].BodySection) > 0 {
@@ -60,7 +61,7 @@ func (a *Account) raw(ctx context.Context, id string) ([]byte, protonmail.Summar
 	})
 	if err != nil {
 		if IsOffline(err) {
-			return nil, meta, fmt.Errorf("zpráva není uložená pro offline čtení a server je nedostupný")
+			return nil, meta, errors.New(i18n.T("the message is not saved for offline reading and the server is unavailable"))
 		}
 		return nil, meta, err
 	}
@@ -93,7 +94,7 @@ func (a *Account) Get(ctx context.Context, id string) (*protonmail.Message, erro
 	headers := mailparse.ParseHeaderBlock(headerBlock(raw), nil)
 	a.learnAutocrypt(headers, sender)
 	display := raw
-	encryption := "Bez šifrování end-to-end – zpráva je u poskytovatele uložená čitelně (na cestě chráněná TLS)"
+	encryption := i18n.T("Not end-to-end encrypted – the provider stores the message readably (TLS protects it in transit)")
 	entity, enc, sig := a.open(ctx, raw, sender)
 	switch {
 	case entity != nil:
@@ -149,7 +150,7 @@ func (a *Account) AttachmentData(ctx context.Context, att protonmail.Attachment)
 	if d := att.InlineData(); d != nil {
 		return d, nil
 	}
-	return nil, fmt.Errorf("příloha nemá data")
+	return nil, errors.New(i18n.T("the attachment has no data"))
 }
 
 func (a *Account) InlineImages(ctx context.Context, msg *protonmail.Message) map[string]string {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/ollama"
 	"github.com/Imbecile6197/klient/internal/power"
 )
@@ -18,7 +19,7 @@ type ollamaProvider struct{ backend LocalBackend }
 
 func newOllama(b LocalBackend) (Provider, error) {
 	if b == nil {
-		return nil, errors.New("lokální AI (Ollama) není k dispozici")
+		return nil, errors.New(i18n.T("local AI (Ollama) is not available"))
 	}
 	return &ollamaProvider{backend: b}, nil
 }

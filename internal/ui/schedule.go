@@ -8,6 +8,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/mailbox"
 	"github.com/Imbecile6197/klient/internal/protonmail"
 )
@@ -16,7 +17,20 @@ import (
 
 var czDays = []string{"ne", "po", "út", "st", "čt", "pá", "so"}
 
-// formatWhen is "dnes v 15:30", "zítra v 8:00" or "po 5. 10. v 8:00".
+// weekdayShort is the abbreviated day name in the interface language.
+func weekdayShort(t time.Time) string {
+	if i18n.Lang() == "cs" {
+		return czDays[t.Weekday()]
+	}
+	return t.Format("Mon")
+}
+
+// dayDate is "Mon Oct 5, 2026" (in Czech "po 5. 10. 2026").
+func dayDate(t time.Time) string {
+	return weekdayShort(t) + " " + t.Format(i18n.T("Jan 2, 2006"))
+}
+
+// formatWhen is "today at 15:30", "tomorrow at 8:00" or "Mon Oct 5 at 8:00".
 func formatWhen(t time.Time) string {
 	now := time.Now()
 	y1, m1, d1 := now.Date()
@@ -25,41 +39,35 @@ func formatWhen(t time.Time) string {
 	hm := fmt.Sprintf("%d:%02d", t.Hour(), t.Minute())
 	switch days := int(day.Hours() / 24); {
 	case days == 0:
-		return "dnes v " + hm
+		return fmt.Sprintf(i18n.T("today at %s"), hm)
 	case days == 1:
-		return "zítra v " + hm
+		return fmt.Sprintf(i18n.T("tomorrow at %s"), hm)
 	case y1 == y2:
-		return czDays[t.Weekday()] + " " + t.Format("2. 1.") + " v " + hm
+		return fmt.Sprintf(i18n.T("%s at %s"), weekdayShort(t)+" "+t.Format(i18n.T("Jan 2")), hm)
 	}
-	return czDays[t.Weekday()] + " " + t.Format("2. 1. 2006") + " v " + hm
+	return fmt.Sprintf(i18n.T("%s at %s"), dayDate(t), hm)
 }
 
-// countdown is the remaining time: "za 45 s", "za 12 min", "za 2 h 5 min", "za 3 dny".
+// countdown is the remaining time: "in 45 s", "in 12 min", "in 2 h 5 min", "in 3 days".
 func countdown(t time.Time) string {
 	d := time.Until(t)
 	switch {
 	case d <= 0:
-		return "právě teď"
+		return i18n.T("right now")
 	case d < time.Minute:
-		return fmt.Sprintf("za %d s", int(d.Seconds()))
+		return fmt.Sprintf(i18n.T("in %d s"), int(d.Seconds()))
 	case d < time.Hour:
-		return fmt.Sprintf("za %d min", int(d.Minutes()))
+		return fmt.Sprintf(i18n.T("in %d min"), int(d.Minutes()))
 	case d < 24*time.Hour:
 		h := int(d.Hours())
 		m := int(d.Minutes()) % 60
 		if m == 0 {
-			return fmt.Sprintf("za %d h", h)
+			return fmt.Sprintf(i18n.T("in %d h"), h)
 		}
-		return fmt.Sprintf("za %d h %d min", h, m)
+		return fmt.Sprintf(i18n.T("in %d h %d min"), h, m)
 	}
 	days := int(d.Hours() / 24)
-	switch {
-	case days == 1:
-		return "za 1 den"
-	case days <= 4:
-		return fmt.Sprintf("za %d dny", days)
-	}
-	return fmt.Sprintf("za %d dní", days)
+	return fmt.Sprintf(i18n.N("in %d day", "in %d days", days), days)
 }
 
 func at(day time.Time, hour int) time.Time {
@@ -76,29 +84,29 @@ func snoozePresets() []preset {
 	now := time.Now()
 	var out []preset
 	if now.Hour() < 17 {
-		out = append(out, preset{"Později dnes", now.Add(3 * time.Hour).Truncate(time.Hour)})
+		out = append(out, preset{i18n.T("Later today"), now.Add(3 * time.Hour).Truncate(time.Hour)})
 	} else {
-		out = append(out, preset{"Dnes večer", at(now, 20)})
+		out = append(out, preset{i18n.T("This evening"), at(now, 20)})
 		if now.Hour() >= 20 {
 			out = out[:0]
 		}
 	}
-	out = append(out, preset{"Zítra ráno", at(now.AddDate(0, 0, 1), 8)})
+	out = append(out, preset{i18n.T("Tomorrow morning"), at(now.AddDate(0, 0, 1), 8)})
 	if wd := now.Weekday(); wd >= time.Monday && wd <= time.Thursday {
-		out = append(out, preset{"O víkendu", at(now.AddDate(0, 0, int(time.Saturday-wd)), 9)})
+		out = append(out, preset{i18n.T("This weekend"), at(now.AddDate(0, 0, int(time.Saturday-wd)), 9)})
 	}
-	out = append(out, preset{"Příští týden", at(nextMonday(now), 8)})
+	out = append(out, preset{i18n.T("Next week"), at(nextMonday(now), 8)})
 	return out
 }
 
 func sendPresets() []preset {
 	now := time.Now()
 	out := []preset{
-		{"Zítra ráno", at(now.AddDate(0, 0, 1), 8)},
-		{"Zítra odpoledne", at(now.AddDate(0, 0, 1), 13)},
+		{i18n.T("Tomorrow morning"), at(now.AddDate(0, 0, 1), 8)},
+		{i18n.T("Tomorrow afternoon"), at(now.AddDate(0, 0, 1), 13)},
 	}
 	if now.Weekday() != time.Sunday {
-		out = append(out, preset{"V pondělí ráno", at(nextMonday(now), 8)})
+		out = append(out, preset{i18n.T("Monday morning"), at(nextMonday(now), 8)})
 	}
 	return out
 }
@@ -111,7 +119,7 @@ func nextMonday(t time.Time) time.Time {
 	return t.AddDate(0, 0, days)
 }
 
-// presetPopover lists quick choices and "Vlastní…" (date and time picker).
+// presetPopover lists quick choices and "Custom date and time…" (a picker).
 func (a *App) presetPopover(presets []preset, customTitle string, parent func() gtk.Widgetter, pick func(time.Time)) *gtk.Popover {
 	pop := gtk.NewPopover()
 	box := gtk.NewBox(gtk.OrientationVertical, 0)
@@ -140,7 +148,7 @@ func (a *App) presetPopover(presets []preset, customTitle string, parent func() 
 		add(p.label, formatWhen(p.t), func() { pick(p.t) })
 	}
 	box.Append(gtk.NewSeparator(gtk.OrientationHorizontal))
-	add("Vlastní datum a čas…", "", func() { a.pickDateTime(parent(), customTitle, pick) })
+	add(i18n.T("Custom date and time…"), "", func() { a.pickDateTime(parent(), customTitle, pick) })
 	pop.SetChild(box)
 	return pop
 }
@@ -170,8 +178,8 @@ func (a *App) pickDateTime(parent gtk.Widgetter, title string, done func(time.Ti
 	box.Append(cal)
 	box.Append(timeBox)
 	d.SetExtraChild(box)
-	d.AddResponse("cancel", "Zrušit")
-	d.AddResponse("ok", "Potvrdit")
+	d.AddResponse("cancel", i18n.T("Cancel"))
+	d.AddResponse("ok", i18n.T("Confirm"))
 	d.SetResponseAppearance("ok", adw.ResponseSuggested)
 	d.SetDefaultResponse("ok")
 	d.SetCloseResponse("cancel")
@@ -182,7 +190,7 @@ func (a *App) pickDateTime(parent gtk.Widgetter, title string, done func(time.Ti
 		dt := cal.Date()
 		t := time.Date(dt.Year(), time.Month(dt.Month()), dt.DayOfMonth(), int(hour.Value()), int(minute.Value()), 0, 0, time.Local)
 		if t.Before(time.Now().Add(time.Minute)) {
-			a.toast("Zvolený čas už uplynul")
+			a.toast(i18n.T("The chosen time has already passed"))
 			return
 		}
 		done(t)
@@ -192,14 +200,14 @@ func (a *App) pickDateTime(parent gtk.Widgetter, title string, done func(time.Ti
 
 // ---- Snooze ------------------------------------------------------------------
 
-// snoozeButton is the reader's "Odložit" menu.
+// snoozeButton is the reader's "Snooze" menu.
 func (m *mainView) snoozeButton() *gtk.MenuButton {
 	btn := gtk.NewMenuButton()
 	btn.SetIconName("alarm-symbolic")
-	btn.SetTooltipText("Odložit (Ctrl+H) – zpráva se vrátí do doručené pošty v zadaný čas")
+	btn.SetTooltipText(i18n.T("Snooze (Ctrl+H) – the message returns to the inbox at the chosen time"))
 	// Presets depend on the current time, so build the popover on open.
 	btn.SetCreatePopupFunc(func(b *gtk.MenuButton) {
-		b.SetPopover(m.a.presetPopover(snoozePresets(), "Odložit do", func() gtk.Widgetter { return m.a.win }, m.snooze))
+		b.SetPopover(m.a.presetPopover(snoozePresets(), i18n.T("Snooze Until"), func() gtk.Widgetter { return m.a.win }, m.snooze))
 	})
 	return btn
 }
@@ -209,7 +217,7 @@ func (m *mainView) snoozeCustom() {
 	if len(m.snoozeTargets()) == 0 {
 		return
 	}
-	m.a.pickDateTime(m.a.win, "Odložit do", m.snooze)
+	m.a.pickDateTime(m.a.win, i18n.T("Snooze Until"), m.snooze)
 }
 
 func (m *mainView) snoozeTargets() []string {
@@ -227,7 +235,7 @@ func (m *mainView) snoozeTargets() []string {
 func (m *mainView) snooze(t time.Time) {
 	ids := m.snoozeTargets()
 	if len(ids) == 0 {
-		m.a.toast("Tuto zprávu nejde odložit")
+		m.a.toast(i18n.T("This message cannot be snoozed"))
 		return
 	}
 	acc := m.a.acc
@@ -243,9 +251,9 @@ func (m *mainView) snooze(t time.Time) {
 			m.reloadFolders()
 			note := ""
 			if !acc.Caps().ServerSnooze {
-				note = " (pokud Klient poběží)"
+				note = i18n.T(" (if Klient is running)")
 			}
-			m.a.toastWithAction("Odloženo – vrátí se "+formatWhen(t)+note, "Zpět", func() {
+			m.a.toastWithAction(fmt.Sprintf(i18n.T("Snoozed – it returns %s"), formatWhen(t))+note, i18n.T("Undo"), func() {
 				go func() {
 					err := acc.Unsnooze(m.a.ctx, ids)
 					ui(func() {
@@ -277,7 +285,7 @@ func (m *mainView) unsnooze() {
 				m.a.toast(err.Error())
 				return
 			}
-			m.a.toast("Vráceno do doručené pošty")
+			m.a.toast(i18n.T("Returned to the inbox"))
 			m.scheduleRefresh()
 		})
 	}()
@@ -294,11 +302,11 @@ func (m *mainView) showScheduledBanner(meta protonmail.Summary) {
 		if m.thread != th || m.a.mv != m {
 			return false
 		}
-		m.banner.SetTitle(fmt.Sprintf("Naplánováno: odejde %s (%s)", formatWhen(when), countdown(when)))
+		m.banner.SetTitle(fmt.Sprintf(i18n.T("Scheduled: it will be sent %s (%s)"), formatWhen(when), countdown(when)))
 		return time.Until(when) > 0
 	}
 	update()
-	m.banner.SetButtonLabel("Zrušit odeslání")
+	m.banner.SetButtonLabel(i18n.T("Cancel Sending"))
 	m.bannerFn = func() { m.cancelScheduled(meta.ID) }
 	m.banner.SetRevealed(true)
 	glib.TimeoutSecondsAdd(1, update)
@@ -314,7 +322,7 @@ func (m *mainView) cancelScheduled(id string) {
 				m.a.toast(err.Error())
 				return
 			}
-			m.a.toast("Odeslání zrušeno, zpráva je v konceptech")
+			m.a.toast(i18n.T("Sending cancelled; the message is in Drafts"))
 			m.scheduleRefresh()
 			if acc.Kind() == mailbox.KindProton {
 				m.a.openDraft(id) // same ID as a draft
@@ -353,7 +361,7 @@ func (a *App) undoToast(delay int, what string, done func(send bool)) {
 	text := func() string { return fmt.Sprintf("%s za %d s", what, left) }
 	t := adw.NewToast(text())
 	t.SetTimeout(0) // dismissed by us
-	t.SetButtonLabel("Zpět")
+	t.SetButtonLabel(i18n.T("Undo"))
 	t.ConnectButtonClicked(func() {
 		if finished {
 			return

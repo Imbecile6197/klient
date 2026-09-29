@@ -12,6 +12,8 @@ import (
 	"github.com/ProtonMail/go-proton-api"
 	"github.com/emersion/go-vcard"
 	"github.com/google/uuid"
+
+	"github.com/Imbecile6197/klient/internal/i18n"
 )
 
 // UserLabel is a custom folder or label created by the user in Proton.
@@ -185,7 +187,7 @@ func (a *Account) AddContact(ctx context.Context, name, email string) error {
 	}
 	for _, r := range res {
 		if r.Response.Code != 0 && r.Response.Code != 1000 {
-			return fmt.Errorf("kontakt nebyl uložen: %s", r.Response.Message)
+			return fmt.Errorf(i18n.T("the contact was not saved: %s"), r.Response.Message)
 		}
 	}
 	a.InvalidateContacts()

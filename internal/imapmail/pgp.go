@@ -8,6 +8,7 @@ import (
 
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
 
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/pgp"
 	"github.com/Imbecile6197/klient/internal/pgpmime"
 	"github.com/Imbecile6197/klient/internal/protonmail"
@@ -197,7 +198,7 @@ func (a *Account) open(ctx context.Context, raw []byte, sender string) ([]byte, 
 		if err != nil {
 			return nil, err.Error(), pgp.SigUnknown
 		}
-		return entity, "End-to-end šifrováno (PGP)", sigStatus(senderKR, verr)
+		return entity, i18n.T("End-to-end encrypted (PGP)"), sigStatus(senderKR, verr)
 	case pgpmime.Signed:
 		var senderKR *crypto.KeyRing
 		if sender != "" {

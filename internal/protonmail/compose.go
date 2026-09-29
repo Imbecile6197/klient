@@ -3,6 +3,7 @@ package protonmail
 import (
 	"context"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"net/mail"
 	"strings"
@@ -11,6 +12,8 @@ import (
 	"github.com/ProtonMail/gluon/rfc822"
 	"github.com/ProtonMail/go-proton-api"
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
+
+	"github.com/Imbecile6197/klient/internal/i18n"
 )
 
 // MaxAttachmentsSize is Proton's limit for all attachments of one message.
@@ -65,7 +68,7 @@ func (a *Account) fromAddress(id string) (*mail.Address, error) {
 			return &mail.Address{Name: addr.DisplayName, Address: addr.Email}, nil
 		}
 	}
-	return nil, fmt.Errorf("adresa odesílatele nenalezena")
+	return nil, errors.New(i18n.T("sender address not found"))
 }
 
 // SaveDraft creates or updates the draft on the server (encrypted with the
@@ -103,7 +106,7 @@ func (a *Account) SaveDraft(ctx context.Context, d *Draft) error {
 				if raw.ID == att.UploadedID {
 					data, err := a.AttachmentData(ctx, Attachment{ID: raw.ID, keyPackets: raw.KeyPackets, addressID: old.AddressID})
 					if err != nil {
-						return fmt.Errorf("příloha %s: %w", att.Name, err)
+						return fmt.Errorf(i18n.T("attachment %s: %w"), att.Name, err)
 					}
 					att.Data = data
 				}
@@ -129,12 +132,12 @@ func (a *Account) SaveDraft(ctx context.Context, d *Draft) error {
 		}
 		msg, err := a.client.CreateDraft(ctx, kr, req)
 		if err != nil {
-			return apiErr("uložení konceptu selhalo", err)
+			return apiErr(i18n.T("saving the draft failed"), err)
 		}
 		d.ID = msg.ID
 	} else {
 		if _, err := a.client.UpdateDraft(ctx, d.ID, kr, proton.UpdateDraftReq{Message: tmpl}); err != nil {
-			return apiErr("aktualizace konceptu selhala", err)
+			return apiErr(i18n.T("updating the draft failed"), err)
 		}
 	}
 
@@ -143,7 +146,7 @@ func (a *Account) SaveDraft(ctx context.Context, d *Draft) error {
 			continue
 		}
 		if att.Data == nil {
-			return fmt.Errorf("příloha %s nemá data", att.Name)
+			return fmt.Errorf(i18n.T("attachment %s has no data"), att.Name)
 		}
 		mt := att.MIMEType
 		if mt == "" {
@@ -154,7 +157,7 @@ func (a *Account) SaveDraft(ctx context.Context, d *Draft) error {
 			Disposition: proton.AttachmentDisposition, Body: att.Data,
 		})
 		if err != nil {
-			return apiErr("nahrání přílohy "+att.Name+" selhalo", err)
+			return apiErr(fmt.Sprintf(i18n.T("uploading attachment %s failed"), att.Name), err)
 		}
 		att.UploadedID = up.ID
 	}
@@ -191,7 +194,7 @@ func (a *Account) Send(ctx context.Context, d *Draft) error {
 		}
 		key, err := kr.DecryptSessionKey(kp)
 		if err != nil {
-			return fmt.Errorf("klíč přílohy %s: %w", att.Name, err)
+			return fmt.Errorf(i18n.T("key of attachment %s: %w"), att.Name, err)
 		}
 		attKeys[att.ID] = key
 	}
@@ -221,11 +224,11 @@ func (a *Account) Send(ctx context.Context, d *Draft) error {
 			body = d.HTML
 		}
 		if err := req.AddTextPackage(kr, body, mt, prefs, attKeys); err != nil {
-			return fmt.Errorf("šifrování zprávy selhalo: %w", err)
+			return fmt.Errorf(i18n.T("encrypting the message failed: %w"), err)
 		}
 	}
 	if _, err := a.client.SendDraft(ctx, d.ID, req); err != nil {
-		return apiErr("odeslání selhalo", err)
+		return apiErr(i18n.T("sending failed"), err)
 	}
 	return nil
 }
@@ -261,7 +264,7 @@ func (a *Account) ForwardAttachments(ctx context.Context, msg *Message) ([]*Outg
 	for _, att := range msg.Attachments {
 		data, err := a.AttachmentData(ctx, att)
 		if err != nil {
-			return nil, fmt.Errorf("příloha %s: %w", att.Name, err)
+			return nil, fmt.Errorf(i18n.T("attachment %s: %w"), att.Name, err)
 		}
 		out = append(out, &Outgoing{Name: att.Name, MIMEType: att.MIMEType, Data: data, Size: int64(len(data))})
 	}

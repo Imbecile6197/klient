@@ -2,6 +2,7 @@ package ui
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"mime"
 	"net/mail"
@@ -19,6 +20,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 
 	"github.com/Imbecile6197/klient/internal/ai"
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/mailbox"
 	"github.com/Imbecile6197/klient/internal/mailparse"
 	"github.com/Imbecile6197/klient/internal/protonmail"
@@ -32,7 +34,7 @@ func parseAddrs(s string) ([]*mail.Address, error) {
 	}
 	list, err := mail.ParseAddressList(s)
 	if err != nil {
-		return nil, fmt.Errorf("neplatná adresa v „%s“", s)
+		return nil, fmt.Errorf(i18n.T("invalid address in “%s”"), s)
 	}
 	return list, nil
 }
@@ -51,7 +53,7 @@ func quote(msg *protonmail.Message) string {
 		from = mailparse.DisplayAddress(msg.Meta.Sender)
 	}
 	var sb strings.Builder
-	fmt.Fprintf(&sb, "\n\nDne %s napsal(a) %s:\n", time.Unix(msg.Meta.Time, 0).Format("2. 1. 2006 v 15:04"), from)
+	fmt.Fprintf(&sb, i18n.T("\n\nOn %s, %s wrote:\n"), time.Unix(msg.Meta.Time, 0).Format(i18n.T("Jan 2, 2006 at 15:04")), from)
 	for _, line := range strings.Split(strings.TrimRight(msg.Text, "\n"), "\n") {
 		sb.WriteString("> " + line + "\n")
 	}
@@ -63,8 +65,8 @@ func forwardHeader(msg *protonmail.Message) string {
 	if msg.Meta.Sender != nil {
 		from = mailparse.DisplayAddress(msg.Meta.Sender)
 	}
-	return fmt.Sprintf("\n\n---------- Přeposlaná zpráva ----------\nOd: %s\nDatum: %s\nPředmět: %s\nKomu: %s\n\n%s",
-		from, time.Unix(msg.Meta.Time, 0).Format("2. 1. 2006 15:04"), msg.Meta.Subject,
+	return fmt.Sprintf(i18n.T("\n\n---------- Forwarded message ----------\nFrom: %s\nDate: %s\nSubject: %s\nTo: %s\n\n%s"),
+		from, time.Unix(msg.Meta.Time, 0).Format(i18n.T("Jan 2, 2006 15:04")), msg.Meta.Subject,
 		formatAddrs(msg.Meta.ToList), msg.Text)
 }
 
@@ -159,7 +161,7 @@ func (a *App) openDraft(id string) {
 		d, _, err := a.acc.OpenDraft(a.ctx, id)
 		ui(func() {
 			if err != nil {
-				a.toast("Koncept se nepodařilo otevřít: " + err.Error())
+				a.toast(i18n.T("The draft could not be opened: ") + err.Error())
 				return
 			}
 			a.composer(d, nil, protonmail.ActionNew)
@@ -180,27 +182,27 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 	tv := adw.NewToolbarView()
 	hb := adw.NewHeaderBar()
 	titleText := map[protonmail.ComposeAction]string{
-		protonmail.ActionNew: "Nová zpráva", protonmail.ActionReply: "Odpověď",
-		protonmail.ActionReplyAll: "Odpověď všem", protonmail.ActionForward: "Přeposlání",
+		protonmail.ActionNew: i18n.T("New Message"), protonmail.ActionReply: i18n.C("compose-title", "Reply"),
+		protonmail.ActionReplyAll: i18n.C("compose-title", "Reply to All"), protonmail.ActionForward: i18n.C("compose-title", "Forward"),
 	}[action]
 	if d.ID != "" {
-		titleText = "Koncept"
+		titleText = i18n.T("Draft")
 	}
 	title := adw.NewWindowTitle(titleText, "")
 	win.SetTitle(titleText)
 	hb.SetTitleWidget(title)
 
 	send := adw.NewSplitButton()
-	send.SetLabel("Odeslat")
+	send.SetLabel(i18n.T("Send"))
 	send.AddCSSClass("suggested-action")
-	send.SetTooltipText("Odeslat (Ctrl+Enter)")
-	send.SetDropdownTooltip("Naplánovat odeslání")
+	send.SetTooltipText(i18n.T("Send (Ctrl+Enter)"))
+	send.SetDropdownTooltip(i18n.T("Schedule Sending"))
 	attachBtn := gtk.NewButtonFromIconName("mail-attachment-symbolic")
-	attachBtn.SetTooltipText("Přiložit soubory")
+	attachBtn.SetTooltipText(i18n.T("Attach Files"))
 	saveBtn := gtk.NewButtonFromIconName("document-save-symbolic")
-	saveBtn.SetTooltipText("Uložit koncept (Ctrl+S)")
+	saveBtn.SetTooltipText(i18n.T("Save Draft (Ctrl+S)"))
 	discardBtn := gtk.NewButtonFromIconName("user-trash-symbolic")
-	discardBtn.SetTooltipText("Zahodit")
+	discardBtn.SetTooltipText(i18n.T("Discard"))
 	hb.PackEnd(send)
 	hb.PackEnd(attachBtn)
 	hb.PackStart(discardBtn)
@@ -215,7 +217,7 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 		fromNames = append(fromNames, ad.Email)
 	}
 	from := adw.NewComboRow()
-	from.SetTitle("Od")
+	from.SetTitle(i18n.T("From"))
 	from.SetModel(gtk.NewStringList(fromNames))
 	for i, ad := range addrs {
 		if ad.ID == d.FromAddressID {
@@ -223,16 +225,16 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 		}
 	}
 	to := adw.NewEntryRow()
-	to.SetTitle("Komu")
+	to.SetTitle(i18n.T("To"))
 	to.SetText(formatAddrs(d.To))
 	cc := adw.NewEntryRow()
-	cc.SetTitle("Kopie")
+	cc.SetTitle(i18n.T("Cc"))
 	cc.SetText(formatAddrs(d.CC))
 	bcc := adw.NewEntryRow()
-	bcc.SetTitle("Skrytá kopie")
+	bcc.SetTitle(i18n.T("Bcc"))
 	bcc.SetText(formatAddrs(d.BCC))
 	subject := adw.NewEntryRow()
-	subject.SetTitle("Předmět")
+	subject.SetTitle(i18n.T("Subject"))
 	subject.SetText(d.Subject)
 	for _, w := range []gtk.Widgetter{from, to, cc, bcc, subject} {
 		group.Add(w)
@@ -241,20 +243,20 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 
 	optGroup := adw.NewPreferencesGroup()
 	sign := adw.NewSwitchRow()
-	sign.SetTitle("Podepsat PGP i nešifrované zprávy")
-	sign.SetSubtitle("Příjemci s PGP ověří, že zpráva je od vás a nebyla změněna")
+	sign.SetTitle(i18n.T("Sign unencrypted messages with PGP too"))
+	sign.SetSubtitle(i18n.T("Recipients with PGP can verify that the message is from you and has not been changed"))
 	sign.SetActive(d.SignExternal)
 	security := adw.NewActionRow()
-	security.SetTitle("Zabezpečení")
-	security.SetSubtitle("Zadejte příjemce")
+	security.SetTitle(i18n.T("Security"))
+	security.SetSubtitle(i18n.T("Enter the recipients"))
 	security.SetSubtitleLines(6)
-	check := gtk.NewButtonWithLabel("Zkontrolovat")
+	check := gtk.NewButtonWithLabel(i18n.T("Check"))
 	check.SetVAlign(gtk.AlignCenter)
 	check.AddCSSClass("flat")
 	security.AddSuffix(check)
 	attachKey := adw.NewSwitchRow()
-	attachKey.SetTitle("Přiložit můj veřejný klíč")
-	attachKey.SetSubtitle("Příjemce s PGP vám pak může odpovědět šifrovaně")
+	attachKey.SetTitle(i18n.T("Attach my public key"))
+	attachKey.SetSubtitle(i18n.T("A recipient with PGP can then send you encrypted replies"))
 	attachKey.SetActive(a.cfg.AttachPublicKey && d.ID == "")
 	optGroup.Add(sign)
 	optGroup.Add(attachKey)
@@ -269,7 +271,7 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 
 	// --- attachments
 	attGroup := adw.NewPreferencesGroup()
-	attGroup.SetTitle("Přílohy")
+	attGroup.SetTitle(i18n.T("Attachments"))
 	var attRows []gtk.Widgetter
 	var refreshAtts func()
 	refreshAtts = func() {
@@ -286,7 +288,7 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 			row.SetSubtitle(humanSize(att.Size))
 			row.AddPrefix(gtk.NewImageFromIconName("mail-attachment-symbolic"))
 			rm := gtk.NewButtonFromIconName("list-remove-symbolic")
-			rm.SetTooltipText("Odebrat")
+			rm.SetTooltipText(i18n.T("Remove"))
 			rm.SetVAlign(gtk.AlignCenter)
 			rm.AddCSSClass("flat")
 			rm.ConnectClicked(func() {
@@ -309,9 +311,9 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 		}
 		attGroup.SetVisible(len(d.Attachments) > 0)
 		if total > protonmail.MaxAttachmentsSize {
-			attGroup.SetDescription(fmt.Sprintf("Celkem %s – překračuje limit Protonu 25 MB!", humanSize(total)))
+			attGroup.SetDescription(fmt.Sprintf(i18n.T("%s in total – exceeds the Proton limit of 25 MB!"), humanSize(total)))
 		} else {
-			attGroup.SetDescription(fmt.Sprintf("Celkem %s, šifrují se stejně jako text zprávy", humanSize(total)))
+			attGroup.SetDescription(fmt.Sprintf(i18n.T("%s in total, encrypted just like the message text"), humanSize(total)))
 		}
 	}
 
@@ -347,11 +349,11 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 	}
 
 	aiEntry := gtk.NewEntry()
-	aiEntry.SetPlaceholderText("Pokyn pro AI, např. „zdvořile odmítni“ nebo „přelož do angličtiny“")
+	aiEntry.SetPlaceholderText(i18n.T("Instruction for the AI, e.g. “politely decline” or “translate into German”"))
 	aiEntry.SetHExpand(true)
-	aiLabel := "Napsat s AI"
+	aiLabel := i18n.T("Write with AI")
 	if orig != nil && action != protonmail.ActionForward {
-		aiLabel = "Navrhnout odpověď"
+		aiLabel = i18n.T("Suggest a Reply")
 	}
 	aiBtn := gtk.NewButtonWithLabel(aiLabel)
 	aiBox := gtk.NewBox(gtk.OrientationHorizontal, 0)
@@ -387,14 +389,14 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 	// Forwarded attachments are downloaded and decrypted in the background.
 	if orig != nil && action == protonmail.ActionForward && len(orig.Attachments) > 0 {
 		attGroup.SetVisible(true)
-		attGroup.SetDescription("Načítám přílohy přeposílané zprávy…")
+		attGroup.SetDescription(i18n.T("Loading the attachments of the forwarded message…"))
 		send.SetSensitive(false)
 		go func() {
 			atts, err := acc.ForwardAttachments(a.ctx, orig)
 			ui(func() {
 				send.SetSensitive(true)
 				if err != nil {
-					localToast("Přílohy se nepodařilo načíst: " + err.Error())
+					localToast(i18n.T("The attachments could not be loaded: ") + err.Error())
 				}
 				d.Attachments = append(d.Attachments, atts...)
 				refreshAtts()
@@ -418,7 +420,7 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 		}
 		sel := int(from.Selected())
 		if sel < 0 || sel >= len(addrs) {
-			return fmt.Errorf("vyberte adresu odesílatele")
+			return errors.New(i18n.T("choose the sender address"))
 		}
 		d.FromAddressID = addrs[sel].ID
 		d.To, d.CC, d.BCC = t, c, b
@@ -444,12 +446,12 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 		for _, md := range modes {
 			switch md.Scheme {
 			case "proton":
-				lines = append(lines, md.Address+": šifrováno end-to-end (Proton)")
+				lines = append(lines, fmt.Sprintf(i18n.T("%s: end-to-end encrypted (Proton)"), md.Address))
 			case "pgp":
-				lines = append(lines, md.Address+": šifrováno PGP ("+shortFP(md.KeyFP)+")")
+				lines = append(lines, fmt.Sprintf(i18n.T("%s: encrypted with PGP (%s)"), md.Address, shortFP(md.KeyFP)))
 			default:
 				allSecure = false
-				lines = append(lines, md.Address+": BEZ ŠIFROVÁNÍ (není znám klíč)")
+				lines = append(lines, fmt.Sprintf(i18n.T("%s: NOT ENCRYPTED (no known key)"), md.Address))
 			}
 		}
 		return strings.Join(lines, "\n"), allSecure
@@ -464,7 +466,7 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 		if len(all) == 0 {
 			return
 		}
-		security.SetSubtitle("Zjišťuji klíče příjemců…")
+		security.SetSubtitle(i18n.T("Looking up the recipients' keys…"))
 		go func() {
 			modes := acc.PlanEncryption(a.ctx, all)
 			ui(func() {
@@ -476,7 +478,7 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 
 	attachBtn.ConnectClicked(func() {
 		dlg := gtk.NewFileDialog()
-		dlg.SetTitle("Přiložit soubory")
+		dlg.SetTitle(i18n.T("Attach Files"))
 		dlg.OpenMultiple(context.Background(), &win.Window, func(res gio.AsyncResulter) {
 			files, err := dlg.OpenMultipleFinish(res)
 			if err != nil || files == nil {
@@ -500,7 +502,7 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 
 	aiBtn.ConnectClicked(func() {
 		if !a.ai.HasAssistant() {
-			localToast("AI asistent není nastavený (Předvolby → AI)")
+			localToast(i18n.T("The AI assistant is not set up (Preferences → AI)"))
 			return
 		}
 		instruction := strings.TrimSpace(aiEntry.Text())
@@ -508,11 +510,11 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 		userPart := strings.TrimSpace(strings.TrimSuffix(draft, tail))
 		isReply := orig != nil && action != protonmail.ActionForward
 		if !isReply && instruction == "" {
-			localToast("Napište pokyn pro AI")
+			localToast(i18n.T("Write an instruction for the AI"))
 			return
 		}
 		aiBtn.SetSensitive(false)
-		aiBtn.SetLabel("Píšu…")
+		aiBtn.SetLabel(i18n.T("Writing…"))
 		subj := subject.Text()
 		go func() {
 			var out string
@@ -525,11 +527,11 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 				out, err = a.ai.DraftReply(a.ctx, sender, orig.Meta.Subject, orig.Text, instruction)
 			} else {
 				if instruction == "" {
-					instruction = "Vylepši text, oprav chyby a zachovej smysl."
+					instruction = "Improve the text, fix mistakes and keep the meaning."
 				}
 				text := userPart
 				if text == "" {
-					text = "(prázdný koncept – napiš nový e-mail podle pokynu; předmět: " + subj + ")"
+					text = "(empty draft – write a new e-mail according to the instruction; subject: " + subj + ")"
 				}
 				out, err = a.ai.Improve(a.ctx, text, instruction)
 			}
@@ -537,7 +539,7 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 				aiBtn.SetSensitive(true)
 				aiBtn.SetLabel(aiLabel)
 				if err != nil {
-					localToast("AI selhala: " + ai.Explain(a.cfg.AssistantProvider, err).Text)
+					localToast(i18n.T("The AI failed: ") + ai.Explain(a.cfg.AssistantProvider, err).Text)
 					return
 				}
 				editor.SetText(strings.TrimSpace(out) + tail)
@@ -567,13 +569,13 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 				localToast(err.Error())
 				return
 			}
-			localToast("Koncept uložen")
+			localToast(i18n.T("Draft saved"))
 		})
 	})
 
 	sendNow := func() {
 		send.SetSensitive(false)
-		send.SetLabel("Odesílám…")
+		send.SetLabel(i18n.T("Sending…"))
 		busy = true
 		go func() {
 			ctx, cancel := context.WithTimeout(a.ctx, 5*time.Minute)
@@ -584,11 +586,11 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 				if err != nil {
 					d.DeliveryTime = time.Time{}
 					send.SetSensitive(true)
-					send.SetLabel("Odeslat")
+					send.SetLabel(i18n.T("Send"))
 					win.SetVisible(true)
 					win.Present()
 					localToast(err.Error())
-					a.toast("Odeslání selhalo, zpráva je znovu otevřená")
+					a.toast(i18n.T("Sending failed; the message has been reopened"))
 					return
 				}
 				for _, ad := range allRecipients() {
@@ -598,14 +600,14 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 				win.Close()
 				switch {
 				case !d.DeliveryTime.IsZero() && !acc.Caps().ServerSchedule:
-					a.toast("Naplánováno – odejde " + formatWhen(d.DeliveryTime) + ", pokud Klient poběží (třeba na pozadí)")
+					a.toast(fmt.Sprintf(i18n.T("Scheduled – it will be sent %s if Klient is running (the background is enough)"), formatWhen(d.DeliveryTime)))
 					if a.mv != nil && a.acc == acc {
 						a.mv.reloadFolders()
 					}
 				case !d.DeliveryTime.IsZero():
-					a.toast("Naplánováno – odejde " + formatWhen(d.DeliveryTime) + " (" + countdown(d.DeliveryTime) + ")")
+					a.toast(fmt.Sprintf(i18n.T("Scheduled – it will be sent %s (%s)"), formatWhen(d.DeliveryTime), countdown(d.DeliveryTime)))
 				case a.cfg.SendDelay <= 0:
-					a.toast("Zpráva odeslána")
+					a.toast(i18n.T("Message sent"))
 				}
 				if a.mv != nil {
 					a.mv.scheduleRefresh()
@@ -632,14 +634,14 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 			err := acc.SaveDraft(a.ctx, d)
 			ui(func() {
 				if err != nil {
-					a.toast("Koncept se nepodařilo uložit: " + err.Error())
+					a.toast(i18n.T("The draft could not be saved: ") + err.Error())
 				}
 				startDelay(delay, &undone)
 			})
 		}()
 	}
 	startDelay = func(delay int, undone *bool) {
-		a.undoToast(delay, "Zpráva se odešle", func(ok bool) {
+		a.undoToast(delay, i18n.T("The message will be sent"), func(ok bool) {
 			if !ok {
 				*undone = true
 				busy = false
@@ -649,7 +651,7 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 			}
 			busy = false
 			sendNow()
-			a.toast("Zpráva odeslána")
+			a.toast(i18n.T("Message sent"))
 		})
 	}
 
@@ -665,7 +667,7 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 		}
 		all := allRecipients()
 		if len(all) == 0 {
-			localToast("Zadejte alespoň jednoho příjemce")
+			localToast(i18n.T("Enter at least one recipient"))
 			return
 		}
 		var total int64
@@ -673,7 +675,7 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 			total += att.Size
 		}
 		if total > protonmail.MaxAttachmentsSize {
-			localToast("Přílohy překračují limit 25 MB")
+			localToast(i18n.T("The attachments exceed the 25 MB limit"))
 			return
 		}
 		send.SetSensitive(false)
@@ -707,9 +709,9 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 					go2()
 					return
 				}
-				dlg := adw.NewAlertDialog("Odeslat bez šifrování?", "Někteří příjemci nemají známý veřejný klíč, zpráva jim dorazí nešifrovaně:\n\n"+text)
-				dlg.AddResponse("cancel", "Zrušit")
-				dlg.AddResponse("send", "Přesto odeslat")
+				dlg := adw.NewAlertDialog(i18n.T("Send Without Encryption?"), i18n.T("Some recipients have no known public key, so the message will reach them unencrypted:")+"\n\n"+text)
+				dlg.AddResponse("cancel", i18n.T("Cancel"))
+				dlg.AddResponse("send", i18n.T("Send Anyway"))
 				dlg.SetResponseAppearance("send", adw.ResponseDestructive)
 				dlg.SetCloseResponse("cancel")
 				dlg.ConnectResponse(func(r string) {
@@ -723,9 +725,9 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 	}
 	send.ConnectClicked(func() { trySend(time.Time{}) })
 	if acc.Caps().CanSchedule() {
-		send.SetPopover(a.presetPopover(sendPresets(), "Naplánovat odeslání", func() gtk.Widgetter { return win }, func(t time.Time) {
+		send.SetPopover(a.presetPopover(sendPresets(), i18n.T("Schedule Sending"), func() gtk.Widgetter { return win }, func(t time.Time) {
 			if t.Before(time.Now().Add(2 * time.Minute)) {
-				localToast("Naplánovat jde nejdřív za 2 minuty")
+				localToast(i18n.T("The earliest possible time is 2 minutes from now"))
 				return
 			}
 			trySend(t)
@@ -733,9 +735,9 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 	}
 
 	discardBtn.ConnectClicked(func() {
-		dlg := adw.NewAlertDialog("Zahodit zprávu?", "Rozepsaný text i uložený koncept budou smazány.")
-		dlg.AddResponse("cancel", "Zrušit")
-		dlg.AddResponse("discard", "Zahodit")
+		dlg := adw.NewAlertDialog(i18n.T("Discard the Message?"), i18n.T("Both the unfinished text and the saved draft will be deleted."))
+		dlg.AddResponse("cancel", i18n.T("Cancel"))
+		dlg.AddResponse("discard", i18n.T("Discard"))
 		dlg.SetResponseAppearance("discard", adw.ResponseDestructive)
 		dlg.SetCloseResponse("cancel")
 		dlg.ConnectResponse(func(r string) {
@@ -771,10 +773,10 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 			err := acc.SaveDraft(context.Background(), d)
 			ui(func() {
 				if err != nil {
-					a.toast("Koncept se nepodařilo uložit: " + err.Error())
+					a.toast(i18n.T("The draft could not be saved: ") + err.Error())
 					return
 				}
-				a.toast("Koncept uložen")
+				a.toast(i18n.T("Draft saved"))
 			})
 		}()
 		return false
@@ -877,7 +879,7 @@ func (a *App) addressCompletion(rows []*adw.EntryRow) gtk.Widgetter {
 				ar.SetTitle(orDefault(c.Name, c.Email))
 				sub := c.Email
 				if c.Recent {
-					sub += " · nedávná korespondence"
+					sub += i18n.T(" · recent correspondence")
 				}
 				ar.SetSubtitle(sub)
 				ar.AddPrefix(adw.NewAvatar(28, orDefault(c.Name, c.Email), true))
@@ -893,14 +895,14 @@ func (a *App) addressCompletion(rows []*adw.EntryRow) gtk.Widgetter {
 // readAttachment loads a local file as an outgoing attachment.
 func readAttachment(path string) (*protonmail.Outgoing, error) {
 	if path == "" {
-		return nil, fmt.Errorf("soubor nejde přiložit (není místní)")
+		return nil, errors.New(i18n.T("the file cannot be attached (it is not local)"))
 	}
 	st, err := os.Stat(path)
 	if err != nil {
 		return nil, err
 	}
 	if st.IsDir() {
-		return nil, fmt.Errorf("%s je složka – přiložit jde jen soubory", filepath.Base(path))
+		return nil, fmt.Errorf(i18n.T("%s is a folder – only files can be attached"), filepath.Base(path))
 	}
 	data, err := os.ReadFile(path)
 	if err != nil {

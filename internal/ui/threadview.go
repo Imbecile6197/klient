@@ -16,6 +16,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/pango"
 
 	"github.com/Imbecile6197/klient/internal/ai"
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/mailparse"
 	"github.com/Imbecile6197/klient/internal/pgp"
 	"github.com/Imbecile6197/klient/internal/protonmail"
@@ -69,14 +70,7 @@ func (m *mainView) setChecking(n int) {
 	if m.checking == nil {
 		return
 	}
-	switch {
-	case n == 1:
-		m.checkLabel.SetText("Spamfiltr kontroluje 1 novou zprávu…")
-	case n >= 2 && n <= 4:
-		m.checkLabel.SetText(fmt.Sprintf("Spamfiltr kontroluje %d nové zprávy…", n))
-	default:
-		m.checkLabel.SetText(fmt.Sprintf("Spamfiltr kontroluje %d nových zpráv…", n))
-	}
+	m.checkLabel.SetText(fmt.Sprintf(i18n.N("The spam filter is checking %d new message…", "The spam filter is checking %d new messages…", n), n))
 	m.checking.SetRevealChild(n > 0)
 }
 
@@ -104,7 +98,7 @@ func (m *mainView) rebuildList() {
 	}
 	if m.emptyTitle != nil {
 		m.emptyTitle.SetTitle(m.folder.Name)
-		m.emptyTitle.SetDescription(fmt.Sprintf("V této složce je načteno %d konverzací", len(m.items)))
+		m.emptyTitle.SetDescription(fmt.Sprintf(i18n.N("%d conversation is loaded in this folder", "%d conversations are loaded in this folder", len(m.items)), len(m.items)))
 	}
 	clearListBox(m.msgList)
 	m.countdowns = nil
@@ -161,7 +155,7 @@ func (m *mainView) threadRow(t protonmail.Thread) gtk.Widgetter {
 		case m.outgoingFolder() && len(msg.ToList) > 0:
 			name = mailparse.DisplayName(msg.ToList[0])
 		case msg.Sender != nil && m.a.acc.IsOwnAddress(msg.Sender.Address):
-			name = "Já"
+			name = i18n.T("Me")
 		case msg.Sender != nil:
 			name = mailparse.DisplayName(msg.Sender)
 		}
@@ -172,10 +166,10 @@ func (m *mainView) threadRow(t protonmail.Thread) gtk.Widgetter {
 	}
 	label := strings.Join(names, ", ")
 	if label == "" {
-		label = "(bez odesílatele)"
+		label = i18n.T("(no sender)")
 	}
 	if m.outgoingFolder() {
-		label = "Komu: " + label
+		label = i18n.T("To: ") + label
 	}
 
 	top := gtk.NewBox(gtk.OrientationHorizontal, 6)
@@ -185,7 +179,7 @@ func (m *mainView) threadRow(t protonmail.Thread) gtk.Widgetter {
 	check.SetCanTarget(false) // the row click toggles it
 	check.SetVAlign(gtk.AlignCenter)
 	m.checks = append(m.checks, check)
-	avatarName := strings.TrimPrefix(names0(names), "Komu: ")
+	avatarName := strings.TrimPrefix(names0(names), i18n.T("To: "))
 	avatar := adw.NewAvatar(36, avatarName, true)
 	avatar.SetVAlign(gtk.AlignStart)
 	outer.Append(bar)
@@ -204,12 +198,12 @@ func (m *mainView) threadRow(t protonmail.Thread) gtk.Widgetter {
 		count := gtk.NewLabel(fmt.Sprintf("%d", len(t.Messages)))
 		count.AddCSSClass("dim-label")
 		count.AddCSSClass("caption-heading")
-		count.SetTooltipText(fmt.Sprintf("%d zpráv ve vlákně", len(t.Messages)))
+		count.SetTooltipText(fmt.Sprintf(i18n.N("%d message in the thread", "%d messages in the thread", len(t.Messages)), len(t.Messages)))
 		top.Append(count)
 	}
 	if d, ok := m.a.filter.Decision(s.ID); ok && d.Spam {
 		icon := gtk.NewImageFromIconName("mail-mark-junk-symbolic")
-		icon.SetTooltipText("AI spamfiltr: " + d.Verdict.Category)
+		icon.SetTooltipText(i18n.T("AI spam filter: ") + categoryName(d.Verdict.Category))
 		icon.AddCSSClass("warning")
 		top.Append(icon)
 	}
@@ -225,21 +219,21 @@ func (m *mainView) threadRow(t protonmail.Thread) gtk.Widgetter {
 		// Scheduled mail: Time is the delivery time; show a countdown.
 		when := time.Unix(s.Time, 0)
 		date.SetText(countdown(when))
-		date.SetTooltipText("Odejde " + formatWhen(when))
+		date.SetTooltipText(fmt.Sprintf(i18n.T("Will be sent %s"), formatWhen(when)))
 		date.RemoveCSSClass("dim-label")
 		date.AddCSSClass("accent")
 		top.Append(gtk.NewImageFromIconName("appointment-soon-symbolic"))
 		m.countdowns = append(m.countdowns, countdownLabel{date, when})
 	case m.folder.ID == protonmail.SnoozedID:
 		if until := m.a.acc.SnoozedUntil(t.ConversationID); !until.IsZero() {
-			date.SetText("vrátí se " + formatWhen(until))
+			date.SetText(fmt.Sprintf(i18n.T("returns %s"), formatWhen(until)))
 			date.RemoveCSSClass("dim-label")
 			date.AddCSSClass("accent")
 		}
 	}
 	top.Append(date)
 
-	subject := gtk.NewLabel(orDefault(s.Subject, "(bez předmětu)"))
+	subject := gtk.NewLabel(orDefault(s.Subject, i18n.T("(no subject)")))
 	subject.SetXAlign(0)
 	subject.SetEllipsize(pango.EllipsizeEnd)
 	if t.Unread() {
@@ -261,15 +255,9 @@ func (m *mainView) threadRow(t protonmail.Thread) gtk.Widgetter {
 	return outer
 }
 
-// attachmentsText is "1 příloha", "2–4 přílohy", "5+ příloh".
+// attachmentsText is "1 attachment", "5 attachments".
 func attachmentsText(n int) string {
-	switch {
-	case n == 1:
-		return "1 příloha"
-	case n >= 2 && n <= 4:
-		return fmt.Sprintf("%d přílohy", n)
-	}
-	return fmt.Sprintf("%d příloh", n)
+	return fmt.Sprintf(i18n.N("%d attachment", "%d attachments", n), n)
 }
 
 func attachmentCount(t protonmail.Thread) int {
@@ -361,7 +349,7 @@ func (m *mainView) openThread(t protonmail.Thread) {
 			if len(full) == 0 {
 				m.readerStack.SetVisibleChildName("empty")
 				if firstErr != nil {
-					m.a.toast("Zprávu se nepodařilo otevřít: " + firstErr.Error())
+					m.a.toast(i18n.T("The message could not be opened: ") + firstErr.Error())
 				}
 				return
 			}
@@ -383,8 +371,8 @@ func (m *mainView) showThread(t protonmail.Thread, metas []protonmail.Summary, f
 	if m.current != nil {
 		subject = m.current.Meta.Subject
 	}
-	m.readerPage.SetTitle(orDefault(subject, "Zpráva"))
-	m.subject.SetText(orDefault(subject, "(bez předmětu)"))
+	m.readerPage.SetTitle(orDefault(subject, i18n.T("Message")))
+	m.subject.SetText(orDefault(subject, i18n.T("(no subject)")))
 	m.summaryCard.SetVisible(false)
 	m.summaryBtn.SetSensitive(true)
 	// A summary computed before (or in advance) shows up right away.
@@ -434,11 +422,11 @@ func (m *mainView) messageCard(meta protonmail.Summary) *messageCard {
 	header.SetMarginBottom(10)
 	header.SetMarginStart(12)
 	header.SetMarginEnd(12)
-	who := "(bez odesílatele)"
+	who := i18n.T("(no sender)")
 	if meta.Sender != nil {
 		who = mailparse.DisplayName(meta.Sender)
 		if m.a.acc.IsOwnAddress(meta.Sender.Address) {
-			who += " (já)"
+			who += i18n.T(" (me)")
 		}
 	}
 	avatarName := who
@@ -456,7 +444,7 @@ func (m *mainView) messageCard(meta protonmail.Summary) *messageCard {
 	c.preview.SetHExpand(true)
 	c.preview.SetEllipsize(pango.EllipsizeEnd)
 	if meta.IsDraft() {
-		c.preview.SetText("Koncept – kliknutím otevřete")
+		c.preview.SetText(i18n.T("Draft – click to open"))
 	} else if meta.NumAttachments > 0 {
 		c.preview.SetText(attachmentsText(meta.NumAttachments))
 	}
@@ -518,7 +506,7 @@ func (m *mainView) toggleCard(meta protonmail.Summary, c *messageCard) {
 				c.detail.Remove(child)
 			}
 			if err != nil {
-				l := gtk.NewLabel("Zprávu se nepodařilo načíst: " + err.Error())
+				l := gtk.NewLabel(i18n.T("The message could not be loaded: ") + err.Error())
 				l.AddCSSClass("error")
 				l.SetWrap(true)
 				c.detail.Append(l)
@@ -546,17 +534,17 @@ func (m *mainView) fillCard(c *messageCard, msg *protonmail.Message) {
 	}
 	meta := msg.Meta
 	if meta.Sender != nil {
-		c.detail.Append(label("Od: "+mailparse.DisplayAddress(meta.Sender), "dim-label"))
+		c.detail.Append(label(i18n.T("From: ")+mailparse.DisplayAddress(meta.Sender), "dim-label"))
 	}
 	var to []string
 	for _, a := range meta.ToList {
 		to = append(to, mailparse.DisplayAddress(a))
 	}
 	for _, a := range meta.CCList {
-		to = append(to, mailparse.DisplayAddress(a)+" (kopie)")
+		to = append(to, mailparse.DisplayAddress(a)+i18n.T(" (cc)"))
 	}
 	if len(to) > 0 {
-		c.detail.Append(label("Komu: "+strings.Join(to, ", "), "dim-label"))
+		c.detail.Append(label(i18n.T("To: ")+strings.Join(to, ", "), "dim-label"))
 	}
 
 	sec := gtk.NewBox(gtk.OrientationHorizontal, 6)
@@ -574,7 +562,7 @@ func (m *mainView) fillCard(c *messageCard, msg *protonmail.Message) {
 	case pgp.SigValid:
 		sigIcon = "object-select-symbolic"
 		if msg.SenderKeyFP != "" {
-			sigLabel.SetText(sigText + " (klíč " + shortFP(msg.SenderKeyFP) + ")")
+			sigLabel.SetText(fmt.Sprintf(i18n.T("%s (key %s)"), sigText, shortFP(msg.SenderKeyFP)))
 		}
 	case pgp.SigInvalid:
 		sigIcon = "dialog-warning-symbolic"
@@ -605,9 +593,9 @@ func (m *mainView) fillCard(c *messageCard, msg *protonmail.Message) {
 		icon, tip string
 		action    protonmail.ComposeAction
 	}{
-		{"mail-reply-sender-symbolic", "Odpovědět na tuto zprávu", protonmail.ActionReply},
-		{"mail-reply-all-symbolic", "Odpovědět všem na tuto zprávu", protonmail.ActionReplyAll},
-		{"mail-forward-symbolic", "Přeposlat tuto zprávu", protonmail.ActionForward},
+		{"mail-reply-sender-symbolic", i18n.T("Reply (This Message)"), protonmail.ActionReply},
+		{"mail-reply-all-symbolic", i18n.T("Reply to All (This Message)"), protonmail.ActionReplyAll},
+		{"mail-forward-symbolic", i18n.T("Forward (This Message)"), protonmail.ActionForward},
 	} {
 		a := a
 		b := gtk.NewButtonFromIconName(a.icon)
@@ -663,14 +651,14 @@ func (m *mainView) messageBody(msg *protonmail.Message) gtk.Widgetter {
 	// Bar offering remote content, like GNOME's other mail clients.
 	bar := gtk.NewBox(gtk.OrientationHorizontal, 6)
 	bar.AddCSSClass("remote-bar")
-	info := gtk.NewLabel("Vzdálené obrázky jsou zablokované kvůli soukromí.")
+	info := gtk.NewLabel(i18n.T("Remote images are blocked for privacy."))
 	info.SetXAlign(0)
 	info.SetHExpand(true)
 	info.SetWrap(true)
 	info.AddCSSClass("caption")
-	showOnce := gtk.NewButtonWithLabel("Zobrazit")
+	showOnce := gtk.NewButtonWithLabel(i18n.T("Show"))
 	showOnce.AddCSSClass("flat")
-	always := gtk.NewButtonWithLabel("Vždy od tohoto odesílatele")
+	always := gtk.NewButtonWithLabel(i18n.T("Always From This Sender"))
 	always.AddCSSClass("flat")
 	bar.Append(gtk.NewImageFromIconName("dialog-information-symbolic"))
 	bar.Append(info)
@@ -691,7 +679,7 @@ func (m *mainView) messageBody(msg *protonmail.Message) gtk.Widgetter {
 
 	asText := gtk.NewToggleButton()
 	asText.SetIconName("text-x-generic-symbolic")
-	asText.SetTooltipText("Zobrazit jako prostý text")
+	asText.SetTooltipText(i18n.T("Show as Plain Text"))
 	asText.AddCSSClass("flat")
 	asText.SetHAlign(gtk.AlignEnd)
 	asText.ConnectToggled(func() {
@@ -761,7 +749,7 @@ func (m *mainView) attachmentChips(msg *protonmail.Message) gtk.Widgetter {
 		open := gtk.NewButton()
 		content := gtk.NewBox(gtk.OrientationHorizontal, 6)
 		content.Append(gtk.NewImageFromIconName(attachmentIcon(att)))
-		name := gtk.NewLabel(orDefault(att.Name, "příloha"))
+		name := gtk.NewLabel(orDefault(att.Name, i18n.T("attachment")))
 		name.SetEllipsize(pango.EllipsizeMiddle)
 		name.SetMaxWidthChars(28)
 		size := gtk.NewLabel(humanSize(att.Size))
@@ -770,10 +758,10 @@ func (m *mainView) attachmentChips(msg *protonmail.Message) gtk.Widgetter {
 		content.Append(name)
 		content.Append(size)
 		open.SetChild(content)
-		open.SetTooltipText("Otevřít " + orDefault(att.Name, "přílohu"))
+		open.SetTooltipText(fmt.Sprintf(i18n.T("Open %s"), orDefault(att.Name, i18n.T("the attachment"))))
 		open.ConnectClicked(func() { m.openAttachment(att) })
 		save := gtk.NewButtonFromIconName("document-save-symbolic")
-		save.SetTooltipText("Uložit…")
+		save.SetTooltipText(i18n.T("Save…"))
 		save.ConnectClicked(func() { m.saveAttachment(att) })
 		chip.Append(open)
 		chip.Append(save)
@@ -820,7 +808,7 @@ func (m *mainView) openAttachment(att protonmail.Attachment) {
 		}
 		ui(func() {
 			if err != nil {
-				m.a.toast("Přílohu nejde otevřít: " + err.Error())
+				m.a.toast(i18n.T("The attachment cannot be opened: ") + err.Error())
 				return
 			}
 			gtk.NewFileLauncher(gio.NewFileForPath(path)).Launch(context.Background(), m.a.gtkWindow(), nil)
@@ -830,10 +818,10 @@ func (m *mainView) openAttachment(att protonmail.Attachment) {
 
 func (m *mainView) attachmentRow(att protonmail.Attachment) gtk.Widgetter {
 	row := adw.NewActionRow()
-	row.SetTitle(orDefault(att.Name, "příloha"))
+	row.SetTitle(orDefault(att.Name, i18n.T("attachment")))
 	row.SetSubtitle(fmt.Sprintf("%s · %s", att.MIMEType, humanSize(att.Size)))
 	btn := gtk.NewButtonFromIconName("document-save-symbolic")
-	btn.SetTooltipText("Uložit")
+	btn.SetTooltipText(i18n.T("Save"))
 	btn.SetVAlign(gtk.AlignCenter)
 	btn.AddCSSClass("flat")
 	btn.ConnectClicked(func() { m.saveAttachment(att) })
@@ -881,7 +869,7 @@ func (m *mainView) moveCurrent(folderID, done string) {
 		err := m.a.acc.Move(m.a.ctx, folderID, ids...)
 		ui(func() {
 			if err != nil {
-				m.a.toast("Přesun selhal: " + err.Error())
+				m.a.toast(i18n.T("Moving failed: ") + err.Error())
 				return
 			}
 			m.a.toast(done)
@@ -906,7 +894,7 @@ func (m *mainView) markUnread() {
 		err := m.a.acc.MarkUnread(m.a.ctx, ids...)
 		ui(func() {
 			if err != nil {
-				m.a.toast("Označení selhalo: " + err.Error())
+				m.a.toast(i18n.T("Marking failed: ") + err.Error())
 				return
 			}
 			m.scheduleRefresh()
@@ -933,10 +921,10 @@ func threadHas(t protonmail.Thread, labelID string) bool {
 func (m *mainView) updateStar() {
 	if m.threadHasLabel(protonmail.StarredID) {
 		m.starBtn.SetIconName("starred-symbolic")
-		m.starBtn.SetTooltipText("Odebrat hvězdičku (Ctrl+D)")
+		m.starBtn.SetTooltipText(i18n.T("Remove Star (Ctrl+D)"))
 	} else {
 		m.starBtn.SetIconName("non-starred-symbolic")
-		m.starBtn.SetTooltipText("Přidat hvězdičku (Ctrl+D)")
+		m.starBtn.SetTooltipText(i18n.T("Add Star (Ctrl+D)"))
 	}
 }
 
@@ -960,7 +948,7 @@ func (m *mainView) toggleLabel(labelID string) {
 			err := m.a.acc.SetLabel(m.a.ctx, labelID, on, ids...)
 			ui(func() {
 				if err != nil {
-					m.a.toast("Změna štítku selhala: " + err.Error())
+					m.a.toast(i18n.T("Changing the label failed: ") + err.Error())
 				}
 				m.scheduleRefresh()
 			})
@@ -987,7 +975,7 @@ func (m *mainView) toggleLabel(labelID string) {
 		err := m.a.acc.SetLabel(m.a.ctx, labelID, on, ids...)
 		ui(func() {
 			if err != nil {
-				m.a.toast("Změna štítku selhala: " + err.Error())
+				m.a.toast(i18n.T("Changing the label failed: ") + err.Error())
 				return
 			}
 			if labelID != protonmail.StarredID {
@@ -998,9 +986,9 @@ func (m *mainView) toggleLabel(labelID string) {
 					}
 				}
 				if on {
-					m.a.toast("Přidán štítek " + name)
+					m.a.toast(fmt.Sprintf(i18n.T("Label %s added"), name))
 				} else {
-					m.a.toast("Odebrán štítek " + name)
+					m.a.toast(fmt.Sprintf(i18n.T("Label %s removed"), name))
 				}
 			}
 			m.scheduleRefresh()
@@ -1059,10 +1047,10 @@ func (m *mainView) toggleSpam() {
 func (m *mainView) updateSpamUI() {
 	if m.threadHasLabel(protonmail.SpamID) {
 		m.spamBtn.SetIconName("mail-mark-notjunk-symbolic")
-		m.spamBtn.SetTooltipText("Není spam")
+		m.spamBtn.SetTooltipText(i18n.T("Not Spam"))
 	} else {
 		m.spamBtn.SetIconName("mail-mark-junk-symbolic")
-		m.spamBtn.SetTooltipText("Označit jako spam")
+		m.spamBtn.SetTooltipText(i18n.T("Mark as Spam"))
 	}
 	if m.current == nil {
 		m.banner.SetRevealed(false)
@@ -1081,19 +1069,19 @@ func (m *mainView) updateSpamUI() {
 	var text string
 	switch d.Source {
 	case "ai":
-		text = fmt.Sprintf("AI spamfiltr: %s (%.0f %%) – %s", categoryName(d.Verdict.Category), d.Verdict.SpamProbability*100, d.Verdict.Reason)
+		text = fmt.Sprintf(i18n.T("AI spam filter: %s (%.0f %%) – %s"), categoryName(d.Verdict.Category), d.Verdict.SpamProbability*100, d.Verdict.Reason)
 	case "user":
 		if d.Spam {
-			text = "Označili jste jako spam"
+			text = i18n.T("You marked this as spam")
 		} else {
-			text = "Označili jste jako legitimní"
+			text = i18n.T("You marked this as legitimate")
 		}
 	default:
-		text = "Spamfiltr (" + d.Source + "): " + strings.Join(d.Hits, "; ")
+		text = fmt.Sprintf(i18n.T("Spam filter (%s): %s"), d.Source, strings.Join(d.Hits, "; "))
 	}
 	m.banner.SetTitle(text)
 	if d.Spam && d.Source != "user" {
-		m.banner.SetButtonLabel("Není spam")
+		m.banner.SetButtonLabel(i18n.T("Not Spam"))
 		m.bannerFn = func() {
 			m.a.markNotSpam(from, msg.Meta.ID)
 			m.banner.SetRevealed(false)
@@ -1111,12 +1099,12 @@ func (m *mainView) summarize() {
 		return
 	}
 	if !m.a.ai.HasAssistant() {
-		m.a.toastWithAction("AI asistent není nastavený", "Nastavit", m.a.openPreferences)
+		m.a.toastWithAction(i18n.T("The AI assistant is not set up"), i18n.T("Set Up"), m.a.openPreferences)
 		return
 	}
 	th := m.thread
 	m.summaryBtn.SetSensitive(false)
-	m.summaryLabel.SetText("Připravuji shrnutí…")
+	m.summaryLabel.SetText(i18n.T("Preparing the summary…"))
 	m.summaryCard.SetVisible(true)
 	metas := th.metas
 	have := map[string]*protonmail.Message{}
@@ -1132,7 +1120,7 @@ func (m *mainView) summarize() {
 			}
 			m.summaryBtn.SetSensitive(true)
 			if err != nil {
-				m.summaryLabel.SetText("Shrnutí selhalo: " + ai.Explain(m.a.cfg.AssistantProvider, err).Text)
+				m.summaryLabel.SetText(i18n.T("The summary failed: ") + ai.Explain(m.a.cfg.AssistantProvider, err).Text)
 				return
 			}
 			m.summaryLabel.SetText(out)

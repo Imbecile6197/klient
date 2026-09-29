@@ -4,9 +4,13 @@ import (
 	"net/mail"
 	"strings"
 	"testing"
+
+	"github.com/Imbecile6197/klient/internal/i18n"
 )
 
 func TestHTMLToText(t *testing.T) {
+	defer i18n.Set(i18n.Lang())
+	i18n.Set("cs")
 	src := `<html><head><style>p{color:red}</style><title>x</title></head><body>
 <p>Dobrý den,</p><p>klikněte <a href="https://evil.example/login">paypal.com</a> ihned.</p>
 <script>alert(1)</script><img src="https://track.example/p.gif" alt="logo"><ul><li>jedna</li><li>dvě</li></ul></body></html>`

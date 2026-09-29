@@ -13,6 +13,7 @@ import (
 	"github.com/ProtonMail/go-proton-api"
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
 
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/mailparse"
 	"github.com/Imbecile6197/klient/internal/pgp"
 )
@@ -35,16 +36,16 @@ type Folder struct {
 }
 
 var Folders = []Folder{
-	{proton.InboxLabel, "Doručená pošta", "mail-send-receive-symbolic"},
-	{proton.SnoozedLabel, "Odložené", "alarm-symbolic"},
-	{proton.StarredLabel, "Označené hvězdičkou", "starred-symbolic"},
-	{proton.DraftsLabel, "Koncepty", "document-edit-symbolic"},
-	{proton.AllScheduledLabel, "Naplánované", "appointment-soon-symbolic"},
-	{proton.SentLabel, "Odeslané", "mail-send-symbolic"},
-	{proton.ArchiveLabel, "Archiv", "folder-documents-symbolic"},
-	{proton.SpamLabel, "Spam", "mail-mark-junk-symbolic"},
-	{proton.TrashLabel, "Koš", "user-trash-symbolic"},
-	{proton.AllMailLabel, "Všechna pošta", "mail-read-symbolic"},
+	{proton.InboxLabel, i18n.T("Inbox"), "mail-send-receive-symbolic"},
+	{proton.SnoozedLabel, i18n.T("Snoozed"), "alarm-symbolic"},
+	{proton.StarredLabel, i18n.T("Starred"), "starred-symbolic"},
+	{proton.DraftsLabel, i18n.T("Drafts"), "document-edit-symbolic"},
+	{proton.AllScheduledLabel, i18n.T("Scheduled"), "appointment-soon-symbolic"},
+	{proton.SentLabel, i18n.T("Sent"), "mail-send-symbolic"},
+	{proton.ArchiveLabel, i18n.T("Archive"), "folder-documents-symbolic"},
+	{proton.SpamLabel, i18n.T("Spam"), "mail-mark-junk-symbolic"},
+	{proton.TrashLabel, i18n.T("Trash"), "user-trash-symbolic"},
+	{proton.AllMailLabel, i18n.T("All Mail"), "mail-read-symbolic"},
 }
 
 const (
@@ -86,7 +87,7 @@ func (a *Account) rawMessage(ctx context.Context, id string) (proton.Message, er
 	m, err := a.client.GetMessage(ctx, id)
 	if err != nil {
 		if IsOffline(err) {
-			return m, errors.New("zpráva není uložená pro offline čtení a server je nedostupný")
+			return m, errors.New(i18n.T("the message is not saved for offline reading and the server is unavailable"))
 		}
 		return m, err
 	}
@@ -145,11 +146,11 @@ func (a *Account) Get(ctx context.Context, id string) (*Message, error) {
 	}
 	enc, err := crypto.NewPGPMessageFromArmored(raw.Body)
 	if err != nil {
-		return nil, fmt.Errorf("neplatné tělo zprávy: %w", err)
+		return nil, fmt.Errorf(i18n.T("invalid message body: %w"), err)
 	}
 	plain, err := kr.Decrypt(enc, nil, 0)
 	if err != nil {
-		return nil, fmt.Errorf("dešifrování selhalo: %w", err)
+		return nil, fmt.Errorf(i18n.T("decryption failed: %w"), err)
 	}
 
 	body := mailparse.Parse(plain.GetBinary(), string(raw.MIMEType))
@@ -185,15 +186,15 @@ func (a *Account) Get(ctx context.Context, id string) (*Message, error) {
 	case raw.Flags.Has(proton.MessageFlagSent) && !raw.Flags.Has(proton.MessageFlagReceived):
 		// Proton's flags on sent copies describe the stored copy, not how each
 		// recipient received it, so don't claim end-to-end here.
-		msg.Encryption = "Odeslaná zpráva, uložena šifrovaně (zero-access)"
+		msg.Encryption = i18n.T("Sent message, stored encrypted (zero-access)")
 	case raw.Flags.Has(proton.MessageFlagInternal) && raw.Flags.Has(proton.MessageFlagE2E):
-		msg.Encryption = "End-to-end šifrováno (Proton)"
+		msg.Encryption = i18n.T("End-to-end encrypted (Proton)")
 	case raw.Flags.Has(proton.MessageFlagE2E):
-		msg.Encryption = "End-to-end šifrováno (PGP)"
+		msg.Encryption = i18n.T("End-to-end encrypted (PGP)")
 	case raw.Flags.Has(proton.MessageFlagReceived):
-		msg.Encryption = "Přijato nešifrovaně, uloženo šifrovaně (zero-access)"
+		msg.Encryption = i18n.T("Received unencrypted, stored encrypted (zero-access)")
 	default:
-		msg.Encryption = "Uloženo šifrovaně"
+		msg.Encryption = i18n.T("Stored encrypted")
 	}
 
 	for _, att := range raw.Attachments {
@@ -430,7 +431,7 @@ func (a *Account) ExportEML(ctx context.Context, id string) ([]byte, error) {
 	for _, att := range raw.Attachments {
 		data, err := a.client.GetAttachment(ctx, att.ID) // still encrypted; BuildRFC822 decrypts
 		if err != nil {
-			return nil, fmt.Errorf("příloha %s: %w", att.Name, err)
+			return nil, fmt.Errorf(i18n.T("attachment %s: %w"), att.Name, err)
 		}
 		atts[att.ID] = data
 	}

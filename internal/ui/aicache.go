@@ -2,6 +2,7 @@ package ui
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"sort"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/mailbox"
 	"github.com/Imbecile6197/klient/internal/mailparse"
 	"github.com/Imbecile6197/klient/internal/power"
@@ -63,7 +65,7 @@ func (a *App) summarizeThread(ctx context.Context, acc mailbox.Account, metas []
 	}
 	latest, ok := latestReal(metas)
 	if !ok {
-		return "", fmt.Errorf("vlákno obsahuje jen koncepty")
+		return "", errors.New(i18n.T("the thread contains only drafts"))
 	}
 	var sb strings.Builder
 	n := 0
@@ -82,11 +84,11 @@ func (a *App) summarizeThread(ctx context.Context, acc mailbox.Account, metas []
 		if msg.Meta.Sender != nil {
 			from = mailparse.DisplayAddress(msg.Meta.Sender)
 		}
-		fmt.Fprintf(&sb, "--- Zpráva od %s, %s ---\n%s\n\n", from,
-			time.Unix(msg.Meta.Time, 0).Format("2. 1. 2006 15:04"), msg.Text)
+		fmt.Fprintf(&sb, "--- Message from %s, %s ---\n%s\n\n", from,
+			time.Unix(msg.Meta.Time, 0).Format("2006-01-02 15:04"), msg.Text)
 		n++
 	}
-	who := fmt.Sprintf("vlákno %d zpráv", n)
+	who := fmt.Sprintf("a thread of %d messages", n)
 	if n == 1 && latest.Sender != nil {
 		who = mailparse.DisplayAddress(latest.Sender)
 	}
@@ -162,7 +164,7 @@ func (a *App) precomputeLoop() {
 		}
 		sort.SliceStable(metas, func(i, j int) bool { return metas[i].Time < metas[j].Time })
 		if _, err := a.summarizeThread(ctx, job.acc, metas, nil); err != nil && ctx.Err() == nil {
-			log.Printf("předpočítání shrnutí: %v", err)
+			log.Printf("precomputing a summary: %v", err)
 		}
 		cancel()
 	}

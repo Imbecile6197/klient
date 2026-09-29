@@ -13,6 +13,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 
 	"github.com/Imbecile6197/klient/internal/ai"
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/ollama"
 )
 
@@ -21,11 +22,11 @@ var localModels = []struct {
 	name, label, size string
 	defaultOn         bool
 }{
-	{"qwen3.5:4b", "Qwen 3.5 4B (Alibaba)", "3,4 GB", true},
-	{"gemma4:e2b-it-qat", "Gemma 4 E2B (Google)", "4,3 GB", true},
-	{"gemma4:e4b-it-qat", "Gemma 4 E4B (Google) – lepší čeština, potřebuje víc paměti", "6,1 GB", false},
-	{"ministral-3:3b", "Ministral 3 3B (Mistral AI)", "3,0 GB", true},
-	{"ministral-3:8b", "Ministral 3 8B (Mistral AI) – chytřejší, pomalejší", "6,0 GB", false},
+	{"qwen3.5:4b", "Qwen 3.5 4B (Alibaba)", i18n.T("3.4 GB"), true},
+	{"gemma4:e2b-it-qat", "Gemma 4 E2B (Google)", i18n.T("4.3 GB"), true},
+	{"gemma4:e4b-it-qat", i18n.T("Gemma 4 E4B (Google) – better at Czech, needs more memory"), i18n.T("6.1 GB"), false},
+	{"ministral-3:3b", "Ministral 3 3B (Mistral AI)", i18n.T("3.0 GB"), true},
+	{"ministral-3:8b", i18n.T("Ministral 3 8B (Mistral AI) – smarter, slower"), i18n.T("6.0 GB"), false},
 }
 
 func (a *App) localClient() *ollama.Client { return ollama.NewClient(a.ollama.Addr()) }
@@ -58,6 +59,9 @@ func (a *App) ollamaUpdateLoop() {
 	}
 }
 
+// doneMark starts the last status text of updateOllama.
+const doneMark = "done:"
+
 // updateOllama checks for and installs a new Ollama and refreshes the used
 // models. Runs off the UI thread; report gets status texts (may be nil).
 func (a *App) updateOllama(manual bool, report func(text string, fraction float64)) {
@@ -69,11 +73,11 @@ func (a *App) updateOllama(manual bool, report func(text string, fraction float6
 	ctx, cancel := context.WithTimeout(a.ctx, 2*time.Hour)
 	defer cancel()
 	installed := a.ollama.Installed()
-	say("Zjišťuji nejnovější verzi…")
+	say(i18n.T("Finding the latest version…"))
 	rel, err := ollama.Latest(ctx)
 	if err != nil {
 		if report != nil {
-			ui(func() { report("Hotovo s chybou – kontrola aktualizací selhala: "+err.Error(), 1) })
+			ui(func() { report(doneMark+fmt.Sprintf(i18n.T("Checking for updates failed: %s"), err.Error()), 1) })
 		}
 		return
 	}
@@ -81,13 +85,13 @@ func (a *App) updateOllama(manual bool, report func(text string, fraction float6
 	if ollama.Newer(rel.Version, installed) {
 		err = a.ollama.Install(ctx, rel, func(done, total int64) {
 			if report != nil {
-				text := fmt.Sprintf("Stahuji Ollamu %s: %s z %s", rel.Version, humanSize(done), humanSize(total))
+				text := fmt.Sprintf(i18n.T("Downloading Ollama %s: %s of %s"), rel.Version, humanSize(done), humanSize(total))
 				ui(func() { report(text, float64(done)/float64(max(total, 1))) })
 			}
 		})
 		if err != nil {
 			if report != nil {
-				ui(func() { report("Hotovo s chybou – instalace selhala: "+err.Error(), 1) })
+				ui(func() { report(doneMark+fmt.Sprintf(i18n.T("Installation failed: %s"), err.Error()), 1) })
 			}
 			log.Printf("ollama update: %v", err)
 			return
@@ -109,7 +113,7 @@ func (a *App) updateOllama(manual bool, report func(text string, fraction float6
 	if len(models) > 0 {
 		if release, err := a.ollama.Acquire(ctx); err == nil {
 			for _, m := range models {
-				say("Kontroluji aktualizace modelu " + m + "…")
+				say(fmt.Sprintf(i18n.T("Checking model %s for updates…"), m))
 				_ = a.localClient().Pull(ctx, m, nil)
 			}
 			release()
@@ -121,27 +125,27 @@ func (a *App) updateOllama(manual bool, report func(text string, fraction float6
 		switch {
 		case updated != "":
 			if installed == "" {
-				a.toast("Ollama " + updated + " je nainstalovaná")
+				a.toast(fmt.Sprintf(i18n.T("Ollama %s is installed"), updated))
 			} else {
-				a.toast("Lokální AI aktualizována na Ollamu " + updated)
+				a.toast(fmt.Sprintf(i18n.T("Local AI updated to Ollama %s"), updated))
 			}
 			if report != nil {
-				report("Hotovo: Ollama "+updated, 1)
+				report(doneMark+fmt.Sprintf(i18n.T("Ollama %s is installed"), updated), 1)
 			}
 		case manual && report != nil:
-			report("Hotovo: Ollama "+installed+" je aktuální", 1)
+			report(doneMark+fmt.Sprintf(i18n.T("Ollama %s is up to date"), installed), 1)
 		}
 	})
 }
 
 // ---- Preferences ----------------------------------------------------------------
 
-// localAIGroup is the "Lokální AI" section of the AI preferences: install,
+// localAIGroup is the "Local AI" section of the AI preferences: install,
 // updates, models, comparison and the local-only switch.
 func (a *App) localAIGroup(d *adw.PreferencesDialog, refreshRoles func()) *adw.PreferencesGroup {
 	g := adw.NewPreferencesGroup()
-	g.SetTitle("Lokální AI (Ollama)")
-	g.SetDescription("Model běží přímo v tomto počítači, obsah zpráv nikam neodchází. Bez grafické karty je pomalejší: posouzení zprávy trvá desítky sekund.")
+	g.SetTitle(i18n.T("Local AI (Ollama)"))
+	g.SetDescription(i18n.T("The model runs right on this computer; the content of your messages goes nowhere. Without a graphics card it is slower: judging a message takes tens of seconds."))
 
 	status := adw.NewActionRow()
 	status.SetTitle("Ollama")
@@ -157,8 +161,8 @@ func (a *App) localAIGroup(d *adw.PreferencesDialog, refreshRoles func()) *adw.P
 	g.Add(status)
 
 	localOnly := adw.NewSwitchRow()
-	localOnly.SetTitle("Jen lokálně")
-	localOnly.SetSubtitle("Nic se neposílá cloudové AI (Gemini, ChatGPT, Claude, Mistral), i když jsou uložené klíče")
+	localOnly.SetTitle(i18n.T("Local only"))
+	localOnly.SetSubtitle(i18n.T("Nothing is sent to cloud AI (Gemini, ChatGPT, Claude, Mistral), even if keys are saved"))
 	localOnly.SetActive(a.cfg.LocalOnly)
 	localOnly.NotifyProperty("active", func() {
 		a.cfg.LocalOnly = localOnly.Active()
@@ -181,8 +185,8 @@ func (a *App) localAIGroup(d *adw.PreferencesDialog, refreshRoles func()) *adw.P
 	g.Add(localOnly)
 
 	auto := adw.NewSwitchRow()
-	auto.SetTitle("Automaticky aktualizovat")
-	auto.SetSubtitle("Jednou denně zkontroluje novou verzi Ollamy a modelů (ne na měřeném připojení)")
+	auto.SetTitle(i18n.T("Update automatically"))
+	auto.SetSubtitle(i18n.T("Checks for a new version of Ollama and the models once a day (not on a metered connection)"))
 	auto.SetActive(a.cfg.OllamaAutoUpdate)
 	auto.NotifyProperty("active", func() {
 		a.cfg.OllamaAutoUpdate = auto.Active()
@@ -191,8 +195,8 @@ func (a *App) localAIGroup(d *adw.PreferencesDialog, refreshRoles func()) *adw.P
 	g.Add(auto)
 
 	pre := adw.NewSwitchRow()
-	pre.SetTitle("Připravovat shrnutí předem")
-	pre.SetSubtitle("Nová pošta se shrne na pozadí, jen při napájení ze sítě a když model nic jiného nedělá; při otevření zprávy je shrnutí hned")
+	pre.SetTitle(i18n.T("Prepare summaries in advance"))
+	pre.SetSubtitle(i18n.T("New mail is summarized in the background, only on mains power and when the model is idle; the summary is ready as soon as you open the message"))
 	pre.SetActive(a.cfg.PrecomputeSummaries)
 	pre.NotifyProperty("active", func() {
 		a.cfg.PrecomputeSummaries = pre.Active()
@@ -201,12 +205,12 @@ func (a *App) localAIGroup(d *adw.PreferencesDialog, refreshRoles func()) *adw.P
 	g.Add(pre)
 
 	models := adw.NewExpanderRow()
-	models.SetTitle("Stažené modely")
+	models.SetTitle(i18n.T("Downloaded models"))
 	g.Add(models)
 	var modelRows []gtk.Widgetter
 
 	compare := adw.NewButtonRow()
-	compare.SetTitle("Porovnat modely na mé poště…")
+	compare.SetTitle(i18n.T("Compare Models on My Mail…"))
 	compare.SetStartIconName("view-dual-symbolic")
 	compare.ConnectActivated(func() { a.compareModels(d) })
 	g.Add(compare)
@@ -219,16 +223,16 @@ func (a *App) localAIGroup(d *adw.PreferencesDialog, refreshRoles func()) *adw.P
 		switch {
 		case busy:
 		case ver == "":
-			status.SetSubtitle("Není nainstalovaná. Stáhne se oficiální verze z GitHubu (asi 1,4 GB, na disku zůstane jen část pro procesor).")
-			action.SetLabel("Nainstalovat")
+			status.SetSubtitle(i18n.T("Not installed. The official version is downloaded from GitHub (about 1.4 GB; only the part for the processor stays on disk)."))
+			action.SetLabel(i18n.T("Install"))
 			action.AddCSSClass("suggested-action")
 		default:
-			sub := fmt.Sprintf("Verze %s · program %s, modely %s", ver, humanSize(prog), humanSize(mods))
+			sub := fmt.Sprintf(i18n.T("Version %s · program %s, models %s"), ver, humanSize(prog), humanSize(mods))
 			if p := a.ollama.PendingRestart(); p != "" {
-				sub += " · nová verze " + p + " se použije při dalším dotazu"
+				sub += " · " + fmt.Sprintf(i18n.T("the new version %s will be used for the next request"), p)
 			}
 			status.SetSubtitle(sub)
-			action.SetLabel("Zkontrolovat aktualizace")
+			action.SetLabel(i18n.T("Check for Updates"))
 			action.RemoveCSSClass("suggested-action")
 		}
 		compare.SetSensitive(ver != "" && !busy)
@@ -252,12 +256,12 @@ func (a *App) localAIGroup(d *adw.PreferencesDialog, refreshRoles func()) *adw.P
 			}
 			ui(func() {
 				if err != nil {
-					models.SetSubtitle("Ollamu nejde spustit: " + err.Error())
+					models.SetSubtitle(i18n.T("Ollama cannot be started: ") + err.Error())
 					return
 				}
-				models.SetSubtitle(fmt.Sprintf("%d stažených", len(list)))
+				models.SetSubtitle(fmt.Sprintf(i18n.N("%d downloaded", "%d downloaded", len(list)), len(list)))
 				if len(list) == 0 {
-					models.SetSubtitle("Zatím žádný – stáhněte ho porovnáním níže")
+					models.SetSubtitle(i18n.T("None yet – download one with the comparison below"))
 				}
 				for _, m := range list {
 					m := m
@@ -266,22 +270,22 @@ func (a *App) localAIGroup(d *adw.PreferencesDialog, refreshRoles func()) *adw.P
 					sub := humanSize(m.Size)
 					if (ai.IsLocal(a.cfg.AssistantProvider) && a.cfg.AssistantModel == m.Name) ||
 						(ai.IsLocal(a.cfg.SpamProvider) && a.cfg.SpamModel == m.Name) {
-						sub += " · používá se"
+						sub += i18n.T(" · in use")
 					}
 					row.SetSubtitle(sub)
-					use := gtk.NewButtonWithLabel("Použít")
+					use := gtk.NewButtonWithLabel(i18n.T("Use"))
 					use.SetVAlign(gtk.AlignCenter)
 					use.AddCSSClass("flat")
 					use.ConnectClicked(func() {
 						a.useLocalModel(m.Name)
 						refreshRoles()
 						refresh()
-						d.AddToast(adw.NewToast("Asistent i spamfiltr teď používají " + m.Name))
+						d.AddToast(adw.NewToast(fmt.Sprintf(i18n.T("The assistant and the spam filter now use %s"), m.Name)))
 					})
 					del := gtk.NewButtonFromIconName("user-trash-symbolic")
 					del.SetVAlign(gtk.AlignCenter)
 					del.AddCSSClass("flat")
-					del.SetTooltipText("Smazat model")
+					del.SetTooltipText(i18n.T("Delete Model"))
 					del.ConnectClicked(func() {
 						go func() {
 							err := a.localClient().Delete(a.ctx, m.Name)
@@ -310,18 +314,18 @@ func (a *App) localAIGroup(d *adw.PreferencesDialog, refreshRoles func()) *adw.P
 		progress.SetVisible(true)
 		progress.SetFraction(0)
 		go a.updateOllama(true, func(s string, fraction float64) {
-			status.SetSubtitle(s)
+			status.SetSubtitle(strings.TrimPrefix(s, doneMark))
 			if fraction >= 0 {
 				progress.SetFraction(fraction)
 			} else {
 				progress.Pulse()
 			}
-			if strings.HasPrefix(s, "Hotovo") {
+			if strings.HasPrefix(s, doneMark) {
 				busy = false
 				action.SetSensitive(true)
 				progress.SetVisible(false)
 				refresh()
-				status.SetSubtitle(strings.TrimPrefix(strings.TrimPrefix(s, "Hotovo s chybou – "), "Hotovo: "))
+				status.SetSubtitle(strings.TrimPrefix(s, doneMark))
 			}
 		})
 	})

@@ -2,6 +2,7 @@ package ui
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"html"
 	"net/mail"
@@ -16,6 +17,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 	"github.com/diamondburned/gotk4/pkg/pango"
 
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/ical"
 	"github.com/Imbecile6197/klient/internal/mailparse"
 	"github.com/Imbecile6197/klient/internal/pgp"
@@ -70,9 +72,9 @@ func (m *mainView) inviteCard(msg *protonmail.Message, ev *ical.Event, data []by
 
 	head := gtk.NewBox(gtk.OrientationHorizontal, 10)
 	head.Append(gtk.NewImageFromIconName("x-office-calendar-symbolic"))
-	kind := "Pozvánka na událost"
+	kind := i18n.T("Event invitation")
 	if ev.Method == "CANCEL" {
-		kind = "Událost byla zrušena"
+		kind = i18n.T("The event has been cancelled")
 	}
 	kl := gtk.NewLabel(kind)
 	kl.AddCSSClass("caption-heading")
@@ -80,12 +82,12 @@ func (m *mainView) inviteCard(msg *protonmail.Message, ev *ical.Event, data []by
 	head.Append(kl)
 	inner.Append(head)
 
-	title := gtk.NewLabel(orDefault(ev.Summary, "(bez názvu)"))
+	title := gtk.NewLabel(orDefault(ev.Summary, i18n.T("(untitled)")))
 	title.AddCSSClass("title-3")
 	title.SetXAlign(0)
 	title.SetWrap(true)
 	if ev.Method == "CANCEL" {
-		title.SetMarkup("<s>" + escapeMarkup(orDefault(ev.Summary, "(bez názvu)")) + "</s>")
+		title.SetMarkup("<s>" + escapeMarkup(orDefault(ev.Summary, i18n.T("(untitled)"))) + "</s>")
 	}
 	inner.Append(title)
 
@@ -112,10 +114,10 @@ func (m *mainView) inviteCard(msg *protonmail.Message, ev *ical.Event, data []by
 		org += " <" + ev.Organizer.Email + ">"
 	}
 	if org != "" {
-		line("avatar-default-symbolic", "Pořádá "+org)
+		line("avatar-default-symbolic", fmt.Sprintf(i18n.T("Organized by %s"), org))
 	}
 	if n := len(ev.Attendees); n > 0 {
-		line("system-users-symbolic", fmt.Sprintf("Pozváno: %d", n))
+		line("system-users-symbolic", fmt.Sprintf(i18n.N("%d person invited", "%d people invited", n), n))
 	}
 
 	me := m.inviteeAddress(msg, ev)
@@ -131,9 +133,9 @@ func (m *mainView) inviteCard(msg *protonmail.Message, ev *ical.Event, data []by
 	buttons.SetMarginTop(6)
 	if ev.Method == "REQUEST" && ev.Organizer.Email != "" && !m.a.acc.IsOwnAddress(ev.Organizer.Email) {
 		for _, r := range []struct{ label, stat, css string }{
-			{"Přijmout", "ACCEPTED", "suggested-action"},
-			{"Možná", "TENTATIVE", ""},
-			{"Odmítnout", "DECLINED", "destructive-action"},
+			{i18n.T("Accept"), "ACCEPTED", "suggested-action"},
+			{i18n.T("Maybe"), "TENTATIVE", ""},
+			{i18n.T("Decline"), "DECLINED", "destructive-action"},
 		} {
 			r := r
 			b := gtk.NewButtonWithLabel(r.label)
@@ -147,8 +149,8 @@ func (m *mainView) inviteCard(msg *protonmail.Message, ev *ical.Event, data []by
 		}
 	}
 	if ev.Method != "CANCEL" {
-		add := gtk.NewButtonWithLabel("Přidat do kalendáře")
-		add.SetTooltipText("Otevře událost ve výchozím kalendáři (např. Kalendář GNOME)")
+		add := gtk.NewButtonWithLabel(i18n.T("Add to Calendar"))
+		add.SetTooltipText(i18n.T("Opens the event in the default calendar (e.g. GNOME Calendar)"))
 		add.ConnectClicked(func() { m.a.openInCalendar(ev, data) })
 		buttons.Append(add)
 	}
@@ -162,30 +164,30 @@ func escapeMarkup(s string) string {
 
 func eventWhen(ev *ical.Event) string {
 	s, e := ev.Start.Local(), ev.End.Local()
-	date := czDays[s.Weekday()] + " " + s.Format("2. 1. 2006")
+	date := dayDate(s)
 	if ev.AllDay {
 		last := e.AddDate(0, 0, -1)
 		if last.After(s) {
-			return date + " – " + czDays[last.Weekday()] + " " + last.Format("2. 1. 2006") + " (celý den)"
+			return date + " – " + dayDate(last) + i18n.T(" (all day)")
 		}
-		return date + " (celý den)"
+		return date + i18n.T(" (all day)")
 	}
 	if s.Format("20060102") == e.Format("20060102") {
 		return date + ", " + s.Format("15:04") + "–" + e.Format("15:04")
 	}
-	return date + " " + s.Format("15:04") + " – " + czDays[e.Weekday()] + " " + e.Format("2. 1. 2006 15:04")
+	return date + " " + s.Format("15:04") + " – " + dayDate(e) + " " + e.Format("15:04")
 }
 
 func partStatText(s string) string {
 	switch s {
 	case "ACCEPTED":
-		return "Vaše odpověď: přijato"
+		return i18n.T("Your answer: accepted")
 	case "TENTATIVE":
-		return "Vaše odpověď: možná"
+		return i18n.T("Your answer: maybe")
 	case "DECLINED":
-		return "Vaše odpověď: odmítnuto"
+		return i18n.T("Your answer: declined")
 	}
-	return "Zatím jste neodpověděli"
+	return i18n.T("You have not answered yet")
 }
 
 // inviteeAddress is the user's address the invitation was sent to.
@@ -205,7 +207,7 @@ func (m *mainView) inviteeAddress(msg *protonmail.Message, ev *ical.Event) strin
 
 // answerInvite sends the iTIP reply to the organizer.
 func (a *App) answerInvite(msg *protonmail.Message, ev *ical.Event, me, stat string, buttons *gtk.Box, status *gtk.Label) {
-	verb := map[string]string{"ACCEPTED": "Přijato", "TENTATIVE": "Možná", "DECLINED": "Odmítnuto"}[stat]
+	verb := map[string]string{"ACCEPTED": i18n.T("Accepted"), "TENTATIVE": i18n.T("Tentative"), "DECLINED": i18n.T("Declined")}[stat]
 	name := a.acc.DisplayName()
 	d := &protonmail.Draft{
 		FromAddressID: msg.Meta.AddressID,
@@ -218,11 +220,11 @@ func (a *App) answerInvite(msg *protonmail.Message, ev *ical.Event, me, stat str
 			d.FromAddressID = ad.ID
 		}
 	}
-	d.Body = fmt.Sprintf("%s odpověděl(a) na pozvánku „%s“ (%s): %s.", name, ev.Summary, eventWhen(ev), strings.ToLower(verb))
+	d.Body = fmt.Sprintf(i18n.T("%s has replied to the invitation “%s” (%s): %s."), name, ev.Summary, eventWhen(ev), strings.ToLower(verb))
 	reply := ev.Reply(me, name, stat, time.Now())
 	d.Attachments = []*protonmail.Outgoing{{Name: "invite.ics", MIMEType: "text/calendar", Data: reply, Size: int64(len(reply))}}
 	buttons.SetSensitive(false)
-	status.SetText("Odesílám odpověď…")
+	status.SetText(i18n.T("Sending the answer…"))
 	acc := a.acc
 	go func() {
 		ctx, cancel := context.WithTimeout(a.ctx, 2*time.Minute)
@@ -231,11 +233,11 @@ func (a *App) answerInvite(msg *protonmail.Message, ev *ical.Event, me, stat str
 		ui(func() {
 			buttons.SetSensitive(true)
 			if err != nil {
-				status.SetText("Odpověď se nepodařilo odeslat: " + err.Error())
+				status.SetText(i18n.T("The answer could not be sent: ") + err.Error())
 				return
 			}
-			status.SetText(partStatText(stat) + " (odesláno pořadateli)")
-			a.toast("Odpověď na pozvánku odeslána")
+			status.SetText(partStatText(stat) + i18n.T(" (sent to the organizer)"))
+			a.toast(i18n.T("Your answer to the invitation has been sent"))
 		})
 	}()
 }
@@ -264,7 +266,7 @@ func isKeyAttachment(att protonmail.Attachment) bool {
 // importKeyButton imports a public key sent as an attachment.
 func (m *mainView) importKeyButton(att protonmail.Attachment) gtk.Widgetter {
 	b := gtk.NewButtonFromIconName("channel-secure-symbolic")
-	b.SetTooltipText("Importovat veřejný klíč – zprávy pro tohoto odesílatele se pak budou šifrovat")
+	b.SetTooltipText(i18n.T("Import the public key – messages to this sender will then be encrypted"))
 	b.SetVAlign(gtk.AlignCenter)
 	b.AddCSSClass("flat")
 	acc := m.a.acc
@@ -275,7 +277,7 @@ func (m *mainView) importKeyButton(att protonmail.Attachment) gtk.Widgetter {
 			var emails []string
 			if err == nil {
 				if !strings.Contains(string(data), "BEGIN PGP PUBLIC KEY BLOCK") {
-					err = fmt.Errorf("příloha neobsahuje veřejný PGP klíč")
+					err = errors.New(i18n.T("the attachment does not contain a public PGP key"))
 				} else {
 					emails, err = pgp.ImportKey(string(data))
 				}
@@ -283,11 +285,11 @@ func (m *mainView) importKeyButton(att protonmail.Attachment) gtk.Widgetter {
 			ui(func() {
 				b.SetSensitive(true)
 				if err != nil {
-					m.a.toast("Import klíče selhal: " + err.Error())
+					m.a.toast(i18n.T("Importing the key failed: ") + err.Error())
 					return
 				}
 				b.SetIconName("object-select-symbolic")
-				m.a.toast("Klíč importován pro " + strings.Join(emails, ", "))
+				m.a.toast(fmt.Sprintf(i18n.T("Key imported for %s"), strings.Join(emails, ", ")))
 			})
 		}()
 	})
@@ -301,12 +303,12 @@ func (a *App) openAutoReply() {
 		return
 	}
 	d := adw.NewDialog()
-	d.SetTitle("Automatická odpověď")
+	d.SetTitle(i18n.T("Automatic Reply"))
 	d.SetContentWidth(560)
 	d.SetContentHeight(640)
 	tv := adw.NewToolbarView()
 	hb := adw.NewHeaderBar()
-	save := gtk.NewButtonWithLabel("Uložit")
+	save := gtk.NewButtonWithLabel(i18n.T("Save"))
 	save.AddCSSClass("suggested-action")
 	save.SetSensitive(false)
 	hb.PackEnd(save)
@@ -315,24 +317,24 @@ func (a *App) openAutoReply() {
 
 	page := adw.NewPreferencesPage()
 	g := adw.NewPreferencesGroup()
-	g.SetDescription("Proton odpovídá sám na serveru, i když máte počítač vypnutý. Odpověď dostane každý odesílatel nejvýš jednou za čas. Funkce vyžaduje placený tarif Proton.")
+	g.SetDescription(i18n.T("Proton replies on its own on the server, even when your computer is off. Each sender gets the reply at most once in a while. This feature requires a paid Proton plan."))
 	enabled := adw.NewSwitchRow()
-	enabled.SetTitle("Odpovídat automaticky")
+	enabled.SetTitle(i18n.T("Reply automatically"))
 	enabled.SetSubtitle(a.acc.Email())
 	subject := adw.NewEntryRow()
-	subject.SetTitle("Předmět")
+	subject.SetTitle(i18n.T("Subject"))
 	g.Add(enabled)
 	g.Add(subject)
 	page.Add(g)
 
 	tg := adw.NewPreferencesGroup()
-	tg.SetTitle("Doba")
+	tg.SetTitle(i18n.T("Duration"))
 	untilRow := adw.NewSwitchRow()
-	untilRow.SetTitle("Ukončit automaticky")
-	untilRow.SetSubtitle("Jinak platí, dokud ji nevypnete")
+	untilRow.SetTitle(i18n.T("End automatically"))
+	untilRow.SetSubtitle(i18n.T("Otherwise it stays on until you turn it off"))
 	cal := gtk.NewCalendar()
 	calRow := adw.NewActionRow()
-	calRow.SetTitle("Poslední den")
+	calRow.SetTitle(i18n.T("Last day"))
 	dateBtn := gtk.NewMenuButton()
 	dateBtn.SetVAlign(gtk.AlignCenter)
 	pop := gtk.NewPopover()
@@ -342,7 +344,7 @@ func (a *App) openAutoReply() {
 	end := time.Now().AddDate(0, 0, 7)
 	setEnd := func(t time.Time) {
 		end = endOfDay(t)
-		dateBtn.SetLabel(czDays[end.Weekday()] + " " + end.Format("2. 1. 2006"))
+		dateBtn.SetLabel(dayDate(end))
 	}
 	setEnd(end)
 	cal.ConnectDaySelected(func() {
@@ -357,7 +359,7 @@ func (a *App) openAutoReply() {
 	page.Add(tg)
 
 	mg := adw.NewPreferencesGroup()
-	mg.SetTitle("Text odpovědi")
+	mg.SetTitle(i18n.T("Reply Text"))
 	view := gtk.NewTextView()
 	view.SetWrapMode(gtk.WrapWordChar)
 	for _, f := range []func(int){view.SetTopMargin, view.SetBottomMargin, view.SetLeftMargin, view.SetRightMargin} {
@@ -386,11 +388,11 @@ func (a *App) openAutoReply() {
 				toasts.AddToast(adw.NewToast(err.Error()))
 			}
 			enabled.SetActive(ar.Enabled)
-			subject.SetText(orDefault(ar.Subject, "Nejsem k zastižení"))
+			subject.SetText(orDefault(ar.Subject, i18n.T("Out of office")))
 			msg := ar.Message
 			if msg == "" {
-				msg = "Dobrý den,\n\ndo %s nejsem k zastižení a e-maily čtu jen občas. Odpovím po návratu.\n\nDěkuji za pochopení."
-				msg = fmt.Sprintf(msg, end.Format("2. 1."))
+				msg = i18n.T("Hello,\n\nI am away until %s and only read email occasionally. I will reply when I am back.\n\nThank you for your understanding.")
+				msg = fmt.Sprintf(msg, end.Format(i18n.T("Jan 2")))
 			}
 			view.Buffer().SetText(htmlToPlain(msg))
 			if !ar.End.IsZero() {
@@ -411,7 +413,7 @@ func (a *App) openAutoReply() {
 		}
 		if untilRow.Active() {
 			if end.Before(time.Now()) {
-				toasts.AddToast(adw.NewToast("Poslední den už uplynul"))
+				toasts.AddToast(adw.NewToast(i18n.T("The last day has already passed")))
 				return
 			}
 			r.End = end
@@ -427,9 +429,9 @@ func (a *App) openAutoReply() {
 				}
 				d.Close()
 				if r.Enabled {
-					a.toast("Automatická odpověď je zapnutá")
+					a.toast(i18n.T("The automatic reply is on"))
 				} else {
-					a.toast("Automatická odpověď je vypnutá")
+					a.toast(i18n.T("The automatic reply is off"))
 				}
 			})
 		}()

@@ -14,6 +14,7 @@ import (
 	"github.com/ProtonMail/gopenpgp/v2/helper"
 
 	"github.com/Imbecile6197/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/i18n"
 )
 
 func keyDir() string { return filepath.Join(config.DataDir(), "keys") }
@@ -27,7 +28,7 @@ func keyFile(email string) string {
 func ImportKey(armored string) ([]string, error) {
 	key, err := crypto.NewKeyFromArmored(armored)
 	if err != nil {
-		return nil, fmt.Errorf("neplatný PGP klíč: %w", err)
+		return nil, fmt.Errorf(i18n.T("invalid PGP key: %w"), err)
 	}
 	if key.IsPrivate() {
 		pub, err := key.ToPublic()
@@ -37,7 +38,7 @@ func ImportKey(armored string) ([]string, error) {
 		key = pub
 	}
 	if key.IsExpired() || key.IsRevoked() {
-		return nil, errors.New("klíč je expirovaný nebo revokovaný")
+		return nil, errors.New(i18n.T("the key has expired or been revoked"))
 	}
 	pubArm, err := key.GetArmoredPublicKey()
 	if err != nil {
@@ -50,7 +51,7 @@ func ImportKey(armored string) ([]string, error) {
 		}
 	}
 	if len(emails) == 0 {
-		return nil, errors.New("klíč neobsahuje žádnou e-mailovou adresu")
+		return nil, errors.New(i18n.T("the key contains no email address"))
 	}
 	if err := os.MkdirAll(keyDir(), 0o700); err != nil {
 		return nil, err
@@ -120,15 +121,15 @@ const (
 func (s SignatureStatus) String() string {
 	switch s {
 	case SigValid:
-		return "Podpis ověřen"
+		return i18n.T("Signature verified")
 	case SigInvalid:
-		return "Podpis NEPLATNÝ"
+		return i18n.T("Signature INVALID")
 	case SigNone:
-		return "Nepodepsáno"
+		return i18n.T("Not signed")
 	case SigOwn:
-		return "Odesláno z vašeho účtu"
+		return i18n.T("Sent from your account")
 	default:
-		return "Podpis nelze ověřit (chybí klíč odesílatele)"
+		return i18n.T("The signature cannot be verified (the sender's key is missing)")
 	}
 }
 

@@ -12,6 +12,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 
 	"github.com/Imbecile6197/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/imapmail"
 	"github.com/Imbecile6197/klient/internal/mailbox"
 	"github.com/Imbecile6197/klient/internal/secrets"
@@ -20,7 +21,7 @@ import (
 // showAddAccount lets the user pick the service of a new account.
 func (a *App) showAddAccount() {
 	d := adw.NewDialog()
-	d.SetTitle("Přidat účet")
+	d.SetTitle(i18n.T("Add Account"))
 	d.SetContentWidth(520)
 	tv := adw.NewToolbarView()
 	tv.AddTopBar(adw.NewHeaderBar())
@@ -58,10 +59,10 @@ func (a *App) showAddAccount() {
 		})
 		grid.Append(b)
 	}
-	tile(mailbox.KindProton, "Proton Mail", "Šifrovaná pošta, plná podpora", func() { a.showLogin("", "") })
-	tile(mailbox.KindGmail, "Gmail", "Přes heslo pro aplikace", func() { a.imapLogin(config.MailServer{Kind: "gmail"}) })
+	tile(mailbox.KindProton, "Proton Mail", i18n.T("Encrypted mail, full support"), func() { a.showLogin("", "") })
+	tile(mailbox.KindGmail, "Gmail", i18n.T("With an app password"), func() { a.imapLogin(config.MailServer{Kind: "gmail"}) })
 	tile(mailbox.KindSeznam, "Seznam.cz", "seznam.cz, email.cz, post.cz", func() { a.imapLogin(config.MailServer{Kind: "seznam"}) })
-	tile(mailbox.KindIMAP, "Jiná služba", "Libovolná schránka s IMAP a SMTP", func() { a.imapLogin(config.MailServer{Kind: "imap"}) })
+	tile(mailbox.KindIMAP, i18n.T("Other Service"), i18n.T("Any mailbox with IMAP and SMTP"), func() { a.imapLogin(config.MailServer{Kind: "imap"}) })
 	tv.SetContent(grid)
 	d.SetChild(tv)
 	d.Present(a.win)
@@ -80,7 +81,7 @@ func (a *App) imapLogin(prefill config.MailServer) {
 	d.SetTitle(providerName(kind))
 	tv := adw.NewToolbarView()
 	hb := adw.NewHeaderBar()
-	login := gtk.NewButtonWithLabel("Přihlásit")
+	login := gtk.NewButtonWithLabel(i18n.T("Log In"))
 	login.AddCSSClass("suggested-action")
 	hb.PackEnd(login)
 	tv.AddTopBar(hb)
@@ -95,22 +96,22 @@ func (a *App) imapLogin(prefill config.MailServer) {
 
 	g := adw.NewPreferencesGroup()
 	email := adw.NewEntryRow()
-	email.SetTitle("E-mailová adresa")
+	email.SetTitle(i18n.T("Email address"))
 	email.SetText(prefill.Email)
 	name := adw.NewEntryRow()
-	name.SetTitle("Vaše jméno (jak ho uvidí příjemci)")
+	name.SetTitle(i18n.T("Your name (as recipients will see it)"))
 	name.SetText(prefill.Name)
 	pass := adw.NewPasswordEntryRow()
-	pass.SetTitle("Heslo")
+	pass.SetTitle(i18n.T("Password"))
 	g.Add(email)
 	g.Add(name)
 	g.Add(pass)
 	var extra *adw.PreferencesGroup
 	switch kind {
 	case mailbox.KindGmail:
-		pass.SetTitle("Heslo pro aplikace (16 znaků)")
-		g.SetDescription("Gmail nepovoluje přihlášení běžným heslem. V účtu Google zapněte dvoufázové ověření a vytvořte heslo pro aplikace. V Gmailu musí být zapnutý přístup přes IMAP (Nastavení → Přeposílání a POP/IMAP).")
-		link := gtk.NewButtonWithLabel("Vytvořit heslo pro aplikace")
+		pass.SetTitle(i18n.T("App password (16 characters)"))
+		g.SetDescription(i18n.T("Gmail does not allow logging in with your normal password. Turn on two-step verification in your Google account and create an app password. IMAP access must be enabled in Gmail (Settings → Forwarding and POP/IMAP)."))
+		link := gtk.NewButtonWithLabel(i18n.T("Create an App Password"))
 		link.AddCSSClass("pill")
 		link.SetHAlign(gtk.AlignCenter)
 		link.SetMarginTop(12)
@@ -120,9 +121,9 @@ func (a *App) imapLogin(prefill config.MailServer) {
 		extra = adw.NewPreferencesGroup()
 		extra.Add(link)
 	case mailbox.KindSeznam:
-		pass.SetTitle("Heslo (s dvoufázovým ověřením heslo pro aplikace)")
-		g.SetDescription("Bez dvoufázového ověření se přihlaste stejným heslem jako na webu. Máte-li dvoufázové ověření zapnuté, Seznam poštovní programy běžným heslem nepustí: v účtu Seznamu otevřete Zabezpečení → Dvoufázové ověření → Heslo pro aplikace → Nastavit a to heslo zadejte sem (platí pro IMAP, SMTP i kalendář, nesmí být stejné jako přihlašovací).")
-		link := gtk.NewButtonWithLabel("Otevřít účet Seznamu")
+		pass.SetTitle(i18n.T("Password (an app password with two-factor authentication)"))
+		g.SetDescription(i18n.T("Without two-factor authentication, log in with the same password as on the web. With two-factor authentication turned on, Seznam does not let mail programs in with your normal password: in your Seznam account open Security → Two-factor authentication → App password → Set up and enter that password here (it works for IMAP, SMTP and the calendar and must differ from your login password)."))
+		link := gtk.NewButtonWithLabel(i18n.T("Open the Seznam Account"))
 		link.AddCSSClass("pill")
 		link.SetHAlign(gtk.AlignCenter)
 		link.ConnectClicked(func() {
@@ -131,7 +132,7 @@ func (a *App) imapLogin(prefill config.MailServer) {
 		extra = adw.NewPreferencesGroup()
 		extra.Add(link)
 	default:
-		g.SetDescription("Klient dohledá servery podle adresy (databáze Thunderbirdu – posílá se jen doména). Pokud se to nepodaří, doplňte je níže.")
+		g.SetDescription(i18n.T("Klient looks up the servers from the address (in the Thunderbird database – only the domain is sent). If that fails, fill them in below."))
 	}
 	page.Add(g)
 	if extra != nil {
@@ -155,12 +156,12 @@ func (a *App) imapLogin(prefill config.MailServer) {
 
 	// Server settings: found automatically, editable.
 	sg := adw.NewPreferencesGroup()
-	sg.SetTitle("Servery")
+	sg.SetTitle(i18n.T("Servers"))
 	servers := adw.NewExpanderRow()
-	servers.SetTitle("Nastavení serverů")
-	servers.SetSubtitle("Zjistí se automaticky")
+	servers.SetTitle(i18n.T("Server settings"))
+	servers.SetSubtitle(i18n.T("Detected automatically"))
 	user := adw.NewEntryRow()
-	user.SetTitle("Uživatelské jméno")
+	user.SetTitle(i18n.T("Username"))
 	imapHost := adw.NewEntryRow()
 	imapHost.SetTitle("IMAP server")
 	imapPort := adw.NewEntryRow()
@@ -171,10 +172,10 @@ func (a *App) imapLogin(prefill config.MailServer) {
 	smtpPort.SetTitle("SMTP port")
 	secNames := []string{"SSL/TLS", "STARTTLS"}
 	imapSec := adw.NewComboRow()
-	imapSec.SetTitle("Zabezpečení IMAP")
+	imapSec.SetTitle(i18n.T("IMAP security"))
 	imapSec.SetModel(gtk.NewStringList(secNames))
 	smtpSec := adw.NewComboRow()
-	smtpSec.SetTitle("Zabezpečení SMTP")
+	smtpSec.SetTitle(i18n.T("SMTP security"))
 	smtpSec.SetModel(gtk.NewStringList(secNames))
 	for _, r := range []gtk.Widgetter{user, imapHost, imapPort, imapSec, smtpHost, smtpPort, smtpSec} {
 		servers.AddRow(r)
@@ -214,7 +215,7 @@ func (a *App) imapLogin(prefill config.MailServer) {
 		s.IMAPPort, err1 = strconv.Atoi(strings.TrimSpace(imapPort.Text()))
 		s.SMTPPort, err2 = strconv.Atoi(strings.TrimSpace(smtpPort.Text()))
 		if err1 != nil || err2 != nil {
-			return s, errors.New("port musí být číslo")
+			return s, errors.New(i18n.T("the port must be a number"))
 		}
 		s.IMAPSecurity = []string{"ssl", "starttls"}[imapSec.Selected()]
 		s.SMTPSecurity = []string{"ssl", "starttls"}[smtpSec.Selected()]
@@ -234,7 +235,7 @@ func (a *App) imapLogin(prefill config.MailServer) {
 			done()
 			return
 		}
-		servers.SetSubtitle("Hledám nastavení…")
+		servers.SetSubtitle(i18n.T("Looking up the settings…"))
 		go func() {
 			s, err := imapmail.Discover(a.ctx, addr)
 			ui(func() {
@@ -252,17 +253,17 @@ func (a *App) imapLogin(prefill config.MailServer) {
 
 	run := func() {
 		if strings.TrimSpace(email.Text()) == "" || pass.Text() == "" {
-			toasts.AddToast(adw.NewToast("Vyplňte adresu a heslo"))
+			toasts.AddToast(adw.NewToast(i18n.T("Fill in the address and password")))
 			return
 		}
 		login.SetSensitive(false)
-		login.SetLabel("Přihlašuji…")
+		login.SetLabel(i18n.T("Logging in…"))
 		showErr("")
 		discover(func() {
 			s, err := collect()
 			if err != nil {
 				login.SetSensitive(true)
-				login.SetLabel("Přihlásit")
+				login.SetLabel(i18n.T("Log In"))
 				toasts.AddToast(adw.NewToast(err.Error()))
 				return
 			}
@@ -277,20 +278,20 @@ func (a *App) imapLogin(prefill config.MailServer) {
 				if err == nil {
 					if serr := imapmail.TestSMTP(ctx, acc); serr != nil {
 						acc.Close()
-						acc, err = nil, fmt.Errorf("příjem funguje, ale odesílání ne: %w", serr)
+						acc, err = nil, fmt.Errorf(i18n.T("receiving works, but sending does not: %w"), serr)
 					}
 				}
 				ui(func() {
 					login.SetSensitive(true)
-					login.SetLabel("Přihlásit")
+					login.SetLabel(i18n.T("Log In"))
 					if err != nil {
 						msg := err.Error()
 						if errors.Is(err, imapmail.ErrAuth) {
 							switch s.Kind {
 							case "gmail":
-								msg = "Google odmítl přihlášení. Použijte heslo pro aplikace, ne heslo k účtu Google, a zkontrolujte, že je v Gmailu zapnutý IMAP.\n\nOdpověď serveru: " + msg
+								msg = i18n.T("Google rejected the login. Use an app password, not your Google account password, and check that IMAP is enabled in Gmail.") + "\n\n" + fmt.Sprintf(i18n.T("Server response: %s"), msg)
 							case "seznam":
-								msg = "Seznam odmítl heslo. Máte-li zapnuté dvoufázové ověření, zadejte heslo pro aplikace (účet Seznamu → Zabezpečení → Dvoufázové ověření → Heslo pro aplikace). Po neúspěšném pokusu vám Seznam obvykle pošle e-mail s návodem.\n\nOdpověď serveru: " + msg
+								msg = i18n.T("Seznam rejected the password. If you have two-factor authentication turned on, enter an app password (Seznam account → Security → Two-factor authentication → App password). After a failed attempt Seznam usually sends you an email with instructions.") + "\n\n" + fmt.Sprintf(i18n.T("Server response: %s"), msg)
 							}
 						}
 						servers.SetExpanded(!errors.Is(err, imapmail.ErrAuth))
@@ -299,7 +300,7 @@ func (a *App) imapLogin(prefill config.MailServer) {
 					}
 					if err := secrets.SaveMailPassword(s.ID(), password); err != nil {
 						acc.Close()
-						toasts.AddToast(adw.NewToast("Heslo nejde uložit do klíčenky: " + err.Error()))
+						toasts.AddToast(adw.NewToast(i18n.T("The password cannot be saved to the keyring: ") + err.Error()))
 						return
 					}
 					a.saveMailServer(s)
@@ -349,7 +350,7 @@ func (a *App) mailServer(id string) (config.MailServer, bool) {
 func (a *App) openIMAP(ctx context.Context, id string) (mailbox.Account, config.MailServer, error) {
 	s, ok := a.mailServerSync(id)
 	if !ok {
-		return nil, s, fmt.Errorf("nastavení účtu %s chybí", strings.TrimPrefix(id, "imap:"))
+		return nil, s, fmt.Errorf(i18n.T("the settings of account %s are missing"), strings.TrimPrefix(id, "imap:"))
 	}
 	pw, err := secrets.LoadMailPassword(id)
 	if err != nil {

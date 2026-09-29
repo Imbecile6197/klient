@@ -10,6 +10,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 	"github.com/diamondburned/gotk4/pkg/pango"
 
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/richtext"
 )
 
@@ -54,10 +55,10 @@ func newRichEditor(parent gtk.Widgetter) *richEditor {
 	e.toolbar = gtk.NewBox(gtk.OrientationHorizontal, 2)
 	e.toolbar.AddCSSClass("toolbar")
 	for _, b := range []struct{ name, icon, tip, accel string }{
-		{"bold", "format-text-bold-symbolic", "Tučně (Ctrl+B)", "<Control>b"},
-		{"italic", "format-text-italic-symbolic", "Kurzíva (Ctrl+I)", "<Control>i"},
-		{"underline", "format-text-underline-symbolic", "Podtržení (Ctrl+U)", "<Control>u"},
-		{"strike", "format-text-strikethrough-symbolic", "Přeškrtnutí", ""},
+		{"bold", "format-text-bold-symbolic", i18n.T("Bold (Ctrl+B)"), "<Control>b"},
+		{"italic", "format-text-italic-symbolic", i18n.T("Italic (Ctrl+I)"), "<Control>i"},
+		{"underline", "format-text-underline-symbolic", i18n.T("Underline (Ctrl+U)"), "<Control>u"},
+		{"strike", "format-text-strikethrough-symbolic", i18n.T("Strikethrough"), ""},
 	} {
 		b := b
 		tb := gtk.NewToggleButton()
@@ -74,18 +75,18 @@ func newRichEditor(parent gtk.Widgetter) *richEditor {
 	sep := gtk.NewSeparator(gtk.OrientationVertical)
 	e.toolbar.Append(sep)
 	list := gtk.NewButtonFromIconName("view-list-bullet-symbolic")
-	list.SetTooltipText("Odrážkový seznam")
+	list.SetTooltipText(i18n.T("Bulleted List"))
 	list.AddCSSClass("flat")
 	list.ConnectClicked(e.toggleBullets)
 	e.toolbar.Append(list)
 	link := gtk.NewButtonFromIconName("insert-link-symbolic")
-	link.SetTooltipText("Odkaz (Ctrl+K)")
+	link.SetTooltipText(i18n.T("Link (Ctrl+K)"))
 	link.AddCSSClass("flat")
 	link.ConnectClicked(e.insertLink)
 	e.toolbar.Append(link)
 	e.shortcut("<Control>k", e.insertLink)
 	clear := gtk.NewButtonFromIconName("edit-clear-all-symbolic")
-	clear.SetTooltipText("Zrušit formátování výběru")
+	clear.SetTooltipText(i18n.T("Clear Formatting"))
 	clear.AddCSSClass("flat")
 	clear.ConnectClicked(func() {
 		if s, en, ok := e.buf.SelectionBounds(); ok {
@@ -203,10 +204,10 @@ func (e *richEditor) insertLink() {
 	if hasSel {
 		startOff, endOff = s.Offset(), en.Offset()
 	}
-	d := adw.NewAlertDialog("Vložit odkaz", "")
+	d := adw.NewAlertDialog(i18n.T("Insert Link"), "")
 	box := gtk.NewBox(gtk.OrientationVertical, 6)
 	textEntry := gtk.NewEntry()
-	textEntry.SetPlaceholderText("Text odkazu")
+	textEntry.SetPlaceholderText(i18n.T("Link text"))
 	textEntry.SetText(selText)
 	urlEntry := gtk.NewEntry()
 	urlEntry.SetPlaceholderText("https://…")
@@ -217,8 +218,8 @@ func (e *richEditor) insertLink() {
 	box.Append(textEntry)
 	box.Append(urlEntry)
 	d.SetExtraChild(box)
-	d.AddResponse("cancel", "Zrušit")
-	d.AddResponse("ok", "Vložit")
+	d.AddResponse("cancel", i18n.T("Cancel"))
+	d.AddResponse("ok", i18n.T("Insert"))
 	d.SetResponseAppearance("ok", adw.ResponseSuggested)
 	d.SetDefaultResponse("ok")
 	d.SetCloseResponse("cancel")

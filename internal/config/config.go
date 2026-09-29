@@ -95,6 +95,9 @@ type Config struct {
 	OllamaAutoUpdate bool   `json:"ollama_auto_update"`
 	OllamaLastCheck  string `json:"ollama_last_check"` // RFC 3339
 
+	// Interface language: "" follows the system, or "en", "cs".
+	Language string `json:"language"`
+
 	// Klient updates from the GitHub releases.
 	AutoUpdate      bool   `json:"auto_update"`
 	UpdateLastCheck string `json:"update_last_check"` // RFC 3339

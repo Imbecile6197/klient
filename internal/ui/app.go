@@ -21,6 +21,7 @@ import (
 
 	"github.com/Imbecile6197/klient/internal/ai"
 	"github.com/Imbecile6197/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/imapmail"
 	"github.com/Imbecile6197/klient/internal/mailbox"
 	"github.com/Imbecile6197/klient/internal/mailparse"
@@ -215,7 +216,7 @@ func (a *App) activate() {
 	go a.lists.RunUpdater(a.ctx, a.cfg, func(err error) {
 		ui(func() {
 			if err != nil {
-				a.toast("Aktualizace blocklistů: " + err.Error())
+				a.toast(i18n.T("Blocklist update: ") + err.Error())
 			}
 			if a.mv != nil {
 				a.mv.updateFilterStatus()
@@ -223,7 +224,7 @@ func (a *App) activate() {
 		})
 	})
 
-	a.showStatus("Připojování…")
+	a.showStatus(i18n.T("Connecting…"))
 	if !a.background {
 		a.win.Present()
 	}
@@ -250,12 +251,12 @@ func (a *App) watchUpgrade() {
 			continue
 		}
 		ui(func() {
-			n := gio.NewNotification("Klient byl aktualizován")
-			n.SetBody("Restartujte ho, aby se použila nová verze.")
+			n := gio.NewNotification(i18n.T("Klient Has Been Updated"))
+			n.SetBody(i18n.T("Restart it to use the new version."))
 			n.SetDefaultAction("app.restart")
-			n.AddButton("Restartovat", "app.restart")
+			n.AddButton(i18n.T("Restart"), "app.restart")
 			a.app.SendNotification("upgrade", n)
-			a.toastWithAction("Klient byl aktualizován – restartujte ho pro novou verzi", "Restartovat", a.restartApp)
+			a.toastWithAction(i18n.T("Klient has been updated – restart it to use the new version"), i18n.T("Restart"), a.restartApp)
 		})
 		return
 	}
@@ -297,7 +298,7 @@ func (a *App) resumeAll() {
 		go func(name string) {
 			s, err := secrets.LoadProtonSession(name)
 			if err != nil {
-				ui(func() { a.showLogin("Klíčenka systému není dostupná: "+err.Error(), name) })
+				ui(func() { a.showLogin(i18n.T("The system keyring is not available: ")+err.Error(), name) })
 				return
 			}
 			if s == nil {
@@ -314,9 +315,9 @@ func (a *App) resumeAll() {
 			ui(func() {
 				if err != nil {
 					if name == active || len(a.sessions) == 0 {
-						a.showLogin("Relace vypršela, přihlaste se znovu. ("+err.Error()+")", name)
+						a.showLogin(fmt.Sprintf(i18n.T("The session has expired; please log in again. (%s)"), err.Error()), name)
 					} else {
-						a.toast("Účet " + name + ": relace vypršela, přihlaste se znovu")
+						a.toast(fmt.Sprintf(i18n.T("Account %s: the session has expired; please log in again"), name))
 					}
 					return
 				}
@@ -339,9 +340,9 @@ func (a *App) resumeIMAP(id string, active bool) {
 		if err != nil {
 			label := strings.TrimPrefix(id, "imap:")
 			if errors.Is(err, imapmail.ErrAuth) {
-				a.toastWithAction("Účet "+label+": server odmítl heslo", "Zadat heslo", func() { a.imapLogin(set) })
+				a.toastWithAction(fmt.Sprintf(i18n.T("Account %s: the server rejected the password"), label), i18n.T("Enter Password"), func() { a.imapLogin(set) })
 			} else {
-				a.toast("Účet " + label + " se nepodařilo otevřít: " + err.Error())
+				a.toast(fmt.Sprintf(i18n.T("Account %s could not be opened: %s"), label, err.Error()))
 			}
 			if active && len(a.sessions) == 0 {
 				a.showLogin("", "")
@@ -363,7 +364,7 @@ func (a *App) initAI() {
 	}, func(provider string) string {
 		key, err := secrets.LoadAPIKey(provider)
 		if err != nil {
-			log.Printf("API klíč %s: %v", provider, err)
+			log.Printf("API key %s: %v", provider, err)
 		}
 		return key
 	})
@@ -377,7 +378,7 @@ func (a *App) initAI() {
 
 func (a *App) saveConfig() {
 	if err := config.Save(a.cfg); err != nil {
-		a.toast("Nastavení se nepodařilo uložit: " + err.Error())
+		a.toast(i18n.T("The settings could not be saved: ") + err.Error())
 	}
 	a.filter.SetConfig(a.cfg)
 }
@@ -446,8 +447,8 @@ func (a *App) setupActions() {
 	add("reply", []string{"<Control>r"}, mv(func(m *mainView) { m.reply(protonmail.ActionReply) }))
 	add("reply-all", []string{"<Control><Shift>r"}, mv(func(m *mainView) { m.reply(protonmail.ActionReplyAll) }))
 	add("forward", []string{"<Control>l"}, mv(func(m *mainView) { m.reply(protonmail.ActionForward) }))
-	add("trash", nil, mv(func(m *mainView) { m.moveCurrent(protonmail.TrashID, "Přesunuto do koše") }))
-	add("archive", []string{"<Control>e"}, mv(func(m *mainView) { m.moveCurrent(protonmail.ArchiveID, "Archivováno") }))
+	add("trash", nil, mv(func(m *mainView) { m.moveCurrent(protonmail.TrashID, i18n.T("Moved to Trash")) }))
+	add("archive", []string{"<Control>e"}, mv(func(m *mainView) { m.moveCurrent(protonmail.ArchiveID, i18n.T("Archived")) }))
 	add("toggle-star", []string{"<Control>d"}, mv(func(m *mainView) { m.toggleStar() }))
 	add("mark-unread", []string{"<Control><Shift>u"}, mv(func(m *mainView) { m.markUnread() }))
 	add("snooze", []string{"<Control>h"}, mv(func(m *mainView) { m.snoozeCustom() }))
@@ -458,7 +459,7 @@ func (a *App) setupActions() {
 	move := gio.NewSimpleAction("move-to", glib.NewVariantType("s"))
 	move.ConnectActivate(func(p *glib.Variant) {
 		if a.mv != nil && p != nil {
-			a.mv.moveCurrent(p.String(), "Přesunuto")
+			a.mv.moveCurrent(p.String(), i18n.T("Moved"))
 		}
 	})
 	a.app.AddAction(move)
@@ -488,24 +489,24 @@ func (a *App) setupActions() {
 func (a *App) primaryMenu() *gio.Menu {
 	menu := gio.NewMenu()
 	s1 := gio.NewMenu()
-	s1.Append("Nová zpráva", "app.compose")
-	s1.Append("Kontakty", "app.contacts")
-	s1.Append("Zeptat se pošty (AI)", "app.ask-mail")
-	s1.Append("Přehled nepřečtené pošty (AI)", "app.digest")
+	s1.Append(i18n.T("New Message"), "app.compose")
+	s1.Append(i18n.T("Contacts"), "app.contacts")
+	s1.Append(i18n.T("Ask Your Mail (AI)"), "app.ask-mail")
+	s1.Append(i18n.T("Unread Mail Overview (AI)"), "app.digest")
 	menu.AppendSection("", s1)
 	s3 := gio.NewMenu()
-	s3.Append("Prověřit doručenou poštu pomocí AI", "app.scan-inbox")
-	s3.Append("Použít pravidla na doručenou poštu", "app.apply-rules")
-	s3.Append("Automatická odpověď…", "app.autoreply")
+	s3.Append(i18n.T("Check the Inbox with AI"), "app.scan-inbox")
+	s3.Append(i18n.T("Apply Rules to the Inbox"), "app.apply-rules")
+	s3.Append(i18n.T("Automatic Reply…"), "app.autoreply")
 	menu.AppendSection("", s3)
 	s2 := gio.NewMenu()
-	s2.Append("Předvolby", "app.preferences")
-	s2.Append("Nápověda", "app.help")
-	s2.Append("Klávesové zkratky", "app.shortcuts")
-	s2.Append("Přidat účet…", "app.add-account")
-	s2.Append("Odhlásit tento účet", "app.logout")
-	s2.Append("O aplikaci Klient", "app.about")
-	s2.Append("Ukončit", "app.quit")
+	s2.Append(i18n.T("Preferences"), "app.preferences")
+	s2.Append(i18n.T("Help"), "app.help")
+	s2.Append(i18n.T("Keyboard Shortcuts"), "app.shortcuts")
+	s2.Append(i18n.T("Add Account…"), "app.add-account")
+	s2.Append(i18n.T("Log Out of This Account"), "app.logout")
+	s2.Append(i18n.T("About Klient"), "app.about")
+	s2.Append(i18n.T("Quit"), "app.quit")
 	menu.AppendSection("", s2)
 	return menu
 }
@@ -577,7 +578,7 @@ func (a *App) onLoggedIn(acc mailbox.Account) {
 	a.addSession(acc)
 	a.switchAccount(acc)
 	if !a.ai.HasAssistant() && !a.ai.HasSpam() {
-		a.toastWithAction("AI není nastavená – zvolte lokální AI nebo vložte API klíč", "Nastavit", a.openPreferences)
+		a.toastWithAction(i18n.T("AI is not set up – choose local AI or enter an API key"), i18n.T("Set Up"), a.openPreferences)
 	}
 }
 
@@ -615,13 +616,13 @@ func (a *App) recoverSession(s *session) {
 	old := s.acc
 	go func() {
 		var acc mailbox.Account
-		err := errors.New("relace ukončena")
+		err := errors.New(i18n.T("the session has ended"))
 		if p := mailbox.AsProton(old); p == nil {
 			// IMAP: the password was rejected (changed or revoked).
 			ui(func() {
 				s.recovering = false
 				set, _ := a.mailServer(old.Username())
-				a.toastWithAction("Účet "+old.Email()+": server odmítl heslo", "Zadat heslo", func() { a.imapLogin(set) })
+				a.toastWithAction(fmt.Sprintf(i18n.T("Account %s: the server rejected the password"), old.Email()), i18n.T("Enter Password"), func() { a.imapLogin(set) })
 			})
 			return
 		} else {
@@ -652,12 +653,12 @@ func (a *App) recoverSession(s *session) {
 				return
 			}
 			a.removeSession(s)
-			msg := "Relace u Protonu skončila (například po odhlášení na webu nebo v jiné aplikaci). Přihlaste se prosím znovu."
+			msg := i18n.T("The Proton session has ended (for example after logging out on the web or in another app). Please log in again.")
 			if a.acc == old || a.acc == nil {
 				a.acc = nil
 				a.showLogin(msg, old.Username())
 			} else {
-				a.toast("Účet " + old.Email() + ": relace skončila, přihlaste se znovu")
+				a.toast(fmt.Sprintf(i18n.T("Account %s: the session has ended; please log in again"), old.Email()))
 			}
 		})
 	}()
@@ -688,7 +689,7 @@ func (a *App) startEvents(s *session) {
 			if err != nil {
 				s.events = false
 				if !protonmail.IsOffline(err) {
-					a.toast("Nepodařilo se spustit sledování nové pošty: " + err.Error())
+					a.toast(i18n.T("Watching for new mail could not be started: ") + err.Error())
 				}
 			}
 		})
@@ -785,7 +786,7 @@ func (a *App) onNewMessage(s *session, meta protonmail.Summary) {
 			}
 			if a.cfg.AutoLabel && len(applied) == 0 {
 				if l := a.autoLabel(acc, meta); l != "" {
-					applied = append(applied, "AI štítek "+l)
+					applied = append(applied, fmt.Sprintf(i18n.T("AI label %s"), l))
 				}
 			}
 		}
@@ -798,7 +799,7 @@ func (a *App) onNewMessage(s *session, meta protonmail.Summary) {
 				}
 			}
 			if len(applied) > 0 && shown {
-				a.toast("Pravidla: " + strings.Join(applied, ", ") + " – " + meta.Subject)
+				a.toast(fmt.Sprintf(i18n.T("Rules: %s – %s"), strings.Join(applied, ", "), meta.Subject))
 				if a.mv != nil {
 					a.mv.scheduleRefresh()
 				}
@@ -808,7 +809,7 @@ func (a *App) onNewMessage(s *session, meta protonmail.Summary) {
 			}
 			if moved {
 				if shown {
-					a.toastWithAction(fmt.Sprintf("AI přesunula do spamu: %s", meta.Subject), "Vrátit", func() {
+					a.toastWithAction(fmt.Sprintf(i18n.T("The AI moved to spam: %s"), meta.Subject), i18n.T("Move Back"), func() {
 						a.markNotSpam(d.From, meta.ID)
 					})
 				}
@@ -817,7 +818,7 @@ func (a *App) onNewMessage(s *session, meta protonmail.Summary) {
 			if d.Spam || (a.win.IsActive() && shown) {
 				return
 			}
-			sender := "Neznámý odesílatel"
+			sender := i18n.T("Unknown sender")
 			if meta.Sender != nil {
 				sender = mailparse.DisplayAddress(meta.Sender)
 			}
@@ -856,10 +857,10 @@ func (a *App) markNotSpam(from string, ids ...string) {
 		err := a.acc.Move(a.ctx, protonmail.InboxID, ids...)
 		ui(func() {
 			if err != nil {
-				a.toast("Přesun selhal: " + err.Error())
+				a.toast(i18n.T("Moving failed: ") + err.Error())
 				return
 			}
-			a.toast("Přesunuto do doručené pošty, odesílatel přidán mezi povolené")
+			a.toast(i18n.T("Moved to the inbox; the sender has been added to the allowed senders"))
 			a.mv.scheduleRefresh()
 		})
 	}()
@@ -873,10 +874,10 @@ func (a *App) markSpam(from string, ids ...string) {
 		err := a.acc.Move(a.ctx, protonmail.SpamID, ids...)
 		ui(func() {
 			if err != nil {
-				a.toast("Přesun selhal: " + err.Error())
+				a.toast(i18n.T("Moving failed: ") + err.Error())
 				return
 			}
-			a.toast("Přesunuto do spamu, odesílatel přidán mezi blokované")
+			a.toast(i18n.T("Moved to spam; the sender has been added to the blocked senders"))
 			a.mv.scheduleRefresh()
 		})
 	}()
@@ -886,9 +887,9 @@ func (a *App) confirmLogout() {
 	if a.acc == nil {
 		return
 	}
-	d := adw.NewAlertDialog("Odhlásit účet "+a.acc.Email()+"?", "Relace bude ukončena na serveru a odstraněna z klíčenky, offline cache tohoto účtu se smaže.")
-	d.AddResponse("cancel", "Zrušit")
-	d.AddResponse("logout", "Odhlásit")
+	d := adw.NewAlertDialog(fmt.Sprintf(i18n.T("Log Out of %s?"), a.acc.Email()), i18n.T("The session will be ended on the server and removed from the keyring, and the offline cache of this account will be deleted."))
+	d.AddResponse("cancel", i18n.T("Cancel"))
+	d.AddResponse("logout", i18n.T("Log Out"))
 	d.SetResponseAppearance("logout", adw.ResponseDestructive)
 	d.SetCloseResponse("cancel")
 	d.ConnectResponse(func(r string) {
@@ -903,7 +904,7 @@ func (a *App) confirmLogout() {
 		a.cfg.MailServers = slices.DeleteFunc(a.cfg.MailServers, func(m config.MailServer) bool { return m.ID() == acc.Username() })
 		a.saveConfig()
 		a.acc = nil
-		a.showStatus("Odhlašování…")
+		a.showStatus(i18n.T("Logging out…"))
 		go func() {
 			err := acc.Logout(context.Background())
 			ui(func() {
@@ -913,7 +914,7 @@ func (a *App) confirmLogout() {
 					a.showLogin("", "")
 				}
 				if err != nil {
-					a.toast("Odhlášení na serveru selhalo: " + err.Error())
+					a.toast(i18n.T("Logging out on the server failed: ") + err.Error())
 				}
 			})
 		}()

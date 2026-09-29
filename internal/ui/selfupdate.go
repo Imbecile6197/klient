@@ -2,6 +2,7 @@ package ui
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 	"time"
@@ -10,6 +11,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/update"
 )
 
@@ -68,48 +70,48 @@ func (a *App) checkUpdate(report func(string)) {
 		busy <- b
 	})
 	if <-busy {
-		say("Kontrola už probíhá…")
+		say(i18n.T("A check is already running…"))
 		return
 	}
 	defer ui(func() { a.update.busy = false })
 
 	ctx, cancel := context.WithTimeout(a.ctx, 30*time.Minute)
 	defer cancel()
-	say("Zjišťuji nejnovější verzi…")
+	say(i18n.T("Finding the latest version…"))
 	rel, err := update.Latest(ctx)
 	ui(func() {
 		a.cfg.UpdateLastCheck = time.Now().Format(time.RFC3339)
 		a.saveConfig()
 	})
 	if err != nil {
-		say("Kontrola selhala: " + err.Error())
+		say(i18n.T("The update check failed: ") + err.Error())
 		return
 	}
 	if !update.Newer(rel.Version, Version) {
-		say("Máte nejnovější verzi " + Version)
+		say(fmt.Sprintf(i18n.T("You have the latest version, %s"), Version))
 		_ = os.RemoveAll(updateDir()) // leftovers of an installed update
 		return
 	}
 	if !update.Installable() {
 		// Built from source: only tell about it.
-		say("Je dostupná verze " + rel.Version + " – tento Klient není nainstalovaný z balíčku, stáhněte ji z GitHubu")
+		say(fmt.Sprintf(i18n.T("Version %s is available – this Klient was not installed from the package, so download it from GitHub"), rel.Version))
 		return
 	}
-	say("Stahuji verzi " + rel.Version + "…")
+	say(fmt.Sprintf(i18n.T("Downloading version %s…"), rel.Version))
 	path, err := update.Download(ctx, rel, updateDir(), nil)
 	if err != nil {
-		say("Stažení selhalo: " + err.Error())
+		say(i18n.T("The download failed: ") + err.Error())
 		return
 	}
-	say("Verze " + rel.Version + " je stažená a ověřená")
+	say(fmt.Sprintf(i18n.T("Version %s is downloaded and verified"), rel.Version))
 	ui(func() {
 		a.update.version, a.update.path = rel.Version, path
-		n := gio.NewNotification("Je připravená nová verze Klienta")
-		n.SetBody("Verze " + rel.Version + " je stažená z GitHubu a ověřená. Instalace si vyžádá heslo správce.")
+		n := gio.NewNotification(i18n.T("A New Version of Klient Is Ready"))
+		n.SetBody(fmt.Sprintf(i18n.T("Version %s has been downloaded from GitHub and verified. Installing it will ask for the administrator password."), rel.Version))
 		n.SetDefaultAction("app.install-update")
-		n.AddButton("Nainstalovat", "app.install-update")
+		n.AddButton(i18n.T("Install"), "app.install-update")
 		a.app.SendNotification("self-update", n)
-		a.toastWithAction("Je připravená verze "+rel.Version, "Nainstalovat", a.installUpdate)
+		a.toastWithAction(fmt.Sprintf(i18n.T("Version %s is ready"), rel.Version), i18n.T("Install"), a.installUpdate)
 	})
 }
 
@@ -121,7 +123,7 @@ func (a *App) installUpdate() {
 	a.update.busy = true
 	path, version := a.update.path, a.update.version
 	a.app.WithdrawNotification("self-update")
-	a.toast("Instaluji verzi " + version + "…")
+	a.toast(fmt.Sprintf(i18n.T("Installing version %s…"), version))
 	go func() {
 		ctx, cancel := context.WithTimeout(a.ctx, 15*time.Minute)
 		defer cancel()
@@ -129,7 +131,7 @@ func (a *App) installUpdate() {
 		ui(func() {
 			a.update.busy = false
 			if err != nil {
-				a.toastWithAction(err.Error(), "Zkusit znovu", a.installUpdate)
+				a.toastWithAction(err.Error(), i18n.T("Try Again"), a.installUpdate)
 				return
 			}
 			a.update.path = ""
@@ -139,14 +141,14 @@ func (a *App) installUpdate() {
 	}()
 }
 
-// updateGroup is the "Aktualizace" group in the preferences.
+// updateGroup is the i18n.T("Updates") group in the preferences.
 func (a *App) updateGroup() *adw.PreferencesGroup {
 	g := adw.NewPreferencesGroup()
-	g.SetTitle("Aktualizace")
-	g.SetDescription("Nové verze se stahují z GitHubu (" + update.Repo + "). Balíček se před instalací ověří kontrolním součtem, instalace si vyžádá heslo správce.")
+	g.SetTitle(i18n.T("Updates"))
+	g.SetDescription(fmt.Sprintf(i18n.T("New versions are downloaded from GitHub (%s). The package is verified by its checksum before installation, and installing asks for the administrator password."), update.Repo))
 	auto := adw.NewSwitchRow()
-	auto.SetTitle("Automaticky kontrolovat aktualizace")
-	auto.SetSubtitle("Jednou denně, ne na měřeném připojení; nová verze se rovnou stáhne")
+	auto.SetTitle(i18n.T("Check for updates automatically"))
+	auto.SetSubtitle(i18n.T("Once a day, not on a metered connection; a new version is downloaded right away"))
 	auto.SetActive(a.cfg.AutoUpdate)
 	auto.NotifyProperty("active", func() {
 		a.cfg.AutoUpdate = auto.Active()
@@ -155,13 +157,13 @@ func (a *App) updateGroup() *adw.PreferencesGroup {
 	g.Add(auto)
 
 	check := adw.NewActionRow()
-	check.SetTitle("Nainstalovaná verze " + Version)
+	check.SetTitle(fmt.Sprintf(i18n.T("Installed version %s"), Version))
 	if last, err := time.Parse(time.RFC3339, a.cfg.UpdateLastCheck); err == nil {
-		check.SetSubtitle("Naposledy zkontrolováno " + last.Format("2. 1. 15:04"))
+		check.SetSubtitle(fmt.Sprintf(i18n.T("Last checked %s"), last.Format(i18n.T("Jan 2 15:04"))))
 	}
-	btn := gtk.NewButtonWithLabel("Zkontrolovat")
+	btn := gtk.NewButtonWithLabel(i18n.T("Check"))
 	btn.SetVAlign(gtk.AlignCenter)
-	install := gtk.NewButtonWithLabel("Nainstalovat")
+	install := gtk.NewButtonWithLabel(i18n.T("Install"))
 	install.SetVAlign(gtk.AlignCenter)
 	install.AddCSSClass("suggested-action")
 	install.SetVisible(a.update.path != "")

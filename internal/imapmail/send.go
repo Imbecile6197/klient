@@ -19,6 +19,7 @@ import (
 	"github.com/emersion/go-sasl"
 	"github.com/emersion/go-smtp"
 
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/pgp"
 	"github.com/Imbecile6197/klient/internal/pgpmime"
 	"github.com/Imbecile6197/klient/internal/protonmail"
@@ -235,7 +236,7 @@ func (a *Account) appendTo(folderID string, data []byte, flags []imap.Flag) (str
 // version, since IMAP messages cannot be edited).
 func (a *Account) SaveDraft(ctx context.Context, d *protonmail.Draft) error {
 	if !a.HasFolder(protonmail.DraftsID) {
-		return errors.New("schránka nemá složku Koncepty")
+		return errors.New(i18n.T("the mailbox has no Drafts folder"))
 	}
 	data, err := a.forSelf(d, a.parentMessageID(ctx, d))
 	if err != nil {
@@ -243,7 +244,7 @@ func (a *Account) SaveDraft(ctx context.Context, d *protonmail.Draft) error {
 	}
 	id, err := a.appendTo(protonmail.DraftsID, data, []imap.Flag{imap.FlagDraft, imap.FlagSeen})
 	if err != nil {
-		return fmt.Errorf("uložení konceptu selhalo: %w", err)
+		return fmt.Errorf(i18n.T("saving the draft failed: %w"), err)
 	}
 	if d.ID != "" && d.ID != id {
 		_ = a.deleteIDs(d.ID)
@@ -263,7 +264,7 @@ func (a *Account) Send(ctx context.Context, d *protonmail.Draft) error {
 	}
 	out, err := a.prepare(ctx, d, a.parentMessageID(ctx, d))
 	if err != nil {
-		return fmt.Errorf("příprava zprávy selhala: %w", err)
+		return fmt.Errorf(i18n.T("preparing the message failed: %w"), err)
 	}
 	if len(out.keyed) > 0 {
 		if err := a.smtpSend(out.keyed, out.encrypted); err != nil {
@@ -273,7 +274,7 @@ func (a *Account) Send(ctx context.Context, d *protonmail.Draft) error {
 	if len(out.clear) > 0 {
 		if err := a.smtpSend(out.clear, out.plain); err != nil {
 			if len(out.keyed) > 0 {
-				return fmt.Errorf("šifrovaná část odešla, ale ostatním příjemcům ne: %w", err)
+				return fmt.Errorf(i18n.T("the encrypted copy was sent, but the other recipients' copy was not: %w"), err)
 			}
 			return err
 		}
@@ -282,7 +283,7 @@ func (a *Account) Send(ctx context.Context, d *protonmail.Draft) error {
 	// there; that is what its servers received).
 	if a.set.Kind != "gmail" && a.HasFolder(protonmail.SentID) {
 		if _, err := a.appendTo(protonmail.SentID, out.sentCopy, []imap.Flag{imap.FlagSeen}); err != nil {
-			return fmt.Errorf("zpráva odešla, ale kopii se nepodařilo uložit do Odeslaných: %w", err)
+			return fmt.Errorf(i18n.T("the message was sent, but saving a copy to Sent failed: %w"), err)
 		}
 	}
 	if d.ID != "" {
@@ -310,7 +311,7 @@ func (a *Account) smtpClient() (*smtp.Client, error) {
 	}
 	if err := c.Auth(sasl.NewPlainClient("", a.set.Username, a.password)); err != nil {
 		c.Close()
-		return nil, fmt.Errorf("SMTP server odmítl přihlášení: %w", err)
+		return nil, fmt.Errorf(i18n.T("the SMTP server rejected the login: %w"), err)
 	}
 	return c, nil
 }
@@ -322,7 +323,7 @@ func (a *Account) smtpSend(rcpts []string, data []byte) error {
 	}
 	defer c.Close()
 	if err := c.SendMail(a.set.Email, rcpts, bytes.NewReader(data)); err != nil {
-		return fmt.Errorf("odeslání selhalo: %w", err)
+		return fmt.Errorf(i18n.T("sending failed: %w"), err)
 	}
 	return c.Quit()
 }

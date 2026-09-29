@@ -26,12 +26,18 @@ RPM=$(ls build/rpm/RPMS/x86_64/klient-"$VERSION"-*.x86_64.rpm)
 cp "$RPM" "$(dirname "$RPM")/klient.x86_64.rpm"
 (cd "$(dirname "$RPM")" && sha256sum "$(basename "$RPM")" klient.x86_64.rpm > SHA256SUMS)
 
-# Release notes: the newest %changelog entry of the spec.
-NOTES=$(awk '/^%changelog/{c=1; next} c && /^\*/{if (n++) exit; next} c' packaging/klient.spec | sed '/^$/d')
+# Release notes: packaging/release-notes/VERSION.md (English and Czech) if it
+# exists, otherwise the newest %changelog entry of the spec.
+if [ -f "packaging/release-notes/$VERSION.md" ]; then
+	NOTES=$(cat "packaging/release-notes/$VERSION.md")
+else
+	NOTES=$(awk '/^%changelog/{c=1; next} c && /^\*/{if (n++) exit; next} c' packaging/klient.spec | sed '/^$/d')
+	NOTES="$NOTES
+
+Install: \`sudo dnf install https://github.com/Imbecile6197/klient/releases/latest/download/klient.x86_64.rpm\` – an installed Klient then updates itself (Preferences → Messages → Updates)."
+fi
 
 git -c credential.helper= -c credential.helper='!gh auth git-credential' push origin main "$TAG"
 gh release create "$TAG" "$RPM" "$(dirname "$RPM")/klient.x86_64.rpm" "$(dirname "$RPM")/SHA256SUMS" \
 	--title "Klient $VERSION" \
-	--notes "$NOTES
-
-Instalace: \`sudo dnf install https://github.com/Imbecile6197/klient/releases/latest/download/klient.x86_64.rpm\` – nainstalovaný Klient si další verze stáhne sám (Předvolby → Zprávy → Aktualizace)."
+	--notes "$NOTES"

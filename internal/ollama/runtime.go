@@ -23,6 +23,8 @@ import (
 	"time"
 
 	"github.com/klauspost/compress/zstd"
+
+	"github.com/Imbecile6197/klient/internal/i18n"
 )
 
 const (
@@ -81,7 +83,7 @@ func Latest(ctx context.Context) (Release, error) {
 	}
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
-		return Release{}, fmt.Errorf("GitHub odpověděl %s", res.Status)
+		return Release{}, fmt.Errorf(i18n.T("GitHub responded with %s"), res.Status)
 	}
 	var rel struct {
 		TagName string `json:"tag_name"`
@@ -107,7 +109,7 @@ func Latest(ctx context.Context) (Release, error) {
 		}
 	}
 	if out.URL == "" {
-		return Release{}, fmt.Errorf("vydání %s neobsahuje %s", rel.TagName, assetName)
+		return Release{}, fmt.Errorf(i18n.T("release %s does not contain %s"), rel.TagName, assetName)
 	}
 	// Cross-check with the published checksum list.
 	if sums != "" {
@@ -116,7 +118,7 @@ func Latest(ctx context.Context) (Release, error) {
 				f := strings.Fields(line)
 				if len(f) == 2 && strings.TrimPrefix(f[1], "./") == assetName {
 					if out.SHA256 != "" && !strings.EqualFold(out.SHA256, f[0]) {
-						return Release{}, errors.New("kontrolní součty vydání Ollamy nesouhlasí")
+						return Release{}, errors.New(i18n.T("the checksums of the Ollama release do not match"))
 					}
 					out.SHA256 = f[0]
 				}
@@ -124,7 +126,7 @@ func Latest(ctx context.Context) (Release, error) {
 		}
 	}
 	if out.SHA256 == "" {
-		return Release{}, errors.New("k vydání Ollamy chybí kontrolní součet")
+		return Release{}, errors.New(i18n.T("the Ollama release has no checksum"))
 	}
 	return out, nil
 }
@@ -197,11 +199,11 @@ func (r *Runtime) Install(ctx context.Context, rel Release, progress Progress) e
 	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, rel.URL, nil)
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("stažení Ollamy selhalo: %w", err)
+		return fmt.Errorf(i18n.T("downloading Ollama failed: %w"), err)
 	}
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("stažení Ollamy selhalo: %s", res.Status)
+		return fmt.Errorf(i18n.T("downloading Ollama failed: %s"), res.Status)
 	}
 	h := sha256.New()
 	var done int64
@@ -224,26 +226,26 @@ func (r *Runtime) Install(ctx context.Context, rel Release, progress Progress) e
 			break
 		}
 		if rerr != nil {
-			return fmt.Errorf("stažení Ollamy selhalo: %w", rerr)
+			return fmt.Errorf(i18n.T("downloading Ollama failed: %w"), rerr)
 		}
 	}
 	if progress != nil {
 		progress(done, rel.Size)
 	}
 	if got := hex.EncodeToString(h.Sum(nil)); !strings.EqualFold(got, rel.SHA256) {
-		return fmt.Errorf("kontrolní součet stažené Ollamy nesouhlasí – soubor byl zahozen")
+		return errors.New(i18n.T("the checksum of the downloaded Ollama does not match – the file was discarded"))
 	}
 
 	dest := filepath.Join(r.dir, "v"+rel.Version)
 	_ = os.RemoveAll(dest)
 	if err := extract(tmp, dest); err != nil {
 		_ = os.RemoveAll(dest)
-		return fmt.Errorf("rozbalení Ollamy selhalo: %w", err)
+		return fmt.Errorf(i18n.T("unpacking Ollama failed: %w"), err)
 	}
 	// Sanity check before switching.
 	if out, err := exec.CommandContext(ctx, filepath.Join(dest, "bin", "ollama"), "--version").CombinedOutput(); err != nil {
 		_ = os.RemoveAll(dest)
-		return fmt.Errorf("nová Ollama nejde spustit: %v %s", err, out)
+		return fmt.Errorf(i18n.T("the new Ollama cannot be started: %v %s"), err, out)
 	}
 	link := r.current() + ".new"
 	_ = os.Remove(link)
@@ -331,7 +333,7 @@ func extract(f *os.File, dest string) error {
 		}
 	}
 	if _, err := os.Stat(filepath.Join(dest, "bin", "ollama")); err != nil {
-		return errors.New("archiv neobsahuje bin/ollama")
+		return errors.New(i18n.T("the archive does not contain bin/ollama"))
 	}
 	return nil
 }
@@ -358,7 +360,7 @@ func freePort() (string, error) {
 			return a, nil
 		}
 	}
-	return "", errors.New("není volný port pro Ollamu")
+	return "", errors.New(i18n.T("no free port for Ollama"))
 }
 
 // Start runs `ollama serve` (if installed and not running) and waits until
@@ -371,7 +373,7 @@ func (r *Runtime) Start(ctx context.Context) error {
 	}
 	if r.Installed() == "" {
 		r.mu.Unlock()
-		return errors.New("Ollama není nainstalovaná")
+		return errors.New(i18n.T("Ollama is not installed"))
 	}
 	addr, err := freePort()
 	if err != nil {
@@ -403,7 +405,7 @@ func (r *Runtime) Start(ctx context.Context) error {
 	}
 	if err := cmd.Start(); err != nil {
 		r.mu.Unlock()
-		return fmt.Errorf("Ollamu nejde spustit: %w", err)
+		return fmt.Errorf(i18n.T("Ollama cannot be started: %w"), err)
 	}
 	r.cmd, r.addr, r.pending = cmd, addr, ""
 	r.mu.Unlock()
@@ -432,7 +434,7 @@ func (r *Runtime) Start(ctx context.Context) error {
 		}
 	}
 	r.Stop()
-	return errors.New("Ollama se nespustila (podrobnosti v ~/.local/share/klient/ollama/server.log)")
+	return errors.New(i18n.T("Ollama did not start (details in ~/.local/share/klient/ollama/server.log)"))
 }
 
 // Stop ends the server.

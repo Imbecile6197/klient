@@ -5,6 +5,8 @@ import (
 	"errors"
 
 	"google.golang.org/genai"
+
+	"github.com/Imbecile6197/klient/internal/i18n"
 )
 
 type geminiProvider struct{ api *genai.Client }
@@ -31,11 +33,11 @@ func (g *geminiProvider) Complete(ctx context.Context, req Request) (string, err
 		return "", err
 	}
 	if res.PromptFeedback != nil && res.PromptFeedback.BlockReason != "" {
-		return "", errors.New("Gemini požadavek zablokoval: " + string(res.PromptFeedback.BlockReason))
+		return "", errors.New(i18n.T("Gemini blocked the request: ") + string(res.PromptFeedback.BlockReason))
 	}
 	text := res.Text()
 	if text == "" {
-		return "", errors.New("Gemini vrátil prázdnou odpověď")
+		return "", errors.New(i18n.T("Gemini returned an empty answer"))
 	}
 	return text, nil
 }

@@ -37,7 +37,7 @@ func (a *Account) Events(ctx context.Context, onNew func(protonmail.Summary), on
 			if time.Since(start) > time.Minute {
 				wait = 5 * time.Second // it ran fine for a while
 			}
-			log.Printf("IMAP %s: sledování nové pošty přerušeno (%v), znovu za %s", a.set.Email, err, wait)
+			log.Printf("IMAP %s: watching for new mail stopped (%v), retrying in %s", a.set.Email, err, wait)
 			select {
 			case <-ctx.Done():
 				return

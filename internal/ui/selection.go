@@ -6,6 +6,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/protonmail"
 )
 
@@ -15,7 +16,7 @@ import (
 func (m *mainView) buildSelection(tv interface{ AddBottomBar(gtk.Widgetter) }, hb interface{ PackEnd(gtk.Widgetter) }) {
 	m.selectBtn = gtk.NewToggleButton()
 	m.selectBtn.SetIconName("object-select-symbolic")
-	m.selectBtn.SetTooltipText("Vybrat více zpráv")
+	m.selectBtn.SetTooltipText(i18n.T("Select Several Messages"))
 	m.selectBtn.ConnectToggled(func() {
 		if m.selectBtn.Active() {
 			m.enterSelection()
@@ -28,8 +29,8 @@ func (m *mainView) buildSelection(tv interface{ AddBottomBar(gtk.Widgetter) }, h
 	m.actionBar = gtk.NewActionBar()
 	m.selLabel = gtk.NewLabel("")
 	m.selLabel.AddCSSClass("caption-heading")
-	all := gtk.NewButtonWithLabel("Vše")
-	all.SetTooltipText("Vybrat vše")
+	all := gtk.NewButtonWithLabel(i18n.T("All"))
+	all.SetTooltipText(i18n.T("Select All"))
 	all.AddCSSClass("flat")
 	all.ConnectClicked(m.selectAll)
 	m.actionBar.PackStart(all)
@@ -43,18 +44,18 @@ func (m *mainView) buildSelection(tv interface{ AddBottomBar(gtk.Widgetter) }, h
 		m.bulkBtns = append(m.bulkBtns, b)
 		return b
 	}
-	m.actionBar.PackEnd(btn("user-trash-symbolic", "Do koše", func() { m.moveCurrent(protonmail.TrashID, "Přesunuto do koše") }))
-	m.actionBar.PackEnd(btn("mail-mark-junk-symbolic", "Spam / není spam", m.toggleSpam))
+	m.actionBar.PackEnd(btn("user-trash-symbolic", i18n.T("Move to Trash"), func() { m.moveCurrent(protonmail.TrashID, i18n.T("Moved to Trash")) }))
+	m.actionBar.PackEnd(btn("mail-mark-junk-symbolic", i18n.T("Spam / Not Spam"), m.toggleSpam))
 	move := gtk.NewMenuButton()
 	move.SetIconName("folder-open-symbolic")
-	move.SetTooltipText("Přesunout do složky")
+	move.SetTooltipText(i18n.T("Move to Folder"))
 	move.AddCSSClass("flat")
 	m.bulkMove = move
 	m.actionBar.PackEnd(move)
-	m.actionBar.PackEnd(btn("folder-documents-symbolic", "Archivovat", func() { m.moveCurrent(protonmail.ArchiveID, "Archivováno") }))
-	m.actionBar.PackEnd(btn("starred-symbolic", "Hvězdička", m.toggleStar))
-	m.actionBar.PackEnd(btn("mail-unread-symbolic", "Označit jako nepřečtené", m.markUnread))
-	m.actionBar.PackEnd(btn("mail-read-symbolic", "Označit jako přečtené", m.markReadSelected))
+	m.actionBar.PackEnd(btn("folder-documents-symbolic", i18n.C("action", "Archive"), func() { m.moveCurrent(protonmail.ArchiveID, i18n.T("Archived")) }))
+	m.actionBar.PackEnd(btn("starred-symbolic", i18n.T("Star"), m.toggleStar))
+	m.actionBar.PackEnd(btn("mail-unread-symbolic", i18n.T("Mark as Unread"), m.markUnread))
+	m.actionBar.PackEnd(btn("mail-read-symbolic", i18n.T("Mark as Read"), m.markReadSelected))
 	m.actionBar.SetRevealed(false)
 	tv.AddBottomBar(m.actionBar)
 
@@ -167,7 +168,7 @@ func (m *mainView) updateSelection() {
 		return
 	}
 	n := len(m.selected)
-	m.selLabel.SetText(fmt.Sprintf("Vybráno: %d", n))
+	m.selLabel.SetText(fmt.Sprintf(i18n.T("Selected: %d"), n))
 	for _, b := range m.bulkBtns {
 		b.SetSensitive(n > 0)
 	}
@@ -212,7 +213,7 @@ func (m *mainView) markReadSelected() {
 		err := m.a.acc.MarkRead(m.a.ctx, ids...)
 		ui(func() {
 			if err != nil {
-				m.a.toast("Označení selhalo: " + err.Error())
+				m.a.toast(i18n.T("Marking failed: ") + err.Error())
 			}
 			m.scheduleRefresh()
 		})

@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"net/mail"
 	"strings"
 	"unicode"
@@ -9,6 +10,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 	"golang.org/x/text/unicode/norm"
 
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/protonmail"
 )
 
@@ -69,19 +71,19 @@ func (a *App) openContacts() {
 		return
 	}
 	d := adw.NewDialog()
-	d.SetTitle("Kontakty")
+	d.SetTitle(i18n.T("Contacts"))
 	d.SetContentWidth(520)
 	d.SetContentHeight(680)
 	toasts := adw.NewToastOverlay()
 	tv := adw.NewToolbarView()
 	hb := adw.NewHeaderBar()
 	add := gtk.NewButtonFromIconName("list-add-symbolic")
-	add.SetTooltipText("Nový kontakt")
+	add.SetTooltipText(i18n.T("New Contact"))
 	hb.PackStart(add)
 	tv.AddTopBar(hb)
 
 	search := gtk.NewSearchEntry()
-	search.SetPlaceholderText("Hledat jméno nebo adresu")
+	search.SetPlaceholderText(i18n.T("Search for a name or address"))
 	search.SetMarginStart(12)
 	search.SetMarginEnd(12)
 	search.SetMarginTop(6)
@@ -102,7 +104,7 @@ func (a *App) openContacts() {
 	stack.AddNamed(spinnerBox(), "loading")
 	empty := adw.NewStatusPage()
 	empty.SetIconName("avatar-default-symbolic")
-	empty.SetTitle("Žádné kontakty")
+	empty.SetTitle(i18n.T("No Contacts"))
 	stack.AddNamed(empty, "empty")
 	stack.AddNamed(sw, "list")
 	tv.SetContent(stack)
@@ -124,7 +126,7 @@ func (a *App) openContacts() {
 			row.SetSubtitle(c.Email)
 			row.AddPrefix(adw.NewAvatar(36, orDefault(c.Name, c.Email), true))
 			write := gtk.NewButtonFromIconName("mail-message-new-symbolic")
-			write.SetTooltipText("Napsat zprávu")
+			write.SetTooltipText(i18n.T("Write a Message"))
 			write.SetVAlign(gtk.AlignCenter)
 			write.AddCSSClass("flat")
 			write.ConnectClicked(func() {
@@ -132,13 +134,13 @@ func (a *App) openContacts() {
 				a.composer(&protonmail.Draft{SignExternal: true, To: []*mail.Address{{Name: c.Name, Address: c.Email}}}, nil, protonmail.ActionNew)
 			})
 			del := gtk.NewButtonFromIconName("user-trash-symbolic")
-			del.SetTooltipText("Smazat kontakt")
+			del.SetTooltipText(i18n.T("Delete Contact"))
 			del.SetVAlign(gtk.AlignCenter)
 			del.AddCSSClass("flat")
 			del.ConnectClicked(func() {
-				confirm := adw.NewAlertDialog("Smazat kontakt?", orDefault(c.Name, c.Email)+" bude odstraněn z adresáře Protonu.")
-				confirm.AddResponse("cancel", "Zrušit")
-				confirm.AddResponse("delete", "Smazat")
+				confirm := adw.NewAlertDialog(i18n.T("Delete the Contact?"), fmt.Sprintf(i18n.T("%s will be removed from the Proton address book."), orDefault(c.Name, c.Email)))
+				confirm.AddResponse("cancel", i18n.T("Cancel"))
+				confirm.AddResponse("delete", i18n.T("Delete"))
 				confirm.SetResponseAppearance("delete", adw.ResponseDestructive)
 				confirm.SetCloseResponse("cancel")
 				confirm.ConnectResponse(func(r string) {
@@ -149,7 +151,7 @@ func (a *App) openContacts() {
 						err := a.acc.DeleteContact(a.ctx, c.ContactID)
 						ui(func() {
 							if err != nil {
-								toasts.AddToast(adw.NewToast("Smazání selhalo: " + err.Error()))
+								toasts.AddToast(adw.NewToast(i18n.T("Deleting failed: ") + err.Error()))
 								return
 							}
 							var keep []protonmail.Contact
@@ -181,7 +183,7 @@ func (a *App) openContacts() {
 			c, err := a.acc.Contacts(a.ctx)
 			ui(func() {
 				if err != nil {
-					toasts.AddToast(adw.NewToast("Kontakty se nepodařilo načíst: " + err.Error()))
+					toasts.AddToast(adw.NewToast(i18n.T("The contacts could not be loaded: ") + err.Error()))
 				}
 				contacts = c
 				render()
@@ -198,19 +200,19 @@ func (a *App) openContacts() {
 
 // addContactDialog asks for name and address and saves a new contact.
 func (a *App) addContactDialog(parent gtk.Widgetter, name, email string, done func()) {
-	d := adw.NewAlertDialog("Nový kontakt", "Kontakt se uloží do adresáře Protonu (podepsaná vCard).")
+	d := adw.NewAlertDialog(i18n.T("New Contact"), i18n.T("The contact is saved to the Proton address book (as a signed vCard)."))
 	group := adw.NewPreferencesGroup()
 	nameRow := adw.NewEntryRow()
-	nameRow.SetTitle("Jméno")
+	nameRow.SetTitle(i18n.T("Name"))
 	nameRow.SetText(name)
 	emailRow := adw.NewEntryRow()
-	emailRow.SetTitle("E-mail")
+	emailRow.SetTitle("Email")
 	emailRow.SetText(email)
 	group.Add(nameRow)
 	group.Add(emailRow)
 	d.SetExtraChild(group)
-	d.AddResponse("cancel", "Zrušit")
-	d.AddResponse("save", "Uložit")
+	d.AddResponse("cancel", i18n.T("Cancel"))
+	d.AddResponse("save", i18n.T("Save"))
 	d.SetResponseAppearance("save", adw.ResponseSuggested)
 	d.SetCloseResponse("cancel")
 	d.ConnectResponse(func(r string) {
@@ -219,7 +221,7 @@ func (a *App) addContactDialog(parent gtk.Widgetter, name, email string, done fu
 		}
 		addr, err := mail.ParseAddress(strings.TrimSpace(emailRow.Text()))
 		if err != nil {
-			a.toast("Neplatná e-mailová adresa")
+			a.toast(i18n.T("Invalid email address"))
 			return
 		}
 		n := strings.TrimSpace(nameRow.Text())
@@ -227,10 +229,10 @@ func (a *App) addContactDialog(parent gtk.Widgetter, name, email string, done fu
 			err := a.acc.AddContact(a.ctx, n, addr.Address)
 			ui(func() {
 				if err != nil {
-					a.toast("Kontakt se nepodařilo uložit: " + err.Error())
+					a.toast(i18n.T("The contact could not be saved: ") + err.Error())
 					return
 				}
-				a.toast("Kontakt uložen")
+				a.toast(i18n.T("Contact saved"))
 				if done != nil {
 					done()
 				}

@@ -12,6 +12,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 
 	"github.com/Imbecile6197/klient/internal/ai"
+	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/imapmail"
 	"github.com/Imbecile6197/klient/internal/mailbox"
 	"github.com/Imbecile6197/klient/internal/ollama"
@@ -22,7 +23,7 @@ import (
 
 func (a *App) openPreferences() {
 	d := adw.NewPreferencesDialog()
-	d.SetTitle("Předvolby")
+	d.SetTitle(i18n.T("Preferences"))
 	// Same order for every account: general settings first, then mail
 	// handling, then the account's encryption.
 	d.Add(a.aiPage(d))
@@ -66,11 +67,11 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		g.SetTitle(title)
 		g.SetDescription(desc)
 		combo := adw.NewComboRow()
-		combo.SetTitle("Poskytovatel")
+		combo.SetTitle(i18n.T("Provider"))
 		combo.SetModel(gtk.NewStringList(names))
 		combo.SetSelected(indexOf(*provider))
 		modelRow := adw.NewEntryRow()
-		modelRow.SetTitle("Model")
+		modelRow.SetTitle(i18n.T("Model"))
 		modelRow.SetText(*model)
 		modelRow.SetShowApplyButton(true)
 		refreshers = append(refreshers, func() {
@@ -83,7 +84,7 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 				return
 			}
 			if a.cfg.LocalOnly && !ai.IsLocal(pr.ID) {
-				d.AddToast(adw.NewToast("Je zapnutý režim „Jen lokálně“ – cloudovou AI nejde zvolit"))
+				d.AddToast(adw.NewToast(i18n.T("“Local only” mode is on – cloud AI cannot be selected")))
 				combo.SetSelected(indexOf(*provider))
 				return
 			}
@@ -100,10 +101,10 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 			*model = strings.TrimSpace(modelRow.Text())
 			a.saveConfig()
 			a.initAI()
-			d.AddToast(adw.NewToast("Model uložen"))
+			d.AddToast(adw.NewToast(i18n.T("Model saved")))
 		})
 		pick := gtk.NewButtonFromIconName("view-list-bullet-symbolic")
-		pick.SetTooltipText("Vybrat z modelů dostupných pro váš účet")
+		pick.SetTooltipText(i18n.T("Choose from the models available for your account"))
 		pick.SetVAlign(gtk.AlignCenter)
 		pick.AddCSSClass("flat")
 		pick.ConnectClicked(func() {
@@ -125,7 +126,7 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 					ui(func() {
 						pick.SetSensitive(true)
 						if err != nil || len(names) == 0 {
-							d.AddToast(adw.NewToast("Žádný stažený lokální model – stáhněte ho v sekci Lokální AI"))
+							d.AddToast(adw.NewToast(i18n.T("No local model is downloaded – download one in the Local AI section")))
 							return
 						}
 						a.pickModel(d, names, *model, func(m string) {
@@ -133,7 +134,7 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 							modelRow.SetText(m)
 							a.saveConfig()
 							a.initAI()
-							d.AddToast(adw.NewToast("Model " + m + " uložen"))
+							d.AddToast(adw.NewToast(fmt.Sprintf(i18n.T("Model %s saved"), m)))
 						})
 					})
 				}()
@@ -141,7 +142,7 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 			}
 			key, _ := secrets.LoadAPIKey(*provider)
 			if key == "" {
-				d.AddToast(adw.NewToast("Nejdřív uložte API klíč tohoto poskytovatele"))
+				d.AddToast(adw.NewToast(i18n.T("Save this provider's API key first")))
 				return
 			}
 			pick.SetSensitive(false)
@@ -153,7 +154,7 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 				ui(func() {
 					pick.SetSensitive(true)
 					if err != nil {
-						d.AddToast(adw.NewToast("Seznam modelů: " + ai.Explain(prov, err).Text))
+						d.AddToast(adw.NewToast(i18n.T("Model list: ") + ai.Explain(prov, err).Text))
 						return
 					}
 					a.pickModel(d, models, *model, func(m string) {
@@ -161,7 +162,7 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 						modelRow.SetText(m)
 						a.saveConfig()
 						a.initAI()
-						d.AddToast(adw.NewToast("Model " + m + " uložen"))
+						d.AddToast(adw.NewToast(fmt.Sprintf(i18n.T("Model %s saved"), m)))
 					})
 				})
 			}()
@@ -171,14 +172,14 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		g.Add(modelRow)
 		return g
 	}
-	p.Add(role("Asistent", "Shrnutí zpráv, návrhy odpovědí a úpravy textu.",
+	p.Add(role(i18n.T("Assistant"), i18n.T("Message summaries, reply suggestions and text editing."),
 		&a.cfg.AssistantProvider, &a.cfg.AssistantModel, func(pr ai.ProviderInfo) string { return pr.AssistantModel }))
-	p.Add(role("Spamfiltr", "Posuzuje každou novou zprávu – levnější a rychlejší model tu obvykle stačí.",
+	p.Add(role(i18n.T("Spam Filter"), i18n.T("Judges every new message – a cheaper and faster model is usually enough here."),
 		&a.cfg.SpamProvider, &a.cfg.SpamModel, func(pr ai.ProviderInfo) string { return pr.SpamModel }))
 
 	keys := adw.NewPreferencesGroup()
-	keys.SetTitle("API klíče")
-	keys.SetDescription("Klíče se ukládají do klíčenky systému. Obsah zpráv, které AI zpracovává, se posílá zvolenému poskytovateli.")
+	keys.SetTitle(i18n.T("API Keys"))
+	keys.SetDescription(i18n.T("The keys are stored in the system keyring. The content of the messages the AI processes is sent to the chosen provider."))
 	for _, pr := range ai.Providers {
 		pr := pr
 		if ai.IsLocal(pr.ID) {
@@ -188,7 +189,7 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		stored, _ := secrets.LoadAPIKey(pr.ID)
 		setTitle := func(has bool) {
 			if has {
-				row.SetTitle(pr.Name + " – uložen")
+				row.SetTitle(fmt.Sprintf(i18n.T("%s – saved"), pr.Name))
 			} else {
 				row.SetTitle(pr.Name)
 			}
@@ -198,7 +199,7 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		row.ConnectApply(func() {
 			v := strings.TrimSpace(row.Text())
 			if err := secrets.SaveAPIKey(pr.ID, v); err != nil {
-				d.AddToast(adw.NewToast("Uložení selhalo: " + err.Error()))
+				d.AddToast(adw.NewToast(i18n.T("Saving failed: ") + err.Error()))
 				return
 			}
 			row.SetText("")
@@ -208,26 +209,26 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 				a.mv.updateFilterStatus()
 			}
 			if v == "" {
-				d.AddToast(adw.NewToast("Klíč " + pr.Name + " odstraněn"))
+				d.AddToast(adw.NewToast(fmt.Sprintf(i18n.T("%s key removed"), pr.Name)))
 			} else {
-				d.AddToast(adw.NewToast("Klíč " + pr.Name + " uložen"))
+				d.AddToast(adw.NewToast(fmt.Sprintf(i18n.T("%s key saved"), pr.Name)))
 			}
 		})
 		link := gtk.NewButtonFromIconName("web-browser-symbolic")
-		link.SetTooltipText("Získat klíč: " + pr.KeyURL)
+		link.SetTooltipText(i18n.T("Get a key: ") + pr.KeyURL)
 		link.SetVAlign(gtk.AlignCenter)
 		link.AddCSSClass("flat")
 		link.ConnectClicked(func() {
 			gtk.NewURILauncher(pr.KeyURL).Launch(context.Background(), a.gtkWindow(), nil)
 		})
-		test := gtk.NewButtonWithLabel("Vyzkoušet")
+		test := gtk.NewButtonWithLabel(i18n.T("Test"))
 		test.SetVAlign(gtk.AlignCenter)
 		test.AddCSSClass("flat")
-		test.SetTooltipText("Pošle krátký testový dotaz")
+		test.SetTooltipText(i18n.T("Sends a short test request"))
 		test.ConnectClicked(func() {
 			key, _ := secrets.LoadAPIKey(pr.ID)
 			if key == "" {
-				d.AddToast(adw.NewToast("Pro " + pr.Name + " není uložen klíč"))
+				d.AddToast(adw.NewToast(fmt.Sprintf(i18n.T("No key is saved for %s"), pr.Name)))
 				return
 			}
 			// Test with the model configured for a role using this provider,
@@ -240,28 +241,28 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 				model = a.cfg.AssistantModel
 			}
 			test.SetSensitive(false)
-			test.SetLabel("Zkouším…")
+			test.SetLabel(i18n.T("Testing…"))
 			go func() {
 				ctx, cancel := context.WithTimeout(a.ctx, 60*time.Second)
 				defer cancel()
 				err := ai.Test(ctx, pr.ID, key, model)
 				ui(func() {
 					test.SetSensitive(true)
-					test.SetLabel("Vyzkoušet")
+					test.SetLabel(i18n.T("Test"))
 					if err != nil {
 						ex := ai.Explain(pr.ID, err)
-						dlg := adw.NewAlertDialog(pr.Name+": test selhal", ex.Text)
-						details := gtk.NewLabel("Model " + model + "\n" + err.Error())
+						dlg := adw.NewAlertDialog(fmt.Sprintf(i18n.T("%s: Test Failed"), pr.Name), ex.Text)
+						details := gtk.NewLabel(fmt.Sprintf(i18n.T("Model %s"), model) + "\n" + err.Error())
 						details.SetWrap(true)
 						details.SetSelectable(true)
 						details.AddCSSClass("caption")
 						details.AddCSSClass("dim-label")
-						exp := gtk.NewExpander("Podrobnosti")
+						exp := gtk.NewExpander(i18n.T("Details"))
 						exp.SetChild(details)
 						dlg.SetExtraChild(exp)
-						dlg.AddResponse("close", "Zavřít")
+						dlg.AddResponse("close", i18n.T("Close"))
 						if ex.URL != "" {
-							dlg.AddResponse("open", "Otevřít stránku")
+							dlg.AddResponse("open", i18n.T("Open Page"))
 							dlg.SetResponseAppearance("open", adw.ResponseSuggested)
 							dlg.SetDefaultResponse("open")
 						}
@@ -274,7 +275,7 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 						dlg.Present(d)
 						return
 					}
-					d.AddToast(adw.NewToast(pr.Name + " funguje (model " + model + ")"))
+					d.AddToast(adw.NewToast(fmt.Sprintf(i18n.T("%s works (model %s)"), pr.Name, model)))
 				})
 			}()
 		})
@@ -285,11 +286,11 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	p.Add(keys)
 
 	fg := adw.NewPreferencesGroup()
-	fg.SetTitle("Automatické funkce")
-	fg.SetDescription("Používají model asistenta. S lokální AI zůstává obsah zpráv v počítači, s cloudovou se posílá poskytovateli.")
+	fg.SetTitle(i18n.T("Automatic Features"))
+	fg.SetDescription(i18n.T("They use the assistant model. With local AI the content of messages stays on this computer; with cloud AI it is sent to the provider."))
 	autoLabel := adw.NewSwitchRow()
-	autoLabel.SetTitle("Třídit novou poštu do štítků")
-	autoLabel.SetSubtitle("AI přidá nové zprávě nejvhodnější z vašich štítků (jen když si je jistá a žádné pravidlo nezasáhlo)")
+	autoLabel.SetTitle(i18n.T("Sort new mail into labels"))
+	autoLabel.SetSubtitle(i18n.T("The AI adds the best matching of your labels to a new message (only when it is confident and no rule has applied)"))
 	autoLabel.SetActive(a.cfg.AutoLabel)
 	autoLabel.NotifyProperty("active", func() {
 		a.cfg.AutoLabel = autoLabel.Active()
@@ -297,8 +298,8 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	})
 	fg.Add(autoLabel)
 	digest := adw.NewExpanderRow()
-	digest.SetTitle("Ranní přehled pošty")
-	digest.SetSubtitle("Jednou denně oznámení se shrnutím nepřečtené pošty ze všech účtů")
+	digest.SetTitle(i18n.T("Morning mail overview"))
+	digest.SetSubtitle(i18n.T("A daily notification summarizing the unread mail of all accounts"))
 	digest.SetShowEnableSwitch(true)
 	digest.SetEnableExpansion(a.cfg.Digest)
 	digest.NotifyProperty("enable-expansion", func() {
@@ -306,8 +307,8 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		a.saveConfig()
 	})
 	hour := adw.NewSpinRowWithRange(0, 23, 1)
-	hour.SetTitle("Hodina")
-	hour.SetSubtitle("Přehled přijde první minutu po této hodině (Klient musí běžet, třeba na pozadí)")
+	hour.SetTitle(i18n.T("Hour"))
+	hour.SetSubtitle(i18n.T("The overview arrives in the first minute after this hour (Klient must be running, for example in the background)"))
 	hour.SetValue(float64(a.cfg.DigestHour))
 	hour.NotifyProperty("value", func() {
 		a.cfg.DigestHour = int(hour.Value())
@@ -321,7 +322,7 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 
 // pickModel shows a list of model names to choose from.
 func (a *App) pickModel(parent gtk.Widgetter, models []string, current string, done func(string)) {
-	dlg := adw.NewAlertDialog("Vyberte model", fmt.Sprintf("%d modelů dostupných pro váš účet", len(models)))
+	dlg := adw.NewAlertDialog(i18n.T("Choose a Model"), fmt.Sprintf(i18n.N("%d model is available for your account", "%d models are available for your account", len(models)), len(models)))
 	list := gtk.NewListBox()
 	list.AddCSSClass("boxed-list")
 	for _, m := range models {
@@ -344,21 +345,22 @@ func (a *App) pickModel(parent gtk.Widgetter, models []string, current string, d
 	sw.SetMinContentHeight(320)
 	sw.SetChild(list)
 	dlg.SetExtraChild(sw)
-	dlg.AddResponse("close", "Zrušit")
+	dlg.AddResponse("close", i18n.T("Cancel"))
 	dlg.SetCloseResponse("close")
 	dlg.Present(parent)
 }
 
 func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	p := adw.NewPreferencesPage()
-	p.SetTitle("Zprávy")
+	p.SetTitle(i18n.T("Messages"))
 	p.SetIconName("mail-message-new-symbolic")
+	p.Add(a.languageGroup(d))
 
 	lg := adw.NewPreferencesGroup()
-	lg.SetTitle("Seznam zpráv")
+	lg.SetTitle(i18n.T("Message List"))
 	threads := adw.NewSwitchRow()
-	threads.SetTitle("Seskupovat zprávy do vláken")
-	threads.SetSubtitle("Odpovědi se zobrazí pohromadě jako konverzace, stejně jako na webu Protonu")
+	threads.SetTitle(i18n.T("Group messages into threads"))
+	threads.SetSubtitle(i18n.T("Replies are shown together as a conversation, just like on the Proton website"))
 	threads.SetActive(a.cfg.Threads)
 	threads.NotifyProperty("active", func() {
 		a.cfg.Threads = threads.Active()
@@ -372,10 +374,10 @@ func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	p.Add(lg)
 
 	sg := adw.NewPreferencesGroup()
-	sg.SetTitle("Odesílání")
+	sg.SetTitle(i18n.T("Sending"))
 	delay := adw.NewSpinRowWithRange(0, 60, 5)
-	delay.SetTitle("Zpoždění odeslání (s)")
-	delay.SetSubtitle("Po tuto dobu jde odeslání vrátit tlačítkem Zpět; 0 = odeslat hned")
+	delay.SetTitle(i18n.T("Send delay (s)"))
+	delay.SetSubtitle(i18n.T("During this time sending can be undone with the Undo button; 0 = send immediately"))
 	delay.SetValue(float64(a.cfg.SendDelay))
 	delay.NotifyProperty("value", func() {
 		a.cfg.SendDelay = int(delay.Value())
@@ -383,8 +385,8 @@ func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	})
 	sg.Add(delay)
 	attachKey := adw.NewSwitchRow()
-	attachKey.SetTitle("Přikládat můj veřejný klíč")
-	attachKey.SetSubtitle("Výchozí stav přepínače v okně zprávy; příjemci s PGP vám pak mohou psát šifrovaně")
+	attachKey.SetTitle(i18n.T("Always attach my public key"))
+	attachKey.SetSubtitle(i18n.T("The default state of the switch in the message window; recipients with PGP can then send you encrypted mail"))
 	attachKey.SetActive(a.cfg.AttachPublicKey)
 	attachKey.NotifyProperty("active", func() {
 		a.cfg.AttachPublicKey = attachKey.Active()
@@ -392,16 +394,16 @@ func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	})
 	sg.Add(attachKey)
 	defRow := adw.NewActionRow()
-	defRow.SetTitle("Výchozí e-mailová aplikace")
+	defRow.SetTitle(i18n.T("Default email application"))
 	setDef := func() {
 		if isDefaultMailApp() {
-			defRow.SetSubtitle("Klient otevírá odkazy mailto: v celém systému")
+			defRow.SetSubtitle(i18n.T("Klient opens mailto: links throughout the system"))
 		} else {
-			defRow.SetSubtitle("Odkazy mailto: otevírá jiná aplikace")
+			defRow.SetSubtitle(i18n.T("Another application opens mailto: links"))
 		}
 	}
 	setDef()
-	defBtn := gtk.NewButtonWithLabel("Nastavit")
+	defBtn := gtk.NewButtonWithLabel(i18n.T("Make Default"))
 	defBtn.SetVAlign(gtk.AlignCenter)
 	defBtn.ConnectClicked(func() {
 		if err := setDefaultMailApp(); err != nil {
@@ -409,18 +411,18 @@ func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 			return
 		}
 		setDef()
-		d.AddToast(adw.NewToast("Klient je výchozí e-mailová aplikace"))
+		d.AddToast(adw.NewToast(i18n.T("Klient is the default email application")))
 	})
 	defRow.AddSuffix(defBtn)
 	sg.Add(defRow)
 	p.Add(sg)
 
 	bg := adw.NewPreferencesGroup()
-	bg.SetTitle("Na pozadí")
-	bg.SetDescription("Ikona v horní liště vyžaduje v GNOME rozšíření AppIndicator (balíček gnome-shell-extension-appindicator).")
+	bg.SetTitle(i18n.T("Background"))
+	bg.SetDescription(i18n.T("In GNOME, the icon in the top bar requires the AppIndicator extension (the gnome-shell-extension-appindicator package)."))
 	background := adw.NewSwitchRow()
-	background.SetTitle("Běžet na pozadí po zavření okna")
-	background.SetSubtitle("Klient dál hlídá poštu, filtruje spam a ukazuje oznámení; ikona v liště okno zase otevře")
+	background.SetTitle(i18n.T("Run in the background after closing the window"))
+	background.SetSubtitle(i18n.T("Klient keeps watching your mail, filtering spam and showing notifications; the icon in the top bar opens the window again"))
 	background.SetActive(a.cfg.RunInBackground)
 	background.NotifyProperty("active", func() {
 		a.cfg.RunInBackground = background.Active()
@@ -428,17 +430,17 @@ func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		if a.cfg.RunInBackground {
 			a.startTray()
 		} else if a.tray.started {
-			d.AddToast(adw.NewToast("Ikona z lišty zmizí po restartu Klienta"))
+			d.AddToast(adw.NewToast(i18n.T("The icon disappears from the top bar after Klient restarts")))
 		}
 	})
 	bg.Add(background)
 	autostart := adw.NewSwitchRow()
-	autostart.SetTitle("Spouštět po přihlášení")
-	autostart.SetSubtitle("Klient se spustí skrytý na pozadí, jen s ikonou v liště")
+	autostart.SetTitle(i18n.T("Start after login"))
+	autostart.SetSubtitle(i18n.T("Klient starts hidden in the background, with just the icon in the top bar"))
 	autostart.SetActive(autostartEnabled())
 	autostart.NotifyProperty("active", func() {
 		if err := setAutostart(autostart.Active()); err != nil {
-			d.AddToast(adw.NewToast("Nastavení automatického spuštění selhalo: " + err.Error()))
+			d.AddToast(adw.NewToast(i18n.T("Setting up automatic start failed: ") + err.Error()))
 			return
 		}
 		if autostart.Active() && !background.Active() {
@@ -450,11 +452,11 @@ func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	p.Add(a.updateGroup())
 
 	og := adw.NewPreferencesGroup()
-	og.SetTitle("Offline")
-	og.SetDescription("Nejnovější zprávy se ukládají do cache zašifrované (AES-256 s klíčem v klíčence, těla navíc PGP jako na serveru), takže je lze číst i bez připojení.")
+	og.SetTitle(i18n.T("Offline"))
+	og.SetDescription(i18n.T("The newest messages are stored in an encrypted cache (AES-256 with the key in the keyring, bodies also PGP-encrypted as on the server), so you can read them without a connection."))
 	count := adw.NewSpinRowWithRange(0, 5000, 100)
-	count.SetTitle("Počet zpráv pro offline čtení")
-	count.SetSubtitle("0 = cache vypnutá")
+	count.SetTitle(i18n.T("Messages kept for offline reading"))
+	count.SetSubtitle(i18n.T("0 = cache turned off"))
 	count.SetValue(float64(a.cfg.OfflineMessages))
 	count.NotifyProperty("value", func() {
 		a.cfg.OfflineMessages = int(count.Value())
@@ -462,24 +464,24 @@ func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	})
 	og.Add(count)
 	stats := adw.NewActionRow()
-	stats.SetTitle("Uloženo")
+	stats.SetTitle(i18n.T("Stored"))
 	setStats := func() {
 		if a.acc == nil || a.acc.Cache() == nil {
-			stats.SetSubtitle("cache není k dispozici")
+			stats.SetSubtitle(i18n.T("the cache is not available"))
 			return
 		}
 		msgs, bodies := a.acc.Cache().Stats()
-		stats.SetSubtitle(fmt.Sprintf("%d zpráv, z toho %d i s obsahem", msgs, bodies))
+		stats.SetSubtitle(fmt.Sprintf(i18n.N("%d message, %d of them with content", "%d messages, %d of them with content", msgs), msgs, bodies))
 	}
 	setStats()
-	clearBtn := gtk.NewButtonWithLabel("Vymazat")
+	clearBtn := gtk.NewButtonWithLabel(i18n.T("Clear"))
 	clearBtn.SetVAlign(gtk.AlignCenter)
 	clearBtn.AddCSSClass("destructive-action")
 	clearBtn.ConnectClicked(func() {
 		if a.acc != nil && a.acc.Cache() != nil {
 			_ = a.acc.Cache().Clear()
 			setStats()
-			d.AddToast(adw.NewToast("Offline cache vymazána"))
+			d.AddToast(adw.NewToast(i18n.T("Offline cache cleared")))
 		}
 	})
 	stats.AddSuffix(clearBtn)
@@ -487,8 +489,8 @@ func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	p.Add(og)
 
 	g := adw.NewPreferencesGroup()
-	g.SetTitle("Podpis")
-	g.SetDescription("Připojí se pod nové zprávy, odpovědi a přeposlání.")
+	g.SetTitle(i18n.T("Signature"))
+	g.SetDescription(i18n.T("Added below new messages, replies and forwards."))
 	view := gtk.NewTextView()
 	view.SetWrapMode(gtk.WrapWordChar)
 	view.SetTopMargin(10)
@@ -499,7 +501,7 @@ func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	view.Buffer().SetText(a.cfg.Signature)
 	frame := gtk.NewFrame("")
 	frame.SetChild(view)
-	save := gtk.NewButtonWithLabel("Uložit podpis")
+	save := gtk.NewButtonWithLabel(i18n.T("Save Signature"))
 	save.SetHAlign(gtk.AlignEnd)
 	save.SetMarginTop(6)
 	save.ConnectClicked(func() {
@@ -507,7 +509,7 @@ func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		start, end := buf.Bounds()
 		a.cfg.Signature = strings.TrimSpace(buf.Text(start, end, false))
 		a.saveConfig()
-		d.AddToast(adw.NewToast("Podpis uložen"))
+		d.AddToast(adw.NewToast(i18n.T("Signature saved")))
 	})
 	box := gtk.NewBox(gtk.OrientationVertical, 0)
 	box.Append(frame)
@@ -519,14 +521,14 @@ func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 
 func (a *App) spamPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	p := adw.NewPreferencesPage()
-	p.SetTitle("Spamfiltr")
+	p.SetTitle(i18n.T("Spam Filter"))
 	p.SetIconName("mail-mark-junk-symbolic")
 
 	g := adw.NewPreferencesGroup()
-	g.SetTitle("Rozhodování AI")
-	g.SetDescription("Každou novou zprávu v doručené poště posoudí AI. Jako podklady dostane výsledky SPF/DKIM/DMARC, zásahy v blocklistech a vaše seznamy povolených a blokovaných odesílatelů.")
+	g.SetTitle(i18n.T("AI Decisions"))
+	g.SetDescription(i18n.T("The AI judges every new message in the inbox. As evidence it gets the SPF/DKIM/DMARC results, blocklist hits and your lists of allowed and blocked senders."))
 	enabled := adw.NewSwitchRow()
-	enabled.SetTitle("Filtrovat příchozí poštu pomocí AI")
+	enabled.SetTitle(i18n.T("Filter incoming mail with AI"))
 	enabled.SetActive(a.cfg.SpamFilterEnabled)
 	enabled.NotifyProperty("active", func() {
 		a.cfg.SpamFilterEnabled = enabled.Active()
@@ -538,8 +540,8 @@ func (a *App) spamPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	g.Add(enabled)
 
 	threshold := adw.NewSpinRowWithRange(0.3, 0.99, 0.05)
-	threshold.SetTitle("Práh pro přesun do spamu")
-	threshold.SetSubtitle("Pravděpodobnost spamu, od které AI zprávu přesune")
+	threshold.SetTitle(i18n.T("Threshold for moving to spam"))
+	threshold.SetSubtitle(i18n.T("The spam probability at which the AI moves a message"))
 	threshold.SetDigits(2)
 	threshold.SetValue(a.cfg.SpamThreshold)
 	threshold.NotifyProperty("value", func() {
@@ -548,8 +550,8 @@ func (a *App) spamPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	})
 	g.Add(threshold)
 	hold := adw.NewSwitchRow()
-	hold.SetTitle("Zobrazovat novou poštu až po kontrole")
-	hold.SetSubtitle("Nová zpráva se v doručené poště objeví, až ji spamfiltr posoudí – spam tak vůbec neprobleskne. Pošta se tím zpozdí o dobu kontroly (s lokální AI asi minutu, nejvýš 6 minut).")
+	hold.SetTitle(i18n.T("Show new mail only after it is checked"))
+	hold.SetSubtitle(i18n.T("A new message appears in the inbox once the spam filter has judged it, so spam never flashes up. Mail is delayed by the time the check takes (about a minute with local AI, at most 6 minutes)."))
 	hold.SetActive(a.cfg.HoldUntilChecked)
 	hold.NotifyProperty("active", func() {
 		a.cfg.HoldUntilChecked = hold.Active()
@@ -559,29 +561,29 @@ func (a *App) spamPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	p.Add(g)
 
 	bg := adw.NewPreferencesGroup()
-	bg.SetTitle("Blocklisty")
-	bg.SetDescription(fmt.Sprintf("Stahují se automaticky každých %s.", strings.TrimSuffix(a.cfg.UpdateInterval.String(), "0m0s")))
+	bg.SetTitle(i18n.T("Blocklists"))
+	bg.SetDescription(fmt.Sprintf(i18n.T("They are downloaded automatically every %s."), strings.TrimSuffix(a.cfg.UpdateInterval.String(), "0m0s")))
 	status := adw.NewActionRow()
-	status.SetTitle("Stav")
+	status.SetTitle(i18n.T("Status"))
 	setStatus := func() {
 		nets, domains := a.lists.Stats()
-		upd := "nikdy"
+		upd := i18n.T("never")
 		if !a.lists.LastUpdate.IsZero() {
-			upd = a.lists.LastUpdate.Format("2. 1. 2006 15:04")
+			upd = a.lists.LastUpdate.Format(i18n.T("Jan 2, 2006 15:04"))
 		}
-		status.SetSubtitle(fmt.Sprintf("%d IP rozsahů, %d domén · poslední aktualizace %s", nets, domains, upd))
+		status.SetSubtitle(fmt.Sprintf(i18n.T("%s, %s · last updated %s"), fmt.Sprintf(i18n.N("%d IP range", "%d IP ranges", nets), nets), fmt.Sprintf(i18n.N("%d domain", "%d domains", domains), domains), upd))
 	}
 	setStatus()
-	upd := gtk.NewButtonWithLabel("Aktualizovat nyní")
+	upd := gtk.NewButtonWithLabel(i18n.T("Update Now"))
 	upd.SetVAlign(gtk.AlignCenter)
 	upd.ConnectClicked(func() {
 		upd.SetSensitive(false)
-		upd.SetLabel("Stahuji…")
+		upd.SetLabel(i18n.T("Downloading…"))
 		go func() {
 			err := a.lists.Update(context.Background(), a.cfg.Feeds)
 			ui(func() {
 				upd.SetSensitive(true)
-				upd.SetLabel("Aktualizovat nyní")
+				upd.SetLabel(i18n.T("Update Now"))
 				setStatus()
 				if a.mv != nil {
 					a.mv.updateFilterStatus()
@@ -589,7 +591,7 @@ func (a *App) spamPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 				if err != nil {
 					d.AddToast(adw.NewToast(err.Error()))
 				} else {
-					d.AddToast(adw.NewToast("Blocklisty aktualizovány"))
+					d.AddToast(adw.NewToast(i18n.T("Blocklists updated")))
 				}
 			})
 		}()
@@ -623,15 +625,15 @@ func (a *App) pgpPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		p.Add(a.ownKeyGroup(d, p))
 	}
 	own := adw.NewPreferencesGroup()
-	own.SetTitle("Moje veřejné klíče")
-	own.SetDescription("Pošlete je kontaktům mimo Proton, aby vám mohli psát šifrovaně.")
+	own.SetTitle(i18n.T("My Public Keys"))
+	own.SetDescription(i18n.T("Send them to contacts outside Proton so they can send you encrypted mail."))
 	own.SetVisible(a.acc.Kind() == mailbox.KindProton)
 	for _, addr := range a.acc.SendAddresses() {
 		addr := addr
 		row := adw.NewActionRow()
 		row.SetTitle(addr.Email)
 		copyBtn := gtk.NewButtonFromIconName("edit-copy-symbolic")
-		copyBtn.SetTooltipText("Kopírovat do schránky")
+		copyBtn.SetTooltipText(i18n.T("Copy to Clipboard"))
 		copyBtn.SetVAlign(gtk.AlignCenter)
 		copyBtn.AddCSSClass("flat")
 		copyBtn.ConnectClicked(func() {
@@ -641,10 +643,10 @@ func (a *App) pgpPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 				return
 			}
 			a.win.Clipboard().SetText(key)
-			d.AddToast(adw.NewToast("Veřejný klíč zkopírován"))
+			d.AddToast(adw.NewToast(i18n.T("Public key copied")))
 		})
 		saveBtn := gtk.NewButtonFromIconName("document-save-symbolic")
-		saveBtn.SetTooltipText("Uložit do souboru")
+		saveBtn.SetTooltipText(i18n.T("Save to File"))
 		saveBtn.SetVAlign(gtk.AlignCenter)
 		saveBtn.AddCSSClass("flat")
 		saveBtn.ConnectClicked(func() {
@@ -672,8 +674,8 @@ func (a *App) pgpPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	p.Add(own)
 
 	contacts := adw.NewPreferencesGroup()
-	contacts.SetTitle("Klíče kontaktů")
-	contacts.SetDescription("Klíče adresátů mimo Proton, kteří nezveřejňují klíč přes WKD. Zprávy pro ně se zašifrují PGP.")
+	contacts.SetTitle(i18n.T("Contact Keys"))
+	contacts.SetDescription(i18n.T("Keys of recipients outside Proton who do not publish their key through WKD. Messages to them are encrypted with PGP."))
 	var rows []gtk.Widgetter
 	var refresh func()
 	refresh = func() {
@@ -687,7 +689,7 @@ func (a *App) pgpPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 			row.SetTitle(email)
 			row.SetSubtitle(shortFP(pgp.Fingerprint(pgp.LocalKey(email))))
 			del := gtk.NewButtonFromIconName("user-trash-symbolic")
-			del.SetTooltipText("Odstranit klíč")
+			del.SetTooltipText(i18n.T("Remove Key"))
 			del.SetVAlign(gtk.AlignCenter)
 			del.AddCSSClass("flat")
 			del.ConnectClicked(func() {
@@ -702,11 +704,11 @@ func (a *App) pgpPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		}
 	}
 	importBtn := gtk.NewButtonFromIconName("list-add-symbolic")
-	importBtn.SetTooltipText("Importovat veřejný klíč…")
+	importBtn.SetTooltipText(i18n.T("Import Public Key…"))
 	importBtn.AddCSSClass("flat")
 	importBtn.ConnectClicked(func() {
 		dlg := gtk.NewFileDialog()
-		dlg.SetTitle("Importovat veřejný klíč")
+		dlg.SetTitle(i18n.T("Import Public Key"))
 		dlg.Open(context.Background(), a.gtkWindow(), func(res gio.AsyncResulter) {
 			file, err := dlg.OpenFinish(res)
 			if err != nil || file == nil {
@@ -722,7 +724,7 @@ func (a *App) pgpPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 				d.AddToast(adw.NewToast(err.Error()))
 				return
 			}
-			d.AddToast(adw.NewToast("Importováno pro: " + strings.Join(emails, ", ")))
+			d.AddToast(adw.NewToast(i18n.T("Imported for: ") + strings.Join(emails, ", ")))
 			refresh()
 		})
 	})
@@ -732,11 +734,11 @@ func (a *App) pgpPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 
 	if a.acc.Kind() != mailbox.KindProton {
 		lg := adw.NewPreferencesGroup()
-		lg.SetTitle("Hledání klíčů příjemců")
-		lg.SetDescription("Klient se vždy zeptá domény příjemce (Web Key Directory) a naučí se klíče z hlavičky Autocrypt v přijaté poště.")
+		lg.SetTitle(i18n.T("Finding Recipients' Keys"))
+		lg.SetDescription(i18n.T("Klient always asks the recipient's domain (Web Key Directory) and learns keys from the Autocrypt header of received mail."))
 		vks := adw.NewSwitchRow()
-		vks.SetTitle("Hledat i na keys.openpgp.org")
-		vks.SetSubtitle("Najde víc klíčů, ale server se dozví adresy, kterým píšete")
+		vks.SetTitle(i18n.T("Also search keys.openpgp.org"))
+		vks.SetSubtitle(i18n.T("Finds more keys, but the server learns the addresses you write to"))
 		vks.SetActive(a.cfg.KeyServerLookup)
 		vks.NotifyProperty("active", func() {
 			a.cfg.KeyServerLookup = vks.Active()
@@ -751,13 +753,13 @@ func (a *App) pgpPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 
 func (a *App) rulesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	p := adw.NewPreferencesPage()
-	p.SetTitle("Pravidla")
+	p.SetTitle(i18n.T("Rules"))
 	p.SetIconName("edit-find-replace-symbolic")
 	g := adw.NewPreferencesGroup()
-	g.SetTitle("Pravidla pro příchozí poštu")
-	g.SetDescription("Použijí se na každou novou zprávu v doručené poště (po spamfiltru). Pravidlo pro odesílatele vytvoříte i z nabídky ⋯ u zprávy.")
+	g.SetTitle(i18n.T("Rules for Incoming Mail"))
+	g.SetDescription(i18n.T("They apply to every new message in the inbox (after the spam filter). You can also create a rule for a sender from the ⋯ menu of a message."))
 	add := gtk.NewButtonFromIconName("list-add-symbolic")
-	add.SetTooltipText("Přidat pravidlo")
+	add.SetTooltipText(i18n.T("Add Rule"))
 	add.AddCSSClass("flat")
 	g.SetHeaderSuffix(add)
 	var rows []gtk.Widgetter
@@ -770,8 +772,8 @@ func (a *App) rulesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		for i, r := range a.cfg.Rules {
 			i, r := i, r
 			row := adw.NewActionRow()
-			row.SetTitle(orDefault(r.Name, "Pravidlo"))
-			sub := fmt.Sprintf("%s obsahuje „%s“ → %s", rules.FieldName(r.Field), r.Contains, rules.ActionName(r.Action))
+			row.SetTitle(orDefault(r.Name, i18n.T("Rule")))
+			sub := fmt.Sprintf(i18n.T("%s contains “%s” → %s"), rules.FieldName(r.Field), r.Contains, rules.ActionName(r.Action))
 			row.SetSubtitle(sub)
 			on := gtk.NewSwitch()
 			on.SetActive(r.Enabled)
@@ -800,7 +802,7 @@ func (a *App) rulesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		}
 		if len(a.cfg.Rules) == 0 {
 			row := adw.NewActionRow()
-			row.SetTitle("Zatím žádná pravidla")
+			row.SetTitle(i18n.T("No rules yet"))
 			g.Add(row)
 			rows = append(rows, row)
 		}
@@ -811,4 +813,39 @@ func (a *App) rulesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	refresh()
 	p.Add(g)
 	return p
+}
+
+// languageGroup picks the interface language; it applies after a restart.
+func (a *App) languageGroup(d *adw.PreferencesDialog) *adw.PreferencesGroup {
+	g := adw.NewPreferencesGroup()
+	g.SetTitle(i18n.T("Language"))
+	row := adw.NewComboRow()
+	row.SetTitle(i18n.T("Interface language"))
+	row.SetSubtitle(i18n.T("AI answers, summaries and suggested replies follow it too"))
+	codes := []string{""}
+	names := []string{i18n.T("System language")}
+	for _, l := range i18n.Languages {
+		codes = append(codes, l.Code)
+		names = append(names, l.Name)
+	}
+	row.SetModel(gtk.NewStringList(names))
+	for i, c := range codes {
+		if c == a.cfg.Language {
+			row.SetSelected(uint(i))
+		}
+	}
+	row.NotifyProperty("selected", func() {
+		c := codes[row.Selected()]
+		if c == a.cfg.Language {
+			return
+		}
+		a.cfg.Language = c
+		a.saveConfig()
+		t := adw.NewToast(i18n.T("The language changes after Klient restarts"))
+		t.SetButtonLabel(i18n.T("Restart"))
+		t.ConnectButtonClicked(a.restartApp)
+		d.AddToast(t)
+	})
+	g.Add(row)
+	return g
 }

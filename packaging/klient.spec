@@ -7,8 +7,8 @@
 Name:           klient
 Version:        %{klient_version}
 Release:        1%{?dist}
-Summary:        Mail client for Proton Mail with PGP, AI assistant and AI spam filter
-Summary(cs):    Pošta Proton s PGP, AI asistentem a AI spamfiltrem
+Summary:        Mail client with PGP, an AI assistant and an AI spam filter
+Summary(cs):    E-mailový klient s PGP, AI asistentem a AI spamfiltrem
 
 License:        GPL-3.0-or-later AND MIT AND MPL-2.0 AND Apache-2.0 AND BSD-3-Clause
 URL:            https://libormacak.eu
@@ -27,16 +27,20 @@ Requires:       hicolor-icon-theme
 Recommends:     gnome-shell-extension-appindicator
 
 %description
-A GNOME mail client that talks to Proton Mail directly over its API, without
-Proton Bridge: end-to-end encryption and native PGP, conversations, safe HTML
-mail, a rich-text editor, an AI assistant and an AI-driven spam filter using
-block lists, an encrypted offline cache, rules and undo send.
+A GNOME mail client for Proton Mail (directly over its API, without Proton
+Bridge), Gmail, Seznam.cz and any IMAP/SMTP mailbox: end-to-end encryption
+and PGP/MIME, conversations, safe HTML mail, a rich-text editor, an AI
+assistant and an AI-driven spam filter with block lists (cloud providers or a
+local model), an encrypted offline cache, rules, undo send and scheduled
+sending. In English and Czech.
 
 %description -l cs
-E-mailový klient pro GNOME, který komunikuje s Proton Mail přímo přes jeho API,
-bez Proton Bridge: end-to-end šifrování a nativní PGP, vlákna, bezpečné HTML
-zprávy, formátovaný editor, AI asistent a spamfiltr řízený AI s blocklisty,
-šifrovaná offline cache, pravidla a zpoždění odeslání.
+E-mailový klient pro GNOME pro Proton Mail (přímo přes jeho API, bez Proton
+Bridge), Gmail, Seznam.cz a libovolnou schránku IMAP/SMTP: end-to-end
+šifrování a PGP/MIME, vlákna, bezpečné HTML zprávy, formátovaný editor, AI
+asistent a spamfiltr řízený AI s blocklisty (cloudoví poskytovatelé nebo
+lokální model), šifrovaná offline cache, pravidla, zpoždění odeslání
+a naplánované odeslání. Česky a anglicky.
 
 %prep
 %setup -q
@@ -62,6 +66,13 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Tue Sep 29 2026 Libor Macák <jsem@libormacak.eu> - 0.7.0-1
+- English and Czech user interface (gettext catalogs in po/, embedded);
+  the language follows the system or the Preferences
+- AI answers in the interface language
+- Documentation and README in English and Czech
+- Localized dates, times and plural forms
+
 * Tue Sep 29 2026 Libor Macák <jsem@libormacak.eu> - 0.6.8-1
 - Automatic updates from GitHub releases: a new version is downloaded in
   the background, verified by SHA-256 and installed after one click and the
