@@ -288,7 +288,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
       <rect x="4" y="12" width="56" height="40" rx="9" fill="#1c71d8"/>
       <path d="M10 20l22 16 22-16" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <div><b>Klient</b><span>Dokumentace · verze 0.6.7</span></div>
+    <div><b>Klient</b><span>Dokumentace · verze 0.6.8</span></div>
   </div>
   <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc">Obsah</button>
   <ol>
@@ -350,19 +350,22 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
 <section id="instalace">
   <h2>Instalace</h2>
   <h3>Z balíčku RPM (Fedora)</h3>
-<pre><code>sudo dnf install ./build/rpm/RPMS/x86_64/klient-0.6.7-1.fc44.x86_64.rpm</code></pre>
+<pre><code>sudo dnf install ./build/rpm/RPMS/x86_64/klient-0.6.8-1.fc44.x86_64.rpm</code></pre>
   <p>Tuto dokumentaci otevřete kdykoli z Klienta: hlavní nabídka → <b>Nápověda</b> nebo klávesa <kbd>F1</kbd>.</p>
   <p>Balíček doporučuje rozšíření <code>gnome-shell-extension-appindicator</code>, bez kterého GNOME nezobrazí ikonu v horní liště.</p>
+  <h3>Automatické aktualizace</h3>
+  <p>Klient jednou denně zkontroluje <a href="https://github.com/Imbecile6197/klient/releases">vydání na GitHubu</a> (ne na měřeném připojení). Novou verzi na pozadí stáhne a ověří kontrolním součtem SHA-256 – musí souhlasit se souborem <code>SHA256SUMS</code> i s otiskem, který uvádí GitHub. Pak přijde oznámení <b>Je připravená nová verze Klienta</b>; tlačítko <b>Nainstalovat</b> si vyžádá heslo správce, balíček nainstaluje a Klient se sám restartuje.</p>
+  <p>Kontrolu jde vypnout nebo spustit ručně v Předvolbách → Zprávy → <b>Aktualizace</b>. Klient sestavený ze zdrojového kódu novou verzi jen ohlásí.</p>
   <div class="note">
     <b>Aktualizace za běhu</b>
-    <p>Pokud Klient při instalaci nové verze běží (třeba na pozadí), do minuty to pozná a nabídne restart. Nemusíte ho hledat a ukončovat ručně.</p>
+    <p>Pokud Klient při ruční instalaci nové verze běží (třeba na pozadí), do minuty to pozná a nabídne restart. Nemusíte ho hledat a ukončovat ručně.</p>
   </div>
   <h3>Sestavení ze zdrojového kódu</h3>
 <pre><code>sudo dnf install golang gcc gtk4-devel libadwaita-devel gobject-introspection-devel webkitgtk6.0-devel
 make build      # první sestavení trvá dlouho (CGo bindingy GTK)
 make run
 make install    # do ~/.local včetně .desktop souboru a ikony
-make rpm VERSION=0.6.7</code></pre>
+make rpm VERSION=0.6.8</code></pre>
 </section>
 
 <!-- ============================================================ -->
@@ -654,7 +657,7 @@ make rpm VERSION=0.6.7</code></pre>
     <tbody>
       <tr><td><b>AI</b></td><td>Lokální AI (Ollama, Jen lokálně, aktualizace, shrnutí předem, porovnání modelů), poskytovatel a model pro asistenta a spamfiltr, API klíče, automatické funkce (třídění do štítků, ranní přehled)</td></tr>
       <tr><td><b>Spamfiltr</b></td><td>Zapnutí AI filtru, práh pro přesun do spamu, zobrazování pošty až po kontrole, stav blocklistů</td></tr>
-      <tr><td><b>Zprávy</b></td><td>Vlákna, zpoždění odeslání, přikládání veřejného klíče, výchozí e-mailová aplikace, běh na pozadí a spouštění po přihlášení, offline cache, podpis</td></tr>
+      <tr><td><b>Zprávy</b></td><td>Vlákna, zpoždění odeslání, přikládání veřejného klíče, výchozí e-mailová aplikace, běh na pozadí a spouštění po přihlášení, aktualizace, offline cache, podpis</td></tr>
       <tr><td><b>Pravidla</b></td><td>Pravidla pro příchozí poštu</td></tr>
       <tr><td><b>PGP</b></td><td>Vlastní klíče (vytvořit, importovat, zálohovat, odstranit), klíče kontaktů, hledání na keys.openpgp.org</td></tr>
     </tbody>
@@ -706,7 +709,7 @@ make rpm VERSION=0.6.7</code></pre>
   <p>Postaveno na GTK4, libadwaita, WebKitGTK, go-proton-api, gopenpgp a knihovnách go-imap/go-smtp.</p>
 </section>
 
-<footer>Dokumentace k verzi 0.6.7 · září 2026</footer>
+<footer>Dokumentace k verzi 0.6.8 · září 2026</footer>
 
 </div>
 </main>

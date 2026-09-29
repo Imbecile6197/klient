@@ -48,6 +48,11 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.6.8" date="2026-09-29">
+      <description>
+        <p>Automatic updates from GitHub: new versions are downloaded and verified in the background and installed with one click.</p>
+      </description>
+    </release>
     <release version="0.6.7" date="2026-09-29">
       <description>
         <p>Link to the source code on GitHub in About.</p>

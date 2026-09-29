@@ -30,6 +30,7 @@ E-mailový klient pro GNOME (GTK4 + libadwaita) napsaný v Go. Umí:
   - zpoždění odeslání s tlačítkem Zpět, pravidla pro příchozí poštu, odhlášení odběru (RFC 8058),
   - tisk, export .eml, výchozí aplikace pro odkazy `mailto:`,
   - **více účtů Proton** v jednom okně (přepínač v postranním panelu); nová pošta, spamfiltr a oznámení fungují pro všechny účty,
+  - **automatické aktualizace z GitHubu**: nová verze se na pozadí stáhne a ověří kontrolním součtem, nainstaluje se jedním kliknutím a heslem správce,
   - **běh na pozadí s ikonou v liště** (GNOME potřebuje rozšíření AppIndicator), volitelné spuštění po přihlášení,
   - **naplánované odeslání** (na serveru Protonu, odejde i při vypnutém počítači) s odpočtem; odpočet i u zpoždění odeslání,
   - **odložení konverzace** – vrátí se do doručené pošty v zadaný čas,
@@ -60,7 +61,7 @@ make rpm          # balíček pro Fedoru do build/rpm/RPMS/x86_64/
 Instalace balíčku:
 
 ```bash
-sudo dnf install ./build/rpm/RPMS/x86_64/klient-0.6.7-1.fc44.x86_64.rpm
+sudo dnf install ./build/rpm/RPMS/x86_64/klient-0.6.8-1.fc44.x86_64.rpm
 ```
 
 ## První spuštění

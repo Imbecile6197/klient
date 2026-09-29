@@ -447,6 +447,7 @@ func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	})
 	bg.Add(autostart)
 	p.Add(bg)
+	p.Add(a.updateGroup())
 
 	og := adw.NewPreferencesGroup()
 	og.SetTitle("Offline")

@@ -92,6 +92,7 @@ type App struct {
 	filter *spam.Filter
 	ai     *ai.Client
 	ollama *ollama.Runtime
+	update pendingUpdate
 
 	ctx    context.Context
 	cancel context.CancelFunc
@@ -229,6 +230,7 @@ func (a *App) activate() {
 	go a.resumeAll()
 	go a.digestLoop()
 	go a.ollamaUpdateLoop()
+	go a.selfUpdateLoop()
 	go a.watchUpgrade()
 	go a.precomputeLoop()
 }
@@ -478,6 +480,7 @@ func (a *App) setupActions() {
 	add("restart", nil, a.restartApp)
 	add("about", nil, a.showAbout)
 	add("help", []string{"F1"}, a.showHelp)
+	add("install-update", nil, a.installUpdate)
 	add("shortcuts", []string{"<Control>question", "<Control>slash"}, a.showShortcuts)
 	add("quit", []string{"<Control>q"}, a.quit)
 }

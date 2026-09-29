@@ -5,7 +5,7 @@ LDFLAGS = -s -w -X github.com/Imbecile6197/klient/internal/ui.Version=$(VERSION)
 RPMTOP = $(CURDIR)/build/rpm
 PKG = klient-$(VERSION)
 
-.PHONY: build run install uninstall test vet rpm clean
+.PHONY: build run install uninstall test vet rpm release clean
 
 build:
 	go build -ldflags "$(LDFLAGS)" -o bin/klient ./cmd/klient
@@ -46,6 +46,10 @@ rpm: build
 	   --define "_topdir $(RPMTOP)" --define "klient_version $(VERSION)"
 	@echo
 	@ls -1 $(RPMTOP)/RPMS/*/*.rpm
+
+# GitHub release with the RPM and SHA256SUMS (needs gh and a tag vVERSION).
+release:
+	packaging/release.sh $(VERSION)
 
 clean:
 	rm -rf bin build

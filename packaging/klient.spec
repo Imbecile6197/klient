@@ -62,6 +62,11 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Tue Sep 29 2026 Libor Macák <jsem@libormacak.eu> - 0.6.8-1
+- Automatic updates from GitHub releases: a new version is downloaded in
+  the background, verified by SHA-256 and installed after one click and the
+  administrator password (Preferences → Messages → Updates)
+
 * Tue Sep 29 2026 Libor Macák <jsem@libormacak.eu> - 0.6.7-1
 - Source code published on GitHub; link in About
 

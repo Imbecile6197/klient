@@ -94,6 +94,10 @@ type Config struct {
 	// Keep the managed Ollama and its models up to date.
 	OllamaAutoUpdate bool   `json:"ollama_auto_update"`
 	OllamaLastCheck  string `json:"ollama_last_check"` // RFC 3339
+
+	// Klient updates from the GitHub releases.
+	AutoUpdate      bool   `json:"auto_update"`
+	UpdateLastCheck string `json:"update_last_check"` // RFC 3339
 	// Summarise new mail in advance with the local model (on AC power only).
 	PrecomputeSummaries bool `json:"precompute_summaries"`
 
@@ -154,6 +158,7 @@ func Default() Config {
 		RunInBackground:     true,
 		HoldUntilChecked:    true,
 		OllamaAutoUpdate:    true,
+		AutoUpdate:          true,
 		PrecomputeSummaries: true,
 		DigestHour:          7,
 		UpdateInterval:      Duration{12 * time.Hour},
