@@ -40,6 +40,7 @@ func (a *App) showAbout() {
 	d.SetSupportURL("mailto:jsem@libormacak.eu?subject=Klient%20" + Version)
 	d.SetIssueURL("mailto:jsem@libormacak.eu?subject=Chyba%20v%20Klientovi%20" + Version)
 	d.SetLicenseType(gtk.LicenseGPL30)
+	d.AddLink("Zdrojový kód na GitHubu", "https://github.com/Imbecile6197/klient")
 	d.SetReleaseNotesVersion(Version)
 	d.SetReleaseNotes(releaseNotes)
 

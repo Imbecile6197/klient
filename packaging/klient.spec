@@ -62,6 +62,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Tue Sep 29 2026 Libor Macák <jsem@libormacak.eu> - 0.6.7-1
+- Source code published on GitHub; link in About
+
 * Tue Sep 29 2026 Libor Macák <jsem@libormacak.eu> - 0.6.6-1
 - Help (F1, main menu) opens the built-in user documentation
 

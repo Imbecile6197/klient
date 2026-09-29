@@ -10,6 +10,8 @@
     <name>Libor Macák</name>
   </developer>
   <url type="homepage">https://libormacak.eu</url>
+  <url type="vcs-browser">https://github.com/Imbecile6197/klient</url>
+  <url type="bugtracker">https://github.com/Imbecile6197/klient/issues</url>
   <update_contact>jsem@libormacak.eu</update_contact>
   <description>
     <p>A GNOME mail client that talks to Proton Mail directly over its API, without Proton Bridge.</p>
@@ -46,6 +48,11 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.6.7" date="2026-09-29">
+      <description>
+        <p>Link to the source code on GitHub in About.</p>
+      </description>
+    </release>
     <release version="0.6.6" date="2026-09-29">
       <description>
         <p>Help in the main menu (F1) opens the user documentation.</p>

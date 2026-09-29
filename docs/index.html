@@ -288,7 +288,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
       <rect x="4" y="12" width="56" height="40" rx="9" fill="#1c71d8"/>
       <path d="M10 20l22 16 22-16" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <div><b>Klient</b><span>Dokumentace · verze 0.6.6</span></div>
+    <div><b>Klient</b><span>Dokumentace · verze 0.6.7</span></div>
   </div>
   <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc">Obsah</button>
   <ol>
@@ -350,7 +350,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
 <section id="instalace">
   <h2>Instalace</h2>
   <h3>Z balíčku RPM (Fedora)</h3>
-<pre><code>sudo dnf install ./build/rpm/RPMS/x86_64/klient-0.6.6-1.fc44.x86_64.rpm</code></pre>
+<pre><code>sudo dnf install ./build/rpm/RPMS/x86_64/klient-0.6.7-1.fc44.x86_64.rpm</code></pre>
   <p>Tuto dokumentaci otevřete kdykoli z Klienta: hlavní nabídka → <b>Nápověda</b> nebo klávesa <kbd>F1</kbd>.</p>
   <p>Balíček doporučuje rozšíření <code>gnome-shell-extension-appindicator</code>, bez kterého GNOME nezobrazí ikonu v horní liště.</p>
   <div class="note">
@@ -362,7 +362,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
 make build      # první sestavení trvá dlouho (CGo bindingy GTK)
 make run
 make install    # do ~/.local včetně .desktop souboru a ikony
-make rpm VERSION=0.6.6</code></pre>
+make rpm VERSION=0.6.7</code></pre>
 </section>
 
 <!-- ============================================================ -->
@@ -702,10 +702,11 @@ make rpm VERSION=0.6.6</code></pre>
 <section id="autor">
   <h2>O aplikaci</h2>
   <p><b>Klient</b> vyvíjí Libor Macák – <a href="https://libormacak.eu">libormacak.eu</a>, <a href="mailto:jsem@libormacak.eu">jsem@libormacak.eu</a>.</p>
+  <p>Zdrojový kód je veřejně na GitHubu: <a href="https://github.com/Imbecile6197/klient">github.com/Imbecile6197/klient</a> (licence GPL-3.0).</p>
   <p>Postaveno na GTK4, libadwaita, WebKitGTK, go-proton-api, gopenpgp a knihovnách go-imap/go-smtp.</p>
 </section>
 
-<footer>Dokumentace k verzi 0.6.6 · září 2026</footer>
+<footer>Dokumentace k verzi 0.6.7 · září 2026</footer>
 
 </div>
 </main>
