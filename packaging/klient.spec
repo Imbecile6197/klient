@@ -66,6 +66,11 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Tue Sep 29 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.7.3-1
+- Ubuntu package (.deb for Ubuntu 26.04 LTS and newer, built in a container
+  by packaging/deb.sh); the updater installs the package format Klient was
+  installed from (dnf or apt)
+
 * Tue Sep 29 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.7.2-1
 - Fix messages with a one-line plain-text body shown empty
 - Fix Czech date formats in the English interface

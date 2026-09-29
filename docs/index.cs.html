@@ -354,9 +354,12 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
 <!-- ============================================================ -->
 <section id="instalace">
   <h2>Instalace</h2>
-  <h3>Z GitHubu (Fedora)</h3>
-  <p>Nejnovější verzi nainstalujete jedním příkazem přímo z GitHubu:</p>
+  <h3>Z GitHubu</h3>
+  <p>Na <b>Fedoře</b> (44 a novější) nainstalujete nejnovější verzi jedním příkazem přímo z GitHubu:</p>
 <pre><code>sudo dnf install https://github.com/Imbecile6197/klient/releases/latest/download/klient.x86_64.rpm</code></pre>
+  <p>Na <b>Ubuntu</b> (26.04 LTS a novější) balíček stáhněte a nainstalujte:</p>
+<pre><code>wget https://github.com/Imbecile6197/klient/releases/latest/download/klient_amd64.deb
+sudo apt install ./klient_amd64.deb</code></pre>
   <p>Další verze si Klient stáhne sám – viz <a href="#aktualizace">Automatické aktualizace</a>.</p>
   <p>Tuto dokumentaci otevřete kdykoli z Klienta: hlavní nabídka → <b>Nápověda</b> nebo klávesa <kbd>F1</kbd>.</p>
   <h3 id="jazyk">Jazyk</h3>
@@ -375,7 +378,8 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
 make build      # první sestavení trvá dlouho (CGo bindingy GTK)
 make run
 make install    # do ~/.local včetně .desktop souboru a ikony
-make rpm VERSION=0.7.2</code></pre>
+make rpm VERSION=0.7.3
+packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman</code></pre>
 </section>
 
 <!-- ============================================================ -->

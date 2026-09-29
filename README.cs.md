@@ -27,11 +27,22 @@ Klient je napsaný v Go s GTK4 a libadwaita. Připojuje se přímo k Proton Mail
 
 ## Instalace
 
-Na Fedoře nainstalujete nejnovější vydání přímo z GitHubu:
+Nejnovější vydání nainstalujete přímo z GitHubu.
+
+**Fedora** (44 a novější):
 
 ```bash
 sudo dnf install https://github.com/Imbecile6197/klient/releases/latest/download/klient.x86_64.rpm
 ```
+
+**Ubuntu** (26.04 LTS a novější) a další distribuce s GNOME 50:
+
+```bash
+wget https://github.com/Imbecile6197/klient/releases/latest/download/klient_amd64.deb
+sudo apt install ./klient_amd64.deb
+```
+
+Debian 13 je pro Klienta příliš starý (potřebuje GLib 2.86 a libadwaita 1.6).
 
 Potom Klient jednou denně zkontroluje nová vydání, stáhne je na pozadí, ověří kontrolní součet SHA-256 a nainstaluje je po jednom kliknutí a zadání hesla správce. Okno Co je nového ukáže změny před aktualizací i po ní.
 
@@ -45,6 +56,7 @@ make build        # první sestavení trvá dlouho (CGo bindingy GTK)
 make run
 make install      # do ~/.local včetně .desktop souboru a ikony
 make rpm          # balíček pro Fedoru do build/rpm/RPMS/x86_64/
+packaging/deb.sh 0.7.3   # balíček pro Ubuntu do build/deb/, sestaví se v kontejneru podman
 ```
 
 Vydání nové verze (potřebuje `gh` a commitnutý strom): poznámky zapište do `packaging/release-notes/X.Y.Z.md` (oddíly „## English“ a „## Česky“ – Klient je ukáže v okně Co je nového a zveřejní se na GitHubu), pak `git tag -a vX.Y.Z -m "Klient X.Y.Z" && make release VERSION=X.Y.Z`.

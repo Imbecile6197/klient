@@ -3366,8 +3366,8 @@ msgid "installation failed: %s"
 msgstr "instalace selhala: %s"
 
 #: internal/update/update.go
-msgid "release %s does not contain an RPM package"
-msgstr "vydání %s neobsahuje balíček RPM"
+msgid "release %s does not contain a package for this system"
+msgstr "vydání %s neobsahuje balíček pro tento systém"
 
 #: internal/update/update.go
 msgid "the downloaded package has a wrong checksum – it will not be installed"

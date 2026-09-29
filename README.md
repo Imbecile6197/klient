@@ -27,11 +27,22 @@ Klient is written in Go with GTK4 and libadwaita. It connects directly to Proton
 
 ## Installation
 
-On Fedora, install the latest release straight from GitHub:
+Install the latest release straight from GitHub.
+
+**Fedora** (44 and newer):
 
 ```bash
 sudo dnf install https://github.com/Imbecile6197/klient/releases/latest/download/klient.x86_64.rpm
 ```
+
+**Ubuntu** (26.04 LTS and newer) and other distributions with GNOME 50:
+
+```bash
+wget https://github.com/Imbecile6197/klient/releases/latest/download/klient_amd64.deb
+sudo apt install ./klient_amd64.deb
+```
+
+Debian 13 is too old for Klient (it needs GLib 2.86 and libadwaita 1.6).
 
 After that, Klient checks for new releases once a day, downloads them in the background, verifies their SHA-256 checksum and installs them after one click and the administrator password. A What's New window shows the changes before and after each update.
 
@@ -45,6 +56,7 @@ make build        # the first build takes a while (CGo bindings of GTK)
 make run
 make install      # into ~/.local, including the .desktop file and the icon
 make rpm          # a Fedora package in build/rpm/RPMS/x86_64/
+packaging/deb.sh 0.7.3   # an Ubuntu package in build/deb/, built in a podman container
 ```
 
 Publishing a release (needs `gh` and a committed tree): write the notes to `packaging/release-notes/X.Y.Z.md` (an “## English” and a “## Česky” section – they are shown in Klient as What's New and published on GitHub), then `git tag -a vX.Y.Z -m "Klient X.Y.Z" && make release VERSION=X.Y.Z`.

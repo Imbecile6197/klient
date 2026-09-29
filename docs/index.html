@@ -354,9 +354,12 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
 <!-- ============================================================ -->
 <section id="installation">
   <h2>Installation</h2>
-  <h3>From GitHub (Fedora)</h3>
-  <p>Install the latest version straight from GitHub with a single command:</p>
+  <h3>From GitHub</h3>
+  <p>On <b>Fedora</b> (44 and newer), install the latest version straight from GitHub with a single command:</p>
 <pre><code>sudo dnf install https://github.com/Imbecile6197/klient/releases/latest/download/klient.x86_64.rpm</code></pre>
+  <p>On <b>Ubuntu</b> (26.04 LTS and newer), download the package and install it:</p>
+<pre><code>wget https://github.com/Imbecile6197/klient/releases/latest/download/klient_amd64.deb
+sudo apt install ./klient_amd64.deb</code></pre>
   <p>Klient downloads later versions by itself – see <a href="#updates">Automatic updates</a>.</p>
   <p>You can open this documentation from Klient at any time: main menu → <b>Help</b>, or the <kbd>F1</kbd> key.</p>
   <h3 id="language">Language</h3>
@@ -375,7 +378,8 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
 make build      # the first build takes a while (CGo bindings of GTK)
 make run
 make install    # into ~/.local, including the .desktop file and the icon
-make rpm VERSION=0.7.2</code></pre>
+make rpm VERSION=0.7.3
+packaging/deb.sh 0.7.3   # Ubuntu package, built in a podman container</code></pre>
 </section>
 
 <!-- ============================================================ -->

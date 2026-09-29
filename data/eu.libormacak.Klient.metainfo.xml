@@ -82,6 +82,12 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.7.3" date="2026-09-29">
+      <description>
+        <p>A package for Ubuntu 26.04 LTS and newer, with automatic updates through apt.</p>
+        <p xml:lang="cs">Balíček pro Ubuntu 26.04 LTS a novější s automatickými aktualizacemi přes apt.</p>
+      </description>
+    </release>
     <release version="0.7.2" date="2026-09-29">
       <description>
         <p>Fixes empty one-line messages and dates in the English interface; adds screenshots and a demo mode.</p>

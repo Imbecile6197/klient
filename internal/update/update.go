@@ -1,6 +1,6 @@
-// Package update finds new Klient releases on GitHub, downloads the RPM
-// package and verifies its checksum. Installing it needs root and is done by
-// the UI through pkexec.
+// Package update finds new Klient releases on GitHub, downloads the RPM or
+// DEB package (the kind Klient was installed from) and verifies its checksum.
+// Installing it needs root and is done by the UI through pkexec.
 package update
 
 import (
@@ -17,6 +17,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/Imbecile6197/klient/internal/i18n"
 )
@@ -32,14 +33,48 @@ type Release struct {
 	Version string // without the "v"
 	Notes   string // release description (Markdown)
 	Page    string // release web page
-	Name    string // RPM file name
-	URL     string // RPM download URL
+	Name    string // package file name
+	URL     string // package download URL
 	Size    int64
 	SHA256  string // hex
 }
 
-// Latest asks GitHub for the newest release and its RPM package.
+// Package formats of the release assets.
+const (
+	RPM = "rpm" // Fedora: klient-VERSION-1.fcNN.x86_64.rpm
+	DEB = "deb" // Debian, Ubuntu: klient_VERSION_amd64.deb
+)
+
+// Format is the kind of package this Klient was installed from, or "" when it
+// was not installed from a package. Replaced in tests.
+var Format = sync.OnceValue(func() string {
+	if exe, err := os.Executable(); err != nil || exe != "/usr/bin/klient" {
+		return ""
+	}
+	if exec.Command("rpm", "-q", "klient").Run() == nil {
+		return RPM
+	}
+	out, err := exec.Command("dpkg-query", "-W", "-f=${db:Status-Status}", "klient").Output()
+	if err == nil && strings.TrimSpace(string(out)) == "installed" {
+		return DEB
+	}
+	return ""
+})
+
+// asset reports whether a release file is the package of the given format.
+// The copies with a fixed name (klient.x86_64.rpm, klient_amd64.deb) serve
+// only as stable links for the first installation.
+func asset(name, format string) bool {
+	if format == DEB {
+		return strings.HasPrefix(name, "klient_") && strings.HasSuffix(name, "_amd64.deb") && name != "klient_amd64.deb"
+	}
+	return strings.HasPrefix(name, "klient-") && strings.HasSuffix(name, ".x86_64.rpm")
+}
+
+// Latest asks GitHub for the newest release and its package in the format
+// Klient was installed from (RPM when it was not installed from a package).
 func Latest(ctx context.Context) (Release, error) {
+	format := Format()
 	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, apiBase+"/repos/"+Repo+"/releases/latest", nil)
 	req.Header.Set("Accept", "application/vnd.github+json")
 	res, err := http.DefaultClient.Do(req)
@@ -71,7 +106,7 @@ func Latest(ctx context.Context) (Release, error) {
 	sums := ""
 	for _, a := range rel.Assets {
 		switch {
-		case strings.HasPrefix(a.Name, "klient-") && strings.HasSuffix(a.Name, ".x86_64.rpm"):
+		case asset(a.Name, format):
 			out.Name, out.URL, out.Size = a.Name, a.URL, a.Size
 			out.SHA256 = strings.TrimPrefix(a.Digest, "sha256:")
 		case a.Name == "SHA256SUMS":
@@ -79,7 +114,7 @@ func Latest(ctx context.Context) (Release, error) {
 		}
 	}
 	if out.URL == "" {
-		return Release{}, fmt.Errorf(i18n.T("release %s does not contain an RPM package"), rel.TagName)
+		return Release{}, fmt.Errorf(i18n.T("release %s does not contain a package for this system"), rel.TagName)
 	}
 	// The published checksum list must agree with GitHub's own digest.
 	if sums != "" {
@@ -212,20 +247,20 @@ func verify(path, sum string) (bool, error) {
 	return strings.EqualFold(hex.EncodeToString(h.Sum(nil)), sum), nil
 }
 
-// Installable reports whether this Klient came from the RPM package, so a
-// new package can replace it. Builds run from the source tree are not.
+// Installable reports whether this Klient came from a package, so a new
+// package can replace it. Builds run from the source tree are not.
 func Installable() bool {
-	exe, err := os.Executable()
-	if err != nil || exe != "/usr/bin/klient" {
-		return false
-	}
-	return exec.Command("rpm", "-q", "klient").Run() == nil
+	return Format() != ""
 }
 
 // Install installs the downloaded package. pkexec shows the system password
-// dialog; dnf checks the package's dependencies.
+// dialog; dnf or apt checks the package's dependencies.
 func Install(ctx context.Context, path string) error {
-	out, err := exec.CommandContext(ctx, "pkexec", "dnf", "install", "-y", path).CombinedOutput()
+	cmd := []string{"pkexec", "dnf", "install", "-y", path}
+	if Format() == DEB {
+		cmd = []string{"pkexec", "env", "DEBIAN_FRONTEND=noninteractive", "apt-get", "install", "-y", path}
+	}
+	out, err := exec.CommandContext(ctx, cmd[0], cmd[1:]...).CombinedOutput()
 	if err != nil {
 		if ee, ok := err.(*exec.ExitError); ok && (ee.ExitCode() == 126 || ee.ExitCode() == 127) {
 			return errors.New(i18n.T("the installation was cancelled"))

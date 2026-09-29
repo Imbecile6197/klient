@@ -1,0 +1,10 @@
+# Build environment for the Debian/Ubuntu package (packaging/deb.sh).
+# Ubuntu 26.04 LTS is the oldest target: the GTK bindings (gotk4 0.4) need
+# GLib 2.86 and Klient needs libadwaita 1.6, which Debian 13 does not have.
+FROM docker.io/library/ubuntu:26.04
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+	gcc libc6-dev pkg-config dpkg-dev fakeroot ca-certificates \
+	libgtk-4-dev libadwaita-1-dev libwebkitgtk-6.0-dev \
+	libjavascriptcoregtk-6.0-dev libsoup-3.0-dev libgirepository1.0-dev \
+	desktop-file-utils appstream \
+	&& rm -rf /var/lib/apt/lists/*

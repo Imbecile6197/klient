@@ -22,6 +22,7 @@ func TestLatestAndDownload(t *testing.T) {
 		switch r.URL.Path {
 		case "/repos/" + Repo + "/releases/latest":
 			fmt.Fprintf(w, `{"tag_name":"v0.7.0","body":"notes","html_url":"%[1]s/rel","assets":[
+				{"name":"klient_0.7.0_amd64.deb","browser_download_url":"%[1]s/deb","size":3,"digest":"sha256:%[3]s"},
 				{"name":"klient-0.7.0-1.fc44.x86_64.rpm","browser_download_url":"%[1]s/pkg","size":%[2]d,"digest":"sha256:%[3]s"},
 				{"name":"SHA256SUMS","browser_download_url":"%[1]s/sums","size":10}]}`, srv.URL, len(pkg), digest)
 		case "/sums":
@@ -36,6 +37,10 @@ func TestLatestAndDownload(t *testing.T) {
 	old := apiBase
 	apiBase = srv.URL
 	defer func() { apiBase = old }()
+
+	oldFormat := Format
+	Format = func() string { return RPM }
+	defer func() { Format = oldFormat }()
 
 	ctx := context.Background()
 	rel, err := Latest(ctx)
@@ -71,6 +76,24 @@ func TestNewer(t *testing.T) {
 	}{{"0.6.10", "0.6.9", true}, {"0.6.7", "0.6.7", false}, {"0.6.7", "0.7.0", false}, {"1.0.0", "0.9.9", true}, {"0.6.8", "0.1.0-dev", true}} {
 		if Newer(c.a, c.b) != c.want {
 			t.Errorf("Newer(%s,%s) != %v", c.a, c.b, c.want)
+		}
+	}
+}
+
+func TestAsset(t *testing.T) {
+	for _, c := range []struct {
+		name, format string
+		want         bool
+	}{
+		{"klient-0.7.3-1.fc44.x86_64.rpm", RPM, true},
+		{"klient_0.7.3_amd64.deb", RPM, false},
+		{"klient_0.7.3_amd64.deb", DEB, true},
+		{"klient_amd64.deb", DEB, false},
+		{"klient-0.7.3-1.fc44.x86_64.rpm", DEB, false},
+		{"SHA256SUMS", DEB, false},
+	} {
+		if asset(c.name, c.format) != c.want {
+			t.Errorf("asset(%s, %s) != %v", c.name, c.format, c.want)
 		}
 	}
 }
