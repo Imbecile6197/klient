@@ -363,12 +363,12 @@ sudo apt install ./klient_amd64.deb</code></pre>
   <p>Další verze si Klient stáhne sám – viz <a href="#aktualizace">Automatické aktualizace</a>.</p>
   <p>Tuto dokumentaci otevřete kdykoli z Klienta: hlavní nabídka → <b>Nápověda</b> nebo klávesa <kbd>F1</kbd>.</p>
   <h3 id="jazyk">Jazyk</h3>
-  <p>Klient mluví česky a anglicky. Jazyk se řídí nastavením systému; změnit ho jde v Předvolbách → Zprávy → <b>Jazyk rozhraní</b> a projeví se po restartu. Stejným jazykem odpovídá i AI – shrnutí, návrhy odpovědí, „Zeptat se pošty“ a zdůvodnění spamfiltru.</p>
+  <p>Klient mluví česky a anglicky. Jazyk se řídí nastavením systému; změnit ho jde v Předvolbách → Obecné → <b>Jazyk rozhraní</b> a projeví se po restartu. Stejným jazykem odpovídá i AI – shrnutí, návrhy odpovědí, „Zeptat se pošty“ a zdůvodnění spamfiltru.</p>
   <p>Balíček doporučuje rozšíření <code>gnome-shell-extension-appindicator</code>, bez kterého GNOME nezobrazí ikonu v horní liště.</p>
   <h3 id="aktualizace">Automatické aktualizace</h3>
   <p>Klient jednou denně zkontroluje <a href="https://github.com/Imbecile6197/klient/releases">vydání na GitHubu</a> (ne na měřeném připojení). Novou verzi na pozadí stáhne a ověří kontrolním součtem SHA-256 – musí souhlasit se souborem <code>SHA256SUMS</code> i s otiskem, který uvádí GitHub. Pak přijde oznámení <b>Je připravená nová verze Klienta</b>; tlačítko <b>Nainstalovat</b> si vyžádá heslo správce, balíček nainstaluje a Klient se sám restartuje. Tlačítko <b>Co je nového</b> ukáže změny ještě před instalací.</p>
   <p>Po aktualizaci Klient ukáže, co se změnilo od verze, kterou jste používali naposledy. Seznam kdykoli znovu otevřete z hlavní nabídky → <b>Co je nového</b>.</p>
-  <p>Kontrolu jde vypnout nebo spustit ručně v Předvolbách → Zprávy → <b>Aktualizace</b>. Klient sestavený ze zdrojového kódu novou verzi jen ohlásí.</p>
+  <p>Kontrolu jde vypnout nebo spustit ručně v Předvolbách → Obecné → <b>Aktualizace</b>. Klient sestavený ze zdrojového kódu novou verzi jen ohlásí.</p>
   <div class="note">
     <b>Aktualizace za běhu</b>
     <p>Pokud Klient při ruční instalaci nové verze běží (třeba na pozadí), do minuty to pozná a nabídne restart. Nemusíte ho hledat a ukončovat ručně.</p>
@@ -452,7 +452,7 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
     <li><b>Přílohy</b> až do 25 MB – šifrují se stejně jako text. Soubory jde do zprávy přetáhnout myší.</li>
     <li><b>Koncepty</b> se uloží automaticky při zavření okna (<kbd>Esc</kbd>) nebo ručně <kbd>Ctrl</kbd>+<kbd>S</kbd>.</li>
     <li><b>Podpis</b> a <b>našeptávání adres</b> z kontaktů.</li>
-    <li><b>Výchozí aplikace pro odkazy <code>mailto:</code></b> – nastavíte v Předvolbách → Zprávy.</li>
+    <li><b>Výchozí aplikace pro odkazy <code>mailto:</code></b> – nastavíte v Předvolbách → Obecné.</li>
   </ul>
 
   <h3>Zpoždění odeslání</h3>
@@ -616,6 +616,7 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
   <ul>
     <li>Po zavření okna Klient běží dál, hlídá novou poštu a ukazuje černobílou ikonu v horní liště (GNOME potřebuje rozšíření AppIndicator). Červená tečka na ikoně znamená nepřečtenou poštu. Nabídka ikony obsahuje Otevřít Klient, Nová zpráva a Ukončit; ukončit ho můžete také klávesami <kbd>Ctrl</kbd>+<kbd>Q</kbd>.</li>
     <li><b>Spouštět po přihlášení</b> – Klient se spustí rovnou na pozadí.</li>
+    <li>Obojí zapnete nebo vypnete v Předvolbách → Obecné → <b>Na pozadí</b>.</li>
     <li>Oznámení o nové poště přijde až po kontrole spamfiltrem.</li>
   </ul>
 </section>
@@ -669,9 +670,10 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
   <table>
     <thead><tr><th>Stránka</th><th>Co obsahuje</th></tr></thead>
     <tbody>
+      <tr><td><b>Obecné</b></td><td>Jazyk rozhraní, výchozí e-mailová aplikace, běh na pozadí a spouštění po přihlášení, aktualizace</td></tr>
       <tr><td><b>AI</b></td><td>Lokální AI (Ollama, Jen lokálně, aktualizace, shrnutí předem, porovnání modelů), poskytovatel a model pro asistenta a spamfiltr, API klíče, automatické funkce (třídění do štítků, ranní přehled)</td></tr>
       <tr><td><b>Spamfiltr</b></td><td>Zapnutí AI filtru, práh pro přesun do spamu, zobrazování pošty až po kontrole, stav blocklistů</td></tr>
-      <tr><td><b>Zprávy</b></td><td>Jazyk rozhraní, vlákna, zpoždění odeslání, přikládání veřejného klíče, výchozí e-mailová aplikace, běh na pozadí a spouštění po přihlášení, aktualizace, offline cache, podpis</td></tr>
+      <tr><td><b>Zprávy</b></td><td>Vlákna, zpoždění odeslání, přikládání veřejného klíče, offline cache, podpis</td></tr>
       <tr><td><b>Pravidla</b></td><td>Pravidla pro příchozí poštu</td></tr>
       <tr><td><b>PGP</b></td><td>Vlastní klíče (vytvořit, importovat, zálohovat, odstranit), klíče kontaktů, hledání na keys.openpgp.org</td></tr>
     </tbody>

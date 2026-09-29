@@ -71,7 +71,7 @@ Kompletní uživatelská dokumentace je v [`docs/index.cs.html`](docs/index.cs.h
 
 ## Překlady
 
-Texty v kódu jsou anglicky a překládají se přes katalogy gettext ve složce [`po/`](po/), které jsou zabudované do programu. Jazyk se řídí systémem (`LC_ALL`, `LC_MESSAGES`, `LANG`) a jde změnit v Předvolbách → Zprávy. Nový jazyk přidáte zkopírováním `po/cs.po` do `po/<kód>.po`, přeložením, doplněním jazyka do `internal/i18n` (název a pravidlo pro množné číslo) a spuštěním `go test ./internal/i18n` – test ověří, že každý text v kódu má překlad se stejnými zástupnými znaky.
+Texty v kódu jsou anglicky a překládají se přes katalogy gettext ve složce [`po/`](po/), které jsou zabudované do programu. Jazyk se řídí systémem (`LC_ALL`, `LC_MESSAGES`, `LANG`) a jde změnit v Předvolbách → Obecné. Nový jazyk přidáte zkopírováním `po/cs.po` do `po/<kód>.po`, přeložením, doplněním jazyka do `internal/i18n` (název a pravidlo pro množné číslo) a spuštěním `go test ./internal/i18n` – test ověří, že každý text v kódu má překlad se stejnými zástupnými znaky.
 
 ## Struktura
 

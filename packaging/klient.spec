@@ -66,6 +66,10 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Tue Sep 29 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.7.4-1
+- New General page in Preferences (language, default email application,
+  background mode, autostart, updates), moved out of Messages
+
 * Tue Sep 29 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.7.3-1
 - Ubuntu package (.deb for Ubuntu 26.04 LTS and newer, built in a container
   by packaging/deb.sh); the updater installs the package format Klient was

@@ -135,7 +135,11 @@ func (a *App) demoScreenshots(dir string) {
 			}
 			a.win.Present()
 		}},
-		{0, func() { dialog = a.preferencesDialog() }},
+		{0, func() {
+			d := a.preferencesDialog()
+			d.SetVisiblePageName("ai")
+			dialog = d
+		}},
 		{2 * time.Second, func() { shot(a.win, "preferences"); dialog.Close() }},
 		{0, func() {
 			rels := relnotes.Embedded(i18n.Lang(), "", Version, update.Newer)

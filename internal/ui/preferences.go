@@ -26,8 +26,9 @@ func (a *App) openPreferences() { a.preferencesDialog() }
 func (a *App) preferencesDialog() *adw.PreferencesDialog {
 	d := adw.NewPreferencesDialog()
 	d.SetTitle(i18n.T("Preferences"))
-	// Same order for every account: general settings first, then mail
-	// handling, then the account's encryption.
+	// Same order for every account: the application itself first, then AI
+	// and mail handling, then the account's encryption.
+	d.Add(a.generalPage(d))
 	d.Add(a.aiPage(d))
 	d.Add(a.spamPage(d))
 	d.Add(a.messagesPage(d))
@@ -43,6 +44,7 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	p := adw.NewPreferencesPage()
 	p.SetTitle("AI")
 	p.SetIconName("applications-science-symbolic")
+	p.SetName("ai")
 
 	var names []string
 	for _, pr := range ai.Providers {
@@ -353,11 +355,81 @@ func (a *App) pickModel(parent gtk.Widgetter, models []string, current string, d
 	dlg.Present(parent)
 }
 
+// generalPage holds the settings of the application itself, unrelated to
+// mail: language, desktop integration, background mode and updates.
+func (a *App) generalPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
+	p := adw.NewPreferencesPage()
+	p.SetTitle(i18n.T("General"))
+	p.SetIconName("preferences-system-symbolic")
+	p.SetName("general")
+	p.Add(a.languageGroup(d))
+
+	ig := adw.NewPreferencesGroup()
+	ig.SetTitle(i18n.T("Desktop Integration"))
+	defRow := adw.NewActionRow()
+	defRow.SetTitle(i18n.T("Default email application"))
+	setDef := func() {
+		if isDefaultMailApp() {
+			defRow.SetSubtitle(i18n.T("Klient opens mailto: links throughout the system"))
+		} else {
+			defRow.SetSubtitle(i18n.T("Another application opens mailto: links"))
+		}
+	}
+	setDef()
+	defBtn := gtk.NewButtonWithLabel(i18n.T("Make Default"))
+	defBtn.SetVAlign(gtk.AlignCenter)
+	defBtn.ConnectClicked(func() {
+		if err := setDefaultMailApp(); err != nil {
+			d.AddToast(adw.NewToast(err.Error()))
+			return
+		}
+		setDef()
+		d.AddToast(adw.NewToast(i18n.T("Klient is the default email application")))
+	})
+	defRow.AddSuffix(defBtn)
+	ig.Add(defRow)
+	p.Add(ig)
+
+	bg := adw.NewPreferencesGroup()
+	bg.SetTitle(i18n.T("Background"))
+	bg.SetDescription(i18n.T("In GNOME, the icon in the top bar requires the AppIndicator extension (the gnome-shell-extension-appindicator package)."))
+	background := adw.NewSwitchRow()
+	background.SetTitle(i18n.T("Run in the background after closing the window"))
+	background.SetSubtitle(i18n.T("Klient keeps watching your mail, filtering spam and showing notifications; the icon in the top bar opens the window again"))
+	background.SetActive(a.cfg.RunInBackground)
+	background.NotifyProperty("active", func() {
+		a.cfg.RunInBackground = background.Active()
+		a.saveConfig()
+		if a.cfg.RunInBackground {
+			a.startTray()
+		} else if a.tray.started {
+			d.AddToast(adw.NewToast(i18n.T("The icon disappears from the top bar after Klient restarts")))
+		}
+	})
+	bg.Add(background)
+	autostart := adw.NewSwitchRow()
+	autostart.SetTitle(i18n.T("Start after login"))
+	autostart.SetSubtitle(i18n.T("Klient starts hidden in the background, with just the icon in the top bar"))
+	autostart.SetActive(autostartEnabled())
+	autostart.NotifyProperty("active", func() {
+		if err := setAutostart(autostart.Active()); err != nil {
+			d.AddToast(adw.NewToast(i18n.T("Setting up automatic start failed: ") + err.Error()))
+			return
+		}
+		if autostart.Active() && !background.Active() {
+			background.SetActive(true)
+		}
+	})
+	bg.Add(autostart)
+	p.Add(bg)
+	p.Add(a.updateGroup())
+	return p
+}
+
 func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	p := adw.NewPreferencesPage()
 	p.SetTitle(i18n.T("Messages"))
 	p.SetIconName("mail-message-new-symbolic")
-	p.Add(a.languageGroup(d))
 
 	lg := adw.NewPreferencesGroup()
 	lg.SetTitle(i18n.T("Message List"))
@@ -396,63 +468,7 @@ func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		a.saveConfig()
 	})
 	sg.Add(attachKey)
-	defRow := adw.NewActionRow()
-	defRow.SetTitle(i18n.T("Default email application"))
-	setDef := func() {
-		if isDefaultMailApp() {
-			defRow.SetSubtitle(i18n.T("Klient opens mailto: links throughout the system"))
-		} else {
-			defRow.SetSubtitle(i18n.T("Another application opens mailto: links"))
-		}
-	}
-	setDef()
-	defBtn := gtk.NewButtonWithLabel(i18n.T("Make Default"))
-	defBtn.SetVAlign(gtk.AlignCenter)
-	defBtn.ConnectClicked(func() {
-		if err := setDefaultMailApp(); err != nil {
-			d.AddToast(adw.NewToast(err.Error()))
-			return
-		}
-		setDef()
-		d.AddToast(adw.NewToast(i18n.T("Klient is the default email application")))
-	})
-	defRow.AddSuffix(defBtn)
-	sg.Add(defRow)
 	p.Add(sg)
-
-	bg := adw.NewPreferencesGroup()
-	bg.SetTitle(i18n.T("Background"))
-	bg.SetDescription(i18n.T("In GNOME, the icon in the top bar requires the AppIndicator extension (the gnome-shell-extension-appindicator package)."))
-	background := adw.NewSwitchRow()
-	background.SetTitle(i18n.T("Run in the background after closing the window"))
-	background.SetSubtitle(i18n.T("Klient keeps watching your mail, filtering spam and showing notifications; the icon in the top bar opens the window again"))
-	background.SetActive(a.cfg.RunInBackground)
-	background.NotifyProperty("active", func() {
-		a.cfg.RunInBackground = background.Active()
-		a.saveConfig()
-		if a.cfg.RunInBackground {
-			a.startTray()
-		} else if a.tray.started {
-			d.AddToast(adw.NewToast(i18n.T("The icon disappears from the top bar after Klient restarts")))
-		}
-	})
-	bg.Add(background)
-	autostart := adw.NewSwitchRow()
-	autostart.SetTitle(i18n.T("Start after login"))
-	autostart.SetSubtitle(i18n.T("Klient starts hidden in the background, with just the icon in the top bar"))
-	autostart.SetActive(autostartEnabled())
-	autostart.NotifyProperty("active", func() {
-		if err := setAutostart(autostart.Active()); err != nil {
-			d.AddToast(adw.NewToast(i18n.T("Setting up automatic start failed: ") + err.Error()))
-			return
-		}
-		if autostart.Active() && !background.Active() {
-			background.SetActive(true)
-		}
-	})
-	bg.Add(autostart)
-	p.Add(bg)
-	p.Add(a.updateGroup())
 
 	og := adw.NewPreferencesGroup()
 	og.SetTitle(i18n.T("Offline"))

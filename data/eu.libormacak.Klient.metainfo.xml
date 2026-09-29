@@ -82,6 +82,12 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.7.4" date="2026-09-29">
+      <description>
+        <p>A new General page in Preferences for the language, background mode and updates.</p>
+        <p xml:lang="cs">Nová stránka Obecné v Předvolbách pro jazyk, běh na pozadí a aktualizace.</p>
+      </description>
+    </release>
     <release version="0.7.3" date="2026-09-29">
       <description>
         <p>A package for Ubuntu 26.04 LTS and newer, with automatic updates through apt.</p>

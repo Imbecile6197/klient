@@ -39,7 +39,7 @@ else
 	NOTES=$(awk '/^%changelog/{c=1; next} c && /^\*/{if (n++) exit; next} c' packaging/klient.spec | sed '/^$/d')
 	NOTES="$NOTES
 
-Install on Fedora: \`sudo dnf install https://github.com/Imbecile6197/klient/releases/latest/download/klient.x86_64.rpm\`, on Ubuntu 26.04+: download \`klient_amd64.deb\` and run \`sudo apt install ./klient_amd64.deb\` – an installed Klient then updates itself (Preferences → Messages → Updates)."
+Install on Fedora: \`sudo dnf install https://github.com/Imbecile6197/klient/releases/latest/download/klient.x86_64.rpm\`, on Ubuntu 26.04+: download \`klient_amd64.deb\` and run \`sudo apt install ./klient_amd64.deb\` – an installed Klient then updates itself (Preferences → General → Updates)."
 fi
 
 git -c credential.helper= -c credential.helper='!gh auth git-credential' push origin main "$TAG"

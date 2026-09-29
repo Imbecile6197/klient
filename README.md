@@ -71,7 +71,7 @@ The complete user documentation is in [`docs/index.html`](docs/index.html) (Czec
 
 ## Translations
 
-The strings in the code are English and are translated through gettext catalogs in [`po/`](po/), which are embedded into the binary. The language follows the system (`LC_ALL`, `LC_MESSAGES`, `LANG`) and can be changed in Preferences → Messages. To add a language, copy `po/cs.po` to `po/<code>.po`, translate it, add the language to `internal/i18n` (its name and plural rule) and run `go test ./internal/i18n` – the test checks that every string in the code is translated with the same format verbs.
+The strings in the code are English and are translated through gettext catalogs in [`po/`](po/), which are embedded into the binary. The language follows the system (`LC_ALL`, `LC_MESSAGES`, `LANG`) and can be changed in Preferences → General. To add a language, copy `po/cs.po` to `po/<code>.po`, translate it, add the language to `internal/i18n` (its name and plural rule) and run `go test ./internal/i18n` – the test checks that every string in the code is translated with the same format verbs.
 
 ## Project structure
 

@@ -1063,7 +1063,7 @@ msgstr "Např. „Kolik byla poslední faktura za elektřinu?“"
 msgid "Forward"
 msgstr "Přeposlat"
 
-#: internal/ui/assistant.go
+#: internal/ui/assistant.go internal/ui/preferences.go
 msgid "General"
 msgstr "Obecné"
 
@@ -3521,3 +3521,7 @@ msgid_plural "%d unread messages"
 msgstr[0] "%d nepřečtená zpráva"
 msgstr[1] "%d nepřečtené zprávy"
 msgstr[2] "%d nepřečtených zpráv"
+
+#: internal/ui/preferences.go
+msgid "Desktop Integration"
+msgstr "Propojení se systémem"

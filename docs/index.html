@@ -363,12 +363,12 @@ sudo apt install ./klient_amd64.deb</code></pre>
   <p>Klient downloads later versions by itself – see <a href="#updates">Automatic updates</a>.</p>
   <p>You can open this documentation from Klient at any time: main menu → <b>Help</b>, or the <kbd>F1</kbd> key.</p>
   <h3 id="language">Language</h3>
-  <p>Klient speaks English and Czech. The language follows your system settings; you can change it in Preferences → Messages → <b>Interface language</b>, and it takes effect after a restart. The AI answers in the same language – summaries, reply suggestions, “Ask Your Mail” and the spam filter's reasons.</p>
+  <p>Klient speaks English and Czech. The language follows your system settings; you can change it in Preferences → General → <b>Interface language</b>, and it takes effect after a restart. The AI answers in the same language – summaries, reply suggestions, “Ask Your Mail” and the spam filter's reasons.</p>
   <p>The package recommends the <code>gnome-shell-extension-appindicator</code> extension; without it, GNOME does not show the icon in the top bar.</p>
   <h3 id="updates">Automatic updates</h3>
   <p>Once a day, Klient checks the <a href="https://github.com/Imbecile6197/klient/releases">releases on GitHub</a> (not on a metered connection). It downloads a new version in the background and verifies its SHA-256 checksum, which must match both the <code>SHA256SUMS</code> file and the digest that GitHub reports. You then get the notification <b>A New Version of Klient Is Ready</b>; the <b>Install</b> button asks for the administrator password, installs the package and restarts Klient. The <b>What's New</b> button shows the changes before you install.</p>
   <p>After an update, Klient shows what has changed since the version you used last. You can open the list again at any time from the main menu → <b>What's New</b>.</p>
-  <p>You can turn the check off or run it by hand in Preferences → Messages → <b>Updates</b>. A Klient built from source only announces a new version.</p>
+  <p>You can turn the check off or run it by hand in Preferences → General → <b>Updates</b>. A Klient built from source only announces a new version.</p>
   <div class="note">
     <b>Updating while running</b>
     <p>If Klient is running (for example in the background) while you install a new version by hand, it notices within a minute and offers a restart. You do not have to find it and quit it yourself.</p>
@@ -452,7 +452,7 @@ packaging/deb.sh 0.7.3   # Ubuntu package, built in a podman container</code></p
     <li><b>Attachments</b> up to 25 MB – encrypted just like the text. You can drag files into the message.</li>
     <li><b>Drafts</b> are saved automatically when you close the window (<kbd>Esc</kbd>) or by hand with <kbd>Ctrl</kbd>+<kbd>S</kbd>.</li>
     <li>A <b>signature</b> and <b>address suggestions</b> from your contacts.</li>
-    <li><b>The default application for <code>mailto:</code> links</b> – set it in Preferences → Messages.</li>
+    <li><b>The default application for <code>mailto:</code> links</b> – set it in Preferences → General.</li>
   </ul>
 
   <h3>Send delay</h3>
@@ -616,6 +616,7 @@ packaging/deb.sh 0.7.3   # Ubuntu package, built in a podman container</code></p
   <ul>
     <li>After you close the window, Klient keeps running, watches for new mail and shows a monochrome icon in the top bar (GNOME needs the AppIndicator extension). A red dot on the icon means unread mail. The icon menu offers Open Klient, New Message and Quit; you can also quit with <kbd>Ctrl</kbd>+<kbd>Q</kbd>.</li>
     <li><b>Start after login</b> – Klient starts straight in the background.</li>
+    <li>You turn both on or off in Preferences → General → <b>Background</b>.</li>
     <li>The new-mail notification arrives only after the spam check.</li>
   </ul>
 </section>
@@ -669,9 +670,10 @@ packaging/deb.sh 0.7.3   # Ubuntu package, built in a podman container</code></p
   <table>
     <thead><tr><th>Page</th><th>What it contains</th></tr></thead>
     <tbody>
+      <tr><td><b>General</b></td><td>Interface language, default email application, running in the background and starting after login, updates</td></tr>
       <tr><td><b>AI</b></td><td>Local AI (Ollama, Local only, updates, summaries in advance, model comparison), the provider and model for the assistant and the spam filter, API keys, automatic features (sorting into labels, morning overview)</td></tr>
       <tr><td><b>Spam Filter</b></td><td>Turning the AI filter on, the threshold for moving to spam, showing mail only after the check, blocklist status</td></tr>
-      <tr><td><b>Messages</b></td><td>Interface language, threads, send delay, attaching your public key, default email application, running in the background and starting after login, updates, offline cache, signature</td></tr>
+      <tr><td><b>Messages</b></td><td>Threads, send delay, attaching your public key, offline cache, signature</td></tr>
       <tr><td><b>Rules</b></td><td>Rules for incoming mail</td></tr>
       <tr><td><b>PGP</b></td><td>Your own keys (create, import, back up, remove), contact keys, searching keys.openpgp.org</td></tr>
     </tbody>
