@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>eu.libormacak.Klient</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name>Klient</name>
+  <summary>Proton Mail with PGP, an AI assistant and an AI spam filter</summary>
+  <summary xml:lang="cs">Proton Mail s PGP, AI asistentem a AI spamfiltrem</summary>
+  <developer id="eu.libormacak">
+    <name>Libor Macák</name>
+  </developer>
+  <url type="homepage">https://libormacak.eu</url>
+  <update_contact>jsem@libormacak.eu</update_contact>
+  <description>
+    <p>A GNOME mail client that talks to Proton Mail directly over its API, without Proton Bridge.</p>
+    <p xml:lang="cs">E-mailový klient pro GNOME, který komunikuje s Proton Mail přímo přes jeho API, bez Proton Bridge.</p>
+    <ul>
+      <li>End-to-end encryption and native PGP for external recipients</li>
+      <li xml:lang="cs">End-to-end šifrování a nativní PGP pro externí příjemce</li>
+      <li>Conversations, safe HTML mail with remote content blocked, rich-text editor</li>
+      <li xml:lang="cs">Vlákna, bezpečné HTML zprávy s blokovaným vzdáleným obsahem, formátovaný editor</li>
+      <li>AI assistant and AI-driven spam filter (Claude, ChatGPT or Gemini) with blocklists updated every 12 hours</li>
+      <li xml:lang="cs">AI asistent a spamfiltr řízený AI (Claude, ChatGPT nebo Gemini) s blocklisty aktualizovanými každých 12 hodin</li>
+      <li>Encrypted offline cache, rules, undo send, one-click unsubscribe, print and .eml export</li>
+      <li xml:lang="cs">Šifrovaná offline cache, pravidla, zpoždění odeslání, odhlášení odběru, tisk a export .eml</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">eu.libormacak.Klient.desktop</launchable>
+  <provides>
+    <binary>klient</binary>
+  </provides>
+  <categories>
+    <category>Network</category>
+    <category>Email</category>
+  </categories>
+  <keywords>
+    <keyword>mail</keyword>
+    <keyword>proton</keyword>
+    <keyword>pgp</keyword>
+  </keywords>
+  <requires>
+    <internet>always</internet>
+  </requires>
+  <recommends>
+    <display_length compare="ge">360</display_length>
+  </recommends>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="0.6.5" date="2026-09-28">
+      <description>
+        <p>The spam-filter status shows the currently chosen AI model.</p>
+      </description>
+    </release>
+    <release version="0.6.4" date="2026-09-28">
+      <description>
+        <p>Monochrome panel icon with a red dot for new mail; user documentation.</p>
+      </description>
+    </release>
+    <release version="0.6.3" date="2026-09-28">
+      <description>
+        <p>Mistral AI (EU servers) as an AI provider; Ministral 3 available as a local model.</p>
+      </description>
+    </release>
+    <release version="0.6.2" date="2026-09-28">
+      <description>
+        <p>Gmail labels, archive and starred folder work like on the Gmail web.</p>
+      </description>
+    </release>
+    <release version="0.6.1" date="2026-09-28">
+      <description>
+        <p>Attachments at the top of messages; no more jumping back to the top while reading.</p>
+      </description>
+    </release>
+    <release version="0.6.0" date="2026-09-28">
+      <description>
+        <p>PGP encryption and signatures for Seznam, Gmail and IMAP accounts; used space for servers without a quota; consistent preferences.</p>
+      </description>
+    </release>
+    <release version="0.5.0" date="2026-09-28">
+      <description>
+        <p>Seznam, Gmail and IMAP accounts get conversation threads, snooze and scheduled sending.</p>
+      </description>
+    </release>
+    <release version="0.4.1" date="2026-09-28">
+      <description>
+        <p>Clearer Seznam login with two-factor authentication; full error messages.</p>
+      </description>
+    </release>
+    <release version="0.4.0" date="2026-09-28">
+      <description>
+        <p>Other mail services: Seznam.cz, Gmail (app password) and any IMAP/SMTP mailbox, with automatic setup and instant new-mail notification after the spam check.</p>
+      </description>
+    </release>
+    <release version="0.3.6" date="2026-09-28">
+      <description>
+        <p>Preparation for other mail services; service logos in the account switcher.</p>
+      </description>
+    </release>
+    <release version="0.3.5" date="2026-09-28">
+      <description>
+        <p>Author's website and contact in the About dialog.</p>
+      </description>
+    </release>
+    <release version="0.3.4" date="2026-09-28">
+      <description>
+        <p>New mail appears only after the spam filter has checked it, so spam never flashes up in the inbox.</p>
+      </description>
+    </release>
+    <release version="0.3.3" date="2026-09-28">
+      <description>
+        <p>The storage indicator matches Proton's web, refreshes regularly and turns orange or red when the mailbox is nearly full.</p>
+      </description>
+    </release>
+    <release version="0.3.2" date="2026-09-27">
+      <description>
+        <p>Faster local AI: summaries and label suggestions are remembered, summaries of new mail are prepared in advance on mains power, and the model stays loaded longer while charging.</p>
+      </description>
+    </release>
+    <release version="0.3.1" date="2026-09-27">
+      <description>
+        <p>Klient notices when it was updated while running in the background and offers a restart.</p>
+      </description>
+    </release>
+    <release version="0.3.0" date="2026-09-27">
+      <description>
+        <p>Local AI with Ollama: mail content never leaves the computer. Klient installs and automatically updates its own copy of Ollama and the used models, lets you compare models on your own mail, and has a local-only mode that blocks cloud AI.</p>
+      </description>
+    </release>
+    <release version="0.2.0" date="2026-09-27">
+      <description>
+        <p>Multiple accounts, background mode with a tray icon, scheduled send with a countdown, snooze, calendar invitations, vacation auto-reply, drag and drop, public key attachment and import, and new AI features: ask your mail, automatic labels and a morning overview.</p>
+      </description>
+    </release>
+    <release version="0.1.4" date="2026-09-27">
+      <description>
+        <p>Unsubscribe button fixes and automatic session recovery.</p>
+      </description>
+    </release>
+    <release version="0.1.3" date="2026-09-27">
+      <description>
+        <p>Clearer status of your own sent messages.</p>
+      </description>
+    </release>
+    <release version="0.1.2" date="2026-09-27">
+      <description>
+        <p>Fixes sending messages that contain only an attachment.</p>
+      </description>
+    </release>
+    <release version="0.1.1" date="2026-09-27">
+      <description>
+        <p>Proton contacts, address suggestions and a contacts window.</p>
+      </description>
+    </release>
+    <release version="0.1.0" date="2026-09-27">
+      <description>
+        <p>First test release.</p>
+      </description>
+    </release>
+  </releases>
+</component>

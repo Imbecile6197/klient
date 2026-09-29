@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9a82ff"/>
+      <stop offset="1" stop-color="#5b3fd9"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a31c2"/>
+      <stop offset="1" stop-color="#3a2498"/>
+    </linearGradient>
+    <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e6e0ff"/>
+    </linearGradient>
+    <linearGradient id="shield" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f9e36b"/>
+      <stop offset="1" stop-color="#e5a50a"/>
+    </linearGradient>
+    <linearGradient id="shieldEdge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c88800"/>
+      <stop offset="1" stop-color="#a86b00"/>
+    </linearGradient>
+  </defs>
+
+  <!-- envelope: 3D bottom edge, body, letter, flap -->
+  <rect x="10" y="32" width="100" height="78" rx="14" fill="url(#edge)"/>
+  <rect x="10" y="26" width="100" height="78" rx="14" fill="url(#body)"/>
+  <path d="M24 26 h72 a4 4 0 0 1 4 4 v26 L60 82 L20 56 v-26 a4 4 0 0 1 4 -4 z" fill="url(#paper)"/>
+  <path d="M34 38 h52 M34 48 h40" stroke="#b9acff" stroke-width="5" stroke-linecap="round"/>
+  <path d="M14 34 L60 70 L106 34" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+
+  <!-- shield with check: end-to-end encryption / PGP -->
+  <g transform="translate(76 62)">
+    <path d="M22 4 L42 11 V25 C42 38 33 47 22 52 C11 47 2 38 2 25 V11 Z" fill="url(#shieldEdge)"/>
+    <path d="M22 0 L42 7 V21 C42 34 33 43 22 48 C11 43 2 34 2 21 V7 Z" fill="url(#shield)"/>
+    <path d="M12 24 L19 31 L32 17" fill="none" stroke="#ffffff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- sparkle: AI assistant -->
+  <path d="M22 4 C23.5 11 25 12.5 32 14 C25 15.5 23.5 17 22 24 C20.5 17 19 15.5 12 14 C19 12.5 20.5 11 22 4 Z" fill="#f9e36b" stroke="#e5a50a" stroke-width="1.5" stroke-linejoin="round"/>
+</svg>

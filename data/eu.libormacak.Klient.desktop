@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Klient
+GenericName=E-mailový klient
+Comment=Proton Mail s PGP, AI asistentem a AI spamfiltrem
+Exec=klient %u
+Icon=eu.libormacak.Klient
+Terminal=false
+Categories=GNOME;GTK;Network;Email;
+Keywords=mail;email;proton;pgp;gpg;
+StartupNotify=true
+MimeType=x-scheme-handler/mailto;
+DBusActivatable=false

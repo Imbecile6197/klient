@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Klient – dokumentace</title>
+<meta name="description" content="Kompletní dokumentace e-mailového klienta Klient pro GNOME: účty, čtení a psaní pošty, PGP, spamfiltr, AI a lokální AI.">
+<style>
+:root {
+  --bg: #fafafb;
+  --surface: #ffffff;
+  --surface-2: #f2f2f4;
+  --text: #1e1e22;
+  --muted: #5e5e66;
+  --border: #dedee3;
+  --accent: #1c71d8;
+  --accent-soft: #e3eefc;
+  --ok: #26a269;
+  --ok-soft: #e1f5ea;
+  --warn: #9c6500;
+  --warn-soft: #fdf1d8;
+  --no: #c01c28;
+  --no-soft: #fbe4e6;
+  --code: #f0f0f3;
+  --radius: 12px;
+  --sidebar: 260px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1d1d20;
+    --surface: #26262a;
+    --surface-2: #2e2e33;
+    --text: #ececef;
+    --muted: #a3a3ab;
+    --border: #3a3a40;
+    --accent: #78aeed;
+    --accent-soft: #1f3552;
+    --ok: #57d18e;
+    --ok-soft: #1c3a2a;
+    --warn: #f0c060;
+    --warn-soft: #3d3220;
+    --no: #ff7b85;
+    --no-soft: #43232a;
+    --code: #323237;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1d1d20;
+  --surface: #26262a;
+  --surface-2: #2e2e33;
+  --text: #ececef;
+  --muted: #a3a3ab;
+  --border: #3a3a40;
+  --accent: #78aeed;
+  --accent-soft: #1f3552;
+  --ok: #57d18e;
+  --ok-soft: #1c3a2a;
+  --warn: #f0c060;
+  --warn-soft: #3d3220;
+  --no: #ff7b85;
+  --no-soft: #43232a;
+  --code: #323237;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.6 "Adwaita Sans", Cantarell, "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); text-underline-offset: 2px; }
+code, kbd {
+  font-family: "Adwaita Mono", "Source Code Pro", ui-monospace, monospace;
+  font-size: .88em;
+}
+code { background: var(--code); padding: .1em .35em; border-radius: 5px; overflow-wrap: anywhere; }
+kbd {
+  display: inline-block;
+  min-width: 1.6em;
+  text-align: center;
+  padding: .05em .45em;
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  background: var(--surface);
+  white-space: nowrap;
+}
+pre {
+  background: var(--code);
+  padding: 12px 14px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: .9em;
+}
+pre code { background: none; padding: 0; }
+
+/* ---- Layout ---- */
+.layout { display: flex; min-height: 100vh; }
+nav.toc {
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  width: var(--sidebar);
+  flex: none;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 24px 12px 24px 20px;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+}
+.brand { display: flex; align-items: center; gap: 10px; margin: 0 0 18px 6px; }
+.brand svg { width: 34px; height: 34px; flex: none; }
+.brand b { font-size: 1.15rem; }
+.brand span { display: block; font-size: .8rem; color: var(--muted); }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc a {
+  display: block;
+  padding: 5px 10px;
+  border-radius: 8px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: .93rem;
+}
+nav.toc a:hover { background: var(--surface-2); }
+nav.toc a.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.theme-switch { margin: 20px 6px 0; display: flex; gap: 4px; }
+.theme-switch button {
+  flex: 1;
+  font: inherit;
+  font-size: .8rem;
+  padding: 5px 0;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.theme-switch button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+
+main { flex: 1; min-width: 0; padding: 40px 48px 80px; }
+.content { max-width: 860px; margin: 0 auto; }
+
+header.hero { margin-bottom: 36px; }
+header.hero h1 { font-size: 2.3rem; line-height: 1.15; margin: 0 0 10px; letter-spacing: -.01em; }
+header.hero p { font-size: 1.1rem; color: var(--muted); margin: 0 0 18px; }
+.badges { display: flex; flex-wrap: wrap; gap: 8px; }
+.badge {
+  font-size: .82rem;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+section { padding-top: 12px; margin-bottom: 44px; }
+h2 {
+  font-size: 1.55rem;
+  margin: 0 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+h3 { font-size: 1.12rem; margin: 26px 0 8px; }
+p, ul, ol { margin: 0 0 12px; }
+li { margin-bottom: 4px; }
+.lead { color: var(--muted); }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin: 16px 0; }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+.card h4 { margin: 0 0 4px; font-size: 1rem; }
+.card p { margin: 0; font-size: .92rem; color: var(--muted); }
+.card a { text-decoration: none; }
+
+.note {
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin: 14px 0;
+  background: var(--accent-soft);
+  border-left: 4px solid var(--accent);
+}
+.note.warn { background: var(--warn-soft); border-left-color: var(--warn); }
+.note b:first-child { display: block; margin-bottom: 2px; }
+.note p:last-child, .note ul:last-child { margin-bottom: 0; }
+
+.table-wrap { overflow-x: auto; margin: 14px 0; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: .93rem; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+th { background: var(--surface-2); font-weight: 600; white-space: nowrap; }
+td.c, th.c { text-align: center; }
+.y, .n, .p {
+  display: inline-block;
+  font-size: .78rem;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.y { background: var(--ok-soft); color: var(--ok); }
+.n { background: var(--no-soft); color: var(--no); }
+.p { background: var(--warn-soft); color: var(--warn); }
+
+.steps { counter-reset: s; list-style: none; padding: 0; }
+.steps > li { counter-increment: s; position: relative; padding-left: 40px; margin-bottom: 12px; }
+.steps > li::before {
+  content: counter(s);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--surface);
+  font-weight: 700;
+  font-size: .9rem;
+  display: grid;
+  place-items: center;
+}
+
+.flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 14px 0; }
+.flow span {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: .9rem;
+}
+.flow i { font-style: normal; color: var(--muted); }
+
+footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--border); padding-top: 18px; }
+
+/* ---- Mobile ---- */
+.toc-toggle { display: none; }
+@media (max-width: 900px) {
+  .layout { display: block; }
+  nav.toc {
+    position: static;
+    width: auto;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+  }
+  .brand { margin: 0; }
+  .toc-toggle {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    font: inherit;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+    cursor: pointer;
+  }
+  nav.toc ol, .theme-switch { display: none; }
+  nav.toc.open ol { display: block; margin-top: 8px; }
+  nav.toc.open .theme-switch { display: flex; }
+  main { padding: 24px 16px 60px; }
+  header.hero h1 { font-size: 1.8rem; }
+}
+@media print {
+  nav.toc { display: none; }
+  main { padding: 0; }
+  section { break-inside: avoid-page; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="toc" id="toc" aria-label="Obsah">
+  <div class="brand">
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <rect x="4" y="12" width="56" height="40" rx="9" fill="#1c71d8"/>
+      <path d="M10 20l22 16 22-16" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div><b>Klient</b><span>Dokumentace · verze 0.6.5</span></div>
+  </div>
+  <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc">Obsah</button>
+  <ol>
+    <li><a href="#prehled">Přehled</a></li>
+    <li><a href="#instalace">Instalace</a></li>
+    <li><a href="#ucty">Účty a služby</a></li>
+    <li><a href="#cteni">Čtení pošty</a></li>
+    <li><a href="#psani">Psaní a odesílání</a></li>
+    <li><a href="#organizace">Organizace pošty</a></li>
+    <li><a href="#pgp">Šifrování a PGP</a></li>
+    <li><a href="#spam">Spamfiltr</a></li>
+    <li><a href="#ai">AI asistent</a></li>
+    <li><a href="#lokalni-ai">Lokální AI</a></li>
+    <li><a href="#kalendar">Pozvánky a nepřítomnost</a></li>
+    <li><a href="#pozadi">Běh na pozadí</a></li>
+    <li><a href="#zkratky">Klávesové zkratky</a></li>
+    <li><a href="#predvolby">Předvolby</a></li>
+    <li><a href="#soukromi">Soukromí a data</a></li>
+    <li><a href="#omezeni">Známá omezení</a></li>
+    <li><a href="#autor">O aplikaci</a></li>
+  </ol>
+  <div class="theme-switch" role="group" aria-label="Vzhled">
+    <button type="button" data-theme-set="auto">Auto</button>
+    <button type="button" data-theme-set="light">Světlý</button>
+    <button type="button" data-theme-set="dark">Tmavý</button>
+  </div>
+</nav>
+
+<main>
+<div class="content">
+
+<header class="hero">
+  <h1>Klient</h1>
+  <p>E-mailový klient pro GNOME s nativní podporou Proton Mailu, PGP šifrováním a spamfiltrem řízeným umělou inteligencí – v cloudu i přímo v počítači.</p>
+  <div class="badges">
+    <span class="badge">GTK4 + libadwaita</span>
+    <span class="badge">Go</span>
+    <span class="badge">Proton · Gmail · Seznam · IMAP</span>
+    <span class="badge">PGP / PGP/MIME</span>
+    <span class="badge">Claude · ChatGPT · Gemini · Mistral · Ollama</span>
+  </div>
+</header>
+
+<!-- ============================================================ -->
+<section id="prehled">
+  <h2>Přehled</h2>
+  <p>Klient je desktopová poštovní aplikace pro Linux s prostředím GNOME. Připojuje se přímo k Proton Mailu (bez Proton Bridge) i ke klasickým schránkám přes IMAP a SMTP. Každou novou zprávu nejdřív posoudí spamfiltr a teprve potom ji ukáže a ohlásí.</p>
+  <div class="cards">
+    <div class="card"><a href="#ucty"><h4>Více služeb v jednom okně</h4></a><p>Proton Mail, Gmail, Seznam.cz a libovolná IMAP/SMTP schránka, přepínání v postranním panelu.</p></div>
+    <div class="card"><a href="#pgp"><h4>Šifrování všude</h4></a><p>End-to-end šifrování Protonu a PGP/MIME pro ostatní služby, automatické hledání klíčů příjemců.</p></div>
+    <div class="card"><a href="#spam"><h4>Spamfiltr s AI</h4></a><p>SPF/DKIM/DMARC, blocklisty a vaše seznamy jako podklady pro rozhodnutí AI.</p></div>
+    <div class="card"><a href="#ai"><h4>AI asistent</h4></a><p>Shrnutí, návrhy odpovědí, „Zeptat se pošty“, třídění do štítků a ranní přehled.</p></div>
+    <div class="card"><a href="#lokalni-ai"><h4>Lokální AI</h4></a><p>Model běží v počítači přes spravovanou Ollamu – obsah zpráv nikam neodchází.</p></div>
+    <div class="card"><a href="#psani"><h4>Pohodlné odesílání</h4></a><p>Zpoždění s tlačítkem Zpět, naplánované odeslání, formátovaný editor, přílohy.</p></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="instalace">
+  <h2>Instalace</h2>
+  <h3>Z balíčku RPM (Fedora)</h3>
+<pre><code>sudo dnf install ./build/rpm/RPMS/x86_64/klient-0.6.5-1.fc44.x86_64.rpm</code></pre>
+  <p>Balíček doporučuje rozšíření <code>gnome-shell-extension-appindicator</code>, bez kterého GNOME nezobrazí ikonu v horní liště.</p>
+  <div class="note">
+    <b>Aktualizace za běhu</b>
+    <p>Pokud Klient při instalaci nové verze běží (třeba na pozadí), do minuty to pozná a nabídne restart. Nemusíte ho hledat a ukončovat ručně.</p>
+  </div>
+  <h3>Sestavení ze zdrojového kódu</h3>
+<pre><code>sudo dnf install golang gcc gtk4-devel libadwaita-devel gobject-introspection-devel webkitgtk6.0-devel
+make build      # první sestavení trvá dlouho (CGo bindingy GTK)
+make run
+make install    # do ~/.local včetně .desktop souboru a ikony
+make rpm VERSION=0.6.5</code></pre>
+</section>
+
+<!-- ============================================================ -->
+<section id="ucty">
+  <h2>Účty a služby</h2>
+  <p>První účet přidáte na přihlašovací obrazovce, další v postranním panelu přes přepínač účtů → <b>Přidat účet</b>. Nová pošta, spamfiltr a oznámení fungují pro všechny účty současně, i pro ty, které právě nemáte otevřené.</p>
+
+  <h3>Proton Mail</h3>
+  <p>Přihlášení přímo přes Proton API včetně dvoufázového ověření a režimu dvou hesel. Heslo se neukládá – v klíčence GNOME zůstane jen token relace a odvozený klíč pro odemčení schránky.</p>
+
+  <h3>Gmail</h3>
+  <ol class="steps">
+    <li>V účtu Google zapněte dvoufázové ověření (bez něj Google hesla pro aplikace nenabízí).</li>
+    <li>Vytvořte <b>heslo pro aplikace</b> – tlačítko v přihlašovacím okně Klienta otevře přímo <a href="https://myaccount.google.com/apppasswords">myaccount.google.com/apppasswords</a>.</li>
+    <li>V nastavení Gmailu musí být povolený IMAP.</li>
+    <li>V Klientovi zvolte <b>Jiná služba → Gmail</b> a zadejte adresu a heslo pro aplikace.</li>
+  </ol>
+  <p>Štítky Gmailu se chovají jako na webu: přidání štítku zprávu jen označí (zůstane v doručené poště), odebrání sundá jen štítek. Archivace přesune zprávu do „Všech zpráv“, složka „S hvězdičkou“ odpovídá hvězdičce a složka „Důležité“ je skrytá.</p>
+
+  <h3>Seznam.cz</h3>
+  <p>Podporované domény: <code>seznam.cz</code>, <code>email.cz</code>, <code>post.cz</code>, <code>spoluzaci.cz</code> a vlastní domény vedené na Seznamu. Máte-li zapnuté dvoufázové ověření, vytvořte si v <a href="https://ucet.seznam.cz/">nastavení účtu Seznam</a> heslo pro aplikace a přihlaste se jím.</p>
+
+  <h3>Jiná schránka (IMAP/SMTP)</h3>
+  <p>Klient servery dohledá sám – podle známých poskytovatelů, databáze Thunderbirdu (ISPDB) a MX záznamů domény. Pokud se to nepovede, zadáte je ručně. Při chybě přihlášení se ukáže celé hlášení serveru.</p>
+
+  <h3>Co která služba umí</h3>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Funkce</th><th class="c">Proton</th><th class="c">Gmail</th><th class="c">Seznam / IMAP</th></tr></thead>
+    <tbody>
+      <tr><td>Nová pošta okamžitě</td><td class="c"><span class="y">ano</span></td><td class="c"><span class="y">IMAP IDLE</span></td><td class="c"><span class="y">IMAP IDLE</span></td></tr>
+      <tr><td>Složky</td><td class="c"><span class="y">ano</span></td><td class="c"><span class="y">ano</span></td><td class="c"><span class="y">ano</span></td></tr>
+      <tr><td>Štítky</td><td class="c"><span class="y">ano</span></td><td class="c"><span class="y">ano</span></td><td class="c"><span class="n">ne</span></td></tr>
+      <tr><td>Vlákna</td><td class="c"><span class="y">server</span></td><td class="c"><span class="y">References</span></td><td class="c"><span class="y">References</span></td></tr>
+      <tr><td>Hledání v textu zpráv</td><td class="c"><span class="n">ne</span></td><td class="c"><span class="y">ano</span></td><td class="c"><span class="y">ano</span></td></tr>
+      <tr><td>Odložení konverzace</td><td class="c"><span class="y">server</span></td><td class="c"><span class="p">Klient</span></td><td class="c"><span class="p">Klient</span></td></tr>
+      <tr><td>Naplánované odeslání</td><td class="c"><span class="y">server</span></td><td class="c"><span class="p">Klient</span></td><td class="c"><span class="p">Klient</span></td></tr>
+      <tr><td>Šifrování</td><td class="c"><span class="y">E2E Protonu</span></td><td class="c"><span class="y">PGP/MIME</span></td><td class="c"><span class="y">PGP/MIME</span></td></tr>
+      <tr><td>Kontakty pro našeptávání</td><td class="c"><span class="y">kontakty Protonu</span></td><td class="c"><span class="p">nedávné adresy</span></td><td class="c"><span class="p">nedávné adresy</span></td></tr>
+      <tr><td>Automatická odpověď</td><td class="c"><span class="y">placený tarif</span></td><td class="c"><span class="n">ne</span></td><td class="c"><span class="n">ne</span></td></tr>
+      <tr><td>Zaplnění schránky</td><td class="c"><span class="y">ano</span></td><td class="c"><span class="y">kvóta</span></td><td class="c"><span class="p">kvóta nebo jen obsazeno</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="lead">„Klient“ znamená, že funkci obstarává sama aplikace přes složky <b>Odložené</b> a <b>Naplánované</b> na serveru. Funguje, když Klient běží (stačí na pozadí); co se mezitím zmeškalo, provede hned po spuštění.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="cteni">
+  <h2>Čtení pošty</h2>
+  <ul>
+    <li><b>Trojpanelové rozvržení</b> (složky – seznam – zpráva), které se na úzkém okně přizpůsobí.</li>
+    <li><b>Vlákna</b> – zprávy se seskupují do konverzací; starší zprávy vlákna se u Protonu dešifrují až po rozbalení. Vypnout jde v Předvolbách → Zprávy.</li>
+    <li><b>HTML zprávy</b> se zobrazují přes WebKitGTK bez JavaScriptu. Vzdálené obrázky a sledovací pixely jsou blokované; povolit je jde pro jednu zprávu nebo natrvalo pro odesílatele.</li>
+    <li><b>Přílohy</b> jsou jako čipy nahoře ve zprávě – kliknutí přílohu otevře, šipka ji uloží.</li>
+    <li><b>Hledání</b> (<kbd>Ctrl</kbd>+<kbd>F</kbd>) – u Protonu v předmětu, odesílateli a příjemcích, u IMAP služeb i v textu zpráv.</li>
+    <li><b>Offline čtení</b> – posledních 500 zpráv (nastavitelné) se ukládá do šifrované cache (AES-256-GCM, klíč v klíčence; těla Proton zpráv navíc zůstávají zašifrovaná PGP).</li>
+    <li><b>Ukazatel zaplnění</b> schránky vlevo dole. Když server limit neuvádí (Seznam), ukáže se aspoň obsazené místo.</li>
+    <li><b>Odhlásit odběr</b> – u hromadných zpráv tlačítko jedním kliknutím (RFC 8058).</li>
+    <li>Tisk a export zprávy do souboru <code>.eml</code>.</li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="psani">
+  <h2>Psaní a odesílání</h2>
+  <ul>
+    <li><b>Formátovaný editor</b> – tučné, kurzíva, podtržení, seznamy, odkazy. Příjemci s PGP dostanou textovou verzi.</li>
+    <li><b>Odpovědět, odpovědět všem, přeposlat</b> (i s přílohami).</li>
+    <li><b>Přílohy</b> až do 25 MB – šifrují se stejně jako text. Soubory jde do zprávy přetáhnout myší.</li>
+    <li><b>Koncepty</b> se uloží automaticky při zavření okna (<kbd>Esc</kbd>) nebo ručně <kbd>Ctrl</kbd>+<kbd>S</kbd>.</li>
+    <li><b>Podpis</b> a <b>našeptávání adres</b> z kontaktů.</li>
+    <li><b>Výchozí aplikace pro odkazy <code>mailto:</code></b> – nastavíte v Předvolbách → Zprávy.</li>
+  </ul>
+
+  <h3>Zpoždění odeslání</h3>
+  <p>Po odeslání zpráva ještě chvíli počká (výchozí 10 s) a v oznámení běží odpočet s tlačítkem <b>Zpět</b>. Délku nastavíte v Předvolbách → Zprávy.</p>
+
+  <h3>Naplánované odeslání</h3>
+  <p>Šipka u tlačítka Odeslat nabídne předvolby (zítra ráno, zítra odpoledne, příští týden) nebo vlastní datum a čas. U Protonu zprávu odešle server i při vypnutém počítači, u ostatních služeb ji odešle Klient. Naplánované zprávy mají v zobrazení pruh s odpočtem a tlačítkem pro zrušení.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="organizace">
+  <h2>Organizace pošty</h2>
+  <ul>
+    <li><b>Složky a štítky</b> – vlastní složky a štítky Protonu, složky IMAP a štítky Gmailu. Zprávy jde do složek a na štítky přetáhnout.</li>
+    <li><b>Hvězdička, nepřečtené, archiv, koš.</b></li>
+    <li><b>Hromadný výběr</b> – tlačítkem, <kbd>Ctrl</kbd>/<kbd>Shift</kbd>+klik nebo <kbd>Ctrl</kbd>+<kbd>A</kbd>.</li>
+    <li><b>Odložení</b> (<kbd>Ctrl</kbd>+<kbd>H</kbd>) – konverzace zmizí a v zadaný čas se vrátí do doručené pošty.</li>
+  </ul>
+  <h3>Pravidla pro příchozí poštu</h3>
+  <p>V Předvolbách → Pravidla vytvoříte pravidla typu <i>„když Odesílatel / Příjemce / Předmět obsahuje text, pak…“</i> s akcemi <b>přesunout do složky</b>, <b>přidat štítek</b>, <b>označit jako přečtené</b> nebo <b>přidat hvězdičku</b>. Pravidla se použijí na novou poštu po kontrole spamfiltrem; položkou nabídky <b>Použít pravidla na doručenou poštu</b> je spustíte i nad stávající poštou.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="pgp">
+  <h2>Šifrování a PGP</h2>
+  <h3>Proton Mail</h3>
+  <p>Každá zpráva se dešifruje a ověří se podpis. Při odesílání se pro každého příjemce zvolí nejsilnější dostupná ochrana:</p>
+  <ul>
+    <li>Proton adresy – end-to-end šifrování Protonu,</li>
+    <li>externí adresy se známým klíčem (WKD nebo importovaným) – PGP,</li>
+    <li>ostatní – nešifrovaně, volitelně s PGP podpisem, a před odesláním se ukáže varování.</li>
+  </ul>
+
+  <h3>Gmail, Seznam a IMAP</h3>
+  <p>V Předvolbách → PGP si pro účet vytvoříte nový klíč nebo naimportujete svůj soukromý klíč. Klíč je v souboru zamčený náhodným heslem uloženým v klíčence. Potom:</p>
+  <ul>
+    <li>zprávy lidem se známým klíčem se šifrují ve formátu <b>PGP/MIME</b>, ostatním se podepisují,</li>
+    <li>smíšeným příjemcům odejdou dvě verze – šifrovaná a podepsaná,</li>
+    <li>koncepty, naplánované zprávy a kopie v Odeslaných se na serveru ukládají zašifrované jen pro vás,</li>
+    <li>příchozí PGP/MIME zprávy se dešifrují a ověří,</li>
+    <li>klíč jde zálohovat i odstranit.</li>
+  </ul>
+
+  <h3>Kde Klient hledá klíče příjemců</h3>
+  <ul>
+    <li><b>Web Key Directory</b> domény příjemce,</li>
+    <li>hlavička <b>Autocrypt</b> v přijatých zprávách (Klient ji do svých zpráv také přidává),</li>
+    <li>ručně <b>importované klíče</b> – i přímo z přílohy <code>.asc</code> tlačítkem ve zprávě,</li>
+    <li>volitelně <b>keys.openpgp.org</b> (Předvolby → PGP).</li>
+  </ul>
+  <p>Do odchozích zpráv jde automaticky přikládat vlastní veřejný klíč (Předvolby → Zprávy).</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="spam">
+  <h2>Spamfiltr</h2>
+  <p>Každou novou zprávu v doručené poště posoudí AI. Jako podklady dostane:</p>
+  <ul>
+    <li>výsledky SPF, DKIM a DMARC,</li>
+    <li>značky Protonu,</li>
+    <li>zásahy IP adres, domén a odkazů v blocklistech,</li>
+    <li>vaše seznamy povolených a blokovaných odesílatelů.</li>
+  </ul>
+  <p>Zpráva s pravděpodobností spamu nad prahem (výchozí 0,7) se přesune do Spamu. Práh nastavíte v Předvolbách → Spamfiltr.</p>
+
+  <h3>Nejdřív kontrola, pak oznámení</h3>
+  <div class="flow">
+    <span>Nová zpráva</span><i>→</i><span>skrytá v seznamu</span><i>→</i><span>spamfiltr</span><i>→</i><span>pravidla a štítky</span><i>→</i><span>zobrazení a oznámení</span>
+  </div>
+  <p>Platí pro všechny služby. Nahoře v seznamu je během kontroly vidět pruh „Kontroluje se N nových zpráv…“. Kdyby se kontrola zasekla, zpráva se ukáže nejpozději po 6 minutách. Chování jde vypnout přepínačem <b>Zobrazovat novou poštu až po kontrole</b>.</p>
+
+  <h3>Blocklisty</h3>
+  <p>Stahují se automaticky každých 12 hodin: Spamhaus DROP (IPv4 a IPv6), URLhaus a OpenPhish. Stav je v Předvolbách → Spamfiltr.</p>
+
+  <h3>Prověření stávající pošty</h3>
+  <p>Položka nabídky <b>Prověřit doručenou poštu pomocí AI</b> spustí filtr nad posledními 50 zprávami.</p>
+  <div class="note">
+    <b>Bez AI</b>
+    <p>Když AI filtr vypnete, Klient pozná spam jen podle blocklistů a vašich seznamů.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="ai">
+  <h2>AI asistent</h2>
+  <h3>Funkce</h3>
+  <ul>
+    <li><b>Shrnutí zprávy</b> a <b>návrh odpovědi</b>.</li>
+    <li><b>Úprava a překlad konceptu</b> přímo v editoru.</li>
+    <li><b>Zeptat se pošty</b> (<kbd>Ctrl</kbd>+<kbd>J</kbd>) – otázka v běžné řeči; AI najde související zprávy a odpoví s odkazy na zdroje.</li>
+    <li><b>Třídění do štítků</b> – nová pošta dostane vhodný štítek (Předvolby → AI → Automatické funkce).</li>
+    <li><b>Ranní přehled</b> nepřečtené pošty v nastavenou hodinu (výchozí 7:00); kdykoli ho vyvoláte položkou <b>Přehled nepřečtené pošty (AI)</b>.</li>
+  </ul>
+
+  <h3>Poskytovatelé</h3>
+  <p>Asistent a spamfiltr mají každý svého poskytovatele a model – spamfiltru obvykle stačí levnější a rychlejší model. Tlačítko se seznamem u modelu nabídne modely dostupné pro váš účet.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Poskytovatel</th><th>Výchozí model asistenta</th><th>Výchozí model spamfiltru</th><th>Klíč</th></tr></thead>
+    <tbody>
+      <tr><td>Claude (Anthropic)</td><td><code>claude-opus-5</code></td><td><code>claude-opus-5</code></td><td><a href="https://platform.claude.com">platform.claude.com</a></td></tr>
+      <tr><td>ChatGPT (OpenAI)</td><td><code>gpt-5.5</code></td><td><code>gpt-5.4-mini</code></td><td><a href="https://platform.openai.com/api-keys">platform.openai.com</a></td></tr>
+      <tr><td>Gemini (Google)</td><td><code>gemini-3.1-pro-preview</code></td><td><code>gemini-3-flash-preview</code></td><td><a href="https://aistudio.google.com/apikey">aistudio.google.com</a></td></tr>
+      <tr><td>Mistral (servery v EU)</td><td><code>mistral-medium-latest</code></td><td><code>mistral-small-latest</code></td><td><a href="https://console.mistral.ai/api-keys">console.mistral.ai</a></td></tr>
+      <tr><td>Lokální AI (Ollama)</td><td><code>qwen3.5:4b</code></td><td><code>qwen3.5:4b</code></td><td>není potřeba</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>API klíče se ukládají do klíčenky systému. Když poskytovatel vrátí chybu (chybějící kredit, neplatný klíč, zrušený model), Klient ji vysvětlí česky a nabídne odkaz, kde ji opravit.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="lokalni-ai">
+  <h2>Lokální AI</h2>
+  <p>S lokální AI běží model přímo v počítači a obsah zpráv nikam neodchází. Nastavení je v Předvolbách → AI → Lokální AI (Ollama).</p>
+  <ol class="steps">
+    <li><b>Nainstalovat Ollamu</b> – Klient stáhne oficiální verzi z GitHubu, ověří kontrolní součet a rozbalí jen část pro procesor do <code>~/.local/share/klient/ollama</code>. Nepotřebuje sudo.</li>
+    <li><b>Porovnat modely na mé poště</b> – každý vybraný model posoudí několik vašich zpráv a jednu shrne; uvidíte rychlost i kvalitu vedle sebe. Vše běží v počítači.</li>
+    <li>V rolích Asistent a Spamfiltr zvolte <b>Lokální AI</b> a vybraný model.</li>
+  </ol>
+
+  <h3>Nabízené modely</h3>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Model</th><th>Stažení</th><th>Poznámka</th></tr></thead>
+    <tbody>
+      <tr><td>Qwen 3.5 4B (Alibaba)</td><td>3,4 GB</td><td>výchozí</td></tr>
+      <tr><td>Gemma 4 E2B (Google)</td><td>4,3 GB</td><td></td></tr>
+      <tr><td>Gemma 4 E4B (Google)</td><td>6,1 GB</td><td>lepší čeština, víc paměti</td></tr>
+      <tr><td>Ministral 3 3B (Mistral AI)</td><td>3,0 GB</td><td></td></tr>
+      <tr><td>Ministral 3 8B (Mistral AI)</td><td>6,0 GB</td><td>chytřejší, pomalejší</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Další možnosti</h3>
+  <ul>
+    <li><b>Jen lokálně</b> – nic se neposílá cloudové AI, i když jsou uložené klíče.</li>
+    <li><b>Automaticky aktualizovat</b> – jednou denně zkontroluje novou verzi Ollamy a modelů (ne na měřeném připojení).</li>
+    <li><b>Připravovat shrnutí předem</b> – nová pošta se shrne na pozadí, jen při napájení ze sítě a když model nic jiného nedělá. Po otevření zprávy je shrnutí hned.</li>
+    <li>Výsledky AI se ukládají do cache, takže opakované shrnutí stejné zprávy je okamžité. Při napájení ze sítě zůstává model načtený v paměti 30 minut, na baterii 5 minut.</li>
+  </ul>
+  <div class="note warn">
+    <b>Rychlost</b>
+    <p>Bez grafické karty je lokální model pomalý: posouzení jedné zprávy trvá desítky sekund (na notebooku s procesorem Intel i5 10. generace zhruba minutu u modelu Qwen 3.5 4B).</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="kalendar">
+  <h2>Pozvánky a nepřítomnost</h2>
+  <h3>Pozvánky do kalendáře</h3>
+  <p>Zpráva s pozvánkou (<code>.ics</code>) ukáže kartu s termínem a místem. Tlačítka <b>Přijmout</b>, <b>Možná</b> a <b>Odmítnout</b> pošlou organizátorovi odpověď; událost jde přidat do kalendáře.</p>
+  <h3>Automatická odpověď</h3>
+  <p>Pouze Proton Mail s placeným tarifem. Odpovídá server, i když je počítač vypnutý; každý odesílatel dostane odpověď nejvýš jednou za čas. Nastavíte předmět, text a volitelně poslední den platnosti.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="pozadi">
+  <h2>Běh na pozadí</h2>
+  <ul>
+    <li>Po zavření okna Klient běží dál, hlídá novou poštu a ukazuje černobílou ikonu v horní liště (GNOME potřebuje rozšíření AppIndicator). Červená tečka na ikoně znamená nepřečtenou poštu. Nabídka ikony obsahuje Otevřít Klient, Nová zpráva a Ukončit; ukončit ho můžete také klávesami <kbd>Ctrl</kbd>+<kbd>Q</kbd>.</li>
+    <li><b>Spouštět po přihlášení</b> – Klient se spustí rovnou na pozadí.</li>
+    <li>Oznámení o nové poště přijde až po kontrole spamfiltrem.</li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="zkratky">
+  <h2>Klávesové zkratky</h2>
+  <p>Přehled je i přímo v aplikaci: <kbd>Ctrl</kbd>+<kbd>?</kbd>.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Zkratka</th><th>Akce</th></tr></thead>
+    <tbody>
+      <tr><th colspan="2">Obecné</th></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>N</kbd></td><td>Nová zpráva</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>F</kbd></td><td>Hledat</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>J</kbd></td><td>Zeptat se pošty (AI)</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd></td><td>Kontakty</td></tr>
+      <tr><td><kbd>F5</kbd></td><td>Obnovit</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>,</kbd></td><td>Předvolby</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>?</kbd></td><td>Klávesové zkratky</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Q</kbd></td><td>Ukončit</td></tr>
+      <tr><th colspan="2">Zprávy</th></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>R</kbd></td><td>Odpovědět</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd></td><td>Odpovědět všem</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>L</kbd></td><td>Přeposlat</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>E</kbd></td><td>Archivovat</td></tr>
+      <tr><td><kbd>Delete</kbd></td><td>Do koše</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>D</kbd></td><td>Hvězdička</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>H</kbd></td><td>Odložit</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>U</kbd></td><td>Označit jako nepřečtené</td></tr>
+      <tr><th colspan="2">Seznam zpráv</th></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>A</kbd></td><td>Vybrat všechny zprávy</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>Zrušit výběr</td></tr>
+      <tr><th colspan="2">Psaní zprávy</th></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Enter</kbd></td><td>Odeslat</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>Uložit koncept</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>B</kbd> / <kbd>I</kbd> / <kbd>U</kbd></td><td>Tučně / kurzíva / podtržení</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>Odkaz</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>Zavřít (koncept se uloží)</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="predvolby">
+  <h2>Předvolby</h2>
+  <p>Otevřou se přes <kbd>Ctrl</kbd>+<kbd>,</kbd>. Stránky jsou pro všechny účty ve stejném pořadí.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Stránka</th><th>Co obsahuje</th></tr></thead>
+    <tbody>
+      <tr><td><b>AI</b></td><td>Lokální AI (Ollama, Jen lokálně, aktualizace, shrnutí předem, porovnání modelů), poskytovatel a model pro asistenta a spamfiltr, API klíče, automatické funkce (třídění do štítků, ranní přehled)</td></tr>
+      <tr><td><b>Spamfiltr</b></td><td>Zapnutí AI filtru, práh pro přesun do spamu, zobrazování pošty až po kontrole, stav blocklistů</td></tr>
+      <tr><td><b>Zprávy</b></td><td>Vlákna, zpoždění odeslání, přikládání veřejného klíče, výchozí e-mailová aplikace, běh na pozadí a spouštění po přihlášení, offline cache, podpis</td></tr>
+      <tr><td><b>Pravidla</b></td><td>Pravidla pro příchozí poštu</td></tr>
+      <tr><td><b>PGP</b></td><td>Vlastní klíče (vytvořit, importovat, zálohovat, odstranit), klíče kontaktů, hledání na keys.openpgp.org</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="soukromi">
+  <h2>Soukromí a data</h2>
+  <h3>Co odchází k AI</h3>
+  <ul>
+    <li>S cloudovým poskytovatelem odchází obsah zpráv, které AI zpracovává (spamfiltr, shrnutí, návrhy). Spamfiltr posílá jen prvních 6000 znaků těla.</li>
+    <li>U OpenAI se posílá se <code>store: false</code>. Mistral zpracovává data v EU.</li>
+    <li>S lokální AI nebo v režimu <b>Jen lokálně</b> nic neodchází.</li>
+  </ul>
+  <h3>Kde jsou data</h3>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Co</th><th>Kde</th></tr></thead>
+    <tbody>
+      <tr><td>Nastavení</td><td><code>~/.config/klient/config.json</code></td></tr>
+      <tr><td>Blocklisty, rozhodnutí filtru, klíče, cache, Ollama</td><td><code>~/.local/share/klient/</code></td></tr>
+      <tr><td>Relace, hesla IMAP, API klíče, klíče cache a PGP</td><td>klíčenka GNOME (Secret Service)</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="omezeni">
+  <h2>Známá omezení</h2>
+  <ul>
+    <li>Proton API není pro aplikace třetích stran oficiálně dokumentované a může se změnit. Proton může přihlášení odmítnout nebo vyžádat CAPTCHA – pak se jednou přihlaste přes web ze stejné sítě.</li>
+    <li>U Protonu hledání neprochází text zpráv (těla jsou na serveru šifrovaná).</li>
+    <li>Odložení a naplánované odeslání u IMAP služeb fungují jen, když Klient běží.</li>
+    <li>U Gmailu Klient při čtení doručené pošty neví, jaké štítky už zpráva má – pozná to až ve složce štítku.</li>
+    <li>Outlook / Hotmail není podporovaný.</li>
+    <li>Přílohy se do offline cache neukládají.</li>
+    <li>Pravidla jsou společná pro všechny účty (cílové složky a štítky patří účtu, ve kterém vznikly).</li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="autor">
+  <h2>O aplikaci</h2>
+  <p><b>Klient</b> vyvíjí Libor Macák – <a href="https://libormacak.eu">libormacak.eu</a>, <a href="mailto:jsem@libormacak.eu">jsem@libormacak.eu</a>.</p>
+  <p>Postaveno na GTK4, libadwaita, WebKitGTK, go-proton-api, gopenpgp a knihovnách go-imap/go-smtp.</p>
+</section>
+
+<footer>Dokumentace k verzi 0.6.5 · září 2026</footer>
+
+</div>
+</main>
+</div>
+
+<script>
+(function () {
+  // Theme switch (remembered per browser when storage is available).
+  var root = document.documentElement;
+  var buttons = document.querySelectorAll('[data-theme-set]');
+  function apply(mode) {
+    if (mode === 'light' || mode === 'dark') root.setAttribute('data-theme', mode);
+    else root.removeAttribute('data-theme');
+    buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.themeSet === mode)); });
+  }
+  var saved = 'auto';
+  try { saved = localStorage.getItem('klient-docs-theme') || 'auto'; } catch (e) {}
+  apply(saved);
+  buttons.forEach(function (b) {
+    b.addEventListener('click', function () {
+      apply(b.dataset.themeSet);
+      try { localStorage.setItem('klient-docs-theme', b.dataset.themeSet); } catch (e) {}
+    });
+  });
+
+  // Mobile table of contents.
+  var toc = document.getElementById('toc');
+  var toggle = toc.querySelector('.toc-toggle');
+  toggle.addEventListener('click', function () {
+    var open = toc.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(open));
+  });
+  toc.querySelectorAll('ol a').forEach(function (a) {
+    a.addEventListener('click', function () {
+      toc.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // Highlight the section in view.
+  var links = {};
+  toc.querySelectorAll('ol a').forEach(function (a) { links[a.getAttribute('href').slice(1)] = a; });
+  if ('IntersectionObserver' in window) {
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting && links[e.target.id]) {
+          Object.values(links).forEach(function (l) { l.classList.remove('active'); });
+          links[e.target.id].classList.add('active');
+        }
+      });
+    }, { rootMargin: '-10% 0px -80% 0px' });
+    document.querySelectorAll('main section[id]').forEach(function (s) { obs.observe(s); });
+  }
+})();
+</script>
+</body>
+</html>

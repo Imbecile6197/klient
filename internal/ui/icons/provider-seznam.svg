@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <circle cx="32" cy="32" r="30" fill="#cc0000"/>
+  <text x="32" y="44" font-family="Adwaita Sans, Cantarell, sans-serif" font-size="36" font-weight="800" fill="#fff" text-anchor="middle">S</text>
+</svg>
