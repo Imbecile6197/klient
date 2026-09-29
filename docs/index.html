@@ -349,11 +349,13 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
 <!-- ============================================================ -->
 <section id="instalace">
   <h2>Instalace</h2>
-  <h3>Z balíčku RPM (Fedora)</h3>
-<pre><code>sudo dnf install ./build/rpm/RPMS/x86_64/klient-0.6.8-1.fc44.x86_64.rpm</code></pre>
+  <h3>Z GitHubu (Fedora)</h3>
+  <p>Nejnovější verzi nainstalujete jedním příkazem přímo z GitHubu:</p>
+<pre><code>sudo dnf install https://github.com/Imbecile6197/klient/releases/latest/download/klient.x86_64.rpm</code></pre>
+  <p>Další verze si Klient stáhne sám – viz <a href="#aktualizace">Automatické aktualizace</a>.</p>
   <p>Tuto dokumentaci otevřete kdykoli z Klienta: hlavní nabídka → <b>Nápověda</b> nebo klávesa <kbd>F1</kbd>.</p>
   <p>Balíček doporučuje rozšíření <code>gnome-shell-extension-appindicator</code>, bez kterého GNOME nezobrazí ikonu v horní liště.</p>
-  <h3>Automatické aktualizace</h3>
+  <h3 id="aktualizace">Automatické aktualizace</h3>
   <p>Klient jednou denně zkontroluje <a href="https://github.com/Imbecile6197/klient/releases">vydání na GitHubu</a> (ne na měřeném připojení). Novou verzi na pozadí stáhne a ověří kontrolním součtem SHA-256 – musí souhlasit se souborem <code>SHA256SUMS</code> i s otiskem, který uvádí GitHub. Pak přijde oznámení <b>Je připravená nová verze Klienta</b>; tlačítko <b>Nainstalovat</b> si vyžádá heslo správce, balíček nainstaluje a Klient se sám restartuje.</p>
   <p>Kontrolu jde vypnout nebo spustit ručně v Předvolbách → Zprávy → <b>Aktualizace</b>. Klient sestavený ze zdrojového kódu novou verzi jen ohlásí.</p>
   <div class="note">

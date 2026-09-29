@@ -58,11 +58,15 @@ make install      # do ~/.local, včetně .desktop souboru a ikony
 make rpm          # balíček pro Fedoru do build/rpm/RPMS/x86_64/
 ```
 
-Instalace balíčku:
+Instalace nejnovější verze přímo z GitHubu (Fedora):
 
 ```bash
-sudo dnf install ./build/rpm/RPMS/x86_64/klient-0.6.8-1.fc44.x86_64.rpm
+sudo dnf install https://github.com/Imbecile6197/klient/releases/latest/download/klient.x86_64.rpm
 ```
+
+Další verze si nainstalovaný Klient stáhne z [vydání na GitHubu](https://github.com/Imbecile6197/klient/releases) sám.
+
+Vydání nové verze (vyžaduje `gh` a commitnutý strom): `git tag -a vX.Y.Z -m "Klient X.Y.Z" && make release VERSION=X.Y.Z`.
 
 ## První spuštění
 

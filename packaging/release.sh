@@ -21,14 +21,17 @@ fi
 
 make rpm VERSION="$VERSION"
 RPM=$(ls build/rpm/RPMS/x86_64/klient-"$VERSION"-*.x86_64.rpm)
-(cd "$(dirname "$RPM")" && sha256sum "$(basename "$RPM")" > SHA256SUMS)
+# A copy with a fixed name gives a stable link for the first installation:
+# https://github.com/Imbecile6197/klient/releases/latest/download/klient.x86_64.rpm
+cp "$RPM" "$(dirname "$RPM")/klient.x86_64.rpm"
+(cd "$(dirname "$RPM")" && sha256sum "$(basename "$RPM")" klient.x86_64.rpm > SHA256SUMS)
 
 # Release notes: the newest %changelog entry of the spec.
 NOTES=$(awk '/^%changelog/{c=1; next} c && /^\*/{if (n++) exit; next} c' packaging/klient.spec | sed '/^$/d')
 
 git -c credential.helper= -c credential.helper='!gh auth git-credential' push origin main "$TAG"
-gh release create "$TAG" "$RPM" "$(dirname "$RPM")/SHA256SUMS" \
+gh release create "$TAG" "$RPM" "$(dirname "$RPM")/klient.x86_64.rpm" "$(dirname "$RPM")/SHA256SUMS" \
 	--title "Klient $VERSION" \
 	--notes "$NOTES
 
-Instalace: \`sudo dnf install ./$(basename "$RPM")\` – nainstalovaný Klient si další verze stáhne sám (Předvolby → Zprávy → Aktualizace)."
+Instalace: \`sudo dnf install https://github.com/Imbecile6197/klient/releases/latest/download/klient.x86_64.rpm\` – nainstalovaný Klient si další verze stáhne sám (Předvolby → Zprávy → Aktualizace)."
