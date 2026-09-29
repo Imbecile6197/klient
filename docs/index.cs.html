@@ -289,7 +289,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
       <rect x="4" y="12" width="56" height="40" rx="9" fill="#1c71d8"/>
       <path d="M10 20l22 16 22-16" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <div><b>Klient</b><span>Dokumentace · verze 0.7.0 · <a href="index.html" hreflang="en" lang="en">English</a></span></div>
+    <div><b>Klient</b><span>Dokumentace · verze 0.7.1 · <a href="index.html" hreflang="en" lang="en">English</a></span></div>
   </div>
   <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc">Obsah</button>
   <ol>
@@ -359,7 +359,8 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
   <p>Klient mluví česky a anglicky. Jazyk se řídí nastavením systému; změnit ho jde v Předvolbách → Zprávy → <b>Jazyk rozhraní</b> a projeví se po restartu. Stejným jazykem odpovídá i AI – shrnutí, návrhy odpovědí, „Zeptat se pošty“ a zdůvodnění spamfiltru.</p>
   <p>Balíček doporučuje rozšíření <code>gnome-shell-extension-appindicator</code>, bez kterého GNOME nezobrazí ikonu v horní liště.</p>
   <h3 id="aktualizace">Automatické aktualizace</h3>
-  <p>Klient jednou denně zkontroluje <a href="https://github.com/Imbecile6197/klient/releases">vydání na GitHubu</a> (ne na měřeném připojení). Novou verzi na pozadí stáhne a ověří kontrolním součtem SHA-256 – musí souhlasit se souborem <code>SHA256SUMS</code> i s otiskem, který uvádí GitHub. Pak přijde oznámení <b>Je připravená nová verze Klienta</b>; tlačítko <b>Nainstalovat</b> si vyžádá heslo správce, balíček nainstaluje a Klient se sám restartuje.</p>
+  <p>Klient jednou denně zkontroluje <a href="https://github.com/Imbecile6197/klient/releases">vydání na GitHubu</a> (ne na měřeném připojení). Novou verzi na pozadí stáhne a ověří kontrolním součtem SHA-256 – musí souhlasit se souborem <code>SHA256SUMS</code> i s otiskem, který uvádí GitHub. Pak přijde oznámení <b>Je připravená nová verze Klienta</b>; tlačítko <b>Nainstalovat</b> si vyžádá heslo správce, balíček nainstaluje a Klient se sám restartuje. Tlačítko <b>Co je nového</b> ukáže změny ještě před instalací.</p>
+  <p>Po aktualizaci Klient ukáže, co se změnilo od verze, kterou jste používali naposledy. Seznam kdykoli znovu otevřete z hlavní nabídky → <b>Co je nového</b>.</p>
   <p>Kontrolu jde vypnout nebo spustit ručně v Předvolbách → Zprávy → <b>Aktualizace</b>. Klient sestavený ze zdrojového kódu novou verzi jen ohlásí.</p>
   <div class="note">
     <b>Aktualizace za běhu</b>
@@ -370,7 +371,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
 make build      # první sestavení trvá dlouho (CGo bindingy GTK)
 make run
 make install    # do ~/.local včetně .desktop souboru a ikony
-make rpm VERSION=0.7.0</code></pre>
+make rpm VERSION=0.7.1</code></pre>
 </section>
 
 <!-- ============================================================ -->
@@ -714,7 +715,7 @@ make rpm VERSION=0.7.0</code></pre>
   <p>Postaveno na GTK4, libadwaita, WebKitGTK, go-proton-api, gopenpgp a knihovnách go-imap/go-smtp.</p>
 </section>
 
-<footer>Dokumentace k verzi 0.7.0 · září 2026 · <a href="index.html" hreflang="en" lang="en">English version</a></footer>
+<footer>Dokumentace k verzi 0.7.1 · září 2026 · <a href="index.html" hreflang="en" lang="en">English version</a></footer>
 
 </div>
 </main>

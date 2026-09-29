@@ -619,10 +619,6 @@ msgid "sender domain %s in %s"
 msgstr "doména odesílatele %s v %s"
 
 #: internal/ui/about.go
-msgid "<p>Klient speaks English and Czech.</p>\n<ul>\n<li>The interface follows the system language; it can be changed in Preferences → Messages</li>\n<li>Automatic updates from GitHub, verified by a checksum</li>\n<li>Mistral (EU servers) as an AI provider, Ministral 3 as a local model</li>\n<li>Help with the complete documentation (F1)</li>\n</ul>"
-msgstr "<p>Klient mluví anglicky a česky.</p>\n<ul>\n<li>Rozhraní se řídí jazykem systému, změnit ho jde v Předvolbách → Zprávy</li>\n<li>Automatické aktualizace z GitHubu ověřené kontrolním součtem</li>\n<li>Mistral (servery v EU) jako poskytovatel AI, Ministral 3 jako lokální model</li>\n<li>Nápověda s kompletní dokumentací (F1)</li>\n</ul>"
-
-#: internal/ui/about.go
 msgid "An email client for GNOME and Proton Mail with native PGP, an AI assistant and a local AI-driven spam filter."
 msgstr "E-mailový klient pro GNOME a Proton Mail s nativním PGP, AI asistentem a lokálním spamfiltrem řízeným AI."
 
@@ -3332,6 +3328,30 @@ msgstr "Klient – žádná nepřečtená pošta"
 #: internal/ui/tray.go
 msgid "Open Klient"
 msgstr "Otevřít Klient"
+
+#: internal/ui/whatsnew.go
+msgid "Click to see what's new."
+msgstr "Kliknutím zobrazíte, co je nového."
+
+#: internal/ui/whatsnew.go
+msgid "Klient has been updated to version %s"
+msgstr "Klient byl aktualizován na verzi %s"
+
+#: internal/ui/whatsnew.go
+msgid "Version %s"
+msgstr "Verze %s"
+
+#: internal/ui/whatsnew.go
+msgid "What's New"
+msgstr "Co je nového"
+
+#: internal/ui/whatsnew.go
+msgid "What's New in Klient %s"
+msgstr "Co je nového v Klientovi %s"
+
+#: internal/ui/whatsnew.go
+msgid "What's New in Version %s"
+msgstr "Co je nového ve verzi %s"
 
 #: internal/update/update.go
 msgid "SHA256SUMS does not contain %s"

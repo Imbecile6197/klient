@@ -24,7 +24,7 @@ Na Fedoře nainstalujete nejnovější vydání přímo z GitHubu:
 sudo dnf install https://github.com/Imbecile6197/klient/releases/latest/download/klient.x86_64.rpm
 ```
 
-Potom Klient jednou denně zkontroluje nová vydání, stáhne je na pozadí, ověří kontrolní součet SHA-256 a nainstaluje je po jednom kliknutí a zadání hesla správce.
+Potom Klient jednou denně zkontroluje nová vydání, stáhne je na pozadí, ověří kontrolní součet SHA-256 a nainstaluje je po jednom kliknutí a zadání hesla správce. Okno Co je nového ukáže změny před aktualizací i po ní.
 
 Ikona v horní liště potřebuje v GNOME rozšíření AppIndicator (`gnome-shell-extension-appindicator`).
 

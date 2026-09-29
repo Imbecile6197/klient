@@ -27,6 +27,7 @@ import (
 	"github.com/Imbecile6197/klient/internal/mailparse"
 	"github.com/Imbecile6197/klient/internal/ollama"
 	"github.com/Imbecile6197/klient/internal/protonmail"
+	"github.com/Imbecile6197/klient/internal/relnotes"
 	"github.com/Imbecile6197/klient/internal/secrets"
 	"github.com/Imbecile6197/klient/internal/spam"
 )
@@ -94,6 +95,8 @@ type App struct {
 	ai     *ai.Client
 	ollama *ollama.Runtime
 	update pendingUpdate
+	// Release notes of the last update, until "What's New" is shown.
+	whatsNew []relnotes.Release
 
 	ctx    context.Context
 	cancel context.CancelFunc
@@ -228,6 +231,7 @@ func (a *App) activate() {
 	if !a.background {
 		a.win.Present()
 	}
+	a.checkWhatsNew()
 	go a.resumeAll()
 	go a.digestLoop()
 	go a.ollamaUpdateLoop()
@@ -482,6 +486,8 @@ func (a *App) setupActions() {
 	add("about", nil, a.showAbout)
 	add("help", []string{"F1"}, a.showHelp)
 	add("install-update", nil, a.installUpdate)
+	add("update-notes", nil, a.showUpdateNotes)
+	add("whats-new", nil, a.showWhatsNew)
 	add("shortcuts", []string{"<Control>question", "<Control>slash"}, a.showShortcuts)
 	add("quit", []string{"<Control>q"}, a.quit)
 }
@@ -505,6 +511,7 @@ func (a *App) primaryMenu() *gio.Menu {
 	s2.Append(i18n.T("Keyboard Shortcuts"), "app.shortcuts")
 	s2.Append(i18n.T("Add Account…"), "app.add-account")
 	s2.Append(i18n.T("Log Out of This Account"), "app.logout")
+	s2.Append(i18n.T("What's New"), "app.whats-new")
 	s2.Append(i18n.T("About Klient"), "app.about")
 	s2.Append(i18n.T("Quit"), "app.quit")
 	menu.AppendSection("", s2)

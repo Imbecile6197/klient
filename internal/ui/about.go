@@ -16,17 +16,6 @@ import (
 // Version is set at build time (-ldflags "-X .../internal/ui.Version=…").
 var Version = "0.1.0-dev"
 
-// releaseNotes describes the current version (shown in About → What's New).
-func releaseNotes() string {
-	return i18n.T(`<p>Klient speaks English and Czech.</p>
-<ul>
-<li>The interface follows the system language; it can be changed in Preferences → Messages</li>
-<li>Automatic updates from GitHub, verified by a checksum</li>
-<li>Mistral (EU servers) as an AI provider, Ministral 3 as a local model</li>
-<li>Help with the complete documentation (F1)</li>
-</ul>`)
-}
-
 func (a *App) showAbout() {
 	d := adw.NewAboutDialog()
 	d.SetApplicationName("Klient")
@@ -41,8 +30,10 @@ func (a *App) showAbout() {
 	d.SetIssueURL("https://github.com/Imbecile6197/klient/issues")
 	d.SetLicenseType(gtk.LicenseGPL30)
 	d.AddLink(i18n.T("Source Code on GitHub"), "https://github.com/Imbecile6197/klient")
-	d.SetReleaseNotesVersion(Version)
-	d.SetReleaseNotes(releaseNotes())
+	if notes := releaseNotes(); notes != "" {
+		d.SetReleaseNotesVersion(Version)
+		d.SetReleaseNotes(notes)
+	}
 
 	d.AddLink(i18n.T("Write to the author: jsem@libormacak.eu"), "mailto:jsem@libormacak.eu?subject=Klient%20"+Version)
 	d.AddLink("Proton Mail", "https://proton.me/mail")

@@ -24,7 +24,7 @@ On Fedora, install the latest release straight from GitHub:
 sudo dnf install https://github.com/Imbecile6197/klient/releases/latest/download/klient.x86_64.rpm
 ```
 
-After that, Klient checks for new releases once a day, downloads them in the background, verifies their SHA-256 checksum and installs them after one click and the administrator password.
+After that, Klient checks for new releases once a day, downloads them in the background, verifies their SHA-256 checksum and installs them after one click and the administrator password. A What's New window shows the changes before and after each update.
 
 For the tray icon, GNOME needs the AppIndicator extension (`gnome-shell-extension-appindicator`).
 

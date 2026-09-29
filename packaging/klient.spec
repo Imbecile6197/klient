@@ -66,6 +66,11 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Tue Sep 29 2026 Libor Macák <jsem@libormacak.eu> - 0.7.1-1
+- "What's New" after an update (changes since the last used version), before
+  installing an update and in the main menu; release notes are embedded
+  from packaging/release-notes
+
 * Tue Sep 29 2026 Libor Macák <jsem@libormacak.eu> - 0.7.0-1
 - English and Czech user interface (gettext catalogs in po/, embedded);
   the language follows the system or the Preferences

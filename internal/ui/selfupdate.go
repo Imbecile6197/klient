@@ -18,7 +18,8 @@ import (
 // pendingUpdate is a downloaded and verified package waiting to be installed.
 type pendingUpdate struct {
 	version, path string
-	busy          bool // a check, download or install is running
+	notes         string // release notes (Markdown) from GitHub
+	busy          bool   // a check, download or install is running
 }
 
 func updateDir() string {
@@ -105,10 +106,11 @@ func (a *App) checkUpdate(report func(string)) {
 	}
 	say(fmt.Sprintf(i18n.T("Version %s is downloaded and verified"), rel.Version))
 	ui(func() {
-		a.update.version, a.update.path = rel.Version, path
+		a.update.version, a.update.path, a.update.notes = rel.Version, path, rel.Notes
 		n := gio.NewNotification(i18n.T("A New Version of Klient Is Ready"))
 		n.SetBody(fmt.Sprintf(i18n.T("Version %s has been downloaded from GitHub and verified. Installing it will ask for the administrator password."), rel.Version))
 		n.SetDefaultAction("app.install-update")
+		n.AddButton(i18n.T("What's New"), "app.update-notes")
 		n.AddButton(i18n.T("Install"), "app.install-update")
 		a.app.SendNotification("self-update", n)
 		a.toastWithAction(fmt.Sprintf(i18n.T("Version %s is ready"), rel.Version), i18n.T("Install"), a.installUpdate)
@@ -168,6 +170,10 @@ func (a *App) updateGroup() *adw.PreferencesGroup {
 	install.AddCSSClass("suggested-action")
 	install.SetVisible(a.update.path != "")
 	install.ConnectClicked(a.installUpdate)
+	notes := gtk.NewButtonWithLabel(i18n.T("What's New"))
+	notes.SetVAlign(gtk.AlignCenter)
+	notes.SetVisible(a.update.path != "")
+	notes.ConnectClicked(a.showUpdateNotes)
 	btn.ConnectClicked(func() {
 		btn.SetSensitive(false)
 		go func() {
@@ -175,9 +181,11 @@ func (a *App) updateGroup() *adw.PreferencesGroup {
 			ui(func() {
 				btn.SetSensitive(true)
 				install.SetVisible(a.update.path != "")
+				notes.SetVisible(a.update.path != "")
 			})
 		}()
 	})
+	check.AddSuffix(notes)
 	check.AddSuffix(install)
 	check.AddSuffix(btn)
 	g.Add(check)

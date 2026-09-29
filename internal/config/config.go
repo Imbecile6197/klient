@@ -95,6 +95,9 @@ type Config struct {
 	OllamaAutoUpdate bool   `json:"ollama_auto_update"`
 	OllamaLastCheck  string `json:"ollama_last_check"` // RFC 3339
 
+	// Version that ran last, to show "What's New" after an update.
+	LastRunVersion string `json:"last_run_version"`
+
 	// Interface language: "" follows the system, or "en", "cs".
 	Language string `json:"language"`
 
