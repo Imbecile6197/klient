@@ -88,8 +88,8 @@ Soubory: nastavení v `~/.config/klient/config.json`, data (blocklisty, rozhodnu
 - Outlook / Hotmail není podporovaný.
 - `third_party/go-proton-api` je kopie knihovny Protonu s několika doplňky (pole konverzací, naplánované odeslání, odkládání, automatická odpověď); `third_party/gotk4-webkitgtk` je výběr Go bindingů WebKitGTK. Podrobnosti jsou v `KLIENT_PATCHES.md` v obou složkách.
 
-## Autor
+## Licence
 
-Libor Macák – [libormacak.eu](https://libormacak.eu), [jsem@libormacak.eu](mailto:jsem@libormacak.eu). Chyby a nápady pište do [Issues](https://github.com/Imbecile6197/klient/issues).
+Chyby a nápady pište do [Issues](https://github.com/Imbecile6197/klient/issues).
 
 Licence [GNU General Public License v3.0](LICENSE).

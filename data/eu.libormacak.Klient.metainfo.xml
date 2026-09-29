@@ -7,9 +7,9 @@
   <summary>Mail client with PGP, an AI assistant and an AI spam filter</summary>
   <summary xml:lang="cs">E-mailový klient s PGP, AI asistentem a AI spamfiltrem</summary>
   <developer id="eu.libormacak">
-    <name>Libor Macák</name>
+    <name>Imbecile6197</name>
   </developer>
-  <url type="homepage">https://libormacak.eu</url>
+  <url type="homepage">https://github.com/Imbecile6197/klient</url>
   <url type="vcs-browser">https://github.com/Imbecile6197/klient</url>
   <url type="bugtracker">https://github.com/Imbecile6197/klient/issues</url>
   <update_contact>jsem@libormacak.eu</update_contact>

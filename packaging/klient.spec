@@ -11,7 +11,7 @@ Summary:        Mail client with PGP, an AI assistant and an AI spam filter
 Summary(cs):    E-mailový klient s PGP, AI asistentem a AI spamfiltrem
 
 License:        GPL-3.0-or-later AND MIT AND MPL-2.0 AND Apache-2.0 AND BSD-3-Clause
-URL:            https://libormacak.eu
+URL:            https://github.com/Imbecile6197/klient
 Source0:        %{name}-%{version}.tar.gz
 ExclusiveArch:  x86_64
 
@@ -66,112 +66,112 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
-* Tue Sep 29 2026 Libor Macák <jsem@libormacak.eu> - 0.7.2-1
+* Tue Sep 29 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.7.2-1
 - Fix messages with a one-line plain-text body shown empty
 - Fix Czech date formats in the English interface
 - Demo mode (KLIENT_DEMO=1) with made-up mail; screenshots generated from
   it (packaging/screenshots.sh) in README, docs and metainfo
 
-* Tue Sep 29 2026 Libor Macák <jsem@libormacak.eu> - 0.7.1-1
+* Tue Sep 29 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.7.1-1
 - "What's New" after an update (changes since the last used version), before
   installing an update and in the main menu; release notes are embedded
   from packaging/release-notes
 
-* Tue Sep 29 2026 Libor Macák <jsem@libormacak.eu> - 0.7.0-1
+* Tue Sep 29 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.7.0-1
 - English and Czech user interface (gettext catalogs in po/, embedded);
   the language follows the system or the Preferences
 - AI answers in the interface language
 - Documentation and README in English and Czech
 - Localized dates, times and plural forms
 
-* Tue Sep 29 2026 Libor Macák <jsem@libormacak.eu> - 0.6.8-1
+* Tue Sep 29 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.6.8-1
 - Automatic updates from GitHub releases: a new version is downloaded in
   the background, verified by SHA-256 and installed after one click and the
   administrator password (Preferences → Messages → Updates)
 
-* Tue Sep 29 2026 Libor Macák <jsem@libormacak.eu> - 0.6.7-1
+* Tue Sep 29 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.6.7-1
 - Source code published on GitHub; link in About
 
-* Tue Sep 29 2026 Libor Macák <jsem@libormacak.eu> - 0.6.6-1
+* Tue Sep 29 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.6.6-1
 - Help (F1, main menu) opens the built-in user documentation
 
-* Mon Sep 28 2026 Libor Macák <jsem@libormacak.eu> - 0.6.5-1
+* Mon Sep 28 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.6.5-1
 - Sidebar spam-filter status follows model changes and names the provider
 
-* Mon Sep 28 2026 Libor Macák <jsem@libormacak.eu> - 0.6.4-1
+* Mon Sep 28 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.6.4-1
 - Monochrome panel icon; only the new-mail dot is red
 - User documentation in docs/index.html
 
-* Mon Sep 28 2026 Libor Macák <jsem@libormacak.eu> - 0.6.3-1
+* Mon Sep 28 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.6.3-1
 - Mistral AI (EU servers) as a cloud AI provider with strict JSON schema
 - Ministral 3 (3B, 8B) offered for local AI and model comparison
 
-* Mon Sep 28 2026 Libor Macák <jsem@libormacak.eu> - 0.6.2-1
+* Mon Sep 28 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.6.2-1
 - Gmail: labels as coloured tags (add keeps the message in place, remove
   drops only the label), Gmail-style archive to All Mail, Starred folder,
   "Important" hidden
 
-* Mon Sep 28 2026 Libor Macák <jsem@libormacak.eu> - 0.6.1-1
+* Mon Sep 28 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.6.1-1
 - Attachments shown as chips at the top of a message (click opens, arrow
   saves)
 - The reader no longer jumps back to the top while scrolling; HTML mail
   height is measured from its content
 
-* Mon Sep 28 2026 Libor Macák <jsem@libormacak.eu> - 0.6.0-1
+* Mon Sep 28 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.6.0-1
 - PGP for Seznam, Gmail and IMAP accounts: own key (create, import, back
   up), PGP/MIME encryption and signatures, WKD, Autocrypt and optional
   keys.openpgp.org lookup; drafts and sent copies encrypted to self
 - Used space shown for servers without a quota (Seznam)
 - Preferences pages in the same order for every account
 
-* Mon Sep 28 2026 Libor Macák <jsem@libormacak.eu> - 0.5.0-1
+* Mon Sep 28 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.5.0-1
 - IMAP accounts: conversation threads, snooze and scheduled sending run by
   Klient (folders "Odložené" and "Naplánované"), full References in replies
 - The UI no longer waits for IMAP network operations when drawing folders
 
-* Mon Sep 28 2026 Libor Macák <jsem@libormacak.eu> - 0.4.1-1
+* Mon Sep 28 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.4.1-1
 - Seznam login: guidance for the application password required with
   two-factor authentication; login errors shown in full
 
-* Mon Sep 28 2026 Libor Macák <jsem@libormacak.eu> - 0.4.0-1
+* Mon Sep 28 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.4.0-1
 - Seznam.cz, Gmail (app password) and any IMAP/SMTP account: automatic
   server discovery, IMAP IDLE, full-text search, drafts, sending with a copy
   in Sent, offline cache, spam filter and AI like for Proton
 - Account wizard with service tiles and logos
 
-* Mon Sep 28 2026 Libor Macák <jsem@libormacak.eu> - 0.3.6-1
+* Mon Sep 28 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.3.6-1
 - Internal: common mail account interface (preparation for Seznam, Gmail
   and IMAP); features the service lacks are hidden
 - Service logo next to accounts in the account switcher
 
-* Mon Sep 28 2026 Libor Macák <jsem@libormacak.eu> - 0.3.5-1
+* Mon Sep 28 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.3.5-1
 - About dialog: author's website and e-mail, updated feature list and
   licences of the new components
 
-* Mon Sep 28 2026 Libor Macák <jsem@libormacak.eu> - 0.3.4-1
+* Mon Sep 28 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.3.4-1
 - New inbox mail is shown only after the spam filter has judged it
   (switchable; released after 6 minutes at the latest)
 
-* Mon Sep 28 2026 Libor Macák <jsem@libormacak.eu> - 0.3.3-1
+* Mon Sep 28 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.3.3-1
 - Storage indicator shows the mail quota like Proton's web (Drive counted
   separately on split-storage plans), refreshes every 30 minutes and warns
   in colour when nearly full
 
-* Sun Sep 27 2026 Libor Macák <jsem@libormacak.eu> - 0.3.2-1
+* Sun Sep 27 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.3.2-1
 - AI summaries and label suggestions are cached (encrypted) per message
 - Summaries of new mail are prepared in advance by the local model, only
   on mains power and when the model is idle
 - The local model stays loaded for 30 minutes on mains power
 
-* Sun Sep 27 2026 Libor Macák <jsem@libormacak.eu> - 0.3.1-1
+* Sun Sep 27 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.3.1-1
 - Offer a restart when the package is updated while Klient runs in the
   background
 
-* Sun Sep 27 2026 Libor Macák <jsem@libormacak.eu> - 0.3.0-1
+* Sun Sep 27 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.3.0-1
 - Local AI via a managed Ollama with an auto-updater (Ollama and models)
 - Model comparison on the user's own mail; local-only mode
 
-* Sun Sep 27 2026 Libor Macák <jsem@libormacak.eu> - 0.2.0-1
+* Sun Sep 27 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.2.0-1
 - Multiple Proton accounts with an account switcher
 - Background mode with a tray icon and autostart
 - Scheduled send with a countdown; countdown in the undo-send toast
@@ -181,25 +181,25 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 - AI: ask your mail, automatic labels, morning overview
 - Keyboard shortcuts window
 
-* Sun Sep 27 2026 Libor Macák <jsem@libormacak.eu> - 0.1.4-1
+* Sun Sep 27 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.1.4-1
 - Headers read from the raw header block: unsubscribe works for cached
   messages too; unsubscribe button moved up and highlighted
 - Revoked sessions recover automatically from the keyring, otherwise the
   login screen is shown instead of an error
 
-* Sun Sep 27 2026 Libor Macák <jsem@libormacak.eu> - 0.1.3-1
+* Sun Sep 27 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.1.3-1
 - Own messages show "Odesláno z vašeho účtu" instead of a missing sender key
 - Correct Czech plural of attachment counts
 
-* Sun Sep 27 2026 Libor Macák <jsem@libormacak.eu> - 0.1.2-1
+* Sun Sep 27 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.1.2-1
 - Messages with an attachment and an empty body can be saved and sent
   (draft update sent an unencrypted empty body, rejected by the API)
 - Shorter, readable error messages from the Proton API
 
-* Sun Sep 27 2026 Libor Macák <jsem@libormacak.eu> - 0.1.1-1
+* Sun Sep 27 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.1.1-1
 - Proton contacts are loaded again (empty filter bug); address suggestions
   from contacts and recent correspondents, diacritics-insensitive
 - Contacts window: search, write, add, delete; add sender from a message
 
-* Sun Sep 27 2026 Libor Macák <jsem@libormacak.eu> - 0.1.0-1
+* Sun Sep 27 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.1.0-1
 - First test release

@@ -88,8 +88,8 @@ Files: settings in `~/.config/klient/config.json`, data (blocklists, filter deci
 - Outlook / Hotmail is not supported.
 - `third_party/go-proton-api` is a copy of Proton's library with a few additions (conversation fields, scheduled sending, snoozing, automatic replies); `third_party/gotk4-webkitgtk` is a selection of the WebKitGTK Go bindings. See `KLIENT_PATCHES.md` in each.
 
-## Author
+## License
 
-Libor Macák – [libormacak.eu](https://libormacak.eu), [jsem@libormacak.eu](mailto:jsem@libormacak.eu). Bug reports and ideas are welcome in [Issues](https://github.com/Imbecile6197/klient/issues).
+Bug reports and ideas are welcome in [Issues](https://github.com/Imbecile6197/klient/issues).
 
 Licensed under the [GNU General Public License v3.0](LICENSE).
