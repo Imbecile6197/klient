@@ -15,6 +15,7 @@ import (
 
 	"github.com/ProtonMail/go-proton-api"
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
+	webkit "github.com/diamondburned/gotk4-webkitgtk/pkg/webkit/v6"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
@@ -95,6 +96,9 @@ type App struct {
 	ai     *ai.Client
 	ollama *ollama.Runtime
 	update pendingUpdate
+	// The help window, kept hidden after closing.
+	helpWin  *adw.Window
+	helpView *webkit.WebView
 	// Release notes of the last update, until "What's New" is shown.
 	whatsNew []relnotes.Release
 

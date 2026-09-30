@@ -66,6 +66,11 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Wed Sep 30 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.7.5-1
+- Help opens in its own WebKit window instead of the web browser (a
+  sandboxed browser got only one file through the document portal, so the
+  language switch and the screenshot failed on Ubuntu)
+
 * Tue Sep 29 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.7.4-1
 - New General page in Preferences (language, default email application,
   background mode, autostart, updates), moved out of Messages
