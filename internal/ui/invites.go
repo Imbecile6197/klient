@@ -19,6 +19,7 @@ import (
 
 	"github.com/Imbecile6197/klient/internal/i18n"
 	"github.com/Imbecile6197/klient/internal/ical"
+	"github.com/Imbecile6197/klient/internal/imapmail"
 	"github.com/Imbecile6197/klient/internal/mailparse"
 	"github.com/Imbecile6197/klient/internal/pgp"
 	"github.com/Imbecile6197/klient/internal/protonmail"
@@ -234,6 +235,11 @@ func (a *App) answerInvite(msg *protonmail.Message, ev *ical.Event, me, stat str
 			buttons.SetSensitive(true)
 			if err != nil {
 				status.SetText(i18n.T("The answer could not be sent: ") + err.Error())
+				if ce := certError(err); ce != nil {
+					if im, ok := acc.(*imapmail.Account); ok {
+						a.askTrustCert(a.win, ce, func() { a.trustCert(im.Settings().ID(), ce) })
+					}
+				}
 				return
 			}
 			status.SetText(partStatText(stat) + i18n.T(" (sent to the organizer)"))

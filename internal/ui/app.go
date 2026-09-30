@@ -358,6 +358,13 @@ func (a *App) resumeIMAP(id string, active bool) {
 			label := strings.TrimPrefix(id, "imap:")
 			if errors.Is(err, imapmail.ErrAuth) {
 				a.toastWithAction(fmt.Sprintf(i18n.T("Account %s: the server rejected the password"), label), i18n.T("Enter Password"), func() { a.imapLogin(set) })
+			} else if ce := certError(err); ce != nil {
+				a.toastWithAction(fmt.Sprintf(i18n.T("Account %s: the server certificate is not trusted"), label), i18n.T("Show Certificate"), func() {
+					a.askTrustCert(a.win, ce, func() {
+						a.trustCert(id, ce)
+						go a.resumeIMAP(id, active)
+					})
+				})
 			} else {
 				a.toast(fmt.Sprintf(i18n.T("Account %s could not be opened: %s"), label, err.Error()))
 			}

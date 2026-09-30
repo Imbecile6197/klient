@@ -82,6 +82,12 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.7.6" date="2026-09-30">
+      <description>
+        <p>Servers with an expired or self-signed certificate: the certificate can be reviewed and trusted.</p>
+        <p xml:lang="cs">Servery s vypršelým nebo vlastnoručně podepsaným certifikátem: certifikát jde prohlédnout a označit jako důvěryhodný.</p>
+      </description>
+    </release>
     <release version="0.7.5" date="2026-09-30">
       <description>
         <p>Help opens in its own window, so switching its language works on Ubuntu too.</p>

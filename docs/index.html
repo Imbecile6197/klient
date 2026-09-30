@@ -292,7 +292,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
       <rect x="4" y="12" width="56" height="40" rx="9" fill="#1c71d8"/>
       <path d="M10 20l22 16 22-16" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <div><b>Klient</b><span>Documentation · version 0.7.5 · <a href="index.cs.html" hreflang="cs" lang="cs">Česky</a></span></div>
+    <div><b>Klient</b><span>Documentation · version 0.7.6 · <a href="index.cs.html" hreflang="cs" lang="cs">Česky</a></span></div>
   </div>
   <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc">Contents</button>
   <ol>
@@ -404,6 +404,7 @@ packaging/deb.sh 0.7.3   # Ubuntu package, built in a podman container</code></p
 
   <h3>Other mailbox (IMAP/SMTP)</h3>
   <p>Klient finds the servers by itself – from the known providers, the Thunderbird database (ISPDB) and the MX records of the domain. If that fails, you enter them by hand. When a login fails, the complete message from the server is shown.</p>
+  <p><b>Untrusted certificates.</b> If a server's certificate cannot be verified (it has expired, is self-signed or was issued for another name), Klient shows its details – the reason, who it was issued to and by, its validity and the SHA-256 fingerprint – and lets you <b>trust this certificate</b>. Klient then accepts exactly that certificate for the server; if it changes, you are asked again. Verification is never switched off completely, because an unverified connection could be intercepted without any warning.</p>
 
   <h3>What each service supports</h3>
   <div class="table-wrap">
@@ -724,7 +725,7 @@ packaging/deb.sh 0.7.3   # Ubuntu package, built in a podman container</code></p
   <p>Built with GTK4, libadwaita, WebKitGTK, go-proton-api, GopenPGP and the go-imap/go-smtp libraries.</p>
 </section>
 
-<footer>Documentation for version 0.7.5 · September 2026 · <a href="index.cs.html" hreflang="cs" lang="cs">Česká verze</a></footer>
+<footer>Documentation for version 0.7.6 · September 2026 · <a href="index.cs.html" hreflang="cs" lang="cs">Česká verze</a></footer>
 
 </div>
 </main>

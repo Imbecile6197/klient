@@ -298,7 +298,7 @@ func (a *Account) Send(ctx context.Context, d *protonmail.Draft) error {
 
 func (a *Account) smtpClient() (*smtp.Client, error) {
 	addr := net.JoinHostPort(a.set.SMTPHost, strconv.Itoa(a.set.SMTPPort))
-	tc := tlsConfig(a.set.SMTPHost)
+	tc := tlsConfig(a.set.SMTPHost, a.set.SMTPPort, a.trusted())
 	var c *smtp.Client
 	var err error
 	if a.set.SMTPSecurity == "starttls" {
@@ -307,7 +307,7 @@ func (a *Account) smtpClient() (*smtp.Client, error) {
 		c, err = smtp.DialTLS(addr, tc)
 	}
 	if err != nil {
-		return nil, &netErr{err}
+		return nil, connErr(err)
 	}
 	if err := c.Auth(sasl.NewPlainClient("", a.set.Username, a.password)); err != nil {
 		c.Close()

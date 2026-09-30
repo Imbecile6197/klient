@@ -21,6 +21,7 @@ import (
 
 	"github.com/Imbecile6197/klient/internal/ai"
 	"github.com/Imbecile6197/klient/internal/i18n"
+	"github.com/Imbecile6197/klient/internal/imapmail"
 	"github.com/Imbecile6197/klient/internal/mailbox"
 	"github.com/Imbecile6197/klient/internal/mailparse"
 	"github.com/Imbecile6197/klient/internal/protonmail"
@@ -591,6 +592,14 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 					win.Present()
 					localToast(err.Error())
 					a.toast(i18n.T("Sending failed; the message has been reopened"))
+					if ce := certError(err); ce != nil {
+						if im, ok := acc.(*imapmail.Account); ok {
+							a.askTrustCert(win, ce, func() {
+								a.trustCert(im.Settings().ID(), ce)
+								localToast(i18n.T("The certificate is trusted – send the message again"))
+							})
+						}
+					}
 					return
 				}
 				for _, ad := range allRecipients() {

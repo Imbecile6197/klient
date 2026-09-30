@@ -124,6 +124,9 @@ type MailServer struct {
 	SMTPHost     string `json:"smtp_host"`
 	SMTPPort     int    `json:"smtp_port"`
 	SMTPSecurity string `json:"smtp_security"`
+	// Certificates the user trusted although they failed verification
+	// (expired, self-signed…): "host:port" -> SHA-256 fingerprint.
+	TrustedCerts map[string]string `json:"trusted_certs,omitempty"`
 }
 
 // ID is the account key used in Accounts and the keyring.

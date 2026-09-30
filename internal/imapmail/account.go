@@ -4,7 +4,6 @@ package imapmail
 
 import (
 	"context"
-	"crypto/tls"
 	"crypto/x509"
 	"encoding/base64"
 	"errors"
@@ -43,6 +42,7 @@ var ErrAuth = errors.New(i18n.T("the server rejected the login – check the pas
 type Account struct {
 	set      config.MailServer
 	password string
+	pins     sync.Mutex // guards set.TrustedCerts
 
 	mu sync.Mutex // guards the command connection (network operations)
 	c  *imapclient.Client
@@ -68,10 +68,6 @@ var (
 	noCache     bool
 )
 
-func tlsConfig(host string) *tls.Config {
-	return &tls.Config{ServerName: host, MinVersion: tls.VersionTLS12, RootCAs: testRootCAs}
-}
-
 func (a *Account) dial() (*imapclient.Client, error) { return a.dialWith(nil) }
 
 // dialWith connects and logs in; handler receives unsolicited server data
@@ -79,7 +75,7 @@ func (a *Account) dial() (*imapclient.Client, error) { return a.dialWith(nil) }
 func (a *Account) dialWith(handler *imapclient.UnilateralDataHandler) (*imapclient.Client, error) {
 	addr := net.JoinHostPort(a.set.IMAPHost, strconv.Itoa(a.set.IMAPPort))
 	opts := &imapclient.Options{
-		TLSConfig:             tlsConfig(a.set.IMAPHost),
+		TLSConfig:             tlsConfig(a.set.IMAPHost, a.set.IMAPPort, a.trusted()),
 		WordDecoder:           wordDecoder,
 		Dialer:                &net.Dialer{Timeout: 30 * time.Second},
 		UnilateralDataHandler: handler,
@@ -92,7 +88,7 @@ func (a *Account) dialWith(handler *imapclient.UnilateralDataHandler) (*imapclie
 		c, err = imapclient.DialTLS(addr, opts)
 	}
 	if err != nil {
-		return nil, &netErr{err}
+		return nil, connErr(err)
 	}
 	if err := c.Login(a.set.Username, a.password).Wait(); err != nil {
 		c.Close()
@@ -110,6 +106,16 @@ type netErr struct{ err error }
 
 func (e *netErr) Error() string { return i18n.T("server unavailable: ") + e.err.Error() }
 func (e *netErr) Unwrap() error { return e.err }
+
+// connErr wraps a connection failure: an untrusted certificate is reported
+// as such, anything else means the server is unreachable (offline).
+func connErr(err error) error {
+	var ce *CertError
+	if errors.As(err, &ce) {
+		return ce
+	}
+	return &netErr{err}
+}
 
 // IsOffline reports whether err means the server was unreachable.
 func IsOffline(err error) bool {
@@ -471,10 +477,14 @@ func (a *Account) Caps() mailbox.Caps {
 	return mailbox.Caps{FullTextSearch: true, LocalSnooze: true, LocalSchedule: true, E2E: pgp.HasOwnKey(a.set.Email), Labels: a.gmail()}
 }
 
-func (a *Account) Settings() config.MailServer { return a.set }
-func (a *Account) Username() string            { return a.set.ID() }
-func (a *Account) UserID() string              { return a.set.ID() }
-func (a *Account) Email() string               { return a.set.Email }
+func (a *Account) Settings() config.MailServer {
+	a.pins.Lock()
+	defer a.pins.Unlock()
+	return a.set
+}
+func (a *Account) Username() string { return a.set.ID() }
+func (a *Account) UserID() string   { return a.set.ID() }
+func (a *Account) Email() string    { return a.set.Email }
 
 func (a *Account) DisplayName() string {
 	if a.set.Name != "" {

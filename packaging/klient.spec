@@ -66,6 +66,11 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Wed Sep 30 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.7.6-1
+- IMAP/SMTP servers with an untrusted certificate: show it and let the user
+  trust that one certificate (pinned by SHA-256 per server); certificate
+  errors are no longer reported as the server being unavailable (#1)
+
 * Wed Sep 30 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.7.5-1
 - Help opens in its own WebKit window instead of the web browser (a
   sandboxed browser got only one file through the document portal, so the

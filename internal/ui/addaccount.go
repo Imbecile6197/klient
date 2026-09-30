@@ -199,6 +199,12 @@ func (a *App) imapLogin(prefill config.MailServer) {
 		smtpSec.SetSelected(secIndex(s.SMTPSecurity))
 		servers.SetSubtitle(s.IMAPHost + " · " + s.SMTPHost)
 	}
+	// Certificates trusted in this dialog (or before, when the password of
+	// a saved account is entered again).
+	pins := map[string]string{}
+	for k, v := range prefill.TrustedCerts {
+		pins[k] = v
+	}
 	collect := func() (config.MailServer, error) {
 		s := config.MailServer{
 			Kind:     string(imapmail.KindForEmail(email.Text())),
@@ -251,7 +257,8 @@ func (a *App) imapLogin(prefill config.MailServer) {
 	}
 	email.ConnectEntryActivated(func() { discover(func() { name.GrabFocus() }) })
 
-	run := func() {
+	var run func()
+	run = func() {
 		if strings.TrimSpace(email.Text()) == "" || pass.Text() == "" {
 			toasts.AddToast(adw.NewToast(i18n.T("Fill in the address and password")))
 			return
@@ -266,6 +273,12 @@ func (a *App) imapLogin(prefill config.MailServer) {
 				login.SetLabel(i18n.T("Log In"))
 				toasts.AddToast(adw.NewToast(err.Error()))
 				return
+			}
+			if len(pins) > 0 {
+				s.TrustedCerts = make(map[string]string, len(pins))
+				for k, v := range pins {
+					s.TrustedCerts[k] = v
+				}
 			}
 			password := strings.ReplaceAll(pass.Text(), " ", "") // app passwords are shown with spaces
 			if s.Kind != "gmail" {
@@ -296,6 +309,12 @@ func (a *App) imapLogin(prefill config.MailServer) {
 						}
 						servers.SetExpanded(!errors.Is(err, imapmail.ErrAuth))
 						showErr(msg)
+						if ce := certError(err); ce != nil {
+							a.askTrustCert(d, ce, func() {
+								pins[ce.Key()] = ce.Fingerprint
+								run()
+							})
+						}
 						return
 					}
 					if err := secrets.SaveMailPassword(s.ID(), password); err != nil {

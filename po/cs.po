@@ -3525,3 +3525,67 @@ msgstr[2] "%d nepřečtených zpráv"
 #: internal/ui/preferences.go
 msgid "Desktop Integration"
 msgstr "Propojení se systémem"
+
+#: internal/imapmail/certs.go
+msgid "the certificate of %s is not trusted: %s"
+msgstr "certifikát serveru %s není důvěryhodný: %s"
+
+#: internal/imapmail/certs.go
+msgid "it expired on %s"
+msgstr "jeho platnost skončila %s"
+
+#: internal/imapmail/certs.go
+msgid "it is valid only from %s"
+msgstr "platí až od %s"
+
+#: internal/imapmail/certs.go
+msgid "it was issued for a different server (%s)"
+msgstr "byl vydán pro jiný server (%s)"
+
+#: internal/imapmail/certs.go
+msgid "it is self-signed"
+msgstr "je podepsaný sám sebou"
+
+#: internal/imapmail/certs.go
+msgid "it was issued by an unknown certificate authority"
+msgstr "vydala ho neznámá certifikační autorita"
+
+#: internal/imapmail/certs.go
+msgid "the server sent no certificate"
+msgstr "server neposlal žádný certifikát"
+
+#: internal/ui/app.go
+msgid "Account %s: the server certificate is not trusted"
+msgstr "Účet %s: certifikát serveru není důvěryhodný"
+
+#: internal/ui/app.go
+msgid "Show Certificate"
+msgstr "Zobrazit certifikát"
+
+#: internal/ui/certtrust.go
+msgid "Untrusted Certificate"
+msgstr "Nedůvěryhodný certifikát"
+
+#: internal/ui/certtrust.go
+msgid "The certificate of the server %s cannot be verified: %s.\n\nThis happens when a certificate has expired or is self-signed, but also when someone intercepts the connection. Trust it only if you know the server and expect this certificate. Klient will accept this one certificate for the server; if it changes, you will be asked again."
+msgstr "Certifikát serveru %s nejde ověřit: %s.\n\nStává se to, když certifikátu skončila platnost nebo je podepsaný sám sebou, ale také když někdo spojení odposlouchává. Důvěřujte mu, jen pokud server znáte a tento certifikát očekáváte. Klient pak u tohoto serveru přijme právě tento certifikát; pokud se změní, zeptá se znovu."
+
+#: internal/ui/certtrust.go
+msgid "Issued to"
+msgstr "Vydán pro"
+
+#: internal/ui/certtrust.go
+msgid "Issued by"
+msgstr "Vydal"
+
+#: internal/ui/certtrust.go
+msgid "Valid"
+msgstr "Platnost"
+
+#: internal/ui/certtrust.go
+msgid "Trust This Certificate"
+msgstr "Důvěřovat tomuto certifikátu"
+
+#: internal/ui/compose.go
+msgid "The certificate is trusted – send the message again"
+msgstr "Certifikát je důvěryhodný – odešlete zprávu znovu"
