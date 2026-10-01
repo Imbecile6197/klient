@@ -66,6 +66,11 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Thu Oct 01 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.7.7-1
+- AI summaries, the morning overview and answers about mail are always in
+  the interface language (stated in the request after the messages too);
+  cached summaries in another language are regenerated
+
 * Wed Sep 30 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.7.6-1
 - IMAP/SMTP servers with an untrusted certificate: show it and let the user
   trust that one certificate (pinned by SHA-256 per server); certificate

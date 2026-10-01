@@ -146,7 +146,7 @@ func (c *Client) AnswerFromMail(ctx context.Context, question, today string, doc
 
 Question: %s
 
-%s`, today, question, sb.String()))
+%s`, today, question, sb.String())+outputLanguage())
 }
 
 // Digest summarises the unread mail for a morning overview.
@@ -157,5 +157,5 @@ func (c *Client) Digest(ctx context.Context, today string, docs []MailDoc) (stri
 	}
 	return c.assist(ctx, fmt.Sprintf(`Prepare a morning overview of the unread mail (today is %s). Start with one sentence on the overall state, then bullet points ordered by importance: first what needs a response or has a deadline (give the deadline), then everything else in brief. Sum up newsletters and advertising in one line. Keep it short, without introductory phrases.
 
-%s`, today, sb.String()))
+%s`, today, sb.String())+outputLanguage())
 }

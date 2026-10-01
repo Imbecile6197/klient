@@ -82,6 +82,12 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.7.7" date="2026-10-01">
+      <description>
+        <p>AI summaries are always written in the interface language.</p>
+        <p xml:lang="cs">Shrnutí od AI jsou vždy v jazyce rozhraní.</p>
+      </description>
+    </release>
     <release version="0.7.6" date="2026-09-30">
       <description>
         <p>Servers with an expired or self-signed certificate: the certificate can be reviewed and trusted.</p>

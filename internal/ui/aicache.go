@@ -25,6 +25,7 @@ type cachedSummary struct {
 	LatestID string // newest message the summary covers
 	Text     string
 	At       int64
+	Lang     string // interface language it was written in
 }
 
 func summaryKey(convID, latestID string) string {
@@ -51,7 +52,7 @@ func cachedSummaryFor(acc mailbox.Account, metas []protonmail.Summary) (string, 
 		return "", false
 	}
 	var cs cachedSummary
-	if acc.Cache().Get(summaryKey(latest.ConversationID, latest.ID), &cs) && cs.LatestID == latest.ID && cs.Text != "" {
+	if acc.Cache().Get(summaryKey(latest.ConversationID, latest.ID), &cs) && cs.LatestID == latest.ID && cs.Text != "" && cs.Lang == i18n.Lang() {
 		return cs.Text, true
 	}
 	return "", false
@@ -98,7 +99,7 @@ func (a *App) summarizeThread(ctx context.Context, acc mailbox.Account, metas []
 	}
 	out = strings.TrimSpace(out)
 	if acc.Cache() != nil {
-		_ = acc.Cache().Set(summaryKey(latest.ConversationID, latest.ID), cachedSummary{latest.ID, out, time.Now().Unix()})
+		_ = acc.Cache().Set(summaryKey(latest.ConversationID, latest.ID), cachedSummary{latest.ID, out, time.Now().Unix(), i18n.Lang()})
 	}
 	return out, nil
 }
