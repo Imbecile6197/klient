@@ -82,6 +82,12 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.7.8" date="2026-10-01">
+      <description>
+        <p>The spam filter's reason is always written in the interface language.</p>
+        <p xml:lang="cs">Zdůvodnění spamfiltru je vždy v jazyce rozhraní.</p>
+      </description>
+    </release>
     <release version="0.7.7" date="2026-10-01">
       <description>
         <p>AI summaries are always written in the interface language.</p>

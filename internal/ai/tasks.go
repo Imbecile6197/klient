@@ -133,6 +133,9 @@ func (c *Client) ClassifySpam(ctx context.Context, in SpamInput) (Verdict, error
 		body = truncate(body, 3000)
 	}
 	fmt.Fprintf(&sb, "<email>\nSubject: %s\n\n%s\n</email>", in.Subject, body)
+	// Repeated after the e-mail: small models otherwise write the reason in
+	// the language of the message.
+	fmt.Fprintf(&sb, "\n\nWrite the reason in %s, even if the e-mail is in another language.", i18n.LanguageName())
 
 	out, err := c.spam.Complete(ctx, Request{
 		Model: c.spamModel, System: fmt.Sprintf(spamSystem, i18n.LanguageName()), User: sb.String(),

@@ -66,6 +66,10 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Thu Oct 01 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.7.8-1
+- The spam filter's reason is always in the interface language (stated
+  again after the message for small local models)
+
 * Thu Oct 01 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.7.7-1
 - AI summaries, the morning overview and answers about mail are always in
   the interface language (stated in the request after the messages too);
