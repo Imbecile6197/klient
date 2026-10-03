@@ -40,8 +40,11 @@ func New(ctx context.Context, s Settings, keyFor func(provider string) string) *
 	}
 	build := func(id string) Provider {
 		if IsLocal(id) {
-			p, _ := newOllama(s.Local)
-			return p
+			p, err := newOllama(s.Local)
+			if err != nil {
+				return nil
+			}
+			return logged{p, id}
 		}
 		if s.LocalOnly {
 			return nil // cloud AI is switched off

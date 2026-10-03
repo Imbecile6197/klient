@@ -102,8 +102,11 @@ type Config struct {
 	Language string `json:"language"`
 
 	// Klient updates from the GitHub releases.
-	AutoUpdate      bool   `json:"auto_update"`
-	UpdateLastCheck string `json:"update_last_check"` // RFC 3339
+	AutoUpdate bool `json:"auto_update"`
+	// The model last chosen for each role and provider ("spam:gemini"), so
+	// switching providers back and forth keeps it.
+	RoleModels      map[string]string `json:"role_models,omitempty"`
+	UpdateLastCheck string            `json:"update_last_check"` // RFC 3339
 	// Summarise new mail in advance with the local model (on AC power only).
 	PrecomputeSummaries bool `json:"precompute_summaries"`
 

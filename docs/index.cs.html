@@ -292,7 +292,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
       <rect x="4" y="12" width="56" height="40" rx="9" fill="#1c71d8"/>
       <path d="M10 20l22 16 22-16" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <div><b>Klient</b><span>Dokumentace · verze 0.7.8 · <a href="index.html" hreflang="en" lang="en">English</a></span></div>
+    <div><b>Klient</b><span>Dokumentace · verze 0.7.9 · <a href="index.html" hreflang="en" lang="en">English</a></span></div>
   </div>
   <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc">Obsah</button>
   <ol>
@@ -690,6 +690,7 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
     <li>S cloudovým poskytovatelem odchází obsah zpráv, které AI zpracovává (spamfiltr, shrnutí, návrhy). Spamfiltr posílá jen prvních 6000 znaků těla.</li>
     <li>U OpenAI se posílá se <code>store: false</code>. Mistral zpracovává data v EU.</li>
     <li>S lokální AI nebo v režimu <b>Jen lokálně</b> nic neodchází.</li>
+    <li>Každý požadavek na AI se zapisuje do systémového logu s poskytovatelem, modelem, velikostí, dobou a výsledkem – nikdy s obsahem. Které modely Klient opravdu volá, zjistíte příkazem <code>journalctl --user -g "AI request"</code>.</li>
   </ul>
   <h3>Kde jsou data</h3>
   <div class="table-wrap">
@@ -725,7 +726,7 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
   <p>Postaveno na GTK4, libadwaita, WebKitGTK, go-proton-api, gopenpgp a knihovnách go-imap/go-smtp.</p>
 </section>
 
-<footer>Dokumentace k verzi 0.7.8 · září 2026 · <a href="index.html" hreflang="en" lang="en">English version</a></footer>
+<footer>Dokumentace k verzi 0.7.9 · září 2026 · <a href="index.html" hreflang="en" lang="en">English version</a></footer>
 
 </div>
 </main>

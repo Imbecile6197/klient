@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
+	"time"
 
 	"github.com/Imbecile6197/klient/internal/i18n"
 )
@@ -72,17 +74,44 @@ func NewProvider(ctx context.Context, id, apiKey string) (Provider, error) {
 	if apiKey == "" {
 		return nil, fmt.Errorf(i18n.T("%w for %s"), ErrNoAPIKey, id)
 	}
+	var p Provider
+	var err error
 	switch id {
 	case ProviderClaude:
-		return newClaude(apiKey), nil
+		p = newClaude(apiKey)
 	case ProviderOpenAI:
-		return newOpenAI(apiKey), nil
+		p = newOpenAI(apiKey)
 	case ProviderGemini:
-		return newGemini(ctx, apiKey)
+		p, err = newGemini(ctx, apiKey)
 	case ProviderMistral:
-		return newMistral(apiKey), nil
+		p = newMistral(apiKey)
+	default:
+		return nil, fmt.Errorf(i18n.T("unknown AI provider %q"), id)
 	}
-	return nil, fmt.Errorf(i18n.T("unknown AI provider %q"), id)
+	if err != nil {
+		return nil, err
+	}
+	return logged{p, id}, nil
+}
+
+// logged records every request in the log (provider, model, size, time,
+// result), so it can be checked which model is really used and what fails.
+// The content itself is never logged.
+type logged struct {
+	Provider
+	id string
+}
+
+func (l logged) Complete(ctx context.Context, req Request) (string, error) {
+	start := time.Now()
+	out, err := l.Provider.Complete(ctx, req)
+	res := "ok"
+	if err != nil {
+		res = "error: " + err.Error()
+	}
+	log.Printf("AI request: %s, model %s, %d characters in, %d out, %.1f s – %s",
+		l.id, req.Model, len(req.System)+len(req.User), len(out), time.Since(start).Seconds(), res)
+	return out, err
 }
 
 // Test sends a tiny request to check that the key and model work.

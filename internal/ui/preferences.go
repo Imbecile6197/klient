@@ -68,6 +68,10 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	}
 	p.Add(a.localAIGroup(d, refreshRoles))
 	role := func(title, desc string, provider, model *string, defaultModel func(ai.ProviderInfo) string) *adw.PreferencesGroup {
+		roleKey := "assistant"
+		if provider == &a.cfg.SpamProvider {
+			roleKey = "spam"
+		}
 		g := adw.NewPreferencesGroup()
 		g.SetTitle(title)
 		g.SetDescription(desc)
@@ -93,8 +97,17 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 				combo.SetSelected(indexOf(*provider))
 				return
 			}
+			// Remember the model chosen for the old provider, and go back to
+			// the one chosen before for the new provider (not its default).
+			if a.cfg.RoleModels == nil {
+				a.cfg.RoleModels = map[string]string{}
+			}
+			a.cfg.RoleModels[roleKey+":"+*provider] = *model
 			*provider = pr.ID
 			*model = defaultModel(pr)
+			if m := a.cfg.RoleModels[roleKey+":"+pr.ID]; m != "" {
+				*model = m
+			}
 			modelRow.SetText(*model)
 			a.saveConfig()
 			a.initAI()
@@ -237,8 +250,9 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 				return
 			}
 			// Test with the model configured for a role using this provider,
-			// otherwise with the provider's default assistant model.
-			model := pr.AssistantModel
+			// otherwise with its cheap default (the spam filter's), never
+			// with the expensive assistant default.
+			model := pr.SpamModel
 			if a.cfg.SpamProvider == pr.ID {
 				model = a.cfg.SpamModel
 			}

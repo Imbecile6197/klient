@@ -82,6 +82,12 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.7.9" date="2026-10-03">
+      <description>
+        <p>Only the configured AI models are used, and every AI request is recorded in the log.</p>
+        <p xml:lang="cs">Používají se jen nastavené modely AI a každý požadavek na AI se zapisuje do logu.</p>
+      </description>
+    </release>
     <release version="0.7.8" date="2026-10-01">
       <description>
         <p>The spam filter's reason is always written in the interface language.</p>
