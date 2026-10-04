@@ -3,6 +3,7 @@ package protonmail
 import (
 	"context"
 	"errors"
+	"log"
 	"strings"
 	"time"
 
@@ -58,9 +59,28 @@ func (a *Account) DeleteFolder(ctx context.Context, id string) error {
 
 // EmptyFolder permanently deletes the messages of Trash or Spam; with a
 // non-zero olderThan only those older than it. It returns how many.
-func (a *Account) EmptyFolder(ctx context.Context, folderID string, olderThan time.Time) (int, error) {
+func (a *Account) EmptyFolder(ctx context.Context, folderID string, olderThan time.Time, progress func(done, total int)) (int, error) {
 	if folderID != TrashID && folderID != SpamID {
 		return 0, errors.New(i18n.T("only Trash and Spam can be emptied"))
+	}
+	report := func(done, total int) {
+		if progress != nil {
+			progress(done, total)
+		}
+	}
+	if olderThan.IsZero() {
+		// The whole folder: one request, the server deletes them itself.
+		total := a.folderTotal(ctx, folderID)
+		report(0, total)
+		err := a.client.EmptyLabel(ctx, folderID)
+		if err == nil {
+			report(total, total)
+			return total, nil
+		}
+		if ctx.Err() != nil {
+			return 0, err
+		}
+		log.Printf("emptying %s in one request failed (%v), deleting in batches", folderID, err)
 	}
 	var ids []string
 	// Newest first: with olderThan the rest of the folder is older still.
@@ -78,11 +98,27 @@ func (a *Account) EmptyFolder(ctx context.Context, folderID string, olderThan ti
 			break
 		}
 	}
+	report(0, len(ids))
 	for i := 0; i < len(ids); i += 150 {
 		end := min(i+150, len(ids))
 		if err := a.client.DeleteMessage(ctx, ids[i:end]...); err != nil {
 			return i, err
 		}
+		report(end, len(ids))
 	}
 	return len(ids), nil
+}
+
+// folderTotal is the number of messages in a folder (0 if unknown).
+func (a *Account) folderTotal(ctx context.Context, folderID string) int {
+	counts, err := a.client.GetGroupedMessageCount(ctx)
+	if err != nil {
+		return 0
+	}
+	for _, c := range counts {
+		if c.LabelID == folderID {
+			return c.Total
+		}
+	}
+	return 0
 }

@@ -91,8 +91,9 @@ type Account interface {
 	RenameFolder(ctx context.Context, id, name string) error
 	DeleteFolder(ctx context.Context, id string) error
 	// EmptyFolder permanently deletes the messages of Trash or Spam (with a
-	// non-zero olderThan only older ones) and returns how many.
-	EmptyFolder(ctx context.Context, folderID string, olderThan time.Time) (int, error)
+	// non-zero olderThan only older ones) and returns how many. progress
+	// (may be nil) reports deleted of total along the way.
+	EmptyFolder(ctx context.Context, folderID string, olderThan time.Time, progress func(done, total int)) (int, error)
 	MarkRead(ctx context.Context, ids ...string) error
 	MarkUnread(ctx context.Context, ids ...string) error
 	Move(ctx context.Context, folderID string, ids ...string) error

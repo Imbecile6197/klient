@@ -92,7 +92,7 @@ func (a *Account) DeleteFolder(ctx context.Context, id string) error {
 // EmptyFolder permanently deletes the messages of Trash or Spam; with a
 // non-zero olderThan only those that arrived before it. It returns how many
 // were deleted.
-func (a *Account) EmptyFolder(ctx context.Context, folderID string, olderThan time.Time) (int, error) {
+func (a *Account) EmptyFolder(ctx context.Context, folderID string, olderThan time.Time, progress func(done, total int)) (int, error) {
 	if folderID != protonmail.TrashID && folderID != protonmail.SpamID {
 		return 0, errors.New(i18n.T("only Trash and Spam can be emptied"))
 	}
@@ -120,7 +120,17 @@ func (a *Account) EmptyFolder(ctx context.Context, folderID string, olderThan ti
 			return nil
 		}
 		n = len(uids)
-		return a.expungeUIDs(c, imap.UIDSetNum(uids...))
+		if progress != nil {
+			progress(0, n)
+		}
+		// The server deletes them all at once.
+		if err := a.expungeUIDs(c, imap.UIDSetNum(uids...)); err != nil {
+			return err
+		}
+		if progress != nil {
+			progress(n, n)
+		}
+		return nil
 	})
 	if err != nil {
 		return 0, err

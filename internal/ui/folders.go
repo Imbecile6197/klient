@@ -263,11 +263,26 @@ func (m *mainView) confirmEmpty(f protonmail.Folder) {
 		if r != "empty" {
 			return
 		}
+		// A toast that stays until the end and shows how far it got.
+		busy := i18n.T("Emptying the Trash…")
+		if f.ID == protonmail.SpamID {
+			busy = i18n.T("Emptying Spam…")
+		}
+		progressToast := adw.NewToast(busy)
+		progressToast.SetTimeout(0)
+		m.a.toasts.AddToast(progressToast)
 		go func() {
 			ctx, cancel := context.WithTimeout(m.a.ctx, 10*time.Minute)
 			defer cancel()
-			n, err := acc.EmptyFolder(ctx, f.ID, time.Time{})
+			n, err := acc.EmptyFolder(ctx, f.ID, time.Time{}, func(done, total int) {
+				ui(func() {
+					if total > 0 {
+						progressToast.SetTitle(busy + " " + fmt.Sprintf(i18n.T("%d of %d"), done, total))
+					}
+				})
+			})
 			ui(func() {
+				progressToast.Dismiss()
 				if err != nil {
 					m.a.toast(i18n.T("Emptying failed: ") + err.Error())
 				} else {
@@ -316,7 +331,7 @@ func (a *App) autoEmptyLoop() {
 				if !acc.HasFolder(f) {
 					continue
 				}
-				n, err := acc.EmptyFolder(a.ctx, f, before)
+				n, err := acc.EmptyFolder(a.ctx, f, before, nil)
 				switch {
 				case err != nil:
 					log.Printf("auto-empty %s of %s: %v", f, acc.Email(), err)

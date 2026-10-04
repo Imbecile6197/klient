@@ -377,12 +377,18 @@ func (u *Unified) CreateFolder(context.Context, string, bool) error   { return E
 func (u *Unified) RenameFolder(context.Context, string, string) error { return ErrUnsupported }
 func (u *Unified) DeleteFolder(context.Context, string) error         { return ErrUnsupported }
 
-// EmptyFolder empties the folder in every account.
-func (u *Unified) EmptyFolder(ctx context.Context, folderID string, olderThan time.Time) (int, error) {
+// EmptyFolder empties the folder in every account, one after another; the
+// progress counts all of them.
+func (u *Unified) EmptyFolder(ctx context.Context, folderID string, olderThan time.Time, progress func(done, total int)) (int, error) {
 	total := 0
 	var first error
 	for _, a := range u.list() {
-		n, err := a.EmptyFolder(ctx, folderID, olderThan)
+		base := total
+		var p func(int, int)
+		if progress != nil {
+			p = func(done, n int) { progress(base+done, base+n) }
+		}
+		n, err := a.EmptyFolder(ctx, folderID, olderThan, p)
 		total += n
 		if err != nil && first == nil {
 			first = err

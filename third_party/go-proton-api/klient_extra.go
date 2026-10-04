@@ -61,3 +61,11 @@ func (c *Client) SetAutoResponder(ctx context.Context, ar AutoResponder) (MailSe
 
 	return res.MailSettings, nil
 }
+
+// EmptyLabel permanently deletes every message with a label (Trash, Spam) in
+// one request, like "Empty" in the web client; the server does the work.
+func (c *Client) EmptyLabel(ctx context.Context, labelID string) error {
+	return c.do(ctx, func(r *resty.Request) (*resty.Response, error) {
+		return r.SetQueryParam("LabelID", labelID).Delete("/mail/v4/messages/empty")
+	})
+}

@@ -65,18 +65,22 @@ func TestFolderManagement(t *testing.T) {
 	put(60 * 24 * time.Hour)
 	put(45 * 24 * time.Hour)
 	put(time.Hour)
-	n, err := acc.EmptyFolder(ctx, protonmail.TrashID, time.Now().Add(-30*24*time.Hour))
+	var seen [][2]int
+	n, err := acc.EmptyFolder(ctx, protonmail.TrashID, time.Now().Add(-30*24*time.Hour), func(d, t int) { seen = append(seen, [2]int{d, t}) })
 	if err != nil || n != 2 {
 		t.Fatalf("older than 30 days: %d, %v", n, err)
+	}
+	if len(seen) != 2 || seen[0] != [2]int{0, 2} || seen[1] != [2]int{2, 2} {
+		t.Errorf("progress %v", seen)
 	}
 	left, _ := acc.List(ctx, protonmail.TrashID, 0, 50)
 	if len(left) != 1 {
 		t.Fatalf("%d messages left in Trash, want 1", len(left))
 	}
-	if n, err := acc.EmptyFolder(ctx, protonmail.TrashID, time.Time{}); err != nil || n != 1 {
+	if n, err := acc.EmptyFolder(ctx, protonmail.TrashID, time.Time{}, nil); err != nil || n != 1 {
 		t.Fatalf("empty: %d, %v", n, err)
 	}
-	if _, err := acc.EmptyFolder(ctx, protonmail.InboxID, time.Time{}); err == nil {
+	if _, err := acc.EmptyFolder(ctx, protonmail.InboxID, time.Time{}, nil); err == nil {
 		t.Error("the inbox was emptied")
 	}
 }

@@ -348,7 +348,7 @@ func (a *Account) DeleteFolder(_ context.Context, id string) error {
 	return nil
 }
 
-func (a *Account) EmptyFolder(_ context.Context, folderID string, olderThan time.Time) (int, error) {
+func (a *Account) EmptyFolder(_ context.Context, folderID string, olderThan time.Time, progress func(done, total int)) (int, error) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	n := 0
@@ -359,6 +359,9 @@ func (a *Account) EmptyFolder(_ context.Context, folderID string, olderThan time
 		}
 		return del
 	})
+	if progress != nil {
+		progress(n, n)
+	}
 	return n, nil
 }
 

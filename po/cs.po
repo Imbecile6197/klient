@@ -3866,3 +3866,15 @@ msgid_plural "%d accounts"
 msgstr[0] "%d účet"
 msgstr[1] "%d účty"
 msgstr[2] "%d účtů"
+
+#: internal
+msgid "Emptying the Trash…"
+msgstr "Vysypávám Koš…"
+
+#: internal
+msgid "Emptying Spam…"
+msgstr "Vysypávám Spam…"
+
+#: internal
+msgid "%d of %d"
+msgstr "%d z %d"

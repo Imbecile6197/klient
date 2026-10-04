@@ -18,7 +18,7 @@ Changes (marked `// klient patch`):
 To update: copy the new upstream version over this directory and re-apply the two fields.
 
 - `klient_extra.go` (new file): `SnoozeConversations`, `UnsnoozeConversations`,
-  `CancelSend`, `SetAutoResponder`, `AutoResponder`, `SnoozedLabel`.
+  `CancelSend`, `SetAutoResponder`, `AutoResponder`, `SnoozedLabel`, `EmptyLabel`.
 - `mail_settings_types.go`: `MailSettings.AutoResponder`.
 - `message_send_types.go`: `SendDraftReq.DeliveryTime` (scheduled send).
 - `user_types.go`: `User.UsedBaseSpace/MaxBaseSpace/UsedDriveSpace/MaxDriveSpace` (split storage).

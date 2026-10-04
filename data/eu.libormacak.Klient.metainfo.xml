@@ -82,6 +82,12 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.8.2" date="2026-10-04">
+      <description>
+        <p>Emptying Trash and Spam shows its progress and is much faster on Proton.</p>
+        <p xml:lang="cs">Vysypávání Koše a Spamu ukazuje průběh a na Protonu je mnohem rychlejší.</p>
+      </description>
+    </release>
     <release version="0.8.1" date="2026-10-04">
       <description>
         <p>Automatic emptying of Trash and Spam is in Preferences → General.</p>
