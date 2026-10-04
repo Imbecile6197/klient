@@ -292,7 +292,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
       <rect x="4" y="12" width="56" height="40" rx="9" fill="#1c71d8"/>
       <path d="M10 20l22 16 22-16" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <div><b>Klient</b><span>Dokumentace · verze 0.8.3 · <a href="index.html" hreflang="en" lang="en">English</a></span></div>
+    <div><b>Klient</b><span>Dokumentace · verze 0.9.0 · <a href="index.html" hreflang="en" lang="en">English</a></span></div>
   </div>
   <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc">Obsah</button>
   <ol>
@@ -458,6 +458,9 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
     <li><b>Výchozí aplikace pro odkazy <code>mailto:</code></b> – nastavíte v Předvolbách → Obecné.</li>
   </ul>
 
+  <h3 id="pravopis">Kontrola pravopisu</h3>
+  <p>Chybná slova se při psaní podtrhnou červeně; pravé tlačítko nabídne opravy, <b>Přidat do slovníku</b> a <b>Ignorovat</b>. Kontroluje se čeština i angličtina zároveň – slovo je správně, když ho zná kterýkoli slovník – a nejbližší opravy jsou nahoře. Citované řádky („&gt; …“), odkazy, adresy a zkratky se nekontrolují. Klient používá systémové slovníky (balíčky <code>hunspell-cs</code> a <code>hunspell-en-US</code>); osobní slovník sdílí s ostatními aplikacemi. Vypnout ji jde v Předvolbách → Zprávy → <b>Kontrola pravopisu</b>.</p>
+
   <h3>Zpoždění odeslání</h3>
   <p>Po odeslání zpráva ještě chvíli počká (výchozí 10 s) a v oznámení běží odpočet s tlačítkem <b>Zpět</b>. Délku nastavíte v Předvolbách → Zprávy.</p>
 
@@ -534,6 +537,7 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
 
   <h3>Blocklisty</h3>
   <p>Stahují se automaticky každých 12 hodin: Spamhaus DROP (IPv4 a IPv6), URLhaus a OpenPhish. Stav je v Předvolbách → Spamfiltr.</p>
+  <p>OpenPhish uvádí jednotlivé podvodné stránky, proto Klient porovnává celé odkazy, ne domény: jedna špatná stránka na zkracovači odkazů nebo sdíleném hostingu nezablokuje celý web. Odkaz na stránku z OpenPhish nebo na server z URLhaus udělá ze zprávy spam bez ohledu na AI, i od povoleného odesílatele – i jeho účet může být ukradený.</p>
 
   <h3>Prověření stávající pošty</h3>
   <p>Položka nabídky <b>Prověřit doručenou poštu pomocí AI</b> spustí filtr nad posledními 50 zprávami.</p>
@@ -681,7 +685,7 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
       <tr><td><b>Obecné</b></td><td>Jazyk rozhraní, výchozí e-mailová aplikace, běh na pozadí a spouštění po přihlášení, automatické vysypání Koše a Spamu, tlačítka oznámení, aktualizace</td></tr>
       <tr><td><b>AI</b></td><td>Lokální AI (Ollama, Jen lokálně, aktualizace, shrnutí předem, porovnání modelů), poskytovatel a model pro asistenta a spamfiltr, API klíče, automatické funkce (třídění do štítků, ranní přehled)</td></tr>
       <tr><td><b>Spamfiltr</b></td><td>Zapnutí AI filtru, práh pro přesun do spamu, zobrazování pošty až po kontrole, stav blocklistů</td></tr>
-      <tr><td><b>Zprávy</b></td><td>Vlákna, zpoždění odeslání, přikládání veřejného klíče, offline cache, podpis</td></tr>
+      <tr><td><b>Zprávy</b></td><td>Vlákna, zpoždění odeslání, přikládání veřejného klíče, kontrola pravopisu, offline cache, podpis</td></tr>
       <tr><td><b>Pravidla</b></td><td>Pravidla pro příchozí poštu</td></tr>
       <tr><td><b>PGP</b></td><td>Vlastní klíče (vytvořit, importovat, zálohovat, odstranit), klíče kontaktů, hledání na keys.openpgp.org</td></tr>
     </tbody>
@@ -733,7 +737,7 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
   <p>Postaveno na GTK4, libadwaita, WebKitGTK, go-proton-api, gopenpgp a knihovnách go-imap/go-smtp.</p>
 </section>
 
-<footer>Dokumentace k verzi 0.8.3 · září 2026 · <a href="index.html" hreflang="en" lang="en">English version</a></footer>
+<footer>Dokumentace k verzi 0.9.0 · září 2026 · <a href="index.html" hreflang="en" lang="en">English version</a></footer>
 
 </div>
 </main>

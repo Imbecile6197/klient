@@ -25,6 +25,7 @@ type richEditor struct {
 	toggles map[string]*gtk.ToggleButton
 	links   map[uintptr]string // link tag (native pointer) -> URL
 	parent  gtk.Widgetter
+	spellSt *spellState // nil: no spell checking
 }
 
 func newRichEditor(parent gtk.Widgetter) *richEditor {

@@ -25,6 +25,10 @@ Requires:       /usr/bin/gio
 Requires:       hicolor-icon-theme
 # The tray icon is shown by GNOME only with the AppIndicator extension.
 Recommends:     gnome-shell-extension-appindicator
+# Spell checking while writing (loaded at run time; off without them).
+Recommends:     enchant2
+Recommends:     hunspell-cs
+Recommends:     hunspell-en-US
 
 %description
 A GNOME mail client for Proton Mail (directly over its API, without Proton
@@ -66,6 +70,13 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Sun Oct 04 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.9.0-1
+- Spell checking while writing (Enchant loaded at run time, Czech and
+  English dictionaries, corrections in the right-click menu)
+- OpenPhish matched by whole links, not domains; a link listed on
+  OpenPhish or URLhaus always means spam, whatever the AI says
+- The status in the sidebar shows the assistant's model too
+
 * Sun Oct 04 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.8.3-1
 - IMAP accounts started offline go online when the connection returns
   (banner, folders and list refresh)

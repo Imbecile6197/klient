@@ -404,21 +404,36 @@ func (m *mainView) rebuildOrganizeMenus() {
 	m.labelBtn.SetVisible(labels.NItems() > 0)
 }
 
+// modelLabel names an AI role's provider and model for the status line.
+func modelLabel(provider, model string) string {
+	if aipkg.IsLocal(provider) {
+		return fmt.Sprintf(i18n.T("local AI (%s, nothing leaves the computer)"), model)
+	}
+	name := provider
+	if p, ok := aipkg.ProviderByID(provider); ok {
+		name = p.Name
+	}
+	return name + ", " + model
+}
+
+// listedNames counts the blocklisted domains and pages (links).
+func listedNames(domains, urls int) string {
+	return fmt.Sprintf(i18n.N("%d domain", "%d domains", domains), domains) + ", " +
+		fmt.Sprintf(i18n.N("%d link", "%d links", urls), urls)
+}
+
 func (m *mainView) updateFilterStatus() {
 	if m.filterStatus == nil {
 		return
 	}
-	nets, domains := m.a.lists.Stats()
+	nets, domains, urls := m.a.lists.Stats()
+	assistant := i18n.T("not set up")
+	if m.a.ai.HasAssistant() {
+		assistant = modelLabel(m.a.cfg.AssistantProvider, m.a.cfg.AssistantModel)
+	}
 	ai := i18n.T("AI turned off")
 	if m.a.ai.HasSpam() && m.a.cfg.SpamFilterEnabled {
-		name := m.a.cfg.SpamProvider
-		if p, ok := aipkg.ProviderByID(name); ok {
-			name = p.Name
-		}
-		ai = name + ", " + m.a.cfg.SpamModel
-		if aipkg.IsLocal(m.a.cfg.SpamProvider) {
-			ai = fmt.Sprintf(i18n.T("local AI (%s, nothing leaves the computer)"), m.a.cfg.SpamModel)
-		}
+		ai = modelLabel(m.a.cfg.SpamProvider, m.a.cfg.SpamModel)
 	} else if m.a.cfg.SpamFilterEnabled {
 		ai = i18n.T("blocklists only (AI is not set up)")
 	}
@@ -426,7 +441,7 @@ func (m *mainView) updateFilterStatus() {
 	if !m.a.lists.LastUpdate.IsZero() {
 		upd = m.a.lists.LastUpdate.Format(i18n.T("Jan 2 15:04"))
 	}
-	m.filterStatus.SetText(fmt.Sprintf(i18n.T("Spam filter: %s\nBlocklists: %s, %s · updated %s"), ai, fmt.Sprintf(i18n.N("%d network", "%d networks", nets), nets), fmt.Sprintf(i18n.N("%d domain", "%d domains", domains), domains), upd))
+	m.filterStatus.SetText(fmt.Sprintf(i18n.T("AI assistant: %s\nSpam filter: %s\nBlocklists: %s, %s · updated %s"), assistant, ai, fmt.Sprintf(i18n.N("%d network", "%d networks", nets), nets), listedNames(domains, urls), upd))
 }
 
 func (m *mainView) buildList() gtk.Widgetter {

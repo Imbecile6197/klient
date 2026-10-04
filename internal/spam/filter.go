@@ -30,7 +30,7 @@ type Decision struct {
 	Spam      bool       `json:"spam"`
 	Verdict   ai.Verdict `json:"verdict"`
 	Hits      []string   `json:"hits"`
-	Source    string     `json:"source"` // "ai", "blocklist", "allowlist", "denylist", "user"
+	Source    string     `json:"source"` // "ai", "blocklist", "dangerous-link", "allowlist", "denylist", "user"
 	Time      time.Time  `json:"time"`
 }
 
@@ -203,15 +203,34 @@ func (f *Filter) Evaluate(ctx context.Context, msg *protonmail.Message) Decision
 			d.Hits = append(d.Hits, fmt.Sprintf(i18n.T("sender domain %s in %s"), from[i+1:], feed))
 		}
 	}
+	// A link to a page listed as phishing or malware makes the message spam
+	// whatever the AI says; other link hits are evidence only.
+	var dangerous []string
 	seen := map[string]bool{}
 	for _, link := range msg.Links {
 		u, err := url.Parse(link)
-		if err != nil || seen[u.Hostname()] {
+		if err != nil || u.Hostname() == "" {
+			continue
+		}
+		if feed := f.Lists.CheckLink(link); feed != "" {
+			if !seen[link] {
+				seen[link] = true
+				dangerous = append(dangerous, fmt.Sprintf(i18n.T("link to %s in %s"), shortLink(u), feed))
+			}
+			continue
+		}
+		if seen[u.Hostname()] {
 			continue
 		}
 		seen[u.Hostname()] = true
 		if feed := f.Lists.CheckDomain(u.Hostname()); feed != "" {
 			d.Hits = append(d.Hits, fmt.Sprintf(i18n.T("link to %s in %s"), u.Hostname(), feed))
+		}
+	}
+	d.Hits = append(d.Hits, dangerous...)
+	forced := func() {
+		if len(dangerous) > 0 {
+			d.Spam, d.Source = true, "dangerous-link"
 		}
 	}
 
@@ -263,6 +282,7 @@ func (f *Filter) Evaluate(ctx context.Context, msg *protonmail.Message) Decision
 		if err == nil {
 			d.Verdict, d.Source = v, "ai"
 			d.Spam = v.SpamProbability >= cfg.SpamThreshold
+			forced()
 			f.store(d)
 			return d
 		}
@@ -280,8 +300,18 @@ func (f *Filter) Evaluate(ctx context.Context, msg *protonmail.Message) Decision
 	default:
 		d.Source = "none"
 	}
+	forced()
 	f.store(d)
 	return d
+}
+
+// shortLink shows a link without its scheme and query, shortened.
+func shortLink(u *url.URL) string {
+	s := u.Host + u.EscapedPath()
+	if r := []rune(s); len(r) > 60 {
+		s = string(r[:59]) + "…"
+	}
+	return s
 }
 
 // Remember stores a decision made elsewhere (the demo account).

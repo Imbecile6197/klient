@@ -31,6 +31,7 @@ import (
 	"github.com/Imbecile6197/klient/internal/relnotes"
 	"github.com/Imbecile6197/klient/internal/secrets"
 	"github.com/Imbecile6197/klient/internal/spam"
+	"github.com/Imbecile6197/klient/internal/spell"
 )
 
 const AppID = "eu.libormacak.Klient"
@@ -104,6 +105,9 @@ type App struct {
 	// open Outbox dialog.
 	outbox        []*outboxItem
 	outboxRefresh func()
+	// Spell checking (spellcheck.go), opened on first use.
+	spell      *spell.Checker
+	spellTried bool
 	// The help window, kept hidden after closing.
 	helpWin  *adw.Window
 	helpView *webkit.WebView

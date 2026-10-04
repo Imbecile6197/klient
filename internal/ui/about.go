@@ -72,8 +72,8 @@ func (a *App) debugInfo() string {
 		a.cfg.AssistantProvider, a.cfg.AssistantModel, a.cfg.SpamProvider, a.cfg.SpamModel, a.cfg.SpamFilterEnabled)
 	fmt.Fprintf(&sb, "Threads: %v, offline messages: %d, send delay: %d s\n", a.cfg.Threads, a.cfg.OfflineMessages, a.cfg.SendDelay)
 	if a.lists != nil {
-		nets, domains := a.lists.Stats()
-		fmt.Fprintf(&sb, "Blocklists: %d networks, %d domains, updated %s\n", nets, domains, a.lists.LastUpdate.Format("2006-01-02 15:04"))
+		nets, domains, urls := a.lists.Stats()
+		fmt.Fprintf(&sb, "Blocklists: %d networks, %d domains, %d links, updated %s\n", nets, domains, urls, a.lists.LastUpdate.Format("2006-01-02 15:04"))
 	}
 	if a.acc != nil && a.acc.Cache() != nil {
 		m, b := a.acc.Cache().Stats()

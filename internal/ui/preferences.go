@@ -19,6 +19,7 @@ import (
 	"github.com/Imbecile6197/klient/internal/pgp"
 	"github.com/Imbecile6197/klient/internal/rules"
 	"github.com/Imbecile6197/klient/internal/secrets"
+	"github.com/Imbecile6197/klient/internal/spell"
 )
 
 func (a *App) openPreferences() { a.preferencesDialog() }
@@ -509,6 +510,21 @@ func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		a.saveConfig()
 	})
 	sg.Add(attachKey)
+	spellRow := adw.NewSwitchRow()
+	spellRow.SetTitle(i18n.T("Check spelling"))
+	if langs := spell.Available(); len(langs) > 0 {
+		spellRow.SetSubtitle(i18n.T("Misspelled words are underlined; right-click one for corrections. Dictionaries: ") + strings.Join(langNames(langs), ", "))
+	} else {
+		spellRow.SetSubtitle(i18n.T("No dictionary is installed (packages hunspell-cs and hunspell-en-US)"))
+		spellRow.SetSensitive(false)
+	}
+	spellRow.SetActive(a.cfg.SpellCheck)
+	spellRow.NotifyProperty("active", func() {
+		a.cfg.SpellCheck = spellRow.Active()
+		a.spell, a.spellTried = nil, false
+		a.saveConfig()
+	})
+	sg.Add(spellRow)
 	p.Add(sg)
 
 	og := adw.NewPreferencesGroup()
@@ -627,12 +643,12 @@ func (a *App) spamPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	status := adw.NewActionRow()
 	status.SetTitle(i18n.T("Status"))
 	setStatus := func() {
-		nets, domains := a.lists.Stats()
+		nets, domains, urls := a.lists.Stats()
 		upd := i18n.T("never")
 		if !a.lists.LastUpdate.IsZero() {
 			upd = a.lists.LastUpdate.Format(i18n.T("Jan 2, 2006 15:04"))
 		}
-		status.SetSubtitle(fmt.Sprintf(i18n.T("%s, %s · last updated %s"), fmt.Sprintf(i18n.N("%d IP range", "%d IP ranges", nets), nets), fmt.Sprintf(i18n.N("%d domain", "%d domains", domains), domains), upd))
+		status.SetSubtitle(fmt.Sprintf(i18n.T("%s, %s · last updated %s"), fmt.Sprintf(i18n.N("%d IP range", "%d IP ranges", nets), nets), listedNames(domains, urls), upd))
 	}
 	setStatus()
 	upd := gtk.NewButtonWithLabel(i18n.T("Update Now"))

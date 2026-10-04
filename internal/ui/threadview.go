@@ -1087,6 +1087,8 @@ func (m *mainView) updateSpamUI() {
 	switch d.Source {
 	case "ai":
 		text = fmt.Sprintf(i18n.T("AI spam filter: %s (%.0f %%) – %s"), categoryName(d.Verdict.Category), d.Verdict.SpamProbability*100, d.Verdict.Reason)
+	case "dangerous-link":
+		text = fmt.Sprintf(i18n.T("Spam filter: a link leads to a known phishing or malware page – %s"), strings.Join(d.Hits, "; "))
 	case "user":
 		if d.Spam {
 			text = i18n.T("You marked this as spam")

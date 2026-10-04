@@ -51,7 +51,7 @@ Architecture: amd64
 Maintainer: Imbecile6197 <Imbecile6197@users.noreply.github.com>
 Installed-Size: $(du -sk $R/usr | cut -f1)
 Depends: $DEPS, gnome-keyring | kwalletmanager | keepassxc, libglib2.0-bin, pkexec, hicolor-icon-theme
-Recommends: gnome-shell-extension-appindicator
+Recommends: gnome-shell-extension-appindicator, libenchant-2-2, hunspell-cs, hunspell-en-us
 Section: mail
 Priority: optional
 Homepage: https://github.com/Imbecile6197/klient

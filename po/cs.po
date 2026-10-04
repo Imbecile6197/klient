@@ -2310,8 +2310,8 @@ msgid "Search: %s"
 msgstr "Hledání: %s"
 
 #: internal/ui/mainview.go
-msgid "Spam filter: %s\nBlocklists: %s, %s · updated %s"
-msgstr "Spamfiltr: %s\nBlocklisty: %s, %s · aktualizace %s"
+msgid "AI assistant: %s\nSpam filter: %s\nBlocklists: %s, %s · updated %s"
+msgstr "AI asistent: %s\nSpamfiltr: %s\nBlocklisty: %s, %s · aktualizace %s"
 
 #: internal/ui/mainview.go
 msgid "Star (Ctrl+D)"
@@ -3878,3 +3878,62 @@ msgstr "Vysypávám Spam…"
 #: internal
 msgid "%d of %d"
 msgstr "%d z %d"
+
+#: internal
+msgid "Add to Dictionary"
+msgstr "Přidat do slovníku"
+
+#: internal
+msgid "Czech"
+msgstr "čeština"
+
+#: internal
+msgid "English (UK)"
+msgstr "angličtina (Spojené království)"
+
+#: internal
+msgid "English (US)"
+msgstr "angličtina (USA)"
+
+#: internal
+msgid "German"
+msgstr "němčina"
+
+#: internal
+msgid "Check spelling"
+msgstr "Kontrola pravopisu"
+
+#: internal
+msgid "Ignore"
+msgstr "Ignorovat"
+
+#: internal
+msgid "Misspelled words are underlined; right-click one for corrections. Dictionaries: "
+msgstr "Chybná slova se podtrhnou; opravy nabídne pravé tlačítko. Slovníky: "
+
+#: internal
+msgid "No dictionary is installed (packages hunspell-cs and hunspell-en-US)"
+msgstr "Není nainstalovaný žádný slovník (balíčky hunspell-cs a hunspell-en-US)"
+
+#: internal
+msgid "(no suggestions)"
+msgstr "(žádné návrhy)"
+
+#: internal
+msgid "Slovak"
+msgstr "slovenština"
+
+#: internal
+msgid "%d link"
+msgid_plural "%d links"
+msgstr[0] "%d odkaz"
+msgstr[1] "%d odkazy"
+msgstr[2] "%d odkazů"
+
+#: internal
+msgid "Spam filter: a link leads to a known phishing or malware page – %s"
+msgstr "Spamový filtr: odkaz vede na známou podvodnou stránku nebo stránku s malwarem – %s"
+
+#: internal
+msgid "not set up"
+msgstr "nenastaven"

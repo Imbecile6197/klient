@@ -113,8 +113,10 @@ type Config struct {
 	AutoEmptyDays int `json:"auto_empty_days,omitempty"`
 	// Buttons of the new-mail notification ("read", "archive", "trash",
 	// "spam"); nil = the defaults. No omitempty: an empty list is a choice.
-	NotifyButtons   []string `json:"notify_buttons"`
-	UpdateLastCheck string   `json:"update_last_check"` // RFC 3339
+	NotifyButtons []string `json:"notify_buttons"`
+	// Underline misspelled words while writing (system dictionaries).
+	SpellCheck      bool   `json:"spell_check"`
+	UpdateLastCheck string `json:"update_last_check"` // RFC 3339
 	// Summarise new mail in advance with the local model (on AC power only).
 	PrecomputeSummaries bool `json:"precompute_summaries"`
 
@@ -179,6 +181,7 @@ func Default() Config {
 		HoldUntilChecked:    true,
 		OllamaAutoUpdate:    true,
 		AutoUpdate:          true,
+		SpellCheck:          true,
 		PrecomputeSummaries: true,
 		DigestHour:          7,
 		UpdateInterval:      Duration{12 * time.Hour},

@@ -338,6 +338,7 @@ func (a *App) composerFor(acc mailbox.Account, d *protonmail.Draft, orig *proton
 
 	// --- body
 	editor := newRichEditor(win)
+	editor.enableSpell(a.spellChecker())
 	body := editor.view
 	bodySW := gtk.NewScrolledWindow()
 	bodySW.SetChild(body)

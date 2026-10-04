@@ -292,7 +292,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
       <rect x="4" y="12" width="56" height="40" rx="9" fill="#1c71d8"/>
       <path d="M10 20l22 16 22-16" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <div><b>Klient</b><span>Documentation · version 0.8.3 · <a href="index.cs.html" hreflang="cs" lang="cs">Česky</a></span></div>
+    <div><b>Klient</b><span>Documentation · version 0.9.0 · <a href="index.cs.html" hreflang="cs" lang="cs">Česky</a></span></div>
   </div>
   <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc">Contents</button>
   <ol>
@@ -458,6 +458,9 @@ packaging/deb.sh 0.7.3   # Ubuntu package, built in a podman container</code></p
     <li><b>The default application for <code>mailto:</code> links</b> – set it in Preferences → General.</li>
   </ul>
 
+  <h3 id="spelling">Spell checking</h3>
+  <p>Misspelled words are underlined in red while you write; a right click offers corrections, <b>Add to Dictionary</b> and <b>Ignore</b>. Czech and English are checked together – a word is right in either – and the closest corrections come first. Quoted lines (“&gt; …”), links, addresses and abbreviations are left alone. Klient uses the system dictionaries (packages <code>hunspell-cs</code> and <code>hunspell-en-US</code>); the personal dictionary is shared with other applications. It can be turned off in Preferences → Messages → <b>Check spelling</b>.</p>
+
   <h3>Send delay</h3>
   <p>After you send a message, it waits a moment (10 s by default) while a notification counts down with an <b>Undo</b> button. You set the length in Preferences → Messages.</p>
 
@@ -534,6 +537,7 @@ packaging/deb.sh 0.7.3   # Ubuntu package, built in a podman container</code></p
 
   <h3>Blocklists</h3>
   <p>They are downloaded automatically every 12 hours: Spamhaus DROP (IPv4 and IPv6), URLhaus and OpenPhish. Their status is in Preferences → Spam Filter.</p>
+  <p>OpenPhish lists single phishing pages, so Klient compares whole links, not domains: one bad page on a link shortener or shared hosting does not block the whole site. A link to a page on OpenPhish or to a host on URLhaus makes the message spam whatever the AI says, even from an allowed sender – their accounts can be stolen too.</p>
 
   <h3>Checking existing mail</h3>
   <p>The menu item <b>Check the Inbox with AI</b> runs the filter on the latest 50 messages.</p>
@@ -681,7 +685,7 @@ packaging/deb.sh 0.7.3   # Ubuntu package, built in a podman container</code></p
       <tr><td><b>General</b></td><td>Interface language, default email application, running in the background and starting after login, emptying Trash and Spam automatically, notification buttons, updates</td></tr>
       <tr><td><b>AI</b></td><td>Local AI (Ollama, Local only, updates, summaries in advance, model comparison), the provider and model for the assistant and the spam filter, API keys, automatic features (sorting into labels, morning overview)</td></tr>
       <tr><td><b>Spam Filter</b></td><td>Turning the AI filter on, the threshold for moving to spam, showing mail only after the check, blocklist status</td></tr>
-      <tr><td><b>Messages</b></td><td>Threads, send delay, attaching your public key, offline cache, signature</td></tr>
+      <tr><td><b>Messages</b></td><td>Threads, send delay, attaching your public key, spell checking, offline cache, signature</td></tr>
       <tr><td><b>Rules</b></td><td>Rules for incoming mail</td></tr>
       <tr><td><b>PGP</b></td><td>Your own keys (create, import, back up, remove), contact keys, searching keys.openpgp.org</td></tr>
     </tbody>
@@ -733,7 +737,7 @@ packaging/deb.sh 0.7.3   # Ubuntu package, built in a podman container</code></p
   <p>Built with GTK4, libadwaita, WebKitGTK, go-proton-api, GopenPGP and the go-imap/go-smtp libraries.</p>
 </section>
 
-<footer>Documentation for version 0.8.3 · September 2026 · <a href="index.cs.html" hreflang="cs" lang="cs">Česká verze</a></footer>
+<footer>Documentation for version 0.9.0 · September 2026 · <a href="index.cs.html" hreflang="cs" lang="cs">Česká verze</a></footer>
 
 </div>
 </main>

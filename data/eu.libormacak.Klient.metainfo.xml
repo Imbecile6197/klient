@@ -82,6 +82,12 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.9.0" date="2026-10-04">
+      <description>
+        <p>Spell checking while writing, in Czech and English. Links to known phishing and malware pages always mean spam.</p>
+        <p xml:lang="cs">Kontrola pravopisu při psaní, česky i anglicky. Odkazy na známé podvodné stránky a malware znamenají spam vždy.</p>
+      </description>
+    </release>
     <release version="0.8.3" date="2026-10-04">
       <description>
         <p>IMAP accounts go back online after a start without a connection; fixes for sending from Gmail and automatic emptying on Seznam.</p>

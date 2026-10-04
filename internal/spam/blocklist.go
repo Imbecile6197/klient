@@ -27,6 +27,13 @@ type Blocklists struct {
 	mu      sync.RWMutex
 	nets    []listedNet
 	domains map[string]string // domain -> feed name
+	// Pages listed by URL feeds (OpenPhish), as urlKey -> feed name. A whole
+	// domain is not blocked for one page: phishing often sits on shared
+	// hosting or link shorteners.
+	urls map[string]string
+	// Feeds whose entries are dangerous pages (phishing, malware): a link
+	// to them makes a message spam whatever the AI says.
+	linkFeeds map[string]bool
 
 	LastUpdate time.Time
 }
@@ -41,7 +48,7 @@ type meta struct {
 }
 
 func NewBlocklists() *Blocklists {
-	return &Blocklists{domains: map[string]string{}}
+	return &Blocklists{domains: map[string]string{}, urls: map[string]string{}, linkFeeds: map[string]bool{}}
 }
 
 func dir() string { return filepath.Join(config.DataDir(), "blocklists") }
@@ -80,10 +87,61 @@ func (b *Blocklists) CheckDomain(host string) string {
 	return ""
 }
 
-func (b *Blocklists) Stats() (nets, domains int) {
+// CheckLink returns the feed listing the page a link leads to, or "": the
+// exact page from a URL feed, or any page on a host of a malware host feed
+// (URLhaus).
+func (b *Blocklists) CheckLink(link string) string {
+	u, err := url.Parse(strings.TrimSpace(link))
+	if err != nil || u.Hostname() == "" {
+		return ""
+	}
+	// Tracking parameters differ per recipient: also the page without them,
+	// and the whole host when its front page is listed.
+	b.mu.RLock()
+	for _, k := range []string{urlKey(u, true), urlKey(u, false), strings.TrimSuffix(strings.ToLower(u.Hostname()), ".") + "/"} {
+		if f, ok := b.urls[k]; ok {
+			b.mu.RUnlock()
+			return f
+		}
+	}
+	b.mu.RUnlock()
+	if f := b.CheckDomain(u.Hostname()); f != "" && b.isLinkFeed(f) {
+		return f
+	}
+	return ""
+}
+
+func (b *Blocklists) isLinkFeed(feed string) bool {
 	b.mu.RLock()
 	defer b.mu.RUnlock()
-	return len(b.nets), len(b.domains)
+	return b.linkFeeds[feed]
+}
+
+// urlKey normalises a URL for comparison: no scheme, user, default port or
+// fragment, the host in lower case and no trailing slash.
+func urlKey(u *url.URL, query bool) string {
+	host := strings.TrimSuffix(strings.ToLower(u.Hostname()), ".")
+	if p := u.Port(); p != "" && p != "80" && p != "443" {
+		host += ":" + p
+	}
+	path := u.EscapedPath()
+	if len(path) > 1 {
+		path = strings.TrimRight(path, "/")
+	}
+	if path == "" {
+		path = "/"
+	}
+	k := host + path
+	if query && u.RawQuery != "" {
+		k += "?" + u.RawQuery
+	}
+	return k
+}
+
+func (b *Blocklists) Stats() (nets, domains, urls int) {
+	b.mu.RLock()
+	defer b.mu.RUnlock()
+	return len(b.nets), len(b.domains), len(b.urls)
 }
 
 // LoadCached parses previously downloaded feeds from disk.
@@ -92,7 +150,7 @@ func (b *Blocklists) LoadCached(feeds []config.Feed) error {
 	if raw, err := os.ReadFile(filepath.Join(dir(), "meta.json")); err == nil {
 		_ = json.Unmarshal(raw, &m)
 	}
-	nets, domains := []listedNet{}, map[string]string{}
+	nets, domains, urls, linkFeeds := []listedNet{}, map[string]string{}, map[string]string{}, map[string]bool{}
 	for _, f := range feeds {
 		if !f.Enabled {
 			continue
@@ -101,11 +159,14 @@ func (b *Blocklists) LoadCached(feeds []config.Feed) error {
 		if err != nil {
 			continue
 		}
-		parseFeed(f, fh, &nets, domains)
+		parseFeed(f, fh, &nets, domains, urls)
 		fh.Close()
+		if f.Kind == "hostfile" || f.Kind == "url-list" {
+			linkFeeds[f.Name] = true
+		}
 	}
 	b.mu.Lock()
-	b.nets, b.domains, b.LastUpdate = nets, domains, m.LastUpdate
+	b.nets, b.domains, b.urls, b.linkFeeds, b.LastUpdate = nets, domains, urls, linkFeeds, m.LastUpdate
 	b.mu.Unlock()
 	return nil
 }
@@ -177,7 +238,7 @@ func download(ctx context.Context, client *http.Client, f config.Feed) error {
 	return os.Rename(tmp, feedPath(f))
 }
 
-func parseFeed(f config.Feed, r io.Reader, nets *[]listedNet, domains map[string]string) {
+func parseFeed(f config.Feed, r io.Reader, nets *[]listedNet, domains, urls map[string]string) {
 	sc := bufio.NewScanner(r)
 	sc.Buffer(make([]byte, 64*1024), 1024*1024)
 	for sc.Scan() {
@@ -203,7 +264,7 @@ func parseFeed(f config.Feed, r io.Reader, nets *[]listedNet, domains map[string
 			}
 		case "url-list":
 			if u, err := url.Parse(line); err == nil && u.Hostname() != "" {
-				addDomain(domains, u.Hostname(), f.Name)
+				urls[urlKey(u, true)] = f.Name
 			}
 		case "domain-list":
 			addDomain(domains, strings.Fields(line)[0], f.Name)
