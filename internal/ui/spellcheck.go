@@ -157,7 +157,9 @@ func spellMenu(suggestions []string) *gio.Menu {
 }
 
 func (e *richEditor) allText() string {
-	return e.buf.Text(e.buf.StartIter(), e.buf.EndIter(), false)
+	// Slice keeps the signature's placeholder character, so that offsets
+	// match the buffer's.
+	return e.buf.Slice(e.buf.StartIter(), e.buf.EndIter(), false)
 }
 
 // checkSpelling underlines every misspelled word again.

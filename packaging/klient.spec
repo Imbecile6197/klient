@@ -70,6 +70,11 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Sun Oct 04 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.9.1-1
+- HTML signature: format choice, HTML source with live preview, template,
+  opening an .html file; shown as a preview in the composer, sent as HTML
+  with a plain-text version
+
 * Sun Oct 04 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.9.0-1
 - Spell checking while writing (Enchant loaded at run time, Czech and
   English dictionaries, corrections in the right-click menu)

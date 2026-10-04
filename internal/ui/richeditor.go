@@ -25,7 +25,8 @@ type richEditor struct {
 	toggles map[string]*gtk.ToggleButton
 	links   map[uintptr]string // link tag (native pointer) -> URL
 	parent  gtk.Widgetter
-	spellSt *spellState // nil: no spell checking
+	spellSt *spellState    // nil: no spell checking
+	sig     *htmlSignature // nil: no HTML signature
 }
 
 func newRichEditor(parent gtk.Widgetter) *richEditor {
@@ -275,6 +276,15 @@ func (e *richEditor) Spans() []richtext.Span {
 	var spans []richtext.Span
 	it := e.buf.StartIter()
 	for !it.IsEnd() {
+		if sp, ok := e.signatureSpan(it); ok {
+			spans = append(spans, sp)
+			it.ForwardChar()
+			continue
+		}
+		if it.ChildAnchor() != nil {
+			it.ForwardChar() // another embedded widget: not part of the text
+			continue
+		}
 		var sp richtext.Span
 		// gotk4 returns a fresh wrapper per call, so compare native pointers.
 		for _, t := range it.Tags() {
@@ -296,7 +306,7 @@ func (e *richEditor) Spans() []richtext.Span {
 		sp.Text = string(rune(it.Char()))
 		if n := len(spans); n > 0 {
 			last := &spans[n-1]
-			if last.Bold == sp.Bold && last.Italic == sp.Italic && last.Underline == sp.Underline &&
+			if last.HTML == "" && last.Bold == sp.Bold && last.Italic == sp.Italic && last.Underline == sp.Underline &&
 				last.Strike == sp.Strike && last.Link == sp.Link {
 				last.Text += sp.Text
 				it.ForwardChar()

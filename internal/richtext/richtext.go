@@ -15,6 +15,9 @@ type Span struct {
 	Underline bool
 	Strike    bool
 	Link      string // target URL, "" if not a link
+	// HTML is inserted as it is into the HTML body (an HTML signature);
+	// Text is then its plain-text version.
+	HTML string
 }
 
 // Bullet starts a list item line; QuotePrefix starts a quoted line.
@@ -26,7 +29,7 @@ const (
 // Formatted reports whether any span carries formatting (so HTML is worth sending).
 func Formatted(spans []Span) bool {
 	for _, s := range spans {
-		if s.Bold || s.Italic || s.Underline || s.Strike || s.Link != "" {
+		if s.Bold || s.Italic || s.Underline || s.Strike || s.Link != "" || s.HTML != "" {
 			return true
 		}
 	}
@@ -131,6 +134,24 @@ func inlineHTML(line []Span) string {
 func HTML(spans []Span) string {
 	var sb strings.Builder
 	sb.WriteString(`<div style="font-family:sans-serif">`)
+	// Raw HTML spans split the text into parts rendered on their own.
+	start := 0
+	for i, s := range spans {
+		if s.HTML != "" {
+			writeText(&sb, spans[start:i])
+			sb.WriteString(s.HTML)
+			start = i + 1
+		}
+	}
+	writeText(&sb, spans[start:])
+	sb.WriteString("</div>")
+	return sb.String()
+}
+
+func writeText(sb *strings.Builder, spans []Span) {
+	if len(spans) == 0 {
+		return
+	}
 	lines := splitLines(spans)
 	const (
 		none = iota
@@ -176,6 +197,4 @@ func HTML(spans []Span) string {
 		}
 	}
 	closeMode()
-	sb.WriteString("</div>")
-	return sb.String()
 }

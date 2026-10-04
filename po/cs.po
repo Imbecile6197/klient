@@ -3937,3 +3937,47 @@ msgstr "Spamový filtr: odkaz vede na známou podvodnou stránku nebo stránku s
 #: internal
 msgid "not set up"
 msgstr "nenastaven"
+
+#: internal
+msgid "Remove Signature"
+msgstr "Odebrat podpis"
+
+#: internal
+msgid "Format"
+msgstr "Formát"
+
+#: internal
+msgid "Plain Text"
+msgstr "Prostý text"
+
+#: internal
+msgid "HTML"
+msgstr "HTML"
+
+#: internal
+msgid "Images from the internet are blocked by many recipients' mail apps until they allow them."
+msgstr "Obrázky z internetu mnoho poštovních aplikací příjemců zablokuje, dokud je příjemce nepovolí."
+
+#: internal
+msgid "Open File…"
+msgstr "Otevřít soubor…"
+
+#: internal
+msgid "HTML Signature"
+msgstr "HTML podpis"
+
+#: internal
+msgid "Web Pages"
+msgstr "Webové stránky"
+
+#: internal
+msgid "Use a Template"
+msgstr "Použít šablonu"
+
+#: internal
+msgid "Preview"
+msgstr "Náhled"
+
+#: internal
+msgid "Your Name"
+msgstr "Vaše jméno"

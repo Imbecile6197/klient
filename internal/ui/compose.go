@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
@@ -352,9 +353,20 @@ func (a *App) composerFor(acc mailbox.Account, d *protonmail.Draft, orig *proton
 	bodyFrame.SetChild(bodyBox)
 
 	// Text below the user's own writing: signature and quoted/forwarded message.
+	// An HTML signature is not text: a preview of it is placed after the
+	// two line breaks that start the tail (tail is the text without it).
 	tail := ""
+	sigHTML, sigPlain := "", ""
+	setBody := func(main string) {
+		editor.SetText(main + tail)
+		if sigHTML != "" {
+			editor.insertSignature(utf8.RuneCountInString(main)+2, sigHTML, sigPlain)
+		}
+	}
 	if d.ID == "" {
-		if sig := strings.TrimSpace(a.cfg.Signature); sig != "" {
+		if sigHTML, sigPlain = a.htmlSignatureOf(); sigHTML != "" {
+			tail += "\n\n"
+		} else if sig := strings.TrimSpace(a.cfg.Signature); sig != "" {
 			tail += "\n\n-- \n" + sig
 		}
 		switch {
@@ -363,7 +375,7 @@ func (a *App) composerFor(acc mailbox.Account, d *protonmail.Draft, orig *proton
 		case orig != nil:
 			tail += quote(orig)
 		}
-		editor.SetText(d.Body + tail) // d.Body is set for mailto: links
+		setBody(d.Body) // d.Body is set for mailto: links
 	} else {
 		editor.SetText(d.Body)
 	}
@@ -562,7 +574,7 @@ func (a *App) composerFor(acc mailbox.Account, d *protonmail.Draft, orig *proton
 					localToast(i18n.T("The AI failed: ") + ai.Explain(a.cfg.AssistantProvider, err).Text)
 					return
 				}
-				editor.SetText(strings.TrimSpace(out) + tail)
+				setBody(strings.TrimSpace(out))
 			})
 		}()
 	})

@@ -62,6 +62,9 @@ type Config struct {
 
 	// Signature appended to new messages ("" = none).
 	Signature string `json:"signature"`
+	// HTML signature, used instead of Signature when SignatureUseHTML is on.
+	SignatureHTML    string `json:"signature_html,omitempty"`
+	SignatureUseHTML bool   `json:"signature_use_html,omitempty"`
 
 	// Logged-in Proton accounts (login names, in sidebar order) and the one
 	// shown in the window.
