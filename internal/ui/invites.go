@@ -209,14 +209,15 @@ func (m *mainView) inviteeAddress(msg *protonmail.Message, ev *ical.Event) strin
 // answerInvite sends the iTIP reply to the organizer.
 func (a *App) answerInvite(msg *protonmail.Message, ev *ical.Event, me, stat string, buttons *gtk.Box, status *gtk.Label) {
 	verb := map[string]string{"ACCEPTED": i18n.T("Accepted"), "TENTATIVE": i18n.T("Tentative"), "DECLINED": i18n.T("Declined")}[stat]
-	name := a.acc.DisplayName()
+	acc, msg := a.ownMessage(msg) // in the combined view: the message's own account
+	name := acc.DisplayName()
 	d := &protonmail.Draft{
 		FromAddressID: msg.Meta.AddressID,
 		To:            []*mail.Address{{Name: ev.Organizer.Name, Address: ev.Organizer.Email}},
 		Subject:       verb + ": " + ev.Summary,
 		SignExternal:  true,
 	}
-	for _, ad := range a.acc.SendAddresses() {
+	for _, ad := range acc.SendAddresses() {
 		if strings.EqualFold(ad.Email, me) {
 			d.FromAddressID = ad.ID
 		}
@@ -226,7 +227,6 @@ func (a *App) answerInvite(msg *protonmail.Message, ev *ical.Event, me, stat str
 	d.Attachments = []*protonmail.Outgoing{{Name: "invite.ics", MIMEType: "text/calendar", Data: reply, Size: int64(len(reply))}}
 	buttons.SetSensitive(false)
 	status.SetText(i18n.T("Sending the answer…"))
-	acc := a.acc
 	go func() {
 		ctx, cancel := context.WithTimeout(a.ctx, 2*time.Minute)
 		defer cancel()

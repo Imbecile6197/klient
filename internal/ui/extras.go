@@ -285,11 +285,18 @@ func (a *App) applyRulesToInbox() {
 		return
 	}
 	a.toast(i18n.T("Applying the rules to the inbox…"))
-	acc := a.acc
+	accs := []mailbox.Account{a.acc}
+	if a.isUnified() {
+		accs = a.openAccounts()
+	}
 	go func() {
-		msgs, err := acc.List(a.ctx, protonmail.InboxID, 0, 150)
 		n := 0
-		if err == nil {
+		var err error
+		for _, acc := range accs {
+			var msgs []protonmail.Summary
+			if msgs, err = acc.List(a.ctx, protonmail.InboxID, 0, 150); err != nil {
+				break
+			}
 			for _, s := range msgs {
 				if len(a.applyRules(a.ctx, acc, s)) > 0 {
 					n++

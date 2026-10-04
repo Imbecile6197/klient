@@ -105,8 +105,16 @@ type Config struct {
 	AutoUpdate bool `json:"auto_update"`
 	// The model last chosen for each role and provider ("spam:gemini"), so
 	// switching providers back and forth keeps it.
-	RoleModels      map[string]string `json:"role_models,omitempty"`
-	UpdateLastCheck string            `json:"update_last_check"` // RFC 3339
+	RoleModels map[string]string `json:"role_models,omitempty"`
+	// Folders left out of the sidebar, per account (Username -> folder IDs).
+	HiddenFolders map[string][]string `json:"hidden_folders,omitempty"`
+	// Messages older than this many days are deleted from Trash and Spam
+	// (0 = never).
+	AutoEmptyDays int `json:"auto_empty_days,omitempty"`
+	// Buttons of the new-mail notification ("read", "archive", "trash",
+	// "spam"); nil = the defaults. No omitempty: an empty list is a choice.
+	NotifyButtons   []string `json:"notify_buttons"`
+	UpdateLastCheck string   `json:"update_last_check"` // RFC 3339
 	// Summarise new mail in advance with the local model (on AC power only).
 	PrecomputeSummaries bool `json:"precompute_summaries"`
 

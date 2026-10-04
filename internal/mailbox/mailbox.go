@@ -85,6 +85,14 @@ type Account interface {
 
 	// Organising
 	UserLabels(ctx context.Context) ([]protonmail.UserLabel, error)
+	// Folder management: name may nest with "/"; label asks for a label
+	// where the service tells folders and labels apart.
+	CreateFolder(ctx context.Context, name string, label bool) error
+	RenameFolder(ctx context.Context, id, name string) error
+	DeleteFolder(ctx context.Context, id string) error
+	// EmptyFolder permanently deletes the messages of Trash or Spam (with a
+	// non-zero olderThan only older ones) and returns how many.
+	EmptyFolder(ctx context.Context, folderID string, olderThan time.Time) (int, error)
 	MarkRead(ctx context.Context, ids ...string) error
 	MarkUnread(ctx context.Context, ids ...string) error
 	Move(ctx context.Context, folderID string, ids ...string) error

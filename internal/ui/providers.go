@@ -27,6 +27,11 @@ var providerIcons = map[mailbox.Kind][]string{
 
 // providerLogo returns an image of the service logo at the given size.
 func providerLogo(kind mailbox.Kind, size int) *gtk.Image {
+	if kind == mailbox.KindUnified {
+		img := gtk.NewImageFromIconName("system-users-symbolic")
+		img.SetPixelSize(size)
+		return img
+	}
 	theme := gtk.IconThemeGetForDisplay(gdk.DisplayGetDefault())
 	for _, name := range providerIcons[kind] {
 		if theme.HasIcon(name) {

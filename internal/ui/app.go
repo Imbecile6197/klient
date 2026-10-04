@@ -96,6 +96,14 @@ type App struct {
 	ai     *ai.Client
 	ollama *ollama.Runtime
 	update pendingUpdate
+	// All accounts shown together; restoreUnified: show it again once the
+	// accounts of the last run are open.
+	unified        *mailbox.Unified
+	restoreUnified bool
+	// Messages that could not be sent (outbox.go); outboxRefresh redraws an
+	// open Outbox dialog.
+	outbox        []*outboxItem
+	outboxRefresh func()
 	// The help window, kept hidden after closing.
 	helpWin  *adw.Window
 	helpView *webkit.WebView
@@ -126,6 +134,8 @@ type notifiedMsg struct {
 
 func Run(cfg config.Config) int {
 	a := &App{cfg: cfg, notified: map[string]notifiedMsg{}, precompute: make(chan precomputeJob, 100)}
+	a.unified = mailbox.NewUnified(a.openAccounts)
+	a.restoreUnified = cfg.ActiveAccount == unifiedID
 	args := os.Args[:1]
 	for _, arg := range os.Args[1:] {
 		if arg == "--background" {
@@ -251,6 +261,8 @@ func (a *App) activate() {
 	go a.selfUpdateLoop()
 	go a.watchUpgrade()
 	go a.precomputeLoop()
+	go a.outboxLoop()
+	go a.autoEmptyLoop()
 }
 
 // watchUpgrade notices that the package was updated while Klient runs (the
@@ -501,6 +513,7 @@ func (a *App) setupActions() {
 		}
 	})
 	a.app.AddAction(open)
+	a.installNotifyActions()
 	add("show", nil, a.showWindow)
 	add("restart", nil, a.restartApp)
 	add("about", nil, a.showAbout)
@@ -574,6 +587,8 @@ func (a *App) sessionOf(acc mailbox.Account) *session {
 func (a *App) addSession(acc mailbox.Account) *session {
 	for i, s := range a.sessions {
 		if s.acc.UserID() == acc.UserID() && acc.UserID() != "" {
+			old := s.acc
+			a.outbox = slices.DeleteFunc(a.outbox, func(it *outboxItem) bool { return it.acc == old })
 			s.acc.Close()
 			a.sessions = append(a.sessions[:i], a.sessions[i+1:]...)
 			break
@@ -595,6 +610,12 @@ func (a *App) addSession(acc mailbox.Account) *session {
 		}
 	})
 	a.refreshUnread(s)
+	a.loadOutbox(acc)
+	// Show all accounts together again, as in the last run.
+	if a.restoreUnified && len(a.sessions) > 1 && a.mv != nil && !a.isUnified() {
+		a.restoreUnified = false
+		a.switchAccount(a.unified)
+	}
 	return s
 }
 
@@ -693,6 +714,8 @@ func (a *App) recoverSession(s *session) {
 
 func (a *App) removeSession(s *session) {
 	a.sessions = slices.DeleteFunc(a.sessions, func(x *session) bool { return x == s })
+	a.outbox = slices.DeleteFunc(a.outbox, func(it *outboxItem) bool { return it.acc == s.acc })
+	a.outboxChanged()
 	a.updateTrayUnread()
 }
 
@@ -706,7 +729,7 @@ func (a *App) startEvents(s *session) {
 	go func() {
 		err := acc.Events(a.ctx, func(meta protonmail.Summary) { a.onNewMessage(s, meta) }, func() {
 			ui(func() {
-				if a.mv != nil && a.acc == acc {
+				if a.mv != nil && a.showing(acc) {
 					a.mv.scheduleRefresh()
 				}
 				a.refreshUnread(s)
@@ -759,7 +782,7 @@ func (a *App) offlineSyncLoop(s *session) {
 		// Storage and profile change over time (Klient may run for days).
 		if err := acc.RefreshUser(a.ctx); err == nil {
 			ui(func() {
-				if a.mv != nil && a.acc == acc {
+				if a.mv != nil && a.showing(acc) {
 					a.mv.updateStorage()
 				}
 			})
@@ -791,12 +814,12 @@ func (a *App) onNewMessage(s *session, meta protonmail.Summary) {
 	if held {
 		s.hold(meta.ID)
 		ui(func() {
-			if a.mv != nil && a.acc == acc {
+			if a.mv != nil && a.showing(acc) {
 				a.mv.updateChecking()
 			}
 			// Show it anyway after maxHold if the check hangs.
 			glib.TimeoutSecondsAdd(uint(maxHold/time.Second)+1, func() bool {
-				if a.mv != nil && a.acc == acc {
+				if a.mv != nil && a.showing(acc) {
 					a.mv.rebuildList()
 				}
 				return false
@@ -818,7 +841,7 @@ func (a *App) onNewMessage(s *session, meta protonmail.Summary) {
 			}
 		}
 		ui(func() {
-			shown := a.acc == acc
+			shown := a.showing(acc)
 			if held {
 				s.release(meta.ID)
 				if a.mv != nil && shown {
@@ -857,6 +880,7 @@ func (a *App) onNewMessage(s *session, meta protonmail.Summary) {
 			n.SetBody(body)
 			a.notified[meta.ID] = notifiedMsg{acc: acc, meta: meta}
 			n.SetDefaultActionAndTarget("app.open-message", glib.NewVariantString(meta.ID))
+			a.addNotifyButtons(n, meta.ID)
 			a.app.SendNotification("new-mail-"+meta.ID, n)
 		})
 	}()
@@ -869,16 +893,19 @@ func (a *App) openNotified(id string) {
 	if !ok || a.sessionOf(n.acc) == nil {
 		return
 	}
-	if a.acc != n.acc {
+	meta := n.meta
+	if a.isUnified() {
+		meta = a.unified.WrapSummary(n.acc, meta)
+	} else if a.acc != n.acc {
 		a.switchAccount(n.acc)
 	}
 	a.app.WithdrawNotification("new-mail-" + id)
-	a.mv.openThread(protonmail.Thread{ConversationID: n.meta.ConversationID, Latest: n.meta, Messages: []protonmail.Summary{n.meta}})
+	a.mv.openThread(protonmail.Thread{ConversationID: meta.ConversationID, Latest: meta, Messages: []protonmail.Summary{meta}})
 }
 
 func (a *App) markNotSpam(from string, ids ...string) {
 	for _, id := range ids {
-		a.filter.Feedback(id, from, false)
+		a.filter.Feedback(a.ownID(id), from, false)
 	}
 	go func() {
 		err := a.acc.Move(a.ctx, protonmail.InboxID, ids...)
@@ -895,7 +922,7 @@ func (a *App) markNotSpam(from string, ids ...string) {
 
 func (a *App) markSpam(from string, ids ...string) {
 	for _, id := range ids {
-		a.filter.Feedback(id, from, true)
+		a.filter.Feedback(a.ownID(id), from, true)
 	}
 	go func() {
 		err := a.acc.Move(a.ctx, protonmail.SpamID, ids...)
@@ -912,6 +939,10 @@ func (a *App) markSpam(from string, ids ...string) {
 
 func (a *App) confirmLogout() {
 	if a.acc == nil {
+		return
+	}
+	if a.isUnified() {
+		a.toast(i18n.T("Switch to the account you want to log out of first"))
 		return
 	}
 	d := adw.NewAlertDialog(fmt.Sprintf(i18n.T("Log Out of %s?"), a.acc.Email()), i18n.T("The session will be ended on the server and removed from the keyring, and the offline cache of this account will be deleted."))

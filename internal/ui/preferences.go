@@ -33,7 +33,7 @@ func (a *App) preferencesDialog() *adw.PreferencesDialog {
 	d.Add(a.spamPage(d))
 	d.Add(a.messagesPage(d))
 	d.Add(a.rulesPage(d))
-	if a.acc != nil {
+	if a.acc != nil && !a.isUnified() {
 		d.Add(a.pgpPage(d))
 	}
 	d.Present(a.win)
@@ -436,6 +436,7 @@ func (a *App) generalPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	})
 	bg.Add(autostart)
 	p.Add(bg)
+	p.Add(a.notifyGroup(d))
 	p.Add(a.updateGroup())
 	return p
 }
@@ -484,6 +485,33 @@ func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	sg.Add(attachKey)
 	p.Add(sg)
 
+	tg := adw.NewPreferencesGroup()
+	tg.SetTitle(i18n.T("Trash and Spam"))
+	autoEmpty := adw.NewComboRow()
+	autoEmpty.SetTitle(i18n.T("Delete old messages automatically"))
+	autoEmpty.SetSubtitle(i18n.T("Messages in Trash and Spam older than this are deleted permanently, in every account"))
+	emptyDays := []int{0, 7, 14, 30, 60, 90}
+	var emptyNames []string
+	sel := 0
+	for i, n := range emptyDays {
+		if n == 0 {
+			emptyNames = append(emptyNames, i18n.T("Never"))
+		} else {
+			emptyNames = append(emptyNames, fmt.Sprintf(i18n.N("After %d day", "After %d days", n), n))
+		}
+		if n == a.cfg.AutoEmptyDays {
+			sel = i
+		}
+	}
+	autoEmpty.SetModel(gtk.NewStringList(emptyNames))
+	autoEmpty.SetSelected(uint(sel))
+	autoEmpty.NotifyProperty("selected", func() {
+		a.cfg.AutoEmptyDays = emptyDays[autoEmpty.Selected()]
+		a.saveConfig()
+	})
+	tg.Add(autoEmpty)
+	p.Add(tg)
+
 	og := adw.NewPreferencesGroup()
 	og.SetTitle(i18n.T("Offline"))
 	og.SetDescription(i18n.T("The newest messages are stored in an encrypted cache (AES-256 with the key in the keyring, bodies also PGP-encrypted as on the server), so you can read them without a connection."))
@@ -513,6 +541,7 @@ func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	clearBtn.ConnectClicked(func() {
 		if a.acc != nil && a.acc.Cache() != nil {
 			_ = a.acc.Cache().Clear()
+			a.saveOutbox(a.acc) // the Outbox lives in the cache too: keep it
 			setStats()
 			d.AddToast(adw.NewToast(i18n.T("Offline cache cleared")))
 		}

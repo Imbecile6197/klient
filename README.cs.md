@@ -23,7 +23,7 @@ Klient je napsaný v Go s GTK4 a libadwaita. Připojuje se přímo k Proton Mail
 - **Spamfiltr s AI** – AI rozhoduje podle výsledků SPF/DKIM/DMARC, značek Protonu, zásahů v blocklistech (Spamhaus DROP, URLhaus, OpenPhish – aktualizace každých 12 hodin) a vašich seznamů povolených a blokovaných odesílatelů.
 - **AI asistent** – shrnutí, návrhy odpovědí, úprava a překlad konceptu, „Zeptat se pošty“, třídění do štítků a ranní přehled. Poskytovatelé: **Claude**, **ChatGPT**, **Gemini**, **Mistral** (servery v EU) nebo **lokální model** přes spravovanou Ollamu, takže nic neopustí počítač. Režim „Jen lokálně“ zablokuje všechny cloudové poskytovatele.
 - **Běžná pošta** – vlákna, bezpečné HTML zprávy s blokovaným vzdáleným obsahem, formátovaný editor, přílohy do 25 MB, koncepty, podpis, zpoždění odeslání s tlačítkem Zpět, naplánované odeslání, odkládání, pravidla, štítky a složky, přetahování, pozvánky do kalendáře, automatická odpověď (Proton), odhlášení odběru jedním kliknutím, tisk a export .eml.
-- **Více účtů** v jednom okně, **běh na pozadí** s ikonou v liště, **šifrovaná offline cache**, **automatické aktualizace** z vydání na GitHubu a vestavěná **nápověda** (F1).
+- **Více účtů** v jednom okně i **všechny účty dohromady** v jednom seznamu, **Pošta k odeslání**, která neodeslanou poštu nepustí, správa složek, **běh na pozadí** s ikonou v liště, **šifrovaná offline cache**, **automatické aktualizace** z vydání na GitHubu a vestavěná **nápověda** (F1).
 
 ## Instalace
 

@@ -292,7 +292,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
       <rect x="4" y="12" width="56" height="40" rx="9" fill="#1c71d8"/>
       <path d="M10 20l22 16 22-16" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <div><b>Klient</b><span>Documentation · version 0.7.9 · <a href="index.cs.html" hreflang="cs" lang="cs">Česky</a></span></div>
+    <div><b>Klient</b><span>Documentation · version 0.8.0 · <a href="index.cs.html" hreflang="cs" lang="cs">Česky</a></span></div>
   </div>
   <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc">Contents</button>
   <ol>
@@ -386,6 +386,8 @@ packaging/deb.sh 0.7.3   # Ubuntu package, built in a podman container</code></p
 <section id="accounts">
   <h2>Accounts and Services</h2>
   <p>You add the first account on the login screen and more accounts in the sidebar with the account switcher → <b>Add Account</b>. New mail, the spam filter and notifications work for all accounts at once, including those that are not open right now.</p>
+  <h3 id="all-accounts">All accounts together</h3>
+  <p>With two or more accounts, the account switcher offers <b>All Accounts</b>: the Inbox, Starred, Sent, Archive, Spam and Trash of every account in one list, sorted by time. Each message shows the address of its account, and everything you do with it – reading, replying, moving, deleting – happens in that account; a reply is written from it. A new message is written from the first account. Labels, snoozing, contacts and account settings stay in the individual accounts. Klient remembers the view for the next start.</p>
 
   <h3>Proton Mail</h3>
   <p>Klient logs in directly through the Proton API, including two-factor authentication and two-password mode. The password is not stored – only the session token and a derived key for unlocking the mailbox stay in the GNOME keyring.</p>
@@ -459,6 +461,9 @@ packaging/deb.sh 0.7.3   # Ubuntu package, built in a podman container</code></p
   <h3>Send delay</h3>
   <p>After you send a message, it waits a moment (10 s by default) while a notification counts down with an <b>Undo</b> button. You set the length in Preferences → Messages.</p>
 
+  <h3 id="outbox">Outbox</h3>
+  <p>A message that cannot be sent is never lost: it goes to the <b>Outbox</b>, which appears under the folders while it holds messages. After a connection failure Klient sends it again by itself every minute; after another failure (for example a rejected recipient) you choose <b>Send Again</b>, <b>Edit</b> or <b>Delete</b>. The Outbox is kept in each account's encrypted cache and survives a restart.</p>
+
   <h3>Scheduled sending</h3>
   <p>The arrow next to the Send button offers presets (tomorrow morning, tomorrow afternoon, Monday morning) or a custom date and time. On Proton the server sends the message even when your computer is off; for the other services Klient sends it. Scheduled messages show a bar with a countdown and a button to cancel sending.</p>
 </section>
@@ -468,6 +473,8 @@ packaging/deb.sh 0.7.3   # Ubuntu package, built in a podman container</code></p
   <h2>Organizing Mail</h2>
   <ul>
     <li><b>Folders and labels</b> – your own Proton folders and labels, IMAP folders and Gmail labels. You can drag messages onto folders and labels.</li>
+    <li><b>Managing folders</b> – right-click (or long-press) a folder in the sidebar: <b>New Folder</b> (a slash nests it, e.g. “Work/Projects”; on Proton it can be a label), <b>Rename</b>, <b>Delete</b> and <b>Hide from the Sidebar</b>. Hidden folders come back with <b>Show Hidden Folders</b> in the same menu.</li>
+    <li><b>Emptying Trash and Spam</b> – right-click Trash or Spam → <b>Empty</b> deletes its messages permanently. Preferences → Messages → <b>Trash and Spam</b> can do it automatically for messages older than 7 to 90 days, in every account.</li>
     <li><b>Star, unread, archive, trash.</b></li>
     <li><b>Selecting several messages</b> – with the button, <kbd>Ctrl</kbd>/<kbd>Shift</kbd>+click or <kbd>Ctrl</kbd>+<kbd>A</kbd>.</li>
     <li><b>Snooze</b> (<kbd>Ctrl</kbd>+<kbd>H</kbd>) – the conversation disappears and returns to the inbox at the chosen time.</li>
@@ -618,7 +625,7 @@ packaging/deb.sh 0.7.3   # Ubuntu package, built in a podman container</code></p
     <li>After you close the window, Klient keeps running, watches for new mail and shows a monochrome icon in the top bar (GNOME needs the AppIndicator extension). A red dot on the icon means unread mail. The icon menu offers Open Klient, New Message and Quit; you can also quit with <kbd>Ctrl</kbd>+<kbd>Q</kbd>.</li>
     <li><b>Start after login</b> – Klient starts straight in the background.</li>
     <li>You turn both on or off in Preferences → General → <b>Background</b>.</li>
-    <li>The new-mail notification arrives only after the spam check.</li>
+    <li>The new-mail notification arrives only after the spam check. It has up to three buttons – by default <b>Mark as Read</b>, <b>Archive</b> and <b>Delete</b>; <b>Spam</b> is the fourth choice. You pick them in Preferences → General → <b>Notifications</b>.</li>
   </ul>
 </section>
 
@@ -671,10 +678,10 @@ packaging/deb.sh 0.7.3   # Ubuntu package, built in a podman container</code></p
   <table>
     <thead><tr><th>Page</th><th>What it contains</th></tr></thead>
     <tbody>
-      <tr><td><b>General</b></td><td>Interface language, default email application, running in the background and starting after login, updates</td></tr>
+      <tr><td><b>General</b></td><td>Interface language, default email application, running in the background and starting after login, notification buttons, updates</td></tr>
       <tr><td><b>AI</b></td><td>Local AI (Ollama, Local only, updates, summaries in advance, model comparison), the provider and model for the assistant and the spam filter, API keys, automatic features (sorting into labels, morning overview)</td></tr>
       <tr><td><b>Spam Filter</b></td><td>Turning the AI filter on, the threshold for moving to spam, showing mail only after the check, blocklist status</td></tr>
-      <tr><td><b>Messages</b></td><td>Threads, send delay, attaching your public key, offline cache, signature</td></tr>
+      <tr><td><b>Messages</b></td><td>Threads, send delay, attaching your public key, emptying Trash and Spam automatically, offline cache, signature</td></tr>
       <tr><td><b>Rules</b></td><td>Rules for incoming mail</td></tr>
       <tr><td><b>PGP</b></td><td>Your own keys (create, import, back up, remove), contact keys, searching keys.openpgp.org</td></tr>
     </tbody>
@@ -726,7 +733,7 @@ packaging/deb.sh 0.7.3   # Ubuntu package, built in a podman container</code></p
   <p>Built with GTK4, libadwaita, WebKitGTK, go-proton-api, GopenPGP and the go-imap/go-smtp libraries.</p>
 </section>
 
-<footer>Documentation for version 0.7.9 · September 2026 · <a href="index.cs.html" hreflang="cs" lang="cs">Česká verze</a></footer>
+<footer>Documentation for version 0.8.0 · September 2026 · <a href="index.cs.html" hreflang="cs" lang="cs">Česká verze</a></footer>
 
 </div>
 </main>

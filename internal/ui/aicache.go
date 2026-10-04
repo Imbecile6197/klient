@@ -45,8 +45,35 @@ func latestReal(metas []protonmail.Summary) (protonmail.Summary, bool) {
 	return protonmail.Summary{}, false
 }
 
+// ownThread turns a conversation of the combined view into one of its own
+// account (summaries are cached there, under the account's own IDs).
+func ownThread(acc mailbox.Account, metas []protonmail.Summary, have map[string]*protonmail.Message) (mailbox.Account, []protonmail.Summary, map[string]*protonmail.Message) {
+	u, ok := acc.(*mailbox.Unified)
+	if !ok || len(metas) == 0 {
+		return acc, metas, have
+	}
+	var own mailbox.Account
+	out := make([]protonmail.Summary, 0, len(metas))
+	for _, m := range metas {
+		a, s, ok := u.UnwrapSummary(m)
+		if !ok {
+			return acc, metas, have
+		}
+		own = a
+		out = append(out, s)
+	}
+	ownHave := map[string]*protonmail.Message{}
+	for _, msg := range have {
+		if _, real, err := u.UnwrapMessage(msg); err == nil {
+			ownHave[real.Meta.ID] = real
+		}
+	}
+	return own, out, ownHave
+}
+
 // cachedSummaryFor returns the stored summary if it still covers the newest message.
 func cachedSummaryFor(acc mailbox.Account, metas []protonmail.Summary) (string, bool) {
+	acc, metas, _ = ownThread(acc, metas, nil)
 	latest, ok := latestReal(metas)
 	if !ok || acc.Cache() == nil {
 		return "", false
@@ -61,6 +88,7 @@ func cachedSummaryFor(acc mailbox.Account, metas []protonmail.Summary) (string, 
 // summarizeThread summarises a conversation (metas oldest first), using and
 // filling the cache. have holds already decrypted messages. Off the UI thread.
 func (a *App) summarizeThread(ctx context.Context, acc mailbox.Account, metas []protonmail.Summary, have map[string]*protonmail.Message) (string, error) {
+	acc, metas, have = ownThread(acc, metas, have)
 	if text, ok := cachedSummaryFor(acc, metas); ok {
 		return text, nil
 	}

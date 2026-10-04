@@ -84,8 +84,14 @@ func (a *App) startDemo() {
 		})
 	}
 	a.cfg.Accounts = []string{acc.Username()}
+	demo.Offline = os.Getenv("KLIENT_DEMO_OFFLINE") != ""
 	a.addSession(acc)
 	a.switchAccount(acc)
+	if os.Getenv("KLIENT_DEMO") == "2" {
+		second := demo.NewSecond()
+		a.cfg.Accounts = append(a.cfg.Accounts, second.Username())
+		a.addSession(second)
+	}
 	if dir := os.Getenv("KLIENT_SCREENSHOTS"); dir != "" {
 		a.demoScreenshots(dir)
 	}

@@ -314,7 +314,7 @@ func (a *App) askMail() {
 					r.AddSuffix(gtk.NewImageFromIconName("go-next-symbolic"))
 					r.ConnectActivated(func() {
 						d.Close()
-						if a.mv != nil && a.acc == acc {
+						if a.mv != nil && a.showing(acc) {
 							a.mv.openThread(protonmail.Thread{ConversationID: s.ConversationID, Latest: s, Messages: []protonmail.Summary{s}})
 						}
 					})
@@ -393,7 +393,7 @@ func (a *App) buildDigest() (string, int, error) {
 			if !bool(s.Unread) || n >= perAccount {
 				continue
 			}
-			if d, ok := a.filter.Decision(s.ID); ok && d.Spam {
+			if d, ok := a.filter.Decision(a.ownID(s.ID)); ok && d.Spam {
 				continue
 			}
 			if msg, err := acc.Get(ctx, s.ID); err == nil {

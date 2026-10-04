@@ -19,7 +19,12 @@ import (
 // accountSwitcher is the sidebar title: name and address of the shown
 // account; with a click it lists all accounts and "Add Account".
 func (m *mainView) accountSwitcher() gtk.Widgetter {
-	title := adw.NewWindowTitle(m.a.acc.DisplayName(), m.a.acc.Email())
+	sub := m.a.acc.Email()
+	if m.a.isUnified() {
+		n := len(m.a.sessions)
+		sub = fmt.Sprintf(i18n.N("%d account", "%d accounts", n), n)
+	}
+	title := adw.NewWindowTitle(m.a.acc.DisplayName(), sub)
 	box := gtk.NewBox(gtk.OrientationHorizontal, 6)
 	box.Append(providerLogo(m.a.acc.Kind(), 20))
 	box.Append(title)
@@ -37,6 +42,9 @@ func (m *mainView) accountPopover() *gtk.Popover {
 	pop := gtk.NewPopover()
 	box := gtk.NewBox(gtk.OrientationVertical, 2)
 	box.SetSizeRequest(280, -1)
+	if len(m.a.sessions) > 1 {
+		box.Append(m.unifiedButton(pop))
+	}
 	for _, s := range m.a.sessions {
 		s := s
 		b := gtk.NewButton()
@@ -77,6 +85,7 @@ func (m *mainView) accountPopover() *gtk.Popover {
 		b.SetChild(row)
 		b.ConnectClicked(func() {
 			pop.Popdown()
+			m.a.restoreUnified = false
 			if s.acc != m.a.acc {
 				m.a.switchAccount(s.acc)
 			}
@@ -107,7 +116,7 @@ func (m *mainView) updateAccountBadges() {
 	}
 	others := 0
 	for _, s := range m.a.sessions {
-		if s.acc != m.a.acc {
+		if !m.a.showing(s.acc) {
 			others += s.unread
 		}
 	}

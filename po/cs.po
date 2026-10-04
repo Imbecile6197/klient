@@ -1498,9 +1498,6 @@ msgstr "Přesto odeslat"
 msgid "Send Without Encryption?"
 msgstr "Odeslat bez šifrování?"
 
-#: internal/ui/compose.go
-msgid "Sending failed; the message has been reopened"
-msgstr "Odeslání selhalo, zpráva je znovu otevřená"
 
 #: internal/ui/compose.go
 msgid "Sending…"
@@ -3586,6 +3583,286 @@ msgstr "Platnost"
 msgid "Trust This Certificate"
 msgstr "Důvěřovat tomuto certifikátu"
 
-#: internal/ui/compose.go
-msgid "The certificate is trusted – send the message again"
-msgstr "Certifikát je důvěryhodný – odešlete zprávu znovu"
+
+#: internal/ui/preferences.go
+msgid "After %d day"
+msgid_plural "After %d days"
+msgstr[0] "Po %d dni"
+msgstr[1] "Po %d dnech"
+msgstr[2] "Po %d dnech"
+
+#: internal/ui/folders.go
+msgid "%d message deleted permanently"
+msgid_plural "%d messages deleted permanently"
+msgstr[0] "%d zpráva trvale smazána"
+msgstr[1] "%d zprávy trvale smazány"
+msgstr[2] "%d zpráv trvale smazáno"
+
+#: internal
+msgid "All Accounts"
+msgstr "Všechny účty"
+
+#: internal
+msgid "All messages in the folder will be deleted permanently in every account. This cannot be undone."
+msgstr "Všechny zprávy ve složce se trvale smažou ve všech účtech. Nejde to vrátit."
+
+#: internal
+msgid "All messages in the folder will be deleted permanently. This cannot be undone."
+msgstr "Všechny zprávy ve složce se trvale smažou. Nejde to vrátit."
+
+#: internal
+msgid "A message can have several labels but be in only one folder"
+msgstr "Zpráva může mít víc štítků, ale být jen v jedné složce"
+
+#: internal
+msgid "A slash nests it in another folder, e.g. “Work/Projects”."
+msgstr "Lomítko ji vnoří do jiné složky, například „Práce/Projekty“."
+
+#: internal
+msgid "Buttons in the new-mail notification (at most %d)"
+msgstr "Tlačítka v oznámení o nové poště (nejvýš %d)"
+
+#: internal
+msgid "Create"
+msgstr "Vytvořit"
+
+#: internal
+msgid "Delete…"
+msgstr "Smazat…"
+
+#: internal
+msgid "Delete old messages automatically"
+msgstr "Automaticky mazat staré zprávy"
+
+#: internal
+msgid "Delete %s?"
+msgstr "Smazat %s?"
+
+#: internal
+msgid "Delete the Message?"
+msgstr "Smazat zprávu?"
+
+#: internal
+msgid "Edit"
+msgstr "Upravit"
+
+#: internal
+msgid "Empty"
+msgstr "Vysypat"
+
+#: internal
+msgid "Emptying failed: "
+msgstr "Vysypání se nepovedlo: "
+
+#: internal
+msgid "Empty Spam?"
+msgstr "Vysypat Spam?"
+
+#: internal
+msgid "Empty Spam…"
+msgstr "Vysypat Spam…"
+
+#: internal
+msgid "Empty the Trash?"
+msgstr "Vysypat Koš?"
+
+#: internal
+msgid "Empty Trash…"
+msgstr "Vysypat Koš…"
+
+#: internal
+msgid "enter a name"
+msgstr "zadejte název"
+
+#: internal
+msgctxt "folder"
+msgid "Name"
+msgstr "Název"
+
+#: internal
+msgid "Folder %s created"
+msgstr "Složka %s vytvořena"
+
+#: internal
+msgid "GNOME shows at most %d buttons – turn another one off first"
+msgstr "GNOME ukáže nejvýš %d tlačítka – nejdřív jiné vypněte"
+
+#: internal
+msgid "Hide from the Sidebar"
+msgstr "Skrýt z postranního panelu"
+
+#: internal
+msgid "Inbox, Sent, Archive, Spam and Trash of every account together"
+msgstr "Doručená, odeslaná, archiv, spam a koš všech účtů dohromady"
+
+#: internal
+msgid "Label instead of a folder"
+msgstr "Štítek místo složky"
+
+#: internal
+msgid "Leave Hidden Folders Out"
+msgstr "Znovu skrýt skryté složky"
+
+#: internal
+msgid "Messages in the folder go back to the inbox; with a label, only the label is removed from the messages."
+msgstr "Zprávy ze složky se vrátí do doručené pošty; u štítku se ze zpráv odebere jen štítek."
+
+#: internal
+msgid "Messages in Trash and Spam older than this are deleted permanently, in every account"
+msgstr "Starší zprávy v Koši a Spamu se trvale smažou, ve všech účtech"
+
+#: internal
+msgid "Messages that could not be sent"
+msgstr "Zprávy, které se nepodařilo odeslat"
+
+#: internal
+msgid "Messages that could not be sent. After a connection failure they are sent again automatically every minute; otherwise send them again, edit them or delete them."
+msgstr "Zprávy, které se nepodařilo odeslat. Po výpadku spojení se každou minutu odesílají znovu samy; jinak je odešlete znovu, upravte nebo smažte."
+
+#: internal
+msgid "Never"
+msgstr "Nikdy"
+
+#: internal
+msgid "New Folder"
+msgstr "Nová složka"
+
+#: internal
+msgid "New Folder…"
+msgstr "Nová složka…"
+
+#: internal
+msgid "No connection – the message waits in the Outbox and will be sent automatically"
+msgstr "Chybí spojení – zpráva čeká v Poště k odeslání a odešle se sama"
+
+#: internal
+msgid "Notifications"
+msgstr "Oznámení"
+
+#: internal
+msgid "Only the label is removed; the messages stay in All Mail."
+msgstr "Odebere se jen štítek; zprávy zůstanou ve Všech zprávách."
+
+#: internal
+msgid "only Trash and Spam can be emptied"
+msgstr "vysypat jde jen Koš a Spam"
+
+#: internal
+msgid "Outbox"
+msgstr "Pošta k odeslání"
+
+#: internal
+msgid "Outbox (%d)"
+msgstr "Pošta k odeslání (%d)"
+
+#: internal
+msgid "Rename"
+msgstr "Přejmenovat"
+
+#: internal
+msgid "Rename…"
+msgstr "Přejmenovat…"
+
+#: internal
+msgid "Renamed to %s"
+msgstr "Přejmenováno na %s"
+
+#: internal
+msgid "Rename %s"
+msgstr "Přejmenovat %s"
+
+#: internal
+msgid "%s deleted"
+msgstr "%s smazáno"
+
+#: internal
+msgid "Send Again"
+msgstr "Odeslat znovu"
+
+#: internal
+msgid "Sending failed: "
+msgstr "Odeslání se nepovedlo: "
+
+#: internal
+msgid "Sending failed – the message waits in the Outbox"
+msgstr "Odeslání se nepovedlo – zpráva čeká v Poště k odeslání"
+
+#: internal
+msgid "Sent from the Outbox: %s"
+msgstr "Odesláno z Pošty k odeslání: %s"
+
+#: internal
+msgid "Show Hidden Folders (%d)"
+msgstr "Ukázat skryté složky (%d)"
+
+#: internal
+msgid "Show in the Sidebar"
+msgstr "Ukázat v postranním panelu"
+
+#: internal
+msgid "%s is hidden – right-click a folder and choose Show Hidden Folders to get it back"
+msgstr "%s je skrytá – vrátíte ji přes pravé tlačítko na složce a Ukázat skryté složky"
+
+#: internal
+msgid "Switch to the account you want to log out of first"
+msgstr "Nejdřív přepněte na účet, ze kterého se chcete odhlásit"
+
+#: internal
+msgid "system folders cannot be changed"
+msgstr "systémové složky nejde měnit"
+
+#: internal
+msgid "the account of this message is no longer open"
+msgstr "účet této zprávy už není otevřený"
+
+#: internal
+msgid "The action failed"
+msgstr "Akce se nepovedla"
+
+#: internal
+msgid "The folder and the messages in it will be deleted from the server."
+msgstr "Složka i zprávy v ní se smažou ze serveru."
+
+#: internal
+msgid "The folder could not be deleted: "
+msgstr "Složku se nepodařilo smazat: "
+
+#: internal
+msgid "The folder could not be saved: "
+msgstr "Složku se nepodařilo uložit: "
+
+#: internal
+msgid "The message will not be sent and cannot be recovered."
+msgstr "Zpráva se neodešle a nepůjde obnovit."
+
+#: internal
+msgid "the name contains a character the server does not allow"
+msgstr "název obsahuje znak, který server nepovoluje"
+
+#: internal
+msgid "The Outbox could not be saved: "
+msgstr "Poštu k odeslání se nepodařilo uložit: "
+
+#: internal
+msgid "The Outbox Is Empty"
+msgstr "Pošta k odeslání je prázdná"
+
+#: internal
+msgid "Trash and Spam"
+msgstr "Koš a Spam"
+
+#: internal
+msgid "Waiting for the connection – "
+msgstr "Čeká na spojení – "
+
+#: internal
+msgctxt "action"
+msgid "Delete"
+msgstr "Smazat"
+
+#: internal/ui/accounts.go
+msgid "%d account"
+msgid_plural "%d accounts"
+msgstr[0] "%d účet"
+msgstr[1] "%d účty"
+msgstr[2] "%d účtů"

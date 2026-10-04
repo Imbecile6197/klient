@@ -292,7 +292,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
       <rect x="4" y="12" width="56" height="40" rx="9" fill="#1c71d8"/>
       <path d="M10 20l22 16 22-16" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <div><b>Klient</b><span>Dokumentace · verze 0.7.9 · <a href="index.html" hreflang="en" lang="en">English</a></span></div>
+    <div><b>Klient</b><span>Dokumentace · verze 0.8.0 · <a href="index.html" hreflang="en" lang="en">English</a></span></div>
   </div>
   <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc">Obsah</button>
   <ol>
@@ -386,6 +386,8 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
 <section id="ucty">
   <h2>Účty a služby</h2>
   <p>První účet přidáte na přihlašovací obrazovce, další v postranním panelu přes přepínač účtů → <b>Přidat účet</b>. Nová pošta, spamfiltr a oznámení fungují pro všechny účty současně, i pro ty, které právě nemáte otevřené.</p>
+  <h3 id="vsechny-ucty">Všechny účty dohromady</h3>
+  <p>Se dvěma a více účty nabídne přepínač účtů <b>Všechny účty</b>: doručenou poštu, hvězdičky, odeslané, archiv, spam a koš všech účtů v jednom seznamu seřazeném podle času. U každé zprávy je vidět adresa jejího účtu a vše, co s ní uděláte – čtení, odpověď, přesun, smazání –, proběhne v tomto účtu; odpověď se píše z něj. Nová zpráva se píše z prvního účtu. Štítky, odkládání, kontakty a nastavení účtu zůstávají v jednotlivých účtech. Klient si zobrazení zapamatuje i pro příští spuštění.</p>
 
   <h3>Proton Mail</h3>
   <p>Přihlášení přímo přes Proton API včetně dvoufázového ověření a režimu dvou hesel. Heslo se neukládá – v klíčence GNOME zůstane jen token relace a odvozený klíč pro odemčení schránky.</p>
@@ -459,6 +461,9 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
   <h3>Zpoždění odeslání</h3>
   <p>Po odeslání zpráva ještě chvíli počká (výchozí 10 s) a v oznámení běží odpočet s tlačítkem <b>Zpět</b>. Délku nastavíte v Předvolbách → Zprávy.</p>
 
+  <h3 id="k-odeslani">Pošta k odeslání</h3>
+  <p>Zpráva, kterou nejde odeslat, se nikdy neztratí: přesune se do <b>Pošty k odeslání</b>, která se ukáže pod složkami, dokud v ní něco je. Po výpadku spojení ji Klient každou minutu odesílá znovu sám; po jiné chybě (třeba odmítnutý adresát) zvolíte <b>Odeslat znovu</b>, <b>Upravit</b> nebo <b>Smazat</b>. Pošta k odeslání se ukládá do šifrované cache účtu a přežije i restart.</p>
+
   <h3>Naplánované odeslání</h3>
   <p>Šipka u tlačítka Odeslat nabídne předvolby (zítra ráno, zítra odpoledne, příští týden) nebo vlastní datum a čas. U Protonu zprávu odešle server i při vypnutém počítači, u ostatních služeb ji odešle Klient. Naplánované zprávy mají v zobrazení pruh s odpočtem a tlačítkem pro zrušení.</p>
 </section>
@@ -468,6 +473,8 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
   <h2>Organizace pošty</h2>
   <ul>
     <li><b>Složky a štítky</b> – vlastní složky a štítky Protonu, složky IMAP a štítky Gmailu. Zprávy jde do složek a na štítky přetáhnout.</li>
+    <li><b>Správa složek</b> – pravým tlačítkem (nebo dlouhým podržením) na složce v postranním panelu: <b>Nová složka</b> (lomítko ji vnoří, např. „Práce/Projekty“; u Protonu může jít o štítek), <b>Přejmenovat</b>, <b>Smazat</b> a <b>Skrýt z postranního panelu</b>. Skryté složky vrátíte položkou <b>Ukázat skryté složky</b> ve stejné nabídce.</li>
+    <li><b>Vysypání Koše a Spamu</b> – pravým tlačítkem na Koš nebo Spam → <b>Vysypat</b> trvale smaže jejich zprávy. V Předvolbách → Zprávy → <b>Koš a Spam</b> to jde nechat dělat automaticky u zpráv starších než 7 až 90 dní, ve všech účtech.</li>
     <li><b>Hvězdička, nepřečtené, archiv, koš.</b></li>
     <li><b>Hromadný výběr</b> – tlačítkem, <kbd>Ctrl</kbd>/<kbd>Shift</kbd>+klik nebo <kbd>Ctrl</kbd>+<kbd>A</kbd>.</li>
     <li><b>Odložení</b> (<kbd>Ctrl</kbd>+<kbd>H</kbd>) – konverzace zmizí a v zadaný čas se vrátí do doručené pošty.</li>
@@ -618,7 +625,7 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
     <li>Po zavření okna Klient běží dál, hlídá novou poštu a ukazuje černobílou ikonu v horní liště (GNOME potřebuje rozšíření AppIndicator). Červená tečka na ikoně znamená nepřečtenou poštu. Nabídka ikony obsahuje Otevřít Klient, Nová zpráva a Ukončit; ukončit ho můžete také klávesami <kbd>Ctrl</kbd>+<kbd>Q</kbd>.</li>
     <li><b>Spouštět po přihlášení</b> – Klient se spustí rovnou na pozadí.</li>
     <li>Obojí zapnete nebo vypnete v Předvolbách → Obecné → <b>Na pozadí</b>.</li>
-    <li>Oznámení o nové poště přijde až po kontrole spamfiltrem.</li>
+    <li>Oznámení o nové poště přijde až po kontrole spamfiltrem. Má až tři tlačítka – výchozí jsou <b>Označit jako přečtené</b>, <b>Archivovat</b> a <b>Smazat</b>; čtvrtou možností je <b>Spam</b>. Vyberete je v Předvolbách → Obecné → <b>Oznámení</b>.</li>
   </ul>
 </section>
 
@@ -671,10 +678,10 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
   <table>
     <thead><tr><th>Stránka</th><th>Co obsahuje</th></tr></thead>
     <tbody>
-      <tr><td><b>Obecné</b></td><td>Jazyk rozhraní, výchozí e-mailová aplikace, běh na pozadí a spouštění po přihlášení, aktualizace</td></tr>
+      <tr><td><b>Obecné</b></td><td>Jazyk rozhraní, výchozí e-mailová aplikace, běh na pozadí a spouštění po přihlášení, tlačítka oznámení, aktualizace</td></tr>
       <tr><td><b>AI</b></td><td>Lokální AI (Ollama, Jen lokálně, aktualizace, shrnutí předem, porovnání modelů), poskytovatel a model pro asistenta a spamfiltr, API klíče, automatické funkce (třídění do štítků, ranní přehled)</td></tr>
       <tr><td><b>Spamfiltr</b></td><td>Zapnutí AI filtru, práh pro přesun do spamu, zobrazování pošty až po kontrole, stav blocklistů</td></tr>
-      <tr><td><b>Zprávy</b></td><td>Vlákna, zpoždění odeslání, přikládání veřejného klíče, offline cache, podpis</td></tr>
+      <tr><td><b>Zprávy</b></td><td>Vlákna, zpoždění odeslání, přikládání veřejného klíče, automatické vysypání Koše a Spamu, offline cache, podpis</td></tr>
       <tr><td><b>Pravidla</b></td><td>Pravidla pro příchozí poštu</td></tr>
       <tr><td><b>PGP</b></td><td>Vlastní klíče (vytvořit, importovat, zálohovat, odstranit), klíče kontaktů, hledání na keys.openpgp.org</td></tr>
     </tbody>
@@ -726,7 +733,7 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
   <p>Postaveno na GTK4, libadwaita, WebKitGTK, go-proton-api, gopenpgp a knihovnách go-imap/go-smtp.</p>
 </section>
 
-<footer>Dokumentace k verzi 0.7.9 · září 2026 · <a href="index.html" hreflang="en" lang="en">English version</a></footer>
+<footer>Dokumentace k verzi 0.8.0 · září 2026 · <a href="index.html" hreflang="en" lang="en">English version</a></footer>
 
 </div>
 </main>

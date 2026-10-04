@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 	"time"
 
@@ -15,6 +16,7 @@ import (
 
 	aipkg "github.com/Imbecile6197/klient/internal/ai"
 	"github.com/Imbecile6197/klient/internal/i18n"
+	"github.com/Imbecile6197/klient/internal/mailbox"
 	"github.com/Imbecile6197/klient/internal/protonmail"
 )
 
@@ -87,6 +89,9 @@ type mainView struct {
 	snoozeBtn   *gtk.MenuButton
 	unsnoozeBtn *gtk.Button
 	accountBtn  *gtk.MenuButton
+	outboxBtn   *gtk.Button
+	outboxLabel *gtk.Label
+	showHidden  bool // hidden folders are shown (dimmed) for a while
 }
 
 func newMainView(a *App) *mainView {
@@ -181,6 +186,7 @@ func (m *mainView) buildSidebar() gtk.Widgetter {
 	side := gtk.NewBox(gtk.OrientationVertical, 0)
 	side.Append(compose)
 	side.Append(sw)
+	side.Append(m.outboxButton())
 	tv.SetContent(side)
 	tv.AddCSSClass("sidebar-pane")
 
@@ -238,6 +244,13 @@ func (m *mainView) setFolders(labels []protonmail.UserLabel) {
 	m.countLabels = map[string]*gtk.Label{}
 	m.folders = nil
 	caps := m.a.acc.Caps()
+	hidden := map[string]bool{}
+	for _, id := range m.a.hiddenFolders() {
+		hidden[id] = true
+	}
+	if !m.showHidden {
+		labels = slices.DeleteFunc(slices.Clone(labels), func(l protonmail.UserLabel) bool { return hidden[l.ID] })
+	}
 	for _, f := range protonmail.Folders {
 		if (f.ID == protonmail.SnoozedID && !caps.CanSnooze()) || (f.ID == protonmail.ScheduledID && !caps.CanSchedule()) ||
 			!m.a.acc.HasFolder(f.ID) {
@@ -282,6 +295,10 @@ func (m *mainView) setFolders(labels []protonmail.UserLabel) {
 		count.SetVAlign(gtk.AlignCenter)
 		row.Append(count)
 		m.countLabels[f.ID] = count
+		if hidden[f.ID] {
+			row.AddCSSClass("dim-label")
+		}
+		m.folderMenu(row, f, hidden[f.ID])
 		m.folderList.Append(row)
 		if i == nSystem && len(labels) > 0 {
 			// Visual gap between system and user folders.
@@ -780,8 +797,13 @@ func (m *mainView) loadPage(page int) {
 			}
 			m.page = page
 			m.msgs = append(m.msgs, msgs...)
+			if m.a.isUnified() {
+				// Pages of several accounts: keep the whole list in time order.
+				mailbox.SortNewestFirst(m.msgs)
+			}
 			m.rebuildList()
-			m.moreBtn.SetVisible(len(msgs) == pageSize)
+			// The combined view returns a page of every account at once.
+			m.moreBtn.SetVisible(len(msgs) >= pageSize)
 			unread := 0
 			for _, t := range m.items {
 				if t.Unread() {
@@ -896,12 +918,20 @@ func (m *mainView) scanInbox() {
 		return
 	}
 	m.a.toast(i18n.T("Checking the inbox…"))
+	accs := []mailbox.Account{m.a.acc}
+	if m.a.isUnified() {
+		accs = m.a.openAccounts()
+	}
 	go func() {
-		msgs, err := m.a.acc.List(m.a.ctx, protonmail.InboxID, 0, pageSize)
 		moved := 0
-		if err == nil {
+		var err error
+		for _, acc := range accs {
+			var msgs []protonmail.Summary
+			if msgs, err = acc.List(m.a.ctx, protonmail.InboxID, 0, pageSize); err != nil {
+				break
+			}
 			for _, s := range msgs {
-				if _, mv, e := m.a.filter.ProcessNew(m.a.ctx, m.a.acc, s); e == nil && mv {
+				if _, mv, e := m.a.filter.ProcessNew(m.a.ctx, acc, s); e == nil && mv {
 					moved++
 				}
 			}

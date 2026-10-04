@@ -173,8 +173,26 @@ func (a *App) openDraft(id string) {
 // composer is the message window. orig is the message being replied to or
 // forwarded (nil for new messages and reopened drafts).
 func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action protonmail.ComposeAction) {
+	a.composerFor(nil, d, orig, action)
+}
+
+// composerFor writes from acc (nil: the account shown).
+func (a *App) composerFor(acc mailbox.Account, d *protonmail.Draft, orig *protonmail.Message, action protonmail.ComposeAction) {
 	// The composer keeps its account even if the window switches to another.
-	acc := a.acc
+	// In the combined view it writes from the account of the message replied
+	// to, otherwise from the first account.
+	if acc == nil {
+		acc = a.acc
+	}
+	if a.isUnified() && acc == mailbox.Account(a.unified) {
+		if orig != nil {
+			acc, orig = a.ownMessage(orig)
+			d.ParentID = orig.Meta.ID
+			d.FromAddressID = orig.Meta.AddressID
+		} else {
+			acc = a.ownAccount("")
+		}
+	}
 	win := adw.NewWindow()
 	win.SetTransientFor(a.gtkWindow())
 	win.SetDefaultSize(780, 760)
@@ -584,19 +602,26 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 			err := acc.Send(ctx, d)
 			ui(func() {
 				busy = false
-				if err != nil {
+				if err != nil && !d.DeliveryTime.IsZero() {
+					// Scheduling failed: back to the window to choose again.
 					d.DeliveryTime = time.Time{}
 					send.SetSensitive(true)
 					send.SetLabel(i18n.T("Send"))
 					win.SetVisible(true)
 					win.Present()
 					localToast(err.Error())
-					a.toast(i18n.T("Sending failed; the message has been reopened"))
+					return
+				}
+				if err != nil {
+					// Nothing written is lost: the message waits in the Outbox.
+					sent = true
+					win.Close()
+					it := a.addToOutbox(acc, d, err)
 					if ce := certError(err); ce != nil {
 						if im, ok := acc.(*imapmail.Account); ok {
-							a.askTrustCert(win, ce, func() {
+							a.askTrustCert(a.win, ce, func() {
 								a.trustCert(im.Settings().ID(), ce)
-								localToast(i18n.T("The certificate is trusted – send the message again"))
+								a.sendFromOutbox(it, true)
 							})
 						}
 					}
@@ -610,12 +635,12 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 				switch {
 				case !d.DeliveryTime.IsZero() && !acc.Caps().ServerSchedule:
 					a.toast(fmt.Sprintf(i18n.T("Scheduled – it will be sent %s if Klient is running (the background is enough)"), formatWhen(d.DeliveryTime)))
-					if a.mv != nil && a.acc == acc {
+					if a.mv != nil && a.showing(acc) {
 						a.mv.reloadFolders()
 					}
 				case !d.DeliveryTime.IsZero():
 					a.toast(fmt.Sprintf(i18n.T("Scheduled – it will be sent %s (%s)"), formatWhen(d.DeliveryTime), countdown(d.DeliveryTime)))
-				case a.cfg.SendDelay <= 0:
+				default:
 					a.toast(i18n.T("Message sent"))
 				}
 				if a.mv != nil {
@@ -660,7 +685,6 @@ func (a *App) composer(d *protonmail.Draft, orig *protonmail.Message, action pro
 			}
 			busy = false
 			sendNow()
-			a.toast(i18n.T("Message sent"))
 		})
 	}
 

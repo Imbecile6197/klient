@@ -82,6 +82,12 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.8.0" date="2026-10-04">
+      <description>
+        <p>All accounts together in one list, an Outbox for mail that could not be sent, folder management with emptying Trash and Spam, and buttons in the new-mail notification.</p>
+        <p xml:lang="cs">Všechny účty dohromady v jednom seznamu, Pošta k odeslání pro neodeslanou poštu, správa složek s vysypáním Koše a Spamu a tlačítka v oznámení o nové poště.</p>
+      </description>
+    </release>
     <release version="0.7.9" date="2026-10-03">
       <description>
         <p>Only the configured AI models are used, and every AI request is recorded in the log.</p>

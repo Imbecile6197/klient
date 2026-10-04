@@ -66,6 +66,13 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Sun Oct 04 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.8.0-1
+- All accounts together (combined Inbox, Starred, Sent, Archive, Spam, Trash)
+- Outbox: unsent mail is kept and retried after connection failures
+- Folder management (create, rename, delete, hide), emptying Trash and Spam
+  by hand or automatically after N days
+- Buttons in the new-mail notification (read, archive, delete, spam)
+
 * Sat Oct 03 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.7.9-1
 - The key test no longer uses the provider's expensive default model;
   switching a role's provider restores the model chosen before

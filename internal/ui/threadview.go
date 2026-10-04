@@ -45,11 +45,19 @@ func (m *mainView) threadsOn() bool {
 
 // visibleMsgs leaves out new mail still waiting for the spam filter.
 func (m *mainView) visibleMsgs() []protonmail.Summary {
-	s := m.a.sessionOf(m.a.acc)
-	if s == nil {
+	var held map[string]bool
+	if m.a.isUnified() {
+		held = map[string]bool{}
+		for _, s := range m.a.sessions {
+			for id := range s.held() {
+				held[m.a.unified.WrapID(s.acc, id)] = true
+			}
+		}
+	} else if s := m.a.sessionOf(m.a.acc); s != nil {
+		held = s.held()
+	} else {
 		return m.msgs
 	}
-	held := s.held()
 	m.setChecking(len(held))
 	if len(held) == 0 {
 		return m.msgs
@@ -201,7 +209,7 @@ func (m *mainView) threadRow(t protonmail.Thread) gtk.Widgetter {
 		count.SetTooltipText(fmt.Sprintf(i18n.N("%d message in the thread", "%d messages in the thread", len(t.Messages)), len(t.Messages)))
 		top.Append(count)
 	}
-	if d, ok := m.a.filter.Decision(s.ID); ok && d.Spam {
+	if d, ok := m.a.filter.Decision(m.a.ownID(s.ID)); ok && d.Spam {
 		icon := gtk.NewImageFromIconName("mail-mark-junk-symbolic")
 		icon.SetTooltipText(i18n.T("AI spam filter: ") + categoryName(d.Verdict.Category))
 		icon.AddCSSClass("warning")
@@ -243,6 +251,9 @@ func (m *mainView) threadRow(t protonmail.Thread) gtk.Widgetter {
 	}
 	box.Append(top)
 	box.Append(subject)
+	if tag := m.accountTag(s.ID); tag != nil {
+		box.Append(tag)
+	}
 	if n := attachmentCount(t); n > 0 {
 		chip := gtk.NewBox(gtk.OrientationHorizontal, 4)
 		chip.AddCSSClass("attach-chip")
@@ -1067,7 +1078,7 @@ func (m *mainView) updateSpamUI() {
 	if msg.Meta.Sender != nil {
 		from = msg.Meta.Sender.Address
 	}
-	d, ok := m.a.filter.Decision(msg.Meta.ID)
+	d, ok := m.a.filter.Decision(m.a.ownID(msg.Meta.ID))
 	if !ok || d.Source == "none" {
 		m.banner.SetRevealed(false)
 		return

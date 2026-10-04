@@ -6,6 +6,7 @@ package demo
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/mail"
 	"slices"
 	"strings"
@@ -27,7 +28,19 @@ type Account struct {
 	me     *mail.Address
 	msgs   []*protonmail.Message
 	labels []protonmail.UserLabel
+	user   string // "demo", or "demo-2" for the second account
+	kind   mailbox.Kind
 }
+
+// Offline makes sending fail as if there were no connection (to try the
+// Outbox: KLIENT_DEMO_OFFLINE=1).
+var Offline bool
+
+type offlineError struct{}
+
+func (offlineError) Error() string   { return "dial tcp: connect: network is unreachable" }
+func (offlineError) Timeout() bool   { return false }
+func (offlineError) Temporary() bool { return true }
 
 var _ mailbox.Account = (*Account)(nil)
 
@@ -49,7 +62,7 @@ func New() *Account {
 		}
 		return en
 	}
-	a := &Account{me: addr(pick("Alex Carter", "Petra Svobodová"), pick("alex@example.com", "petra@example.com"))}
+	a := &Account{me: addr(pick("Alex Carter", "Petra Svobodová"), pick("alex@example.com", "petra@example.com")), user: "demo", kind: mailbox.KindProton}
 	a.labels = []protonmail.UserLabel{
 		{ID: LabelWork, Name: pick("Work", "Práce"), Color: "#1c71d8"},
 		{ID: LabelFamily, Name: pick("Family", "Rodina"), Color: "#2ec27e"},
@@ -142,6 +155,41 @@ func New() *Account {
 	return a
 }
 
+// NewSecond is a second, smaller account (KLIENT_DEMO=2), to show all
+// accounts together.
+func NewSecond() *Account {
+	cs := i18n.Lang() == "cs"
+	pick := func(en, czech string) string {
+		if cs {
+			return czech
+		}
+		return en
+	}
+	a := &Account{me: addr(pick("Alex Carter", "Petra Svobodová"), pick("alex.carter@example.net", "petra.svobodova@example.net")), user: "demo-2", kind: mailbox.KindSeznam}
+	now := time.Now()
+	at := func(d, h, m int) int64 {
+		y, mo, dd := now.AddDate(0, 0, -d).Date()
+		return time.Date(y, mo, dd, h, m, 0, 0, time.Local).Unix()
+	}
+	add := func(id string, from *mail.Address, subject, text string, t int64, unread bool) {
+		a.msgs = append(a.msgs, &protonmail.Message{
+			Meta: protonmail.Summary{
+				ID: id, ConversationID: "c-" + id, AddressID: "demo2-address", Subject: subject, Sender: from,
+				ToList: []*mail.Address{a.me}, Time: t, Unread: proton.Bool(unread), Size: len(text) + 1024,
+				LabelIDs: []string{protonmail.AllMailID, protonmail.InboxID}, Flags: proton.MessageFlagReceived | proton.MessageFlagDMARCPass,
+			},
+			Text: text, Encryption: i18n.T("Not end-to-end encrypted – the provider stores the message readably (TLS protects it in transit)"),
+		})
+	}
+	add("demo2-1", addr(pick("City Library", "Městská knihovna"), "library@example.org"), pick("Your book is ready for pickup", "Kniha je připravená k vyzvednutí"),
+		pick("The book you reserved is waiting for you at the front desk until Friday.", "Rezervovaná kniha na vás čeká u pultu do pátku."), at(0, 10, 30), true)
+	add("demo2-2", addr(pick("Running Club", "Běžecký klub"), "club@example.org"), pick("Saturday run: new route", "Sobotní běh: nová trasa"),
+		pick("This Saturday we start at the park gate at 8:00 and run along the river.", "V sobotu startujeme v 8:00 u brány parku a poběžíme podél řeky."), at(1, 18, 5), false)
+	add("demo2-3", addr(pick("Mia Carter", "Eva Svobodová"), pick("mia@example.net", "eva@example.net")), pick("Dinner on Sunday?", "Večeře v neděli?"),
+		pick("Would you like to come over for dinner on Sunday? Bring nothing but a good mood.", "Nepřijdeš v neděli na večeři? Stačí dobrá nálada."), at(2, 20, 15), false)
+	return a
+}
+
 // invite is a small iCalendar invitation.
 func invite(start time.Time, summary, location string, org, me *mail.Address) []byte {
 	f := func(t time.Time) string { return t.UTC().Format("20060102T150405Z") }
@@ -166,17 +214,17 @@ func (a *Account) SpamID() string {
 	return ""
 }
 
-func (a *Account) Kind() mailbox.Kind { return mailbox.KindProton }
+func (a *Account) Kind() mailbox.Kind { return a.kind }
 func (a *Account) Caps() mailbox.Caps {
 	return mailbox.Caps{Labels: true, ServerSnooze: true, ServerSchedule: true, AutoReply: true, E2E: true, Contacts: true}
 }
 func (a *Account) HasFolder(string) bool { return true }
-func (a *Account) Username() string      { return "demo" }
-func (a *Account) UserID() string        { return "demo" }
+func (a *Account) Username() string      { return a.user }
+func (a *Account) UserID() string        { return a.user }
 func (a *Account) Email() string         { return a.me.Address }
 func (a *Account) DisplayName() string   { return a.me.Name }
 func (a *Account) SendAddresses() []proton.Address {
-	return []proton.Address{{ID: "demo-address", Email: a.me.Address, DisplayName: a.me.Name, Send: true, Receive: true}}
+	return []proton.Address{{ID: a.user + "-address", Email: a.me.Address, DisplayName: a.me.Name, Send: true, Receive: true}}
 }
 func (a *Account) IsOwnAddress(s string) bool { return strings.EqualFold(s, a.me.Address) }
 
@@ -264,7 +312,55 @@ func (a *Account) Events(ctx context.Context, _ func(protonmail.Summary), _ func
 }
 func (a *Account) SyncOffline(context.Context, int, func(int, int)) error { return nil }
 
-func (a *Account) UserLabels(context.Context) ([]protonmail.UserLabel, error) { return a.labels, nil }
+func (a *Account) UserLabels(context.Context) ([]protonmail.UserLabel, error) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	return append([]protonmail.UserLabel{}, a.labels...), nil
+}
+
+// Folders of the demo account change only in memory.
+func (a *Account) CreateFolder(_ context.Context, name string, label bool) error {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	l := protonmail.UserLabel{ID: fmt.Sprintf("demo-new-%d", len(a.labels)), Name: name, Folder: !label}
+	if label {
+		l.Color = "#1DA583"
+	}
+	a.labels = append(a.labels, l)
+	return nil
+}
+
+func (a *Account) RenameFolder(_ context.Context, id, name string) error {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	for i := range a.labels {
+		if a.labels[i].ID == id {
+			a.labels[i].Name = name
+		}
+	}
+	return nil
+}
+
+func (a *Account) DeleteFolder(_ context.Context, id string) error {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	a.labels = slices.DeleteFunc(a.labels, func(l protonmail.UserLabel) bool { return l.ID == id })
+	return nil
+}
+
+func (a *Account) EmptyFolder(_ context.Context, folderID string, olderThan time.Time) (int, error) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	n := 0
+	a.msgs = slices.DeleteFunc(a.msgs, func(m *protonmail.Message) bool {
+		del := slices.Contains(m.Meta.LabelIDs, folderID) && (olderThan.IsZero() || time.Unix(m.Meta.Time, 0).Before(olderThan))
+		if del {
+			n++
+		}
+		return del
+	})
+	return n, nil
+}
 
 func (a *Account) setUnread(on bool, ids []string) {
 	a.mu.Lock()
@@ -326,8 +422,13 @@ func (a *Account) Storage() protonmail.StorageInfo {
 }
 
 func (a *Account) SaveDraft(context.Context, *protonmail.Draft) error { return nil }
-func (a *Account) Send(context.Context, *protonmail.Draft) error      { return nil }
-func (a *Account) DeleteDraft(context.Context, string) error          { return nil }
+func (a *Account) Send(context.Context, *protonmail.Draft) error {
+	if Offline {
+		return &net.OpError{Op: "dial", Net: "tcp", Err: offlineError{}}
+	}
+	return nil
+}
+func (a *Account) DeleteDraft(context.Context, string) error { return nil }
 func (a *Account) OpenDraft(context.Context, string) (*protonmail.Draft, *protonmail.Message, error) {
 	return nil, nil, mailbox.ErrUnsupported
 }
