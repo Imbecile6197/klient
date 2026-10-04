@@ -66,6 +66,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Sun Oct 04 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.8.1-1
+- Automatic emptying of Trash and Spam moved to Preferences → General
+
 * Sun Oct 04 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.8.0-1
 - All accounts together (combined Inbox, Starred, Sent, Archive, Spam, Trash)
 - Outbox: unsent mail is kept and retried after connection failures

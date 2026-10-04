@@ -292,7 +292,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
       <rect x="4" y="12" width="56" height="40" rx="9" fill="#1c71d8"/>
       <path d="M10 20l22 16 22-16" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <div><b>Klient</b><span>Dokumentace · verze 0.8.0 · <a href="index.html" hreflang="en" lang="en">English</a></span></div>
+    <div><b>Klient</b><span>Dokumentace · verze 0.8.1 · <a href="index.html" hreflang="en" lang="en">English</a></span></div>
   </div>
   <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc">Obsah</button>
   <ol>
@@ -474,7 +474,7 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
   <ul>
     <li><b>Složky a štítky</b> – vlastní složky a štítky Protonu, složky IMAP a štítky Gmailu. Zprávy jde do složek a na štítky přetáhnout.</li>
     <li><b>Správa složek</b> – pravým tlačítkem (nebo dlouhým podržením) na složce v postranním panelu: <b>Nová složka</b> (lomítko ji vnoří, např. „Práce/Projekty“; u Protonu může jít o štítek), <b>Přejmenovat</b>, <b>Smazat</b> a <b>Skrýt z postranního panelu</b>. Skryté složky vrátíte položkou <b>Ukázat skryté složky</b> ve stejné nabídce.</li>
-    <li><b>Vysypání Koše a Spamu</b> – pravým tlačítkem na Koš nebo Spam → <b>Vysypat</b> trvale smaže jejich zprávy. V Předvolbách → Zprávy → <b>Koš a Spam</b> to jde nechat dělat automaticky u zpráv starších než 7 až 90 dní, ve všech účtech.</li>
+    <li><b>Vysypání Koše a Spamu</b> – pravým tlačítkem na Koš nebo Spam → <b>Vysypat</b> trvale smaže jejich zprávy. V Předvolbách → Obecné → <b>Koš a Spam</b> to jde nechat dělat automaticky u zpráv starších než 7 až 90 dní, ve všech účtech.</li>
     <li><b>Hvězdička, nepřečtené, archiv, koš.</b></li>
     <li><b>Hromadný výběr</b> – tlačítkem, <kbd>Ctrl</kbd>/<kbd>Shift</kbd>+klik nebo <kbd>Ctrl</kbd>+<kbd>A</kbd>.</li>
     <li><b>Odložení</b> (<kbd>Ctrl</kbd>+<kbd>H</kbd>) – konverzace zmizí a v zadaný čas se vrátí do doručené pošty.</li>
@@ -678,10 +678,10 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
   <table>
     <thead><tr><th>Stránka</th><th>Co obsahuje</th></tr></thead>
     <tbody>
-      <tr><td><b>Obecné</b></td><td>Jazyk rozhraní, výchozí e-mailová aplikace, běh na pozadí a spouštění po přihlášení, tlačítka oznámení, aktualizace</td></tr>
+      <tr><td><b>Obecné</b></td><td>Jazyk rozhraní, výchozí e-mailová aplikace, běh na pozadí a spouštění po přihlášení, automatické vysypání Koše a Spamu, tlačítka oznámení, aktualizace</td></tr>
       <tr><td><b>AI</b></td><td>Lokální AI (Ollama, Jen lokálně, aktualizace, shrnutí předem, porovnání modelů), poskytovatel a model pro asistenta a spamfiltr, API klíče, automatické funkce (třídění do štítků, ranní přehled)</td></tr>
       <tr><td><b>Spamfiltr</b></td><td>Zapnutí AI filtru, práh pro přesun do spamu, zobrazování pošty až po kontrole, stav blocklistů</td></tr>
-      <tr><td><b>Zprávy</b></td><td>Vlákna, zpoždění odeslání, přikládání veřejného klíče, automatické vysypání Koše a Spamu, offline cache, podpis</td></tr>
+      <tr><td><b>Zprávy</b></td><td>Vlákna, zpoždění odeslání, přikládání veřejného klíče, offline cache, podpis</td></tr>
       <tr><td><b>Pravidla</b></td><td>Pravidla pro příchozí poštu</td></tr>
       <tr><td><b>PGP</b></td><td>Vlastní klíče (vytvořit, importovat, zálohovat, odstranit), klíče kontaktů, hledání na keys.openpgp.org</td></tr>
     </tbody>
@@ -733,7 +733,7 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
   <p>Postaveno na GTK4, libadwaita, WebKitGTK, go-proton-api, gopenpgp a knihovnách go-imap/go-smtp.</p>
 </section>
 
-<footer>Dokumentace k verzi 0.8.0 · září 2026 · <a href="index.html" hreflang="en" lang="en">English version</a></footer>
+<footer>Dokumentace k verzi 0.8.1 · září 2026 · <a href="index.html" hreflang="en" lang="en">English version</a></footer>
 
 </div>
 </main>
