@@ -667,7 +667,9 @@ func (a *App) composerFor(acc mailbox.Account, d *protonmail.Draft, orig *proton
 		go func() {
 			err := acc.SaveDraft(a.ctx, d)
 			ui(func() {
-				if err != nil {
+				// Only a safety copy while the message waits to be sent: a
+				// mailbox without Drafts needs no warning.
+				if err != nil && !errors.Is(err, imapmail.ErrNoDrafts) {
 					a.toast(i18n.T("The draft could not be saved: ") + err.Error())
 				}
 				startDelay(delay, &undone)

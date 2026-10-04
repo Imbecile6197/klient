@@ -334,7 +334,7 @@ func (a *App) autoEmptyLoop() {
 				n, err := acc.EmptyFolder(a.ctx, f, before, nil)
 				switch {
 				case err != nil:
-					log.Printf("auto-empty %s of %s: %v", f, acc.Email(), err)
+					log.Printf("auto-empty: %s of %s: %v", protonmail.FolderByID(f).Name, acc.Email(), err)
 				case n > 0:
 					log.Printf("auto-empty: %d messages older than %d days deleted from %s of %s", n, days, protonmail.FolderByID(f).Name, acc.Email())
 				}

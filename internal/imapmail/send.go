@@ -234,9 +234,17 @@ func (a *Account) appendTo(folderID string, data []byte, flags []imap.Flag) (str
 
 // SaveDraft stores the draft in the Drafts folder (replacing the previous
 // version, since IMAP messages cannot be edited).
+// ErrNoDrafts means the mailbox has no Drafts folder (for example Gmail with
+// Drafts hidden from IMAP).
+var ErrNoDrafts = errors.New(i18n.T("the mailbox has no Drafts folder"))
+
 func (a *Account) SaveDraft(ctx context.Context, d *protonmail.Draft) error {
+	if !a.HasFolder(protonmail.DraftsID) && a.StartedOffline() {
+		// The folders may be an old copy from the cache: connect and look again.
+		_ = a.with(func(*imapclient.Client) error { return nil })
+	}
 	if !a.HasFolder(protonmail.DraftsID) {
-		return errors.New(i18n.T("the mailbox has no Drafts folder"))
+		return ErrNoDrafts
 	}
 	data, err := a.forSelf(d, a.parentMessageID(ctx, d))
 	if err != nil {

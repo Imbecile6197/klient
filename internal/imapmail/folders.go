@@ -107,15 +107,26 @@ func (a *Account) EmptyFolder(ctx context.Context, folderID string, olderThan ti
 		if _, err := c.Select(mb, nil).Wait(); err != nil {
 			return err
 		}
-		crit := &imap.SearchCriteria{}
-		if !olderThan.IsZero() {
-			crit.Before = olderThan
+		var uids []imap.UID
+		if olderThan.IsZero() {
+			res, err := c.UIDSearch(&imap.SearchCriteria{}, nil).Wait()
+			if err != nil {
+				return err
+			}
+			uids = res.AllUIDs()
+		} else {
+			// Not SEARCH BEFORE: some servers (Seznam) reject its date. The
+			// arrival dates are read and compared here instead.
+			msgs, err := c.Fetch(imap.SeqSet{imap.SeqRange{Start: 1, Stop: 0}}, &imap.FetchOptions{UID: true, InternalDate: true}).Collect()
+			if err != nil {
+				return err
+			}
+			for _, m := range msgs {
+				if !m.InternalDate.IsZero() && m.InternalDate.Before(olderThan) {
+					uids = append(uids, m.UID)
+				}
+			}
 		}
-		res, err := c.UIDSearch(crit, nil).Wait()
-		if err != nil {
-			return err
-		}
-		uids := res.AllUIDs()
 		if len(uids) == 0 {
 			return nil
 		}

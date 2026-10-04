@@ -84,3 +84,39 @@ func TestFolderManagement(t *testing.T) {
 		t.Error("the inbox was emptied")
 	}
 }
+
+// Klient started offline with an old copy of the folders (no Drafts): saving
+// a draft connects, reads the folders again and succeeds; the watcher going
+// online tells the window.
+func TestBackOnline(t *testing.T) {
+	set, _, _ := startServers(t)
+	ctx := context.Background()
+	a := &Account{set: set, password: "tajne", offline: true,
+		roles: map[string]string{protonmail.InboxID: "INBOX"}}
+	defer a.Close()
+	if a.HasFolder(protonmail.DraftsID) {
+		t.Fatal("the stale copy already has Drafts")
+	}
+	d := &protonmail.Draft{Subject: "Koncept", Body: "text", To: nil}
+	if err := a.SaveDraft(ctx, d); err != nil {
+		t.Fatalf("SaveDraft after coming online: %v", err)
+	}
+	if a.StartedOffline() || !a.HasFolder(protonmail.DraftsID) || d.ID == "" {
+		t.Fatalf("offline=%v drafts=%v id=%q", a.StartedOffline(), a.HasFolder(protonmail.DraftsID), d.ID)
+	}
+
+	b := &Account{set: set, password: "tajne", offline: true, roles: map[string]string{protonmail.InboxID: "INBOX"}}
+	defer b.Close()
+	changed := make(chan struct{}, 4)
+	cctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	_ = b.Events(cctx, func(protonmail.Summary) {}, func() { changed <- struct{}{} })
+	select {
+	case <-changed:
+	case <-time.After(10 * time.Second):
+		t.Fatal("the window was not told that the account is online")
+	}
+	if b.StartedOffline() || !b.HasFolder(protonmail.TrashID) {
+		t.Error("the watcher did not bring the account online")
+	}
+}

@@ -82,6 +82,12 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.8.3" date="2026-10-04">
+      <description>
+        <p>IMAP accounts go back online after a start without a connection; fixes for sending from Gmail and automatic emptying on Seznam.</p>
+        <p xml:lang="cs">Účty IMAP se po startu bez připojení vrátí online; opravy odesílání z Gmailu a automatického vysypání na Seznamu.</p>
+      </description>
+    </release>
     <release version="0.8.2" date="2026-10-04">
       <description>
         <p>Emptying Trash and Spam shows its progress and is much faster on Proton.</p>

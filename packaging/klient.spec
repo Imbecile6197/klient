@@ -66,6 +66,12 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Sun Oct 04 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.8.3-1
+- IMAP accounts started offline go online when the connection returns
+  (banner, folders and list refresh)
+- No "no Drafts folder" warning for the safety copy before sending
+- Auto-empty no longer uses SEARCH BEFORE (rejected by Seznam)
+
 * Sun Oct 04 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.8.2-1
 - Progress while emptying Trash and Spam; Proton empties a whole folder in
   one request (falls back to batches)

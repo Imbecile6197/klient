@@ -795,6 +795,7 @@ func (m *mainView) loadPage(page int) {
 			if page == 0 {
 				m.msgs = nil
 			}
+			m.syncOnline()
 			m.page = page
 			m.msgs = append(m.msgs, msgs...)
 			if m.a.isUnified() {
@@ -817,6 +818,17 @@ func (m *mainView) loadPage(page int) {
 			}
 		})
 	}()
+}
+
+// syncOnline hides the offline banner once an IMAP account that started
+// without a connection is online again, and reads its real folders (the
+// cached copy may lack some, such as Drafts). Proton has its own status.
+func (m *mainView) syncOnline() {
+	if !m.offline.Revealed() || m.a.acc.Kind() == mailbox.KindProton || m.a.acc.StartedOffline() {
+		return
+	}
+	m.offline.SetRevealed(false)
+	m.reloadFolders()
 }
 
 // scheduleRefresh coalesces bursts of mailbox events into one reload.

@@ -76,6 +76,12 @@ func (a *Account) watch(ctx context.Context, lastUID *imap.UID, onNew func(proto
 		<-ctx.Done()
 		c.Close()
 	}()
+	if a.StartedOffline() {
+		// Klient started without a connection and it is back: read the
+		// folders again and let the window refresh (banner, folders, list).
+		_ = a.with(func(*imapclient.Client) error { return nil })
+		onChange()
+	}
 
 	if *lastUID == 0 {
 		st, err := c.Status("INBOX", &imap.StatusOptions{UIDNext: true}).Wait()
