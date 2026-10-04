@@ -292,7 +292,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
       <rect x="4" y="12" width="56" height="40" rx="9" fill="#1c71d8"/>
       <path d="M10 20l22 16 22-16" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <div><b>Klient</b><span>Dokumentace · verze 0.9.1 · <a href="index.html" hreflang="en" lang="en">English</a></span></div>
+    <div><b>Klient</b><span>Dokumentace · verze 0.10.0 · <a href="index.html" hreflang="en" lang="en">English</a></span></div>
   </div>
   <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc">Obsah</button>
   <ol>
@@ -494,8 +494,8 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
   <p>Každá zpráva se dešifruje a ověří se podpis. Při odesílání se pro každého příjemce zvolí nejsilnější dostupná ochrana:</p>
   <ul>
     <li>Proton adresy – end-to-end šifrování Protonu,</li>
-    <li>externí adresy se známým klíčem (WKD nebo importovaným) – PGP,</li>
-    <li>ostatní – nešifrovaně, volitelně s PGP podpisem, a před odesláním se ukáže varování.</li>
+    <li>externí adresy se známým klíčem – <b>PGP/MIME</b>, které zachová formátování, HTML podpis i přílohy v jedné šifrované části. Klient použije klíč zveřejněný příjemcem (WKD), klíč a nastavení připnuté u <b>kontaktu v Protonu</b> (jako na webu), nebo klíč importovaný v Klientovi,</li>
+    <li>ostatní – nešifrovaně, volitelně s PGP/MIME podpisem (formátování zůstane), a před odesláním se ukáže varování.</li>
   </ul>
 
   <h3>Gmail, Seznam a IMAP</h3>
@@ -503,18 +503,35 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
   <ul>
     <li>zprávy lidem se známým klíčem se šifrují ve formátu <b>PGP/MIME</b>, ostatním se podepisují,</li>
     <li>smíšeným příjemcům odejdou dvě verze – šifrovaná a podepsaná,</li>
+    <li>s volbou <b>Šifrovat i předmět</b> putuje předmět uvnitř šifrování (chráněné hlavičky, jako v Thunderbirdu) a navenek je „...“; vaše kopie v Odeslaných předmět ponechá,</li>
     <li>koncepty, naplánované zprávy a kopie v Odeslaných se na serveru ukládají zašifrované jen pro vás,</li>
-    <li>příchozí PGP/MIME zprávy se dešifrují a ověří,</li>
+    <li>příchozí PGP/MIME zprávy se dešifrují a ověří, včetně chráněného předmětu.</li>
+  </ul>
+  <p>Váš klíč:</p>
+  <ul>
+    <li>nový klíč dostane <b>platnost</b> (1, 2 nebo 5 let, nebo bez omezení) – klíč s omezenou platností se přestane používat sám, kdybyste o něj přišli; <b>Prodloužit…</b> ho kdykoli obnoví,</li>
+    <li><b>Zveřejnit na keys.openpgp.org…</b> nahraje váš veřejný klíč; po potvrzení odkazu, který vám server pošle e-mailem, ho kdokoli najde podle vaší adresy,</li>
+    <li><b>Uložit certifikát pro zneplatnění…</b> – uložte ho bezpečně; když klíč ztratíte nebo vám ho ukradnou, zveřejněte ho nebo pošlete kontaktům a jejich aplikace klíč přestanou používat,</li>
     <li>klíč jde zálohovat i odstranit.</li>
   </ul>
 
+  <h3>Inline PGP</h3>
+  <p>Zprávy zašifrované přímo v textu (<code>-----BEGIN PGP MESSAGE-----</code>, např. z Mailvelope) se dešifrují a ověří se jejich podpis, i když je blok citovaný v odpovědi.</p>
+
   <h3>Kde Klient hledá klíče příjemců</h3>
   <ul>
-    <li><b>Web Key Directory</b> domény příjemce,</li>
+    <li><b>Web Key Directory</b> domény příjemce – u uložených klíčů znovu jednou týdně, aby si všiml novějšího klíče,</li>
     <li>hlavička <b>Autocrypt</b> v přijatých zprávách (Klient ji do svých zpráv také přidává),</li>
     <li>ručně <b>importované klíče</b> – i přímo z přílohy <code>.asc</code> tlačítkem ve zprávě,</li>
     <li>volitelně <b>keys.openpgp.org</b> (Předvolby → PGP).</li>
   </ul>
+
+  <h3>Klíče kontaktů a změny klíčů</h3>
+  <p>Předvolby → PGP → Klíče kontaktů ukazují uložené klíče. Po kliknutí uvidíte celý <b>otisk</b> (porovnejte ho s kontaktem osobně nebo po telefonu), identity, platnost a odkud klíč pochází, a můžete ho označit jako <b>Ověřený</b>.</p>
+  <p>Když se u kontaktu objeví jiný klíč, Klient uložený klíč vymění jen tehdy, když byl získaný automaticky, není ověřený a nový klíč je novější. Jinak nový klíč <b>čeká</b>: u zprávy se ukáže „Odesílatel používá nový klíč…“ a v detailu klíče zvolíte <b>Použít nový klíč</b> nebo <b>Ponechat starý klíč</b>. Podvržená zpráva tak nemůže vyměnit klíč, na který se spoléháte.</p>
+
+  <h3>Posílat jen šifrovaně</h3>
+  <p>S volbou Předvolby → PGP → <b>Posílat jen šifrovaně</b> (nebo stejným přepínačem v okně psaní pro jednu zprávu) se zpráva neodešle, dokud některý příjemce nemá klíč.</p>
   <p>Do odchozích zpráv jde automaticky přikládat vlastní veřejný klíč (Předvolby → Zprávy).</p>
 </section>
 
@@ -738,7 +755,7 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
   <p>Postaveno na GTK4, libadwaita, WebKitGTK, go-proton-api, gopenpgp a knihovnách go-imap/go-smtp.</p>
 </section>
 
-<footer>Dokumentace k verzi 0.9.1 · říjen 2026 · <a href="index.html" hreflang="en" lang="en">English version</a></footer>
+<footer>Dokumentace k verzi 0.10.0 · říjen 2026 · <a href="index.html" hreflang="en" lang="en">English version</a></footer>
 
 </div>
 </main>

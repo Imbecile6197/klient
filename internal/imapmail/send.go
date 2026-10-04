@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"net"
 	"net/mail"
 	"strconv"
@@ -20,6 +19,7 @@ import (
 	"github.com/emersion/go-smtp"
 
 	"github.com/Imbecile6197/klient/internal/i18n"
+	"github.com/Imbecile6197/klient/internal/mimebuild"
 	"github.com/Imbecile6197/klient/internal/pgp"
 	"github.com/Imbecile6197/klient/internal/pgpmime"
 	"github.com/Imbecile6197/klient/internal/protonmail"
@@ -28,82 +28,11 @@ import (
 // content writes the body of a draft as a standalone MIME entity (its own
 // Content-Type header + body), ready to be signed or encrypted.
 func content(d *protonmail.Draft) ([]byte, error) {
-	var buf bytes.Buffer
-	textHeader := func() gomail.InlineHeader {
-		var th gomail.InlineHeader
-		th.Set("Content-Type", "text/plain; charset=utf-8")
-		th.Set("Content-Transfer-Encoding", "quoted-printable")
-		return th
-	}
-	if len(d.Attachments) == 0 && d.HTML == "" {
-		var h gomail.Header
-		h.Set("Content-Type", "text/plain; charset=utf-8")
-		h.Set("Content-Transfer-Encoding", "quoted-printable")
-		w, err := gomail.CreateSingleInlineWriter(&buf, h)
-		if err != nil {
-			return nil, err
-		}
-		if _, err := io.WriteString(w, d.Body); err != nil {
-			return nil, err
-		}
-		if err := w.Close(); err != nil {
-			return nil, err
-		}
-		return buf.Bytes(), nil
-	}
-	var h gomail.Header
-	mw, err := gomail.CreateWriter(&buf, h)
-	if err != nil {
-		return nil, err
-	}
-	iw, err := mw.CreateInline()
-	if err != nil {
-		return nil, err
-	}
-	pw, err := iw.CreatePart(textHeader())
-	if err != nil {
-		return nil, err
-	}
-	if _, err := io.WriteString(pw, d.Body); err != nil {
-		return nil, err
-	}
-	pw.Close()
-	if d.HTML != "" {
-		var hh gomail.InlineHeader
-		hh.Set("Content-Type", "text/html; charset=utf-8")
-		hh.Set("Content-Transfer-Encoding", "quoted-printable")
-		hw, err := iw.CreatePart(hh)
-		if err != nil {
-			return nil, err
-		}
-		if _, err := io.WriteString(hw, d.HTML); err != nil {
-			return nil, err
-		}
-		hw.Close()
-	}
-	iw.Close()
+	atts := make([]mimebuild.Attachment, 0, len(d.Attachments))
 	for _, att := range d.Attachments {
-		var ah gomail.AttachmentHeader
-		mt := att.MIMEType
-		if mt == "" {
-			mt = "application/octet-stream"
-		}
-		ah.Set("Content-Type", mt)
-		ah.SetFilename(att.Name)
-		ah.Set("Content-Transfer-Encoding", "base64")
-		aw, err := mw.CreateAttachment(ah)
-		if err != nil {
-			return nil, err
-		}
-		if _, err := aw.Write(att.Data); err != nil {
-			return nil, err
-		}
-		aw.Close()
+		atts = append(atts, mimebuild.Attachment{Name: att.Name, MIMEType: att.MIMEType, Data: att.Data})
 	}
-	if err := mw.Close(); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
+	return mimebuild.Content(d.Body, d.HTML, atts)
 }
 
 // headers are the top-level headers of a message (no Content-Type).

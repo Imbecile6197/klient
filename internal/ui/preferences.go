@@ -725,7 +725,7 @@ func (a *App) pgpPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 
 	contacts := adw.NewPreferencesGroup()
 	contacts.SetTitle(i18n.T("Contact Keys"))
-	contacts.SetDescription(i18n.T("Keys of recipients outside Proton who do not publish their key through WKD. Messages to them are encrypted with PGP."))
+	contacts.SetDescription(i18n.T("Keys of people outside Proton: imported by you or learned from their mail (Autocrypt). Click a key to compare its fingerprint with the contact, mark it as verified, or decide about a new key."))
 	var rows []gtk.Widgetter
 	var refresh func()
 	refresh = func() {
@@ -737,18 +737,15 @@ func (a *App) pgpPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 			email := email
 			row := adw.NewActionRow()
 			row.SetTitle(email)
-			row.SetSubtitle(shortFP(pgp.Fingerprint(pgp.LocalKey(email))))
-			del := gtk.NewButtonFromIconName("user-trash-symbolic")
-			del.SetTooltipText(i18n.T("Remove Key"))
-			del.SetVAlign(gtk.AlignCenter)
-			del.AddCSSClass("flat")
-			del.ConnectClicked(func() {
-				if err := pgp.DeleteKey(email); err != nil {
-					d.AddToast(adw.NewToast(err.Error()))
-				}
-				refresh()
-			})
-			row.AddSuffix(del)
+			row.SetSubtitle(contactKeySubtitle(email))
+			if pgp.PendingKey(email) != nil {
+				row.AddPrefix(gtk.NewImageFromIconName("dialog-warning-symbolic"))
+			} else if pgp.Meta(email).Verified {
+				row.AddPrefix(gtk.NewImageFromIconName("security-high-symbolic"))
+			}
+			row.AddSuffix(gtk.NewImageFromIconName("go-next-symbolic"))
+			row.SetActivatable(true)
+			row.ConnectActivated(func() { a.contactKeyDialog(email, refresh) })
 			contacts.Add(row)
 			rows = append(rows, row)
 		}
@@ -782,6 +779,19 @@ func (a *App) pgpPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	refresh()
 	p.Add(contacts)
 
+	sg := adw.NewPreferencesGroup()
+	sg.SetTitle(i18n.T("Sending"))
+	req := adw.NewSwitchRow()
+	req.SetTitle(i18n.T("Send only encrypted"))
+	req.SetSubtitle(i18n.T("A message is not sent while some recipient has no key; it can be turned off for one message in the compose window"))
+	req.SetActive(a.cfg.RequireEncryption)
+	req.NotifyProperty("active", func() {
+		a.cfg.RequireEncryption = req.Active()
+		a.saveConfig()
+	})
+	sg.Add(req)
+	p.Add(sg)
+
 	if a.acc.Kind() != mailbox.KindProton {
 		lg := adw.NewPreferencesGroup()
 		lg.SetTitle(i18n.T("Finding Recipients' Keys"))
@@ -796,6 +806,16 @@ func (a *App) pgpPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 			a.saveConfig()
 		})
 		lg.Add(vks)
+		ps := adw.NewSwitchRow()
+		ps.SetTitle(i18n.T("Encrypt the subject too"))
+		ps.SetSubtitle(i18n.T("Recipients' mail apps show the real subject from inside the encryption (protected headers, e.g. Thunderbird); outside it reads “...”. Older apps show only “...”."))
+		ps.SetActive(a.cfg.ProtectSubject)
+		ps.NotifyProperty("active", func() {
+			a.cfg.ProtectSubject = ps.Active()
+			imapmail.SetProtectSubject(a.cfg.ProtectSubject)
+			a.saveConfig()
+		})
+		lg.Add(ps)
 		p.Add(lg)
 	}
 	return p

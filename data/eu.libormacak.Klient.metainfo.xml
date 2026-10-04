@@ -82,6 +82,12 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.10.0" date="2026-10-04">
+      <description>
+        <p>PGP: formatting kept for PGP recipients from Proton, keys from Proton contacts, inline PGP, key change warnings, contact key details, encrypted subject, send only encrypted, key validity, publishing and revocation.</p>
+        <p xml:lang="cs">PGP: formátování pro PGP příjemce z Protonu, klíče z kontaktů v Protonu, inline PGP, upozornění na změnu klíče, detail klíče kontaktu, šifrovaný předmět, posílání jen šifrovaně, platnost klíče, zveřejnění a zneplatnění.</p>
+      </description>
+    </release>
     <release version="0.9.1" date="2026-10-04">
       <description>
         <p>HTML signatures with a live preview.</p>

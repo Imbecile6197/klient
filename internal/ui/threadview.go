@@ -584,6 +584,11 @@ func (m *mainView) fillCard(c *messageCard, msg *protonmail.Message) {
 	sec.Append(gtk.NewImageFromIconName(sigIcon))
 	sec.Append(sigLabel)
 	c.detail.Append(sec)
+	if msg.Meta.Sender != nil && !m.a.acc.IsOwnAddress(msg.Meta.Sender.Address) {
+		if n := m.a.senderKeyNotice(msg.Meta.Sender.Address, nil); n != nil {
+			c.detail.Append(n)
+		}
+	}
 	if unsub := m.unsubscribeButton(msg); unsub != nil {
 		c.detail.Append(unsub)
 	}

@@ -91,6 +91,12 @@ type Config struct {
 	// Look up recipients' PGP keys on keys.openpgp.org (IMAP accounts; WKD of
 	// the recipient's own domain is always asked).
 	KeyServerLookup bool `json:"key_server_lookup"`
+	// Hide the subject of encrypted mail inside the encryption (protected
+	// headers, IMAP accounts); outside it reads "...".
+	ProtectSubject bool `json:"protect_subject,omitempty"`
+	// New messages are sent only when every recipient can get them
+	// encrypted (can be turned off per message).
+	RequireEncryption bool `json:"require_encryption,omitempty"`
 
 	// Never send anything to cloud AI providers (only the local Ollama).
 	LocalOnly bool `json:"local_only"`

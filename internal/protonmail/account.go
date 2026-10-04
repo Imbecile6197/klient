@@ -159,13 +159,15 @@ type Account struct {
 	offline  bool         // started without network
 	refresh  string       // current refresh token (rotates on every refresh)
 
-	mu       sync.RWMutex
-	user     proton.User
-	userAt   time.Time // when user was fetched
-	addrs    []proton.Address
-	userKR   *crypto.KeyRing
-	addrKRs  map[string]*crypto.KeyRing // address ID -> unlocked keyring
-	contacts []Contact
+	mu     sync.RWMutex
+	user   proton.User
+	userAt time.Time // when user was fetched
+	addrs  []proton.Address
+	userKR *crypto.KeyRing
+	// Encryption settings from the Proton contacts, by address.
+	contactCache map[string]cachedContact
+	addrKRs      map[string]*crypto.KeyRing // address ID -> unlocked keyring
+	contacts     []Contact
 }
 
 func (a *Account) unlock(ctx context.Context, user proton.User) error {

@@ -5,6 +5,7 @@ import (
 	"net/mail"
 	"strings"
 	"sync/atomic"
+	"time"
 
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
 
@@ -19,6 +20,12 @@ var keyServer atomic.Bool
 // lookup finds keys on the web (replaced in tests).
 var lookup = pgpmime.Lookup
 
+// SetProtectSubject hides the subject of encrypted mail inside the
+// encryption (protected headers); outside it reads "...".
+func SetProtectSubject(on bool) { protectSubject.Store(on) }
+
+var protectSubject atomic.Bool
+
 // SetKeyServer allows looking up recipients' keys on keys.openpgp.org (it
 // learns whom you write to, so it is optional).
 func SetKeyServer(on bool) { keyServer.Store(on) }
@@ -27,10 +34,32 @@ func SetKeyServer(on bool) { keyServer.Store(on) }
 // recipient's Web Key Directory, or keys.openpgp.org if allowed.
 func (a *Account) keyFor(ctx context.Context, email string) *crypto.KeyRing {
 	if kr := pgp.LocalKey(email); kr != nil {
-		return kr
+		a.refreshKey(ctx, email)
+		return pgp.LocalKey(email)
 	}
 	kr, _ := lookup(ctx, email, keyServer.Load())
 	return kr
+}
+
+// refreshKey asks the contact's Web Key Directory, at most once a week,
+// whether they publish a newer key than the stored one (only the domain's
+// own directory: it does not tell anyone else whom you write to).
+func (a *Account) refreshKey(ctx context.Context, email string) {
+	if time.Since(pgp.Meta(email).Checked) < 7*24*time.Hour {
+		return
+	}
+	pgp.MarkChecked(email)
+	cctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	kr, src := lookup(cctx, email, false)
+	if kr == nil || src != "wkd" {
+		return
+	}
+	if k, err := kr.GetKey(0); err == nil {
+		if arm, err := k.GetArmoredPublicKey(); err == nil {
+			pgp.LearnKey(email, arm, pgp.SourceWKD)
+		}
+	}
 }
 
 func (a *Account) ownKey() *crypto.KeyRing {
@@ -135,13 +164,40 @@ func (a *Account) prepare(ctx context.Context, d *protonmail.Draft, parent paren
 		if own != nil {
 			_ = recipients.AddKey(publicOf(own))
 		}
-		ct, body, err := pgpmime.Encrypt(entity, recipients, own)
+		hc := h.Copy()
+		inner := entity
+		protect := protectSubject.Load()
+		if protect {
+			// The subject travels inside the encryption; outside it is "...".
+			var hs [][2]string
+			for _, k := range []string{"Subject", "From", "To", "Cc", "Reply-To", "Date", "Message-Id", "In-Reply-To", "References"} {
+				hs = append(hs, [2]string{k, h.Header.Get(k)})
+			}
+			inner = pgpmime.ProtectHeaders(entity, hs)
+			hc.Header.Set("Subject", pgpmime.HiddenSubject)
+		}
+		ct, body, err := pgpmime.Encrypt(inner, recipients, own)
 		if err != nil {
 			return nil, err
 		}
-		hc := h.Copy()
 		if out.encrypted, err = assemble(hc, ct, body); err != nil {
 			return nil, err
+		}
+		if protect && own != nil {
+			// The copy in Sent keeps its subject readable in the list; it
+			// is encrypted to the sender only.
+			self, err := crypto.NewKeyRing(publicOf(own))
+			if err != nil {
+				return nil, err
+			}
+			ct, body, err := pgpmime.Encrypt(entity, self, own)
+			if err != nil {
+				return nil, err
+			}
+			if out.sentCopy, err = assemble(h.Copy(), ct, body); err != nil {
+				return nil, err
+			}
+			return out, nil
 		}
 	}
 	out.sentCopy = out.plain

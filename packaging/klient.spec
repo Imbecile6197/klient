@@ -70,6 +70,15 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Sun Oct 04 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.10.0-1
+- Proton: PGP/MIME (and signed clear MIME) for external recipients, keys
+  and settings from Proton contacts
+- Inline PGP decryption; protected headers (send optional, receive)
+- Contact key store with source, verification, pending key changes,
+  weekly WKD refresh; key details dialog and warning in the message
+- Send only encrypted option; own key validity, extension, publishing on
+  keys.openpgp.org, revocation certificate
+
 * Sun Oct 04 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.9.1-1
 - HTML signature: format choice, HTML source with live preview, template,
   opening an .html file; shown as a preview in the composer, sent as HTML

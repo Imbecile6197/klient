@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/ProtonMail/gopenpgp/v2/constants"
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
@@ -60,6 +61,8 @@ func ImportKey(armored string) ([]string, error) {
 		if err := os.WriteFile(keyFile(e), []byte(pubArm), 0o600); err != nil {
 			return nil, err
 		}
+		_ = os.Remove(pendingFile(e))
+		_ = updateMeta(e, func(m *KeyMeta) { *m = KeyMeta{Source: SourceImport, Added: time.Now()} })
 	}
 	return emails, nil
 }
@@ -86,14 +89,18 @@ func LocalKeys() []string {
 	entries, _ := os.ReadDir(keyDir())
 	var out []string
 	for _, e := range entries {
-		if name, ok := strings.CutSuffix(e.Name(), ".asc"); ok {
+		if name, ok := strings.CutSuffix(e.Name(), ".asc"); ok && !strings.HasSuffix(name, ".pending") {
 			out = append(out, name)
 		}
 	}
 	return out
 }
 
-func DeleteKey(email string) error { return os.Remove(keyFile(email)) }
+func DeleteKey(email string) error {
+	_ = os.Remove(pendingFile(email))
+	_ = os.Remove(metaFile(email))
+	return os.Remove(keyFile(email))
+}
 
 // Fingerprint returns the primary key fingerprint of a keyring for display.
 func Fingerprint(kr *crypto.KeyRing) string {
@@ -185,4 +192,93 @@ func VerifyClearSigned(text string, kr *crypto.KeyRing) (string, SignatureStatus
 		return msg.GetString(), StatusFromError(err)
 	}
 	return plain, SigValid
+}
+
+const (
+	encryptedHeader = "-----BEGIN PGP MESSAGE-----"
+	encryptedFooter = "-----END PGP MESSAGE-----"
+)
+
+// HasInlineEncrypted reports whether text contains an inline PGP message
+// (Mailvelope, Enigmail in inline mode, copy-paste from GnuPG).
+func HasInlineEncrypted(text string) bool { return strings.Contains(text, encryptedHeader) }
+
+// DecryptInline replaces every inline PGP message in text that own can open
+// by its plain text. verify (may be nil) checks the signatures; the result
+// is the weakest status of the blocks. ok is false when nothing could be
+// decrypted.
+func DecryptInline(text string, own, verify *crypto.KeyRing) (out string, status SignatureStatus, ok bool) {
+	if own == nil {
+		return text, SigNone, false
+	}
+	status = SigValid
+	var sb strings.Builder
+	rest := text
+	for {
+		start := strings.Index(rest, encryptedHeader)
+		if start < 0 {
+			break
+		}
+		end := strings.Index(rest[start:], encryptedFooter)
+		if end < 0 {
+			break
+		}
+		end += start + len(encryptedFooter)
+		block := normalizeArmor(rest[start:end])
+		msg, err := crypto.NewPGPMessageFromArmored(block)
+		if err != nil {
+			sb.WriteString(rest[:end])
+			rest = rest[end:]
+			continue
+		}
+		plain, verr := own.Decrypt(msg, verify, crypto.GetUnixTime())
+		if plain == nil && verr != nil {
+			// The signature check may have failed: decrypt without it. A
+			// block not meant for our key stays as it is.
+			plain, _ = own.Decrypt(msg, nil, 0)
+			if plain == nil {
+				sb.WriteString(rest[:end])
+				rest = rest[end:]
+				continue
+			}
+		}
+		ok = true
+		st := SigValid
+		switch {
+		case verify == nil:
+			st = SigUnknown
+		case verr != nil:
+			st = StatusFromError(verr)
+		}
+		status = weaker(status, st)
+		sb.WriteString(rest[:start])
+		sb.WriteString(plain.GetString())
+		rest = rest[end:]
+	}
+	sb.WriteString(rest)
+	if !ok {
+		return text, SigNone, false
+	}
+	return sb.String(), status, true
+}
+
+// normalizeArmor undoes what mail bodies do to armor: quoted lines ("> "),
+// non-breaking spaces and CRLF line ends.
+func normalizeArmor(block string) string {
+	block = strings.ReplaceAll(block, "\r\n", "\n")
+	block = strings.ReplaceAll(block, "\u00a0", " ")
+	lines := strings.Split(block, "\n")
+	for i, l := range lines {
+		lines[i] = strings.TrimSpace(strings.TrimLeft(l, "> "))
+	}
+	return strings.Join(lines, "\n")
+}
+
+// weaker returns the less trustworthy of two signature results.
+func weaker(a, b SignatureStatus) SignatureStatus {
+	rank := map[SignatureStatus]int{SigInvalid: 0, SigNone: 1, SigUnknown: 2, SigValid: 3, SigOwn: 4}
+	if rank[b] < rank[a] {
+		return b
+	}
+	return a
 }

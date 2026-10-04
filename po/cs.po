@@ -2650,9 +2650,6 @@ msgstr "2. 1. 2006 15:04"
 msgid "Judges every new message – a cheaper and faster model is usually enough here."
 msgstr "Posuzuje každou novou zprávu – levnější a rychlejší model tu obvykle stačí."
 
-#: internal/ui/preferences.go
-msgid "Keys of recipients outside Proton who do not publish their key through WKD. Messages to them are encrypted with PGP."
-msgstr "Klíče adresátů mimo Proton, kteří nezveřejňují klíč přes WKD. Zprávy pro ně se zašifrují PGP."
 
 #: internal/ui/preferences.go
 msgid "Klient always asks the recipient's domain (Web Key Directory) and learns keys from the Autocrypt header of received mail."
@@ -3981,3 +3978,250 @@ msgstr "Náhled"
 #: internal
 msgid "Your Name"
 msgstr "Vaše jméno"
+
+#: internal
+msgid "no new key is waiting"
+msgstr "žádný nový klíč nečeká"
+
+#: internal
+msgid "keys.openpgp.org: %s"
+msgstr "keys.openpgp.org: %s"
+
+#: internal
+msgid "keys.openpgp.org: HTTP %d"
+msgstr "keys.openpgp.org: HTTP %d"
+
+#: internal
+msgid "downloading attachment %s failed"
+msgstr "stažení přílohy %s selhalo"
+
+#: internal
+msgid "Send only encrypted"
+msgstr "Posílat jen šifrovaně"
+
+#: internal
+msgid "Do not send while some recipient has no key"
+msgstr "Neodeslat, dokud některý příjemce nemá klíč"
+
+#: internal
+msgid "The Message Cannot Be Sent Encrypted"
+msgstr "Zprávu nelze odeslat šifrovaně"
+
+#: internal
+msgid "Some recipients have no known public key:"
+msgstr "Někteří příjemci nemají známý veřejný klíč:"
+
+#: internal
+msgid "Remove them, import their keys (Preferences → PGP), or turn off “Send only encrypted” for this message."
+msgstr "Odeberte je, importujte jejich klíče (Předvolby → PGP), nebo u této zprávy vypněte „Posílat jen šifrovaně“."
+
+#: internal
+msgid "OK"
+msgstr "OK"
+
+#: internal
+msgid "Validity of a new key"
+msgstr "Platnost nového klíče"
+
+#: internal
+msgid "An expiring key stops being used by itself if you lose it; you can extend it any time before"
+msgstr "Klíč s omezenou platností se přestane používat sám, kdybyste o něj přišli; prodloužit ho můžete kdykoli předtím"
+
+#: internal
+msgid "Valid until"
+msgstr "Platný do"
+
+#: internal
+msgid "no expiry"
+msgstr "bez omezení"
+
+#: internal
+msgid "expired"
+msgstr "platnost vypršela"
+
+#: internal
+msgid "expires soon, extend it"
+msgstr "brzy vyprší, prodlužte ho"
+
+#: internal
+msgid "Extend…"
+msgstr "Prodloužit…"
+
+#: internal
+msgid "Extend the Key"
+msgstr "Prodloužit klíč"
+
+#: internal
+msgid "How long should the key be valid from today? Contacts learn the new date from your next message (Autocrypt) or a new copy of your public key."
+msgstr "Jak dlouho má klíč platit ode dneška? Kontakty se nové datum dozvědí z vaší příští zprávy (Autocrypt) nebo z nové kopie veřejného klíče."
+
+#: internal
+msgid "The key validity was changed"
+msgstr "Platnost klíče byla změněna"
+
+#: internal
+msgid "Publish on keys.openpgp.org…"
+msgstr "Zveřejnit na keys.openpgp.org…"
+
+#: internal
+msgid "Publish the Public Key?"
+msgstr "Zveřejnit veřejný klíč?"
+
+#: internal
+msgid "Klient uploads your public key to keys.openpgp.org and the server sends a confirmation e-mail to %s. After you click the link in it, anyone can find your key by your address and send you encrypted mail. Only the public key leaves the computer; you can remove it there any time."
+msgstr "Klient nahraje váš veřejný klíč na keys.openpgp.org a server pošle potvrzovací e-mail na %s. Po kliknutí na odkaz v něm kdokoli najde váš klíč podle adresy a může vám psát šifrovaně. Počítač opustí jen veřejný klíč; ze serveru ho můžete kdykoli odebrat."
+
+#: internal
+msgid "Publish"
+msgstr "Zveřejnit"
+
+#: internal
+msgid "The key is already published for this address"
+msgstr "Klíč je pro tuto adresu už zveřejněný"
+
+#: internal
+msgid "Check your mail: keys.openpgp.org sent a confirmation link to %s"
+msgstr "Zkontrolujte poštu: keys.openpgp.org poslal potvrzovací odkaz na %s"
+
+#: internal
+msgid "The key was uploaded, but the address could not be confirmed"
+msgstr "Klíč byl nahrán, ale adresu se nepodařilo potvrdit"
+
+#: internal
+msgid "Save a Revocation Certificate…"
+msgstr "Uložit certifikát pro zneplatnění…"
+
+#: internal
+msgid "Revocation Certificate"
+msgstr "Certifikát pro zneplatnění"
+
+#: internal
+msgid "If your key is lost or stolen, publish this certificate (keys.openpgp.org) or send it to your contacts: their apps then stop using the key. Keep it somewhere safe – anyone who has it can revoke your key. Saving it does not revoke anything."
+msgstr "Když klíč ztratíte nebo vám ho někdo ukradne, zveřejněte tento certifikát (keys.openpgp.org) nebo ho pošlete kontaktům: jejich aplikace pak klíč přestanou používat. Uložte ho na bezpečné místo – kdo ho má, může váš klíč zneplatnit. Samotné uložení nic nezneplatní."
+
+#: internal
+msgid "revocation"
+msgstr "zneplatneni"
+
+#: internal
+msgid "No expiry"
+msgstr "Bez omezení"
+
+#: internal
+msgid "from the Autocrypt header of their mail"
+msgstr "z hlavičky Autocrypt v jeho poště"
+
+#: internal
+msgid "from their domain (Web Key Directory)"
+msgstr "z jeho domény (Web Key Directory)"
+
+#: internal
+msgid "imported by you"
+msgstr "importovaný vámi"
+
+#: internal
+msgid "verified"
+msgstr "ověřený"
+
+#: internal
+msgid "a new key is waiting"
+msgstr "čeká nový klíč"
+
+#: internal
+msgid "Fingerprint"
+msgstr "Otisk"
+
+#: internal
+msgid "User IDs"
+msgstr "Identity"
+
+#: internal
+msgid "Algorithm"
+msgstr "Algoritmus"
+
+#: internal
+msgid "Created"
+msgstr "Vytvořen"
+
+#: internal
+msgid "revoked"
+msgstr "zneplatněný"
+
+#: internal
+msgid "Expires"
+msgstr "Platnost"
+
+#: internal
+msgid "New Key Waiting"
+msgstr "Čeká nový klíč"
+
+#: internal
+msgid "On %s Klient saw a different key for this address (%s). Contacts get a new key when they set up a new computer or lose the old key – but a forged message can bring a key too. Accept it only if you expect the change, best after checking the fingerprint with the contact."
+msgstr "%s Klient uviděl pro tuto adresu jiný klíč (%s). Kontakty dostanou nový klíč, když si nastaví nový počítač nebo ztratí starý klíč – ale klíč může přinést i podvržená zpráva. Přijměte ho, jen když změnu čekáte, nejlépe po ověření otisku s kontaktem."
+
+#: internal
+msgid "Keep the Old Key"
+msgstr "Ponechat starý klíč"
+
+#: internal
+msgid "Use the New Key"
+msgstr "Použít nový klíč"
+
+#: internal
+msgid "Key in Use"
+msgstr "Používaný klíč"
+
+#: internal
+msgid "Added %s, %s."
+msgstr "Přidán %s, %s."
+
+#: internal
+msgid "Previous key"
+msgstr "Předchozí klíč"
+
+#: internal
+msgid "%s, replaced %s"
+msgstr "%s, nahrazen %s"
+
+#: internal
+msgid "Verified"
+msgstr "Ověřený"
+
+#: internal
+msgid "You compared the fingerprint with the contact (in person, by phone). A verified key is never replaced automatically."
+msgstr "Otisk jste porovnali s kontaktem (osobně, po telefonu). Ověřený klíč se nikdy nevymění automaticky."
+
+#: internal
+msgid "The sender uses a new key that Klient has not accepted yet."
+msgstr "Odesílatel používá nový klíč, který Klient zatím nepřijal."
+
+#: internal
+msgid "The sender's key changed on %s."
+msgstr "Klíč odesílatele se změnil %s."
+
+#: internal
+msgid "Show Key…"
+msgstr "Zobrazit klíč…"
+
+#: internal
+msgid "Keys of people outside Proton: imported by you or learned from their mail (Autocrypt). Click a key to compare its fingerprint with the contact, mark it as verified, or decide about a new key."
+msgstr "Klíče lidí mimo Proton: importované vámi nebo získané z jejich pošty (Autocrypt). Kliknutím na klíč porovnáte otisk s kontaktem, označíte klíč jako ověřený nebo rozhodnete o novém klíči."
+
+#: internal
+msgid "A message is not sent while some recipient has no key; it can be turned off for one message in the compose window"
+msgstr "Zpráva se neodešle, dokud některý příjemce nemá klíč; u jedné zprávy jde vypnout v okně psaní"
+
+#: internal
+msgid "Encrypt the subject too"
+msgstr "Šifrovat i předmět"
+
+#: internal
+msgid "Recipients' mail apps show the real subject from inside the encryption (protected headers, e.g. Thunderbird); outside it reads “...”. Older apps show only “...”."
+msgstr "Poštovní aplikace příjemců zobrazí skutečný předmět ze šifrované části (chráněné hlavičky, např. Thunderbird); navenek je „...“. Starší aplikace ukážou jen „...“."
+
+#: internal
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] "%d rok"
+msgstr[1] "%d roky"
+msgstr[2] "%d let"

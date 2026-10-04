@@ -278,8 +278,13 @@ func (a *App) composerFor(acc mailbox.Account, d *protonmail.Draft, orig *proton
 	attachKey.SetTitle(i18n.T("Attach my public key"))
 	attachKey.SetSubtitle(i18n.T("A recipient with PGP can then send you encrypted replies"))
 	attachKey.SetActive(a.cfg.AttachPublicKey && d.ID == "")
+	onlyEnc := adw.NewSwitchRow()
+	onlyEnc.SetTitle(i18n.T("Send only encrypted"))
+	onlyEnc.SetSubtitle(i18n.T("Do not send while some recipient has no key"))
+	onlyEnc.SetActive(a.cfg.RequireEncryption)
 	optGroup.Add(sign)
 	optGroup.Add(attachKey)
+	optGroup.Add(onlyEnc)
 	optGroup.Add(security)
 	// PGP options only where the service handles keys (Proton for now).
 	e2e := acc.Caps().E2E
@@ -755,6 +760,12 @@ func (a *App) composerFor(acc mailbox.Account, d *protonmail.Draft, orig *proton
 				}
 				if secure {
 					go2()
+					return
+				}
+				if onlyEnc.Active() {
+					dlg := adw.NewAlertDialog(i18n.T("The Message Cannot Be Sent Encrypted"), i18n.T("Some recipients have no known public key:")+"\n\n"+text+"\n\n"+i18n.T("Remove them, import their keys (Preferences → PGP), or turn off “Send only encrypted” for this message."))
+					dlg.AddResponse("ok", i18n.T("OK"))
+					dlg.Present(win)
 					return
 				}
 				dlg := adw.NewAlertDialog(i18n.T("Send Without Encryption?"), i18n.T("Some recipients have no known public key, so the message will reach them unencrypted:")+"\n\n"+text)

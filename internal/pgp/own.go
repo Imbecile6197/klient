@@ -1,6 +1,8 @@
 package pgp
 
 import (
+	"bytes"
+	stdcrypto "crypto"
 	"crypto/rand"
 	"encoding/base64"
 	"errors"
@@ -8,7 +10,10 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
+	"github.com/ProtonMail/go-crypto/openpgp"
+	"github.com/ProtonMail/go-crypto/openpgp/packet"
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
 	"github.com/zalando/go-keyring"
 
@@ -154,4 +159,112 @@ func DeleteOwnKey(email string) error {
 		return nil
 	}
 	return err
+}
+
+// ownConfig is the configuration of keys Klient creates: Curve25519, as
+// gopenpgp's default; lifetime 0 means the key does not expire.
+func ownConfig(lifetime uint32) *packet.Config {
+	return &packet.Config{
+		Algorithm:       packet.PubKeyAlgoEdDSA,
+		Curve:           packet.Curve25519,
+		DefaultHash:     stdcrypto.SHA256,
+		KeyLifetimeSecs: lifetime,
+		Time:            crypto.GetTime,
+	}
+}
+
+// GenerateOwnKeyFor creates a new key valid for years (0 = no expiry). An
+// expiring key is safer: if it is lost, it stops being used by itself; it
+// can be extended any time before.
+func GenerateOwnKeyFor(name, email string, years int) error {
+	e, err := openpgp.NewEntity(name, "", email, ownConfig(yearsSecs(time.Now(), time.Now(), years)))
+	if err != nil {
+		return err
+	}
+	key, err := crypto.NewKeyFromEntity(e)
+	if err != nil {
+		return err
+	}
+	return storeOwn(email, key)
+}
+
+// yearsSecs is a key lifetime (counted from the key's creation) that ends
+// years after from; 0 for no expiry.
+func yearsSecs(created, from time.Time, years int) uint32 {
+	if years <= 0 {
+		return 0
+	}
+	return uint32(from.AddDate(years, 0, 0).Sub(created) / time.Second)
+}
+
+// SetOwnExpiry makes the own key valid for years from now (0 = never
+// expires) by signing its identities and subkeys anew. Contacts get the
+// change with the next message (Autocrypt) or a new copy of the public key.
+func SetOwnExpiry(email string, years int) error {
+	kr, err := OwnKeyRing(email)
+	if err != nil {
+		return err
+	}
+	k, err := kr.GetKey(0)
+	if err != nil {
+		return err
+	}
+	e := k.GetEntity()
+	now := crypto.GetTime()
+	secs := yearsSecs(e.PrimaryKey.CreationTime, now, years)
+	var life *uint32
+	if secs > 0 {
+		life = &secs
+	}
+	for _, id := range e.Identities {
+		if id.SelfSignature == nil {
+			continue
+		}
+		id.SelfSignature.KeyLifetimeSecs = life
+		id.SelfSignature.CreationTime = now
+	}
+	for i := range e.Subkeys {
+		e.Subkeys[i].Sig.KeyLifetimeSecs = life
+		e.Subkeys[i].Sig.CreationTime = now
+	}
+	var buf bytes.Buffer
+	if err := e.SerializePrivate(&buf, ownConfig(secs)); err != nil {
+		return err
+	}
+	key, err := crypto.NewKey(buf.Bytes())
+	if err != nil {
+		return err
+	}
+	return storeOwn(email, key)
+}
+
+// RevocationCertificate returns the own public key with a revocation
+// signature: published or sent to contacts, it tells everyone the key must
+// not be used any more. Keep it safe; it needs no passphrase to use.
+func RevocationCertificate(email string) (string, error) {
+	kr, err := OwnKeyRing(email)
+	if err != nil {
+		return "", err
+	}
+	k, err := kr.GetKey(0)
+	if err != nil {
+		return "", err
+	}
+	k, err = k.Copy()
+	if err != nil {
+		return "", err
+	}
+	e := k.GetEntity()
+	if err := e.RevokeKey(packet.NoReason, "", ownConfig(0)); err != nil {
+		return "", err
+	}
+	var buf bytes.Buffer
+	if err := e.Serialize(&buf); err != nil {
+		return "", err
+	}
+	pub, err := crypto.NewKey(buf.Bytes())
+	if err != nil {
+		return "", err
+	}
+	return pub.GetArmoredPublicKey()
 }

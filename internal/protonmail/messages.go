@@ -172,6 +172,14 @@ func (a *Account) Get(ctx context.Context, id string) (*Message, error) {
 		_, verr := kr.Decrypt(enc, senderKR, crypto.GetUnixTime())
 		msg.Signature = pgp.StatusFromError(verr)
 	}
+	// Inline PGP messages (Mailvelope and others) encrypted to the
+	// address's key inside Proton's own encryption.
+	if pgp.HasInlineEncrypted(msg.Text) {
+		if text, st, ok := pgp.DecryptInline(msg.Text, kr, senderKR); ok {
+			msg.Text, msg.Signature, msg.HTML = text, st, ""
+			msg.Links = mailparse.FindLinks(text)
+		}
+	}
 	// Inline cleartext-signed PGP (common with external PGP users).
 	if pgp.HasClearSigned(msg.Text) {
 		msg.Text, msg.Signature = pgp.VerifyClearSigned(msg.Text, senderKR)
@@ -278,7 +286,7 @@ func (a *Account) PlanEncryption(ctx context.Context, addrs []*mail.Address) []R
 		switch p.EncryptionScheme {
 		case proton.InternalScheme:
 			mode.Scheme = "proton"
-		case proton.PGPInlineScheme:
+		case proton.PGPInlineScheme, proton.PGPMIMEScheme:
 			mode.Scheme = "pgp"
 		}
 		mode.KeyFP = pgp.Fingerprint(p.PubKey)
@@ -287,36 +295,114 @@ func (a *Account) PlanEncryption(ctx context.Context, addrs []*mail.Address) []R
 	return out
 }
 
+// prefsFor decides how a recipient gets the message, as the Proton apps do:
+// Proton users end-to-end; others with a known key (published, pinned in
+// the Proton contact, or imported in Klient) PGP/MIME, which keeps the HTML
+// and the attachments in one encrypted part; everyone else in the clear,
+// signed as PGP/MIME when sign is set (or the contact asks for it).
 func (a *Account) prefsFor(ctx context.Context, email string, sign bool) proton.SendPreferences {
 	lookupCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
+	cs, _ := a.contactSettings(lookupCtx, email)
 	keys, rtype, err := a.client.GetPublicKeys(lookupCtx, email)
-	if err == nil && len(keys) > 0 {
+	if err == nil && len(keys) > 0 && rtype == proton.RecipientTypeInternal {
 		if kr, err := keys.GetKeyRing(); err == nil {
-			scheme := proton.PGPInlineScheme
-			if rtype == proton.RecipientTypeInternal {
-				scheme = proton.InternalScheme
-			}
 			return proton.SendPreferences{
 				Encrypt: true, PubKey: kr, SignatureType: proton.DetachedSignature,
-				EncryptionScheme: scheme, MIMEType: rfc822.TextPlain,
+				EncryptionScheme: proton.InternalScheme, MIMEType: rfc822.TextPlain,
 			}
 		}
 	}
-	if kr := pgp.LocalKey(email); kr != nil {
+	encrypt := cs.Encrypt == nil || *cs.Encrypt
+	var kr *crypto.KeyRing
+	switch {
+	case !encrypt:
+	case len(cs.Keys) > 0:
+		kr, _ = crypto.NewKeyRing(nil)
+		for _, k := range cs.Keys {
+			if !k.IsExpired() && !k.IsRevoked() {
+				_ = kr.AddKey(k)
+			}
+		}
+		if kr.CountEntities() == 0 {
+			kr = nil
+		}
+	case err == nil && len(keys) > 0:
+		kr, _ = keys.GetKeyRing()
+	}
+	if kr == nil && encrypt {
+		kr = pgp.LocalKey(email)
+	}
+	if kr != nil {
+		if cs.Scheme != nil && *cs.Scheme == proton.PGPInlineScheme {
+			return proton.SendPreferences{
+				Encrypt: true, PubKey: kr, SignatureType: proton.DetachedSignature,
+				EncryptionScheme: proton.PGPInlineScheme, MIMEType: rfc822.TextPlain,
+			}
+		}
 		return proton.SendPreferences{
 			Encrypt: true, PubKey: kr, SignatureType: proton.DetachedSignature,
-			EncryptionScheme: proton.PGPInlineScheme, MIMEType: rfc822.TextPlain,
+			EncryptionScheme: proton.PGPMIMEScheme, MIMEType: rfc822.MultipartMixed,
 		}
 	}
-	sig := proton.NoSignature
+	if cs.Sign != nil {
+		sign = *cs.Sign
+	}
 	if sign {
-		sig = proton.DetachedSignature
+		return proton.SendPreferences{
+			SignatureType:    proton.DetachedSignature,
+			EncryptionScheme: proton.ClearMIMEScheme, MIMEType: rfc822.MultipartMixed,
+		}
 	}
 	return proton.SendPreferences{
-		Encrypt: false, SignatureType: sig,
+		SignatureType:    proton.NoSignature,
 		EncryptionScheme: proton.ClearScheme, MIMEType: rfc822.TextPlain,
 	}
+}
+
+// contactSettings reads the encryption settings and pinned keys of an
+// address from the user's Proton contacts (the signed vCard), cached for a
+// few minutes.
+func (a *Account) contactSettings(ctx context.Context, email string) (proton.ContactSettings, bool) {
+	email = strings.ToLower(email)
+	a.mu.RLock()
+	c, ok := a.contactCache[email]
+	userKR := a.userKR
+	a.mu.RUnlock()
+	if ok && time.Since(c.at) < 5*time.Minute {
+		return c.settings, c.found
+	}
+	var out proton.ContactSettings
+	found := false
+	if userKR != nil {
+		if emails, err := a.client.GetAllContactEmails(ctx, email); err == nil {
+			for _, ce := range emails {
+				contact, err := a.client.GetContact(ctx, ce.ContactID)
+				if err != nil {
+					continue
+				}
+				if s, err := contact.GetSettings(userKR, ce.Email, proton.CardTypeSigned); err == nil {
+					out, found = s, true
+					break
+				}
+			}
+		} else {
+			return out, false // not cached: try again next time
+		}
+	}
+	a.mu.Lock()
+	if a.contactCache == nil {
+		a.contactCache = map[string]cachedContact{}
+	}
+	a.contactCache[email] = cachedContact{settings: out, found: found, at: time.Now()}
+	a.mu.Unlock()
+	return out, found
+}
+
+type cachedContact struct {
+	settings proton.ContactSettings
+	found    bool
+	at       time.Time
 }
 
 // Events streams mailbox events; newMessages receives metadata of every

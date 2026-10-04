@@ -14,6 +14,7 @@ import (
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
 
 	"github.com/Imbecile6197/klient/internal/i18n"
+	"github.com/Imbecile6197/klient/internal/mimebuild"
 )
 
 // MaxAttachmentsSize is Proton's limit for all attachments of one message.
@@ -219,6 +220,18 @@ func (a *Account) Send(ctx context.Context, d *Draft) error {
 		req.DeliveryTime = d.DeliveryTime.Unix()
 	}
 	for mt, prefs := range byType {
+		if mt == rfc822.MultipartMixed {
+			// PGP/MIME: text, HTML and attachments in one (encrypted or
+			// signed) MIME body.
+			entity, err := a.mimeBody(ctx, d, draft.Attachments, attKeys)
+			if err != nil {
+				return err
+			}
+			if err := req.AddMIMEPackage(kr, string(entity), prefs); err != nil {
+				return fmt.Errorf(i18n.T("encrypting the message failed: %w"), err)
+			}
+			continue
+		}
 		body := d.Body
 		if mt == rfc822.TextHTML {
 			body = d.HTML
@@ -231,6 +244,24 @@ func (a *Account) Send(ctx context.Context, d *Draft) error {
 		return apiErr(i18n.T("sending failed"), err)
 	}
 	return nil
+}
+
+// mimeBody writes the draft as one MIME entity with the attachments, which
+// are downloaded and decrypted from the saved draft.
+func (a *Account) mimeBody(ctx context.Context, d *Draft, atts []proton.Attachment, keys map[string]*crypto.SessionKey) ([]byte, error) {
+	var parts []mimebuild.Attachment
+	for _, att := range atts {
+		enc, err := a.client.GetAttachment(ctx, att.ID)
+		if err != nil {
+			return nil, apiErr(fmt.Sprintf(i18n.T("downloading attachment %s failed"), att.Name), err)
+		}
+		plain, err := keys[att.ID].Decrypt(enc)
+		if err != nil {
+			return nil, fmt.Errorf(i18n.T("key of attachment %s: %w"), att.Name, err)
+		}
+		parts = append(parts, mimebuild.Attachment{Name: att.Name, MIMEType: string(att.MIMEType), Data: plain.GetBinary()})
+	}
+	return mimebuild.Content(d.Body, d.HTML, parts)
 }
 
 // DeleteDraft removes a draft permanently.

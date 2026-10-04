@@ -204,6 +204,7 @@ func (a *App) activate() {
 	a.filter = spam.NewFilter(a.cfg, a.lists)
 	a.ollama = ollama.New(config.DataDir())
 	imapmail.SetKeyServer(a.cfg.KeyServerLookup)
+	imapmail.SetProtectSubject(a.cfg.ProtectSubject)
 	a.initAI()
 	a.mgr.AddStatusObserver(func(st proton.Status) {
 		ui(func() {

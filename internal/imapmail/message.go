@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
+	"github.com/ProtonMail/gopenpgp/v2/crypto"
 	"net/mail"
 	"sort"
 	"strings"
@@ -99,6 +100,9 @@ func (a *Account) Get(ctx context.Context, id string) (*protonmail.Message, erro
 	switch {
 	case entity != nil:
 		display = entity
+		if subj := pgpmime.ProtectedSubject(entity); subj != "" {
+			meta.Subject = subj
+		}
 	case enc != "":
 		display = nil // encrypted but cannot be opened
 	}
@@ -118,6 +122,18 @@ func (a *Account) Get(ctx context.Context, id string) (*protonmail.Message, erro
 		Encryption: encryption,
 		Signature:  sig,
 	}
+	if pgp.HasInlineEncrypted(msg.Text) {
+		var verify *crypto.KeyRing
+		if sender != "" && !a.IsOwnAddress(sender) {
+			verify = a.keyFor(ctx, sender)
+		}
+		if text, st, ok := pgp.DecryptInline(msg.Text, a.ownKey(), verify); ok {
+			msg.Text, msg.Signature = text, st
+			msg.HTML = "" // the HTML part shows only the armored block
+			msg.Encryption = i18n.T("End-to-end encrypted (PGP)")
+			msg.Links = mailparse.FindLinks(text)
+		}
+	}
 	if pgp.HasClearSigned(msg.Text) && sender != "" {
 		msg.Text, msg.Signature = pgp.VerifyClearSigned(msg.Text, a.keyFor(ctx, sender))
 	}
@@ -130,10 +146,11 @@ func (a *Account) Get(ctx context.Context, id string) (*protonmail.Message, erro
 	return msg, nil
 }
 
-// learnAutocrypt stores a sender's key from the Autocrypt header, unless a
-// key for them is already known (so a forged header cannot replace it).
+// learnAutocrypt takes a sender's key from the Autocrypt header: a first
+// key is stored, a changed one replaces only an unverified key learned the
+// same way or waits for the user (pgp.LearnKey).
 func (a *Account) learnAutocrypt(headers map[string][]string, sender string) {
-	if sender == "" || a.IsOwnAddress(sender) || pgp.LocalKey(sender) != nil {
+	if sender == "" || a.IsOwnAddress(sender) {
 		return
 	}
 	for k, vs := range headers {
@@ -141,7 +158,7 @@ func (a *Account) learnAutocrypt(headers map[string][]string, sender string) {
 			continue
 		}
 		if armored, ok := pgpmime.ParseAutocrypt(vs[0], sender); ok {
-			_, _ = pgp.ImportKey(armored)
+			pgp.LearnKey(sender, armored, pgp.SourceAutocrypt)
 		}
 	}
 }
