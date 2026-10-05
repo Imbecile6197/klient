@@ -70,6 +70,11 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Mon Oct 05 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.10.1-1
+- Morning overview: the day is marked done only after success; retries
+  every 5 minutes when offline, gives up after 3 AI failures with a
+  notification; notification also when there is no unread mail
+
 * Sun Oct 04 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.10.0-1
 - Proton: PGP/MIME (and signed clear MIME) for external recipients, keys
   and settings from Proton contacts

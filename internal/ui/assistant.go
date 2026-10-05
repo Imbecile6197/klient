@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"sort"
 	"strings"
 	"time"
@@ -333,8 +334,13 @@ func (a *App) askMail() {
 
 // ---- Morning overview --------------------------------------------------------
 
-// digestLoop sends the morning overview once a day after DigestHour.
+// digestLoop sends the morning overview once a day after DigestHour. The
+// day counts as done only when the overview was made: after a resume from
+// suspend the network is often not up yet, so a failed attempt (an account
+// that cannot be read, the AI not answering) is tried again in a few minutes.
 func (a *App) digestLoop() {
+	var retryAt time.Time
+	aiFailures := 0
 	for {
 		select {
 		case <-a.ctx.Done():
@@ -345,32 +351,63 @@ func (a *App) digestLoop() {
 		ui(func() {
 			now := time.Now()
 			ready <- a.cfg.Digest && a.ai.HasAssistant() && len(a.sessions) > 0 &&
-				now.Hour() >= a.cfg.DigestHour && a.cfg.DigestLast != now.Format("2006-01-02")
+				now.Hour() >= a.cfg.DigestHour && a.cfg.DigestLast != now.Format("2006-01-02") &&
+				!now.Before(retryAt)
 		})
 		if !<-ready {
 			continue
 		}
+		text, n, failed, err := a.buildDigest()
+		switch {
+		case err != nil:
+			aiFailures++
+			if aiFailures < 3 {
+				log.Printf("digest: the AI failed, trying again in 5 minutes: %v", err)
+				retryAt = time.Now().Add(5 * time.Minute)
+				continue
+			}
+			// Do not keep paying for failing requests all day: say it once.
+			log.Printf("digest: the AI failed again, giving up for today: %v", err)
+			aiFailures = 0
+			ui(func() {
+				a.cfg.DigestLast = time.Now().Format("2006-01-02")
+				a.saveConfig()
+				note := gio.NewNotification(i18n.T("The morning overview could not be prepared"))
+				note.SetBody(ai.Explain(a.cfg.AssistantProvider, err).Text)
+				a.app.SendNotification("digest", note)
+			})
+			continue
+		case len(failed) > 0 && n == 0:
+			// Nothing could be read (offline): an empty overview would be wrong.
+			log.Printf("digest: cannot read %s, trying again in 5 minutes", strings.Join(failed, ", "))
+			retryAt = time.Now().Add(5 * time.Minute)
+			continue
+		}
+		aiFailures = 0
+		log.Printf("digest: %d unread messages summarised (accounts not read: %d)", n, len(failed))
 		ui(func() {
 			a.cfg.DigestLast = time.Now().Format("2006-01-02")
 			a.saveConfig()
-		})
-		text, n, err := a.buildDigest()
-		ui(func() {
-			if err != nil || n == 0 {
-				return
+			title := i18n.T("Morning overview: no unread mail")
+			body := ""
+			if n > 0 {
+				a.digest = text
+				title = fmt.Sprintf(i18n.T("Morning overview: %s"), unreadText(n))
+				body, _, _ = strings.Cut(strings.TrimSpace(text), "\n")
 			}
-			a.digest = text
-			note := gio.NewNotification(fmt.Sprintf(i18n.T("Morning overview: %s"), unreadText(n)))
-			first, _, _ := strings.Cut(strings.TrimSpace(text), "\n")
-			note.SetBody(first)
-			note.SetDefaultAction("app.digest")
+			note := gio.NewNotification(title)
+			if body != "" {
+				note.SetBody(body)
+				note.SetDefaultAction("app.digest")
+			}
 			a.app.SendNotification("digest", note)
 		})
 	}
 }
 
-// buildDigest summarises the unread inbox of every account. Off the UI thread.
-func (a *App) buildDigest() (string, int, error) {
+// buildDigest summarises the unread inbox of every account. Off the UI
+// thread. failed lists the accounts whose inbox could not be read.
+func (a *App) buildDigest() (text string, n int, failed []string, err error) {
 	accs := make(chan []mailbox.Account)
 	ui(func() {
 		var l []mailbox.Account
@@ -386,6 +423,7 @@ func (a *App) buildDigest() (string, int, error) {
 	for _, acc := range <-accs {
 		msgs, err := acc.List(ctx, protonmail.InboxID, 0, 100)
 		if err != nil {
+			failed = append(failed, acc.Email())
 			continue
 		}
 		n := 0
@@ -407,10 +445,10 @@ func (a *App) buildDigest() (string, int, error) {
 		}
 	}
 	if len(docs) == 0 {
-		return i18n.T("No unread mail. 🎉"), 0, nil
+		return i18n.T("No unread mail. 🎉"), 0, failed, nil
 	}
 	out, err := a.ai.Digest(ctx, today(), docs)
-	return out, len(docs), err
+	return out, len(docs), failed, err
 }
 
 // showDigest shows the last overview; generate builds a fresh one.
@@ -453,7 +491,7 @@ func (a *App) showDigest(generate bool) {
 		stack.SetVisibleChildName("loading")
 		refresh.SetSensitive(false)
 		go func() {
-			text, _, err := a.buildDigest()
+			text, _, _, err := a.buildDigest()
 			ui(func() {
 				refresh.SetSensitive(true)
 				if err != nil {

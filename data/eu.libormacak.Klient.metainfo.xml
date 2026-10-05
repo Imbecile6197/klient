@@ -82,6 +82,12 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.10.1" date="2026-10-05">
+      <description>
+        <p>The morning overview no longer gives up when the network is not ready after waking up.</p>
+        <p xml:lang="cs">Ranní přehled to už nevzdá, když po probuzení ještě není připojená síť.</p>
+      </description>
+    </release>
     <release version="0.10.0" date="2026-10-04">
       <description>
         <p>PGP: formatting kept for PGP recipients from Proton, keys from Proton contacts, inline PGP, key change warnings, contact key details, encrypted subject, send only encrypted, key validity, publishing and revocation.</p>

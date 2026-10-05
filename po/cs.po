@@ -4225,3 +4225,11 @@ msgid_plural "%d years"
 msgstr[0] "%d rok"
 msgstr[1] "%d roky"
 msgstr[2] "%d let"
+
+#: internal
+msgid "The morning overview could not be prepared"
+msgstr "Ranní přehled se nepodařilo připravit"
+
+#: internal
+msgid "Morning overview: no unread mail"
+msgstr "Ranní přehled: žádná nepřečtená pošta"
