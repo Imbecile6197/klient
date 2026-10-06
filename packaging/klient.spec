@@ -70,6 +70,10 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Tue Oct 06 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.10.2-1
+- IMAP conversations show each Message-ID once (Gmail All Mail copies,
+  mail to self in Inbox and Sent)
+
 * Mon Oct 05 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.10.1-1
 - Morning overview: the day is marked done only after success; retries
   every 5 minutes when offline, gives up after 3 AI failures with a

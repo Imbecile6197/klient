@@ -82,6 +82,12 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.10.2" date="2026-10-06">
+      <description>
+        <p>Messages in Gmail conversations are no longer shown twice.</p>
+        <p xml:lang="cs">Zprávy v konverzacích Gmailu se už nezobrazují dvakrát.</p>
+      </description>
+    </release>
     <release version="0.10.1" date="2026-10-05">
       <description>
         <p>The morning overview no longer gives up when the network is not ready after waking up.</p>

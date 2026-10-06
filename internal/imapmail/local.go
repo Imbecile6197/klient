@@ -85,6 +85,10 @@ func (a *Account) ThreadMessages(ctx context.Context, conversationID string, inc
 		}}},
 	}}}
 	var out []protonmail.Summary
+	// One message can sit in several of these folders: Gmail keeps every
+	// message also in All Mail (its archive), mail to yourself is in Inbox
+	// and Sent. Show each once, the copy from the first folder.
+	seen := map[string]bool{}
 	err := a.with(func(c *imapclient.Client) error {
 		for _, f := range folders {
 			mb, err := a.mailboxOf(f)
@@ -104,18 +108,42 @@ func (a *Account) ThreadMessages(ctx context.Context, conversationID string, inc
 				return err
 			}
 			for _, s := range found {
-				if s.ConversationID == conversationID {
-					out = append(out, s)
+				if s.ConversationID != conversationID {
+					continue
 				}
+				if s.ExternalID != "" {
+					if seen[s.ExternalID] {
+						continue
+					}
+					seen[s.ExternalID] = true
+				}
+				out = append(out, s)
 			}
 		}
 		return nil
 	})
 	if err != nil && IsOffline(err) && a.cache != nil {
-		return a.cache.Conversation(conversationID)
+		cached, cerr := a.cache.Conversation(conversationID)
+		return uniqueMessages(cached), cerr
 	}
 	sort.SliceStable(out, func(i, j int) bool { return out[i].Time < out[j].Time })
 	return out, err
+}
+
+// uniqueMessages keeps the first copy of each Message-ID.
+func uniqueMessages(in []protonmail.Summary) []protonmail.Summary {
+	seen := map[string]bool{}
+	out := in[:0:0]
+	for _, s := range in {
+		if s.ExternalID != "" {
+			if seen[s.ExternalID] {
+				continue
+			}
+			seen[s.ExternalID] = true
+		}
+		out = append(out, s)
+	}
+	return out
 }
 
 // ---- Local folders (snooze, scheduled) --------------------------------------------------

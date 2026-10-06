@@ -493,3 +493,32 @@ func TestGmailLabels(t *testing.T) {
 		t.Fatal("Gmail Starred folder not mapped")
 	}
 }
+
+// Gmail keeps every message also in All Mail (its archive): a thread must
+// show each message once.
+func TestGmailThreadNoDuplicates(t *testing.T) {
+	set, u, _ := startServers(t)
+	if err := u.Create("[Gmail]/All Mail", nil); err != nil {
+		t.Fatal(err)
+	}
+	set.Kind = "gmail"
+	appendMsg(t, u, "INBOX", hello)
+	appendMsg(t, u, "[Gmail]/All Mail", hello)
+	ctx := context.Background()
+	acc, err := Open(ctx, set, "tajne")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer acc.Close()
+	in, _ := acc.List(ctx, protonmail.InboxID, 0, 10)
+	if len(in) != 1 {
+		t.Fatalf("inbox %d", len(in))
+	}
+	thread, err := acc.ThreadMessages(ctx, in[0].ConversationID, false)
+	if err != nil || len(thread) != 1 {
+		t.Fatalf("thread has %d messages (%v), want 1", len(thread), err)
+	}
+	if thread[0].ID != in[0].ID {
+		t.Error("the copy from the inbox should be shown")
+	}
+}
