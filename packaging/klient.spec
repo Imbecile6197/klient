@@ -70,6 +70,12 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Thu Oct 08 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.10.4-1
+- IMAP auto-empty: skip empty folders, fetch arrival dates by UID
+  (servers answering "Bad MSN")
+- Tray unread dot follows the folder counts and is updated after opening
+  an unread message
+
 * Thu Oct 08 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.10.3-1
 - Catch-up on start: unread inbox mail of the last 7 days without a spam
   decision goes through the filter, rules and AI labels (no notifications)

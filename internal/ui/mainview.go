@@ -322,6 +322,16 @@ func (m *mainView) updateCounts() {
 			return
 		}
 		ui(func() {
+			// The same numbers drive the dot of the tray icon.
+			if m.a.isUnified() {
+				for _, s := range m.a.sessions {
+					m.a.refreshUnread(s)
+				}
+			} else if s := m.a.sessionOf(m.a.acc); s != nil {
+				s.unread = counts[protonmail.InboxID]
+				m.a.updateTrayUnread()
+				m.updateAccountBadges()
+			}
 			for id, l := range m.countLabels {
 				n := counts[id]
 				// "All mail" and "Sent" counts are not useful as badges.

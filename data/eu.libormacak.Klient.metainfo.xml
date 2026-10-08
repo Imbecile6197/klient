@@ -82,6 +82,12 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.10.4" date="2026-10-08">
+      <description>
+        <p>Automatic emptying of Trash and Spam no longer fails on some IMAP servers; the tray dot goes out as soon as mail is read.</p>
+        <p xml:lang="cs">Automatické vysypání Koše a Spamu už na některých IMAP serverech nekončí chybou; tečka v liště zhasne hned po přečtení.</p>
+      </description>
+    </release>
     <release version="0.10.3" date="2026-10-08">
       <description>
         <p>Mail that arrived while Klient was not running now goes through the spam filter and the rules too.</p>

@@ -104,8 +104,12 @@ func (a *Account) EmptyFolder(ctx context.Context, folderID string, olderThan ti
 	}
 	n := 0
 	err := a.with(func(c *imapclient.Client) error {
-		if _, err := c.Select(mb, nil).Wait(); err != nil {
+		sel, err := c.Select(mb, nil).Wait()
+		if err != nil {
 			return err
+		}
+		if sel.NumMessages == 0 {
+			return nil // already empty (some servers reject "1:*" then)
 		}
 		var uids []imap.UID
 		if olderThan.IsZero() {
@@ -117,7 +121,9 @@ func (a *Account) EmptyFolder(ctx context.Context, folderID string, olderThan ti
 		} else {
 			// Not SEARCH BEFORE: some servers (Seznam) reject its date. The
 			// arrival dates are read and compared here instead.
-			msgs, err := c.Fetch(imap.SeqSet{imap.SeqRange{Start: 1, Stop: 0}}, &imap.FetchOptions{UID: true, InternalDate: true}).Collect()
+			// By UID: a sequence range is refused when it does not match
+			// the server's view of the mailbox ("Bad MSN").
+			msgs, err := c.Fetch(imap.UIDSet{imap.UIDRange{Start: 1, Stop: 0}}, &imap.FetchOptions{UID: true, InternalDate: true}).Collect()
 			if err != nil {
 				return err
 			}

@@ -83,6 +83,19 @@ func TestFolderManagement(t *testing.T) {
 	if _, err := acc.EmptyFolder(ctx, protonmail.InboxID, time.Time{}, nil); err == nil {
 		t.Error("the inbox was emptied")
 	}
+	// Automatic emptying of an empty folder is no error ("Bad MSN" from
+	// servers that refuse "1:*" on an empty mailbox).
+	if n, err := acc.EmptyFolder(ctx, protonmail.TrashID, time.Now().Add(-30*24*time.Hour), nil); err != nil || n != 0 {
+		t.Fatalf("empty Trash again: %d, %v", n, err)
+	}
+	if n, err := acc.EmptyFolder(ctx, protonmail.SpamID, time.Now().Add(-30*24*time.Hour), nil); err != nil || n != 0 {
+		t.Fatalf("empty Spam: %d, %v", n, err)
+	}
+	// Only recent mail: nothing old enough.
+	put(time.Hour)
+	if n, err := acc.EmptyFolder(ctx, protonmail.TrashID, time.Now().Add(-30*24*time.Hour), nil); err != nil || n != 0 {
+		t.Fatalf("nothing old enough: %d, %v", n, err)
+	}
 }
 
 // Klient started offline with an old copy of the folders (no Drafts): saving

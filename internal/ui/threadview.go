@@ -351,7 +351,9 @@ func (m *mainView) openThread(t protonmail.Thread) {
 		}
 		wg.Wait()
 		if len(unread) > 0 {
-			_ = m.a.acc.MarkRead(ctx, unread...)
+			if m.a.acc.MarkRead(ctx, unread...) == nil {
+				ui(m.updateCounts) // badges and the tray dot at once
+			}
 		}
 		ui(func() {
 			if seq != m.loadSeq {
