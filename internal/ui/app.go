@@ -731,6 +731,7 @@ func (a *App) startEvents(s *session) {
 	}
 	s.events = true
 	acc := s.acc
+	go a.catchUp(s)
 	go func() {
 		err := acc.Events(a.ctx, func(meta protonmail.Summary) { a.onNewMessage(s, meta) }, func() {
 			ui(func() {
@@ -807,6 +808,12 @@ func (a *App) offlineSyncLoop(s *session) {
 
 // onNewMessage runs on the event goroutine.
 func (a *App) onNewMessage(s *session, meta protonmail.Summary) {
+	held := a.holdNew(s, meta)
+	go a.checkNew(s, meta, held, true)
+}
+
+// holdNew hides an unchecked inbox message until the spam filter decides.
+func (a *App) holdNew(s *session, meta protonmail.Summary) bool {
 	acc := s.acc
 	// Hide the message before the list refresh that follows this event
 	// (this runs on the event goroutine, before onChange).
@@ -831,7 +838,14 @@ func (a *App) onNewMessage(s *session, meta protonmail.Summary) {
 			})
 		})
 	}
-	go func() {
+	return held
+}
+
+// checkNew runs the spam filter, the rules and the AI label on a new
+// message and notifies about it (when notify).
+func (a *App) checkNew(s *session, meta protonmail.Summary, held, notify bool) {
+	acc := s.acc
+	func() {
 		d, moved, err := a.filter.ProcessNew(a.ctx, acc, meta)
 		var applied []string
 		if err == nil && !moved {
@@ -870,7 +884,7 @@ func (a *App) onNewMessage(s *session, meta protonmail.Summary) {
 				}
 				return
 			}
-			if d.Spam || (a.win.IsActive() && shown) {
+			if d.Spam || !notify || (a.win.IsActive() && shown) {
 				return
 			}
 			sender := i18n.T("Unknown sender")
@@ -889,6 +903,40 @@ func (a *App) onNewMessage(s *session, meta protonmail.Summary) {
 			a.app.SendNotification("new-mail-"+meta.ID, n)
 		})
 	}()
+}
+
+// catchUpMax limits how far back mail that arrived while Klient was not
+// running is checked.
+const catchUpMax = 7 * 24 * time.Hour
+
+// catchUp checks the unread inbox mail that arrived while Klient was not
+// running (or offline): the event streams report only mail that comes after
+// they start, so it would never meet the spam filter and the rules. One
+// message at a time, without a notification for each.
+func (a *App) catchUp(s *session) {
+	acc := s.acc
+	msgs, err := acc.List(a.ctx, protonmail.InboxID, 0, 50)
+	if err != nil {
+		return
+	}
+	since := time.Now().Add(-catchUpMax).Unix()
+	n := 0
+	for _, m := range msgs {
+		if !bool(m.Unread) || m.Time < since || !hasLabel(m, protonmail.InboxID) {
+			continue
+		}
+		if _, known := a.filter.Decision(m.ID); known {
+			continue
+		}
+		if a.ctx.Err() != nil || a.sessionOf(acc) != s {
+			return
+		}
+		a.checkNew(s, m, a.holdNew(s, m), false)
+		n++
+	}
+	if n > 0 {
+		log.Printf("spamfilter: checked %d messages of %s that arrived while Klient was not running", n, acc.Email())
+	}
 }
 
 // openNotified shows the message a notification was about.

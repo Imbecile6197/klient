@@ -82,6 +82,12 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.10.3" date="2026-10-08">
+      <description>
+        <p>Mail that arrived while Klient was not running now goes through the spam filter and the rules too.</p>
+        <p xml:lang="cs">Pošta, která přišla, když Klient neběžel, teď také projde spamfiltrem a pravidly.</p>
+      </description>
+    </release>
     <release version="0.10.2" date="2026-10-06">
       <description>
         <p>Messages in Gmail conversations are no longer shown twice.</p>
