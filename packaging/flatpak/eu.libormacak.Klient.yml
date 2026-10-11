@@ -1,0 +1,67 @@
+# Flatpak manifest for Klient.
+#
+# The build runs fully offline (no --share=network): Go modules are vendored
+# into the source tree by packaging/flatpak.sh before flatpak-builder is
+# invoked, and the build uses -mod=vendor with GOPROXY=off. The GNOME 49
+# runtime already provides GTK 4, libadwaita and WebKitGTK 6.0, so only the
+# Go binary is compiled here. Go itself comes from the SDK golang extension
+# (25.08 ships Go 1.27.1, which satisfies go.mod's "go 1.26.8").
+#
+# For a Flathub submission, replace the `dir` source with a tagged `archive`
+# or `git` source that already contains the vendored modules, and drop the
+# in-app self-updater (see README).
+app-id: eu.libormacak.Klient
+runtime: org.gnome.Platform
+runtime-version: '49'
+sdk: org.gnome.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.golang
+command: klient
+
+finish-args:
+  # Display and GPU.
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+  # Mail needs the network (IMAP/SMTP/Proton API and cloud AI providers).
+  - --share=network
+  # Secrets (session tokens, API keys) via the Secret Service keyring.
+  - --talk-name=org.freedesktop.secrets
+  # New-mail notifications.
+  - --talk-name=org.freedesktop.Notifications
+  # Tray icon (GNOME needs the AppIndicator extension on the host).
+  - --talk-name=org.kde.StatusNotifierWatcher
+  # Saving and attaching files.
+  - --filesystem=xdg-download
+  - --filesystem=xdg-documents
+
+modules:
+  - name: klient
+    buildsystem: simple
+    build-options:
+      append-path: /usr/lib/sdk/golang/bin
+      env:
+        GOFLAGS: -mod=vendor
+        GOPROXY: 'off'
+        GOTOOLCHAIN: local
+        GOCACHE: /run/build/klient/.gocache
+    build-commands:
+      - . /usr/lib/sdk/golang/enable.sh && go build -trimpath -mod=vendor -ldflags "-s -w -X github.com/Imbecile6197/klient/internal/ui.Version=${KLIENT_VERSION:-dev}" -o klient ./cmd/klient
+      - install -Dm755 klient /app/bin/klient
+      - install -Dm644 data/eu.libormacak.Klient.desktop /app/share/applications/eu.libormacak.Klient.desktop
+      - install -Dm644 data/eu.libormacak.Klient.svg /app/share/icons/hicolor/scalable/apps/eu.libormacak.Klient.svg
+      - install -Dm644 data/eu.libormacak.Klient-symbolic.svg /app/share/icons/hicolor/symbolic/apps/eu.libormacak.Klient-symbolic.svg
+      - install -Dm644 data/eu.libormacak.Klient.metainfo.xml /app/share/metainfo/eu.libormacak.Klient.metainfo.xml
+    sources:
+      # packaging/flatpak.sh builds against a vendored export of the checkout
+      # (it writes a temporary manifest pointing at that export). This source
+      # is the canonical reference: it expects ./vendor to be present (run
+      # `go mod vendor` first, or let flatpak.sh handle it). For a Flathub
+      # submission, swap this for a tagged `archive`/`git` source whose tree
+      # already contains vendor/.
+      - type: dir
+        path: ../..
+        skip:
+          - .git
+          - build
+          - bin

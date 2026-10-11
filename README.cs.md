@@ -57,7 +57,13 @@ make run
 make install      # do ~/.local včetně .desktop souboru a ikony
 make rpm          # balíček pro Fedoru do build/rpm/RPMS/x86_64/
 packaging/deb.sh 0.7.3   # balíček pro Ubuntu do build/deb/, sestaví se v kontejneru podman
+packaging/arch.sh 0.7.3  # balíček pro Arch/Manjaro do build/arch/, sestaví se v kontejneru podman
+packaging/flatpak.sh 0.7.3  # Flatpak, sestaví se offline a nainstaluje přes --user
 ```
+
+Balíček pro Arch potřebuje GLib ≥ 2.89.3 (kvůli vazbám na GTK), která je zatím v repozitářích `core-testing`/`extra-testing`; `packaging/arch/Containerfile` je zapíná. Manjaro za Archem zaostává, takže nemusí mít dost novou GLib k instalaci balíčku.
+
+Flatpak tenhle problém obchází: běží proti běhovému prostředí GNOME 49 s vlastní GLib, GTK 4, libadwaitou a WebKitGTK, takže funguje i tam, kde jsou systémové knihovny pro nativní balíček příliš staré (třeba Manjaro s GLib 2.88). Potřebuje `flatpak` a `flatpak-builder`; `packaging/flatpak.sh` nainstaluje běhové prostředí GNOME 49, SDK a Go rozšíření SDK, zavendoruje Go moduly do čistého exportu a pak sestaví v sandboxu flatpak-builderu bez sítě (`-mod=vendor`, `GOPROXY=off`). Přepínač `--bundle` navíc vyexportuje `build/flatpak/klient.flatpak`. Manifest je `packaging/flatpak/eu.libormacak.Klient.yml`. Pro skutečné odeslání na Flathub jsou potřeba dvě změny: nahradit zdroj `dir` taggovaným zdrojem `git`/`archive`, jehož strom už obsahuje `vendor/`, a vypnout vestavěný aktualizátor Klienta z GitHubu (aktualizace řeší Flatpak a aplikace, které se aktualizují samy, Flathub nepřijímá).
 
 Vydání nové verze (potřebuje `gh` a commitnutý strom): poznámky zapište do `packaging/release-notes/X.Y.Z.md` (oddíly „## English“ a „## Česky“ – Klient je ukáže v okně Co je nového a zveřejní se na GitHubu), pak `git tag -a vX.Y.Z -m "Klient X.Y.Z" && make release VERSION=X.Y.Z`.
 
