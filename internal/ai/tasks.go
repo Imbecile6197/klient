@@ -118,6 +118,7 @@ Rules:
 Answer only with a JSON object with the fields spam_probability, category and reason. Write the reason in %s.`
 
 func (c *Client) ClassifySpam(ctx context.Context, in SpamInput) (Verdict, error) {
+	ctx = withTask(ctx, TaskSpam)
 	if !c.HasSpam() {
 		return Verdict{}, ErrNoAPIKey
 	}
@@ -196,6 +197,7 @@ func (c *Client) assist(ctx context.Context, prompt string) (string, error) {
 
 // Summarize returns a short summary of a message with action items.
 func (c *Client) Summarize(ctx context.Context, from, subject, body string) (string, error) {
+	ctx = withTask(ctx, TaskSummary)
 	if c.assistantLocal {
 		body = truncate(body, 8000)
 	}
@@ -205,6 +207,7 @@ func (c *Client) Summarize(ctx context.Context, from, subject, body string) (str
 // DraftReply writes the body of a reply. instruction is what the user wants
 // to say (may be empty).
 func (c *Client) DraftReply(ctx context.Context, from, subject, body, instruction string) (string, error) {
+	ctx = withTask(ctx, TaskReply)
 	if c.assistantLocal {
 		body = truncate(body, 5000)
 	}
@@ -228,6 +231,7 @@ func stripSubjectLine(s string) string {
 
 // Improve rewrites a draft according to an instruction ("more formal", "translate to German", ...).
 func (c *Client) Improve(ctx context.Context, draft, instruction string) (string, error) {
+	ctx = withTask(ctx, TaskImprove)
 	out, err := c.assist(ctx, fmt.Sprintf("Edit this e-mail draft according to the instruction. Keep the language of the draft unless the instruction asks for a translation. Return only the edited body text – no subject line, no lead-in such as \"Here is the text:\" and no comments.\n\nInstruction: %s\n\n<draft>\n%s\n</draft>", instruction, draft))
 	return stripSubjectLine(out), err
 }

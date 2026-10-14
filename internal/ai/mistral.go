@@ -54,6 +54,10 @@ func (m *mistralProvider) Complete(ctx context.Context, req Request) (string, er
 		if err != nil {
 			return "", err
 		}
+		if req.usage != nil { // both attempts are paid
+			req.usage.In += resp.Usage.PromptTokens
+			req.usage.Out += resp.Usage.CompletionTokens
+		}
 		if len(resp.Choices) == 0 {
 			last = errors.New(i18n.T("the model returned an empty answer"))
 			continue

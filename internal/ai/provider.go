@@ -62,6 +62,8 @@ type Request struct {
 	Schema    map[string]any // non-nil: the answer must be JSON matching it
 	Effort    Effort
 	MaxTokens int64
+
+	usage *Usage // filled by the provider when set
 }
 
 // Provider is implemented by every LLM backend.
@@ -104,13 +106,23 @@ type logged struct {
 
 func (l logged) Complete(ctx context.Context, req Request) (string, error) {
 	start := time.Now()
+	var u Usage
+	req.usage = &u
 	out, err := l.Provider.Complete(ctx, req)
 	res := "ok"
 	if err != nil {
 		res = "error: " + err.Error()
 	}
-	log.Printf("AI request: %s, model %s, %d characters in, %d out, %.1f s – %s",
-		l.id, req.Model, len(req.System)+len(req.User), len(out), time.Since(start).Seconds(), res)
+	log.Printf("AI request: %s, model %s, %d characters in, %d out, %d+%d tokens in, %d out, %.1f s – %s",
+		l.id, req.Model, len(req.System)+len(req.User), len(out), u.In, u.Cached, u.Out, time.Since(start).Seconds(), res)
+	// Failed requests are paid too when the provider counted tokens.
+	if u.In+u.Cached+u.Out > 0 {
+		model := u.Model
+		if model == "" {
+			model = req.Model
+		}
+		report(Record{Time: time.Now(), Provider: l.id, Model: model, Task: taskOf(ctx), Usage: u})
+	}
 	return out, err
 }
 
@@ -120,7 +132,7 @@ func Test(ctx context.Context, id, apiKey, model string) error {
 	if err != nil {
 		return err
 	}
-	out, err := p.Complete(ctx, Request{
+	out, err := p.Complete(withTask(ctx, TaskTest), Request{
 		Model: model, System: "You are a connection test.", User: "Reply with just the word OK.",
 		Effort: EffortLow, MaxTokens: 2000,
 	})

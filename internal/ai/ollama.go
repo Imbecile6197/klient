@@ -40,9 +40,12 @@ func (p *ollamaProvider) Complete(ctx context.Context, req Request) (string, err
 	if power.OnAC() {
 		keep = "30m"
 	}
-	out, _, err := ollama.NewClient(p.backend.Addr()).Chat(ctx, ollama.ChatRequest{
+	out, st, err := ollama.NewClient(p.backend.Addr()).Chat(ctx, ollama.ChatRequest{
 		Model: req.Model, System: req.System, User: req.User, Schema: req.Schema, NumCtx: numCtx, KeepAlive: keep,
 	})
+	if req.usage != nil {
+		*req.usage = Usage{In: int64(st.PromptTokens), Out: int64(st.OutputTokens)}
+	}
 	return out, err
 }
 

@@ -129,9 +129,21 @@ type Config struct {
 	// Summarise new mail in advance with the local model (on AC power only).
 	PrecomputeSummaries bool `json:"precompute_summaries"`
 
+	// Prices of AI models the built-in price list does not know, or set by
+	// the user (model name -> price).
+	AIPrices map[string]ModelPrice `json:"ai_prices,omitempty"`
+
 	// Blocklist feeds and refresh interval.
 	Feeds          []Feed   `json:"feeds"`
 	UpdateInterval Duration `json:"update_interval"`
+}
+
+// ModelPrice is the price of an AI model in USD per million tokens: input,
+// input served from the provider's cache, and output.
+type ModelPrice struct {
+	In     float64 `json:"in"`
+	Cached float64 `json:"cached"`
+	Out    float64 `json:"out"`
 }
 
 // MailServer is the configuration of an IMAP/SMTP account.

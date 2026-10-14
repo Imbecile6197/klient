@@ -292,7 +292,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
       <rect x="4" y="12" width="56" height="40" rx="9" fill="#1c71d8"/>
       <path d="M10 20l22 16 22-16" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <div><b>Klient</b><span>Dokumentace · verze 0.10.4 · <a href="index.html" hreflang="en" lang="en">English</a></span></div>
+    <div><b>Klient</b><span>Dokumentace · verze 0.11.0 · <a href="index.html" hreflang="en" lang="en">English</a></span></div>
   </div>
   <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc">Obsah</button>
   <ol>
@@ -592,6 +592,9 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
   </table>
   </div>
   <p>API klíče se ukládají do klíčenky systému. Když poskytovatel vrátí chybu (chybějící kredit, neplatný klíč, zrušený model), Klient ji srozumitelně vysvětlí a nabídne odkaz, kde ji opravit.</p>
+
+  <h3>Kolik AI stojí</h3>
+  <p>V levém dolním rohu hlavního okna je útrata za AI tento měsíc a dnes. <b>Podrobnosti</b> ji rozepíšou podle modelu a úlohy (spamfiltr, shrnutí, ranní přehled…) za tento měsíc, minulý měsíc, dnešek nebo celkem. Klient sčítá tokeny, které hlásí každý poskytovatel, a oceňuje je podle ceníků poskytovatelů (v USD, bez DPH); přesnou částku najdete ve svém účtu u poskytovatele. U modelu, který ceník nezná (např. Mistral), klikněte na <b>Zadat cenu…</b>. Lokální AI je zdarma. Ukládají se jen počty (<code>~/.local/share/klient/ai-usage.json</code>), nikdy obsah.</p>
 </section>
 
 <!-- ============================================================ -->
@@ -755,7 +758,7 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
   <p>Postaveno na GTK4, libadwaita, WebKitGTK, go-proton-api, gopenpgp a knihovnách go-imap/go-smtp.</p>
 </section>
 
-<footer>Dokumentace k verzi 0.10.4 · říjen 2026 · <a href="index.html" hreflang="en" lang="en">English version</a></footer>
+<footer>Dokumentace k verzi 0.11.0 · říjen 2026 · <a href="index.html" hreflang="en" lang="en">English version</a></footer>
 
 </div>
 </main>

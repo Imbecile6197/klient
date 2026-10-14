@@ -82,6 +82,12 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.11.0" date="2026-10-14">
+      <description>
+        <p>An overview of what the AI costs, per model and task.</p>
+        <p xml:lang="cs">Přehled útraty za AI podle modelu a úlohy.</p>
+      </description>
+    </release>
     <release version="0.10.4" date="2026-10-08">
       <description>
         <p>Automatic emptying of Trash and Spam no longer fails on some IMAP servers; the tray dot goes out as soon as mail is read.</p>

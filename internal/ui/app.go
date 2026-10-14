@@ -32,6 +32,7 @@ import (
 	"github.com/Imbecile6197/klient/internal/secrets"
 	"github.com/Imbecile6197/klient/internal/spam"
 	"github.com/Imbecile6197/klient/internal/spell"
+	"github.com/Imbecile6197/klient/internal/usage"
 )
 
 const AppID = "eu.libormacak.Klient"
@@ -90,6 +91,7 @@ type App struct {
 	toasts *adw.ToastOverlay
 
 	cfg    config.Config
+	usage  *usage.Store // AI requests and tokens, for the spending overview
 	mgr    *proton.Manager
 	acc    mailbox.Account // the account shown in the window
 	lists  *spam.Blocklists
@@ -205,6 +207,7 @@ func (a *App) activate() {
 	a.ollama = ollama.New(config.DataDir())
 	imapmail.SetKeyServer(a.cfg.KeyServerLookup)
 	imapmail.SetProtectSubject(a.cfg.ProtectSubject)
+	a.startUsage()
 	a.initAI()
 	a.mgr.AddStatusObserver(func(st proton.Status) {
 		ui(func() {

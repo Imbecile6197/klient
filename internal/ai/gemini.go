@@ -32,6 +32,13 @@ func (g *geminiProvider) Complete(ctx context.Context, req Request) (string, err
 	if err != nil {
 		return "", err
 	}
+	if req.usage != nil && res.UsageMetadata != nil {
+		u := res.UsageMetadata
+		cached := int64(u.CachedContentTokenCount)
+		// Thinking is paid as output.
+		*req.usage = Usage{In: int64(u.PromptTokenCount) - cached, Cached: cached,
+			Out: int64(u.CandidatesTokenCount) + int64(u.ThoughtsTokenCount), Model: res.ModelVersion}
+	}
 	if res.PromptFeedback != nil && res.PromptFeedback.BlockReason != "" {
 		return "", errors.New(i18n.T("Gemini blocked the request: ") + string(res.PromptFeedback.BlockReason))
 	}

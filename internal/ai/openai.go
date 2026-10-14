@@ -48,6 +48,11 @@ func (o *openaiProvider) Complete(ctx context.Context, req Request) (string, err
 	if err != nil {
 		return "", err
 	}
+	if req.usage != nil {
+		u := resp.Usage
+		cached := u.InputTokensDetails.CachedTokens
+		*req.usage = Usage{In: u.InputTokens - cached, Cached: cached, Out: u.OutputTokens, Model: string(resp.Model)}
+	}
 	if resp.Status == responses.ResponseStatusIncomplete {
 		return "", errors.New(i18n.T("the model's answer is incomplete (") + string(resp.IncompleteDetails.Reason) + ")")
 	}

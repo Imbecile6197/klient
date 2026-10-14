@@ -70,6 +70,11 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Wed Oct 14 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.11.0-1
+- AI spending: token usage reported by each provider, stored per day,
+  model and task; priced from the providers' price lists; shown in the
+  main window with a breakdown dialog; own prices for unknown models
+
 * Thu Oct 08 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.10.4-1
 - IMAP auto-empty: skip empty folders, fetch arrival dates by UID
   (servers answering "Bad MSN")

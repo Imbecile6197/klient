@@ -22,6 +22,7 @@ const noLabel = "(none)"
 // SuggestLabel picks the best fitting label for a message from the user's
 // labels (by name). An empty Label means none fits.
 func (c *Client) SuggestLabel(ctx context.Context, labels []string, from, subject, body string) (LabelChoice, error) {
+	ctx = withTask(ctx, TaskLabel)
 	if !c.HasAssistant() {
 		return LabelChoice{}, ErrNoAPIKey
 	}
@@ -89,6 +90,7 @@ func truncate(s string, n int) string {
 // SearchPlan turns a question about the user's mail into search terms for
 // the mailbox search (which matches subject, sender and recipients).
 func (c *Client) SearchPlan(ctx context.Context, question, today string) ([]string, error) {
+	ctx = withTask(ctx, TaskSearch)
 	if !c.HasAssistant() {
 		return nil, ErrNoAPIKey
 	}
@@ -138,6 +140,7 @@ type MailDoc struct {
 // AnswerFromMail answers a question using only the given messages, citing
 // them as [1], [2], …
 func (c *Client) AnswerFromMail(ctx context.Context, question, today string, docs []MailDoc) (string, error) {
+	ctx = withTask(ctx, TaskAnswer)
 	var sb strings.Builder
 	for i, d := range docs {
 		fmt.Fprintf(&sb, "<email id=\"%d\">\nFrom: %s\nDate: %s\nSubject: %s\n\n%s\n</email>\n\n", i+1, d.From, d.Date, d.Subject, truncate(d.Body, c.limit(2500, 1000)))
@@ -151,6 +154,7 @@ Question: %s
 
 // Digest summarises the unread mail for a morning overview.
 func (c *Client) Digest(ctx context.Context, today string, docs []MailDoc) (string, error) {
+	ctx = withTask(ctx, TaskDigest)
 	var sb strings.Builder
 	for i, d := range docs {
 		fmt.Fprintf(&sb, "<email id=\"%d\">\nFrom: %s\nDate: %s\nSubject: %s\n\n%s\n</email>\n\n", i+1, d.From, d.Date, d.Subject, truncate(d.Body, c.limit(800, 350)))

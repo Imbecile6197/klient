@@ -49,6 +49,11 @@ func (c *claudeProvider) Complete(ctx context.Context, req Request) (string, err
 	if err != nil {
 		return "", err
 	}
+	if req.usage != nil {
+		u := resp.Usage
+		*req.usage = Usage{In: u.InputTokens + u.CacheCreationInputTokens, Cached: u.CacheReadInputTokens,
+			Out: u.OutputTokens, Model: string(resp.Model)}
+	}
 	switch resp.StopReason {
 	case anthropic.BetaStopReasonRefusal:
 		return "", errors.New(i18n.T("the model refused to process the request"))

@@ -4233,3 +4233,134 @@ msgstr "Ranní přehled se nepodařilo připravit"
 #: internal
 msgid "Morning overview: no unread mail"
 msgstr "Ranní přehled: žádná nepřečtená pošta"
+
+#: internal
+msgid "%d request"
+msgid_plural "%d requests"
+msgstr[0] "%d požadavek"
+msgstr[1] "%d požadavky"
+msgstr[2] "%d požadavků"
+
+#: internal
+msgid "< $0.01"
+msgstr "< 0,01 $"
+
+#: internal
+msgid "Spam filter"
+msgstr "Spamfiltr"
+
+#: internal
+msgid "Summaries"
+msgstr "Shrnutí"
+
+#: internal
+msgid "Reply suggestions"
+msgstr "Návrhy odpovědí"
+
+#: internal
+msgid "Writing with AI"
+msgstr "Psaní s AI"
+
+#: internal
+msgid "AI labels"
+msgstr "AI štítky"
+
+#: internal
+msgid "Questions about mail"
+msgstr "Dotazy na poštu"
+
+#: internal
+msgid "Morning overview"
+msgstr "Ranní přehled"
+
+#: internal
+msgid "Connection tests"
+msgstr "Testy připojení"
+
+#: internal
+msgid "AI assistant"
+msgstr "AI asistent"
+
+#: internal
+msgid "AI spending this month: %s (today %s)"
+msgstr "Útrata za AI tento měsíc: %s (dnes %s)"
+
+#: internal
+msgid "AI Spending"
+msgstr "Útrata za AI"
+
+#: internal
+msgid "This month"
+msgstr "Tento měsíc"
+
+#: internal
+msgid "Last month"
+msgstr "Minulý měsíc"
+
+#: internal
+msgid "Today"
+msgstr "Dnes"
+
+#: internal
+msgid "All time"
+msgstr "Celkem"
+
+#: internal
+msgid "Period"
+msgstr "Období"
+
+#: internal
+msgid "Total"
+msgstr "Celkem"
+
+#: internal
+msgid "%s tokens"
+msgstr "%s tokenů"
+
+#: internal
+msgid "An estimate from the providers' price lists (without VAT), counted from the tokens each provider reports. The exact amount is in your account with the provider. Klient counts from version 0.11.0."
+msgstr "Odhad podle ceníků poskytovatelů (bez DPH), spočítaný z tokenů, které každý poskytovatel hlásí. Přesnou částku najdete ve svém účtu u poskytovatele. Klient počítá od verze 0.11.0."
+
+#: internal
+msgid "By Model and Task"
+msgstr "Podle modelu a úlohy"
+
+#: internal
+msgid "No AI requests in this period."
+msgstr "V tomto období nebyly žádné požadavky na AI."
+
+#: internal
+msgid "%s in, %s out"
+msgstr "%s vstup, %s výstup"
+
+#: internal
+msgid "on this computer, free"
+msgstr "na tomto počítači, zdarma"
+
+#: internal
+msgid "Set Price…"
+msgstr "Zadat cenu…"
+
+#: internal
+msgid "Klient does not know the price of this model"
+msgstr "Klient cenu tohoto modelu nezná"
+
+#: internal
+msgid "Price of %s"
+msgstr "Cena modelu %s"
+
+#: internal
+msgid "USD per million tokens, as in the provider's price list."
+msgstr "USD za milion tokenů, jako v ceníku poskytovatele."
+
+#: internal
+msgid "Input"
+msgstr "Vstup"
+
+#: internal
+msgid "Cached input"
+msgstr "Vstup z mezipaměti"
+
+#: internal
+msgid "Output"
+msgstr "Výstup"

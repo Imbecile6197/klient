@@ -37,6 +37,7 @@ type mainView struct {
 	folders      []protonmail.Folder // system folders followed by user folders/labels
 	labels       []protonmail.UserLabel
 	filterStatus *gtk.Label
+	usageLabel   *gtk.Label
 
 	selecting   bool
 	selected    map[int]bool
@@ -213,8 +214,10 @@ func (m *mainView) buildSidebar() gtk.Widgetter {
 	m.filterStatus.SetMarginStart(12)
 	m.filterStatus.SetMarginEnd(12)
 	m.filterStatus.SetMarginTop(8)
-	m.filterStatus.SetMarginBottom(8)
 	tv.AddBottomBar(m.filterStatus)
+	m.usageLabel = m.newUsageLabel()
+	tv.AddBottomBar(m.usageLabel)
+	m.updateUsage()
 	return tv
 }
 
