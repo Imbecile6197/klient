@@ -339,6 +339,10 @@ func (u *Unified) Get(ctx context.Context, id string) (*protonmail.Message, erro
 }
 
 func (u *Unified) AttachmentData(ctx context.Context, att protonmail.Attachment) ([]byte, error) {
+	// IMAP attachments come with the message and have no ID to resolve.
+	if d := att.InlineData(); d != nil {
+		return d, nil
+	}
 	acc, real, err := u.resolve(att.ID)
 	if err != nil {
 		return nil, err

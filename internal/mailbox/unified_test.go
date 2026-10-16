@@ -117,3 +117,19 @@ func TestUnified(t *testing.T) {
 		t.Error("unexpected folders")
 	}
 }
+
+// IMAP attachments come with the message and have no ID: opening one in the
+// combined view must not fail ("the account … is no longer open").
+func TestUnifiedInlineAttachment(t *testing.T) {
+	ctx := context.Background()
+	a := &fakeAccount{id: "a", msgs: []protonmail.Summary{sum("1", 300)}}
+	u := NewUnified(func() []Account { return []Account{a} })
+	list, _ := u.List(ctx, protonmail.InboxID, 0, 50)
+	msg := &protonmail.Message{Meta: list[0],
+		Attachments: []protonmail.Attachment{protonmail.InlineAttachment("cenik.pdf", "application/pdf", "", []byte("PDF"))}}
+	wrapped := u.wrapMessage(a, msg)
+	data, err := u.AttachmentData(ctx, wrapped.Attachments[0])
+	if err != nil || string(data) != "PDF" {
+		t.Fatalf("AttachmentData = %q, %v", data, err)
+	}
+}
