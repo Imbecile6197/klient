@@ -48,6 +48,7 @@ func (a *App) compareModels(parent gtk.Widgetter) {
 	var checks []*gtk.CheckButton
 	for _, m := range localModels {
 		row := adw.NewActionRow()
+		row.SetUseMarkup(false) // names and addresses may contain & or <
 		row.SetTitle(m.label)
 		row.SetSubtitle(m.name + " · " + m.size)
 		c := gtk.NewCheckButton()
@@ -272,6 +273,7 @@ func (a *App) runComparison(ctx context.Context, acc mailbox.Account, models []s
 			for i, v := range verdicts {
 				s := samples[i]
 				row := adw.NewActionRow()
+				row.SetUseMarkup(false) // names and addresses may contain & or <
 				row.SetTitle(orDefault(s.msg.Meta.Subject, i18n.T("(no subject)")))
 				row.SetTitleLines(1)
 				where := i18n.T("Inbox")
@@ -301,6 +303,7 @@ func (a *App) runComparison(ctx context.Context, acc mailbox.Account, models []s
 				g.Add(row)
 			}
 			sum := adw.NewExpanderRow()
+			sum.SetUseMarkup(false) // names and addresses may contain & or <
 			sum.SetTitle(fmt.Sprintf(i18n.T("Summary of “%s”"), orDefault(first.Meta.Subject, i18n.T("(no subject)"))))
 			text := summary
 			if serr != nil {

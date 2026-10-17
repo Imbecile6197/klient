@@ -359,7 +359,7 @@ func (a *App) undoToast(delay int, what string, done func(send bool)) {
 	left := delay
 	finished := false
 	text := func() string { return fmt.Sprintf("%s za %d s", what, left) }
-	t := adw.NewToast(text())
+	t := newToast(text())
 	t.SetTimeout(0) // dismissed by us
 	t.SetButtonLabel(i18n.T("Undo"))
 	t.ConnectButtonClicked(func() {

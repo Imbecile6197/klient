@@ -148,6 +148,7 @@ func (a *App) localAIGroup(d *adw.PreferencesDialog, refreshRoles func()) *adw.P
 	g.SetDescription(i18n.T("The model runs right on this computer; the content of your messages goes nowhere. Without a graphics card it is slower: judging a message takes tens of seconds."))
 
 	status := adw.NewActionRow()
+	status.SetUseMarkup(false) // names and addresses may contain & or <
 	status.SetTitle("Ollama")
 	status.SetSubtitleLines(3)
 	action := gtk.NewButton()
@@ -161,6 +162,7 @@ func (a *App) localAIGroup(d *adw.PreferencesDialog, refreshRoles func()) *adw.P
 	g.Add(status)
 
 	localOnly := adw.NewSwitchRow()
+	localOnly.SetUseMarkup(false) // names and addresses may contain & or <
 	localOnly.SetTitle(i18n.T("Local only"))
 	localOnly.SetSubtitle(i18n.T("Nothing is sent to cloud AI (Gemini, ChatGPT, Claude, Mistral), even if keys are saved"))
 	localOnly.SetActive(a.cfg.LocalOnly)
@@ -185,6 +187,7 @@ func (a *App) localAIGroup(d *adw.PreferencesDialog, refreshRoles func()) *adw.P
 	g.Add(localOnly)
 
 	auto := adw.NewSwitchRow()
+	auto.SetUseMarkup(false) // names and addresses may contain & or <
 	auto.SetTitle(i18n.T("Update automatically"))
 	auto.SetSubtitle(i18n.T("Checks for a new version of Ollama and the models once a day (not on a metered connection)"))
 	auto.SetActive(a.cfg.OllamaAutoUpdate)
@@ -195,6 +198,7 @@ func (a *App) localAIGroup(d *adw.PreferencesDialog, refreshRoles func()) *adw.P
 	g.Add(auto)
 
 	pre := adw.NewSwitchRow()
+	pre.SetUseMarkup(false) // names and addresses may contain & or <
 	pre.SetTitle(i18n.T("Prepare summaries in advance"))
 	pre.SetSubtitle(i18n.T("New mail is summarized in the background, only on mains power and when the model is idle; the summary is ready as soon as you open the message"))
 	pre.SetActive(a.cfg.PrecomputeSummaries)
@@ -205,6 +209,7 @@ func (a *App) localAIGroup(d *adw.PreferencesDialog, refreshRoles func()) *adw.P
 	g.Add(pre)
 
 	models := adw.NewExpanderRow()
+	models.SetUseMarkup(false) // names and addresses may contain & or <
 	models.SetTitle(i18n.T("Downloaded models"))
 	g.Add(models)
 	var modelRows []gtk.Widgetter
@@ -266,6 +271,7 @@ func (a *App) localAIGroup(d *adw.PreferencesDialog, refreshRoles func()) *adw.P
 				for _, m := range list {
 					m := m
 					row := adw.NewActionRow()
+					row.SetUseMarkup(false) // names and addresses may contain & or <
 					row.SetTitle(m.Name)
 					sub := humanSize(m.Size)
 					if (ai.IsLocal(a.cfg.AssistantProvider) && a.cfg.AssistantModel == m.Name) ||
@@ -280,7 +286,7 @@ func (a *App) localAIGroup(d *adw.PreferencesDialog, refreshRoles func()) *adw.P
 						a.useLocalModel(m.Name)
 						refreshRoles()
 						refresh()
-						d.AddToast(adw.NewToast(fmt.Sprintf(i18n.T("The assistant and the spam filter now use %s"), m.Name)))
+						d.AddToast(newToast(fmt.Sprintf(i18n.T("The assistant and the spam filter now use %s"), m.Name)))
 					})
 					del := gtk.NewButtonFromIconName("user-trash-symbolic")
 					del.SetVAlign(gtk.AlignCenter)
@@ -291,7 +297,7 @@ func (a *App) localAIGroup(d *adw.PreferencesDialog, refreshRoles func()) *adw.P
 							err := a.localClient().Delete(a.ctx, m.Name)
 							ui(func() {
 								if err != nil {
-									d.AddToast(adw.NewToast(err.Error()))
+									d.AddToast(newToast(err.Error()))
 								}
 								refresh()
 							})

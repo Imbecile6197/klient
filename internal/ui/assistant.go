@@ -305,6 +305,7 @@ func (a *App) askMail() {
 				for i, s := range used {
 					s := s
 					r := adw.NewActionRow()
+					r.SetUseMarkup(false) // names and addresses may contain & or <
 					r.SetTitle(fmt.Sprintf("[%d] %s", i+1, orDefault(s.Subject, i18n.T("(no subject)"))))
 					from := ""
 					if s.Sender != nil {
@@ -568,6 +569,7 @@ func (a *App) showShortcuts() {
 		grp.SetTitle(g.title)
 		for _, k := range g.keys {
 			r := adw.NewActionRow()
+			r.SetUseMarkup(false) // names and addresses may contain & or <
 			r.SetTitle(k[1])
 			sl := gtk.NewShortcutLabel(k[0])
 			sl.SetVAlign(gtk.AlignCenter)
@@ -584,6 +586,7 @@ func (a *App) showShortcuts() {
 		{i18n.T("Drag files into the message window"), i18n.T("Attach the files")},
 	} {
 		r := adw.NewActionRow()
+		r.SetUseMarkup(false) // names and addresses may contain & or <
 		r.SetTitle(t[1])
 		l := gtk.NewLabel(t[0])
 		l.AddCSSClass("dim-label")

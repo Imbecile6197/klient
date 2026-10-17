@@ -237,6 +237,7 @@ func (a *App) composerFor(acc mailbox.Account, d *protonmail.Draft, orig *proton
 		fromNames = append(fromNames, ad.Email)
 	}
 	from := adw.NewComboRow()
+	from.SetUseMarkup(false) // names and addresses may contain & or <
 	from.SetTitle(i18n.T("From"))
 	from.SetModel(gtk.NewStringList(fromNames))
 	for i, ad := range addrs {
@@ -263,10 +264,12 @@ func (a *App) composerFor(acc mailbox.Account, d *protonmail.Draft, orig *proton
 
 	optGroup := adw.NewPreferencesGroup()
 	sign := adw.NewSwitchRow()
+	sign.SetUseMarkup(false) // names and addresses may contain & or <
 	sign.SetTitle(i18n.T("Sign unencrypted messages with PGP too"))
 	sign.SetSubtitle(i18n.T("Recipients with PGP can verify that the message is from you and has not been changed"))
 	sign.SetActive(d.SignExternal)
 	security := adw.NewActionRow()
+	security.SetUseMarkup(false) // names and addresses may contain & or <
 	security.SetTitle(i18n.T("Security"))
 	security.SetSubtitle(i18n.T("Enter the recipients"))
 	security.SetSubtitleLines(6)
@@ -275,10 +278,12 @@ func (a *App) composerFor(acc mailbox.Account, d *protonmail.Draft, orig *proton
 	check.AddCSSClass("flat")
 	security.AddSuffix(check)
 	attachKey := adw.NewSwitchRow()
+	attachKey.SetUseMarkup(false) // names and addresses may contain & or <
 	attachKey.SetTitle(i18n.T("Attach my public key"))
 	attachKey.SetSubtitle(i18n.T("A recipient with PGP can then send you encrypted replies"))
 	attachKey.SetActive(a.cfg.AttachPublicKey && d.ID == "")
 	onlyEnc := adw.NewSwitchRow()
+	onlyEnc.SetUseMarkup(false) // names and addresses may contain & or <
 	onlyEnc.SetTitle(i18n.T("Send only encrypted"))
 	onlyEnc.SetSubtitle(i18n.T("Do not send while some recipient has no key"))
 	onlyEnc.SetActive(a.cfg.RequireEncryption)
@@ -309,6 +314,7 @@ func (a *App) composerFor(acc mailbox.Account, d *protonmail.Draft, orig *proton
 			att := att
 			total += att.Size
 			row := adw.NewActionRow()
+			row.SetUseMarkup(false) // names and addresses may contain & or <
 			row.SetTitle(att.Name)
 			row.SetSubtitle(humanSize(att.Size))
 			row.AddPrefix(gtk.NewImageFromIconName("mail-attachment-symbolic"))
@@ -421,7 +427,7 @@ func (a *App) composerFor(acc mailbox.Account, d *protonmail.Draft, orig *proton
 	refreshAtts()
 
 	getBody := editor.Text
-	localToast := func(s string) { toasts.AddToast(adw.NewToast(s)) }
+	localToast := func(s string) { toasts.AddToast(newToast(s)) }
 
 	// Forwarded attachments are downloaded and decrypted in the background.
 	if orig != nil && action == protonmail.ActionForward && len(orig.Attachments) > 0 {
@@ -935,6 +941,7 @@ func (a *App) addressCompletion(rows []*adw.EntryRow) gtk.Widgetter {
 			shown = matchContacts(contacts, token, 6)
 			for _, c := range shown {
 				ar := adw.NewActionRow()
+				ar.SetUseMarkup(false) // names and addresses may contain & or <
 				ar.SetTitle(orDefault(c.Name, c.Email))
 				sub := c.Email
 				if c.Recent {

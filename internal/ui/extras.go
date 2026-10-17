@@ -342,6 +342,7 @@ func (a *App) editRule(index int, r rules.Rule, saved func()) {
 	name.SetText(r.Name)
 	fields := []rules.Field{rules.FieldFrom, rules.FieldTo, rules.FieldSubject}
 	fieldRow := adw.NewComboRow()
+	fieldRow.SetUseMarkup(false) // names and addresses may contain & or <
 	fieldRow.SetTitle(i18n.T("When"))
 	var fieldNames []string
 	for i, f := range fields {
@@ -356,6 +357,7 @@ func (a *App) editRule(index int, r rules.Rule, saved func()) {
 	contains.SetText(r.Contains)
 	actions := []rules.Action{rules.ActionMove, rules.ActionLabel, rules.ActionRead, rules.ActionStar}
 	actionRow := adw.NewComboRow()
+	actionRow.SetUseMarkup(false) // names and addresses may contain & or <
 	actionRow.SetTitle(i18n.T("Then"))
 	var actionNames []string
 	for _, ac := range actions {
@@ -363,6 +365,7 @@ func (a *App) editRule(index int, r rules.Rule, saved func()) {
 	}
 	actionRow.SetModel(gtk.NewStringList(actionNames))
 	targetRow := adw.NewComboRow()
+	targetRow.SetUseMarkup(false) // names and addresses may contain & or <
 	targetRow.SetTitle(i18n.T("Target"))
 	var current []target
 	setTargets := func() {

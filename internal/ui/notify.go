@@ -114,6 +114,7 @@ func (a *App) notifyGroup(d *adw.PreferencesDialog) *adw.PreferencesGroup {
 	for _, b := range notifyButtons {
 		b := b
 		row := adw.NewSwitchRow()
+		row.SetUseMarkup(false) // names and addresses may contain & or <
 		row.SetTitle(b.label())
 		row.SetActive(slices.Contains(a.notifyButtonIDs(), b.id))
 		row.NotifyProperty("active", func() {
@@ -122,7 +123,7 @@ func (a *App) notifyGroup(d *adw.PreferencesDialog) *adw.PreferencesGroup {
 			switch {
 			case row.Active() && !has:
 				if len(chosen) >= maxNotifyButtons {
-					d.AddToast(adw.NewToast(fmt.Sprintf(i18n.T("GNOME shows at most %d buttons – turn another one off first"), maxNotifyButtons)))
+					d.AddToast(newToast(fmt.Sprintf(i18n.T("GNOME shows at most %d buttons – turn another one off first"), maxNotifyButtons)))
 					row.SetActive(false)
 					return
 				}

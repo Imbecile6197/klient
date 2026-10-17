@@ -77,6 +77,7 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		g.SetTitle(title)
 		g.SetDescription(desc)
 		combo := adw.NewComboRow()
+		combo.SetUseMarkup(false) // names and addresses may contain & or <
 		combo.SetTitle(i18n.T("Provider"))
 		combo.SetModel(gtk.NewStringList(names))
 		combo.SetSelected(indexOf(*provider))
@@ -94,7 +95,7 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 				return
 			}
 			if a.cfg.LocalOnly && !ai.IsLocal(pr.ID) {
-				d.AddToast(adw.NewToast(i18n.T("“Local only” mode is on – cloud AI cannot be selected")))
+				d.AddToast(newToast(i18n.T("“Local only” mode is on – cloud AI cannot be selected")))
 				combo.SetSelected(indexOf(*provider))
 				return
 			}
@@ -120,7 +121,7 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 			*model = strings.TrimSpace(modelRow.Text())
 			a.saveConfig()
 			a.initAI()
-			d.AddToast(adw.NewToast(i18n.T("Model saved")))
+			d.AddToast(newToast(i18n.T("Model saved")))
 		})
 		pick := gtk.NewButtonFromIconName("view-list-bullet-symbolic")
 		pick.SetTooltipText(i18n.T("Choose from the models available for your account"))
@@ -145,7 +146,7 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 					ui(func() {
 						pick.SetSensitive(true)
 						if err != nil || len(names) == 0 {
-							d.AddToast(adw.NewToast(i18n.T("No local model is downloaded – download one in the Local AI section")))
+							d.AddToast(newToast(i18n.T("No local model is downloaded – download one in the Local AI section")))
 							return
 						}
 						a.pickModel(d, names, *model, func(m string) {
@@ -153,7 +154,7 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 							modelRow.SetText(m)
 							a.saveConfig()
 							a.initAI()
-							d.AddToast(adw.NewToast(fmt.Sprintf(i18n.T("Model %s saved"), m)))
+							d.AddToast(newToast(fmt.Sprintf(i18n.T("Model %s saved"), m)))
 						})
 					})
 				}()
@@ -161,7 +162,7 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 			}
 			key, _ := secrets.LoadAPIKey(*provider)
 			if key == "" {
-				d.AddToast(adw.NewToast(i18n.T("Save this provider's API key first")))
+				d.AddToast(newToast(i18n.T("Save this provider's API key first")))
 				return
 			}
 			pick.SetSensitive(false)
@@ -173,7 +174,7 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 				ui(func() {
 					pick.SetSensitive(true)
 					if err != nil {
-						d.AddToast(adw.NewToast(i18n.T("Model list: ") + ai.Explain(prov, err).Text))
+						d.AddToast(newToast(i18n.T("Model list: ") + ai.Explain(prov, err).Text))
 						return
 					}
 					a.pickModel(d, models, *model, func(m string) {
@@ -181,7 +182,7 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 						modelRow.SetText(m)
 						a.saveConfig()
 						a.initAI()
-						d.AddToast(adw.NewToast(fmt.Sprintf(i18n.T("Model %s saved"), m)))
+						d.AddToast(newToast(fmt.Sprintf(i18n.T("Model %s saved"), m)))
 					})
 				})
 			}()
@@ -218,7 +219,7 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		row.ConnectApply(func() {
 			v := strings.TrimSpace(row.Text())
 			if err := secrets.SaveAPIKey(pr.ID, v); err != nil {
-				d.AddToast(adw.NewToast(i18n.T("Saving failed: ") + err.Error()))
+				d.AddToast(newToast(i18n.T("Saving failed: ") + err.Error()))
 				return
 			}
 			row.SetText("")
@@ -228,9 +229,9 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 				a.mv.updateFilterStatus()
 			}
 			if v == "" {
-				d.AddToast(adw.NewToast(fmt.Sprintf(i18n.T("%s key removed"), pr.Name)))
+				d.AddToast(newToast(fmt.Sprintf(i18n.T("%s key removed"), pr.Name)))
 			} else {
-				d.AddToast(adw.NewToast(fmt.Sprintf(i18n.T("%s key saved"), pr.Name)))
+				d.AddToast(newToast(fmt.Sprintf(i18n.T("%s key saved"), pr.Name)))
 			}
 		})
 		link := gtk.NewButtonFromIconName("web-browser-symbolic")
@@ -247,7 +248,7 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		test.ConnectClicked(func() {
 			key, _ := secrets.LoadAPIKey(pr.ID)
 			if key == "" {
-				d.AddToast(adw.NewToast(fmt.Sprintf(i18n.T("No key is saved for %s"), pr.Name)))
+				d.AddToast(newToast(fmt.Sprintf(i18n.T("No key is saved for %s"), pr.Name)))
 				return
 			}
 			// Test with the model configured for a role using this provider,
@@ -295,7 +296,7 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 						dlg.Present(d)
 						return
 					}
-					d.AddToast(adw.NewToast(fmt.Sprintf(i18n.T("%s works (model %s)"), pr.Name, model)))
+					d.AddToast(newToast(fmt.Sprintf(i18n.T("%s works (model %s)"), pr.Name, model)))
 				})
 			}()
 		})
@@ -309,6 +310,7 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	fg.SetTitle(i18n.T("Automatic Features"))
 	fg.SetDescription(i18n.T("They use the assistant model. With local AI the content of messages stays on this computer; with cloud AI it is sent to the provider."))
 	autoLabel := adw.NewSwitchRow()
+	autoLabel.SetUseMarkup(false) // names and addresses may contain & or <
 	autoLabel.SetTitle(i18n.T("Sort new mail into labels"))
 	autoLabel.SetSubtitle(i18n.T("The AI adds the best matching of your labels to a new message (only when it is confident and no rule has applied)"))
 	autoLabel.SetActive(a.cfg.AutoLabel)
@@ -318,6 +320,7 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	})
 	fg.Add(autoLabel)
 	digest := adw.NewExpanderRow()
+	digest.SetUseMarkup(false) // names and addresses may contain & or <
 	digest.SetTitle(i18n.T("Morning mail overview"))
 	digest.SetSubtitle(i18n.T("A daily notification summarizing the unread mail of all accounts"))
 	digest.SetShowEnableSwitch(true)
@@ -347,6 +350,7 @@ func (a *App) pickModel(parent gtk.Widgetter, models []string, current string, d
 	list.AddCSSClass("boxed-list")
 	for _, m := range models {
 		row := adw.NewActionRow()
+		row.SetUseMarkup(false) // names and addresses may contain & or <
 		row.SetTitle(m)
 		row.SetActivatable(true)
 		if m == current {
@@ -382,6 +386,7 @@ func (a *App) generalPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	ig := adw.NewPreferencesGroup()
 	ig.SetTitle(i18n.T("Desktop Integration"))
 	defRow := adw.NewActionRow()
+	defRow.SetUseMarkup(false) // names and addresses may contain & or <
 	defRow.SetTitle(i18n.T("Default email application"))
 	setDef := func() {
 		if isDefaultMailApp() {
@@ -395,11 +400,11 @@ func (a *App) generalPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	defBtn.SetVAlign(gtk.AlignCenter)
 	defBtn.ConnectClicked(func() {
 		if err := setDefaultMailApp(); err != nil {
-			d.AddToast(adw.NewToast(err.Error()))
+			d.AddToast(newToast(err.Error()))
 			return
 		}
 		setDef()
-		d.AddToast(adw.NewToast(i18n.T("Klient is the default email application")))
+		d.AddToast(newToast(i18n.T("Klient is the default email application")))
 	})
 	defRow.AddSuffix(defBtn)
 	ig.Add(defRow)
@@ -409,6 +414,7 @@ func (a *App) generalPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	bg.SetTitle(i18n.T("Background"))
 	bg.SetDescription(i18n.T("In GNOME, the icon in the top bar requires the AppIndicator extension (the gnome-shell-extension-appindicator package)."))
 	background := adw.NewSwitchRow()
+	background.SetUseMarkup(false) // names and addresses may contain & or <
 	background.SetTitle(i18n.T("Run in the background after closing the window"))
 	background.SetSubtitle(i18n.T("Klient keeps watching your mail, filtering spam and showing notifications; the icon in the top bar opens the window again"))
 	background.SetActive(a.cfg.RunInBackground)
@@ -418,17 +424,18 @@ func (a *App) generalPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		if a.cfg.RunInBackground {
 			a.startTray()
 		} else if a.tray.started {
-			d.AddToast(adw.NewToast(i18n.T("The icon disappears from the top bar after Klient restarts")))
+			d.AddToast(newToast(i18n.T("The icon disappears from the top bar after Klient restarts")))
 		}
 	})
 	bg.Add(background)
 	autostart := adw.NewSwitchRow()
+	autostart.SetUseMarkup(false) // names and addresses may contain & or <
 	autostart.SetTitle(i18n.T("Start after login"))
 	autostart.SetSubtitle(i18n.T("Klient starts hidden in the background, with just the icon in the top bar"))
 	autostart.SetActive(autostartEnabled())
 	autostart.NotifyProperty("active", func() {
 		if err := setAutostart(autostart.Active()); err != nil {
-			d.AddToast(adw.NewToast(i18n.T("Setting up automatic start failed: ") + err.Error()))
+			d.AddToast(newToast(i18n.T("Setting up automatic start failed: ") + err.Error()))
 			return
 		}
 		if autostart.Active() && !background.Active() {
@@ -440,6 +447,7 @@ func (a *App) generalPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	tg := adw.NewPreferencesGroup()
 	tg.SetTitle(i18n.T("Trash and Spam"))
 	autoEmpty := adw.NewComboRow()
+	autoEmpty.SetUseMarkup(false) // names and addresses may contain & or <
 	autoEmpty.SetTitle(i18n.T("Delete old messages automatically"))
 	autoEmpty.SetSubtitle(i18n.T("Messages in Trash and Spam older than this are deleted permanently, in every account"))
 	emptyDays := []int{0, 7, 14, 30, 60, 90}
@@ -476,6 +484,7 @@ func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	lg := adw.NewPreferencesGroup()
 	lg.SetTitle(i18n.T("Message List"))
 	threads := adw.NewSwitchRow()
+	threads.SetUseMarkup(false) // names and addresses may contain & or <
 	threads.SetTitle(i18n.T("Group messages into threads"))
 	threads.SetSubtitle(i18n.T("Replies are shown together as a conversation, just like on the Proton website"))
 	threads.SetActive(a.cfg.Threads)
@@ -502,6 +511,7 @@ func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	})
 	sg.Add(delay)
 	attachKey := adw.NewSwitchRow()
+	attachKey.SetUseMarkup(false) // names and addresses may contain & or <
 	attachKey.SetTitle(i18n.T("Always attach my public key"))
 	attachKey.SetSubtitle(i18n.T("The default state of the switch in the message window; recipients with PGP can then send you encrypted mail"))
 	attachKey.SetActive(a.cfg.AttachPublicKey)
@@ -511,6 +521,7 @@ func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	})
 	sg.Add(attachKey)
 	spellRow := adw.NewSwitchRow()
+	spellRow.SetUseMarkup(false) // names and addresses may contain & or <
 	spellRow.SetTitle(i18n.T("Check spelling"))
 	if langs := spell.Available(); len(langs) > 0 {
 		spellRow.SetSubtitle(i18n.T("Misspelled words are underlined; right-click one for corrections. Dictionaries: ") + strings.Join(langNames(langs), ", "))
@@ -540,6 +551,7 @@ func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	})
 	og.Add(count)
 	stats := adw.NewActionRow()
+	stats.SetUseMarkup(false) // names and addresses may contain & or <
 	stats.SetTitle(i18n.T("Stored"))
 	setStats := func() {
 		if a.acc == nil || a.acc.Cache() == nil {
@@ -558,7 +570,7 @@ func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 			_ = a.acc.Cache().Clear()
 			a.saveOutbox(a.acc) // the Outbox lives in the cache too: keep it
 			setStats()
-			d.AddToast(adw.NewToast(i18n.T("Offline cache cleared")))
+			d.AddToast(newToast(i18n.T("Offline cache cleared")))
 		}
 	})
 	stats.AddSuffix(clearBtn)
@@ -578,6 +590,7 @@ func (a *App) spamPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	g.SetTitle(i18n.T("AI Decisions"))
 	g.SetDescription(i18n.T("The AI judges every new message in the inbox. As evidence it gets the SPF/DKIM/DMARC results, blocklist hits and your lists of allowed and blocked senders."))
 	enabled := adw.NewSwitchRow()
+	enabled.SetUseMarkup(false) // names and addresses may contain & or <
 	enabled.SetTitle(i18n.T("Filter incoming mail with AI"))
 	enabled.SetActive(a.cfg.SpamFilterEnabled)
 	enabled.NotifyProperty("active", func() {
@@ -600,6 +613,7 @@ func (a *App) spamPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	})
 	g.Add(threshold)
 	hold := adw.NewSwitchRow()
+	hold.SetUseMarkup(false) // names and addresses may contain & or <
 	hold.SetTitle(i18n.T("Show new mail only after it is checked"))
 	hold.SetSubtitle(i18n.T("A new message appears in the inbox once the spam filter has judged it, so spam never flashes up. Mail is delayed by the time the check takes (about a minute with local AI, at most 6 minutes)."))
 	hold.SetActive(a.cfg.HoldUntilChecked)
@@ -614,6 +628,7 @@ func (a *App) spamPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	bg.SetTitle(i18n.T("Blocklists"))
 	bg.SetDescription(fmt.Sprintf(i18n.T("They are downloaded automatically every %s."), strings.TrimSuffix(a.cfg.UpdateInterval.String(), "0m0s")))
 	status := adw.NewActionRow()
+	status.SetUseMarkup(false) // names and addresses may contain & or <
 	status.SetTitle(i18n.T("Status"))
 	setStatus := func() {
 		nets, domains, urls := a.lists.Stats()
@@ -639,9 +654,9 @@ func (a *App) spamPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 					a.mv.updateFilterStatus()
 				}
 				if err != nil {
-					d.AddToast(adw.NewToast(err.Error()))
+					d.AddToast(newToast(err.Error()))
 				} else {
-					d.AddToast(adw.NewToast(i18n.T("Blocklists updated")))
+					d.AddToast(newToast(i18n.T("Blocklists updated")))
 				}
 			})
 		}()
@@ -653,6 +668,7 @@ func (a *App) spamPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		i := i
 		f := a.cfg.Feeds[i]
 		row := adw.NewSwitchRow()
+		row.SetUseMarkup(false) // names and addresses may contain & or <
 		row.SetTitle(f.Name)
 		row.SetSubtitle(f.URL)
 		row.SetActive(f.Enabled)
@@ -681,6 +697,7 @@ func (a *App) pgpPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	for _, addr := range a.acc.SendAddresses() {
 		addr := addr
 		row := adw.NewActionRow()
+		row.SetUseMarkup(false) // names and addresses may contain & or <
 		row.SetTitle(addr.Email)
 		copyBtn := gtk.NewButtonFromIconName("edit-copy-symbolic")
 		copyBtn.SetTooltipText(i18n.T("Copy to Clipboard"))
@@ -689,11 +706,11 @@ func (a *App) pgpPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		copyBtn.ConnectClicked(func() {
 			key, err := a.acc.OwnPublicKey(addr.ID)
 			if err != nil {
-				d.AddToast(adw.NewToast(err.Error()))
+				d.AddToast(newToast(err.Error()))
 				return
 			}
 			a.win.Clipboard().SetText(key)
-			d.AddToast(adw.NewToast(i18n.T("Public key copied")))
+			d.AddToast(newToast(i18n.T("Public key copied")))
 		})
 		saveBtn := gtk.NewButtonFromIconName("document-save-symbolic")
 		saveBtn.SetTooltipText(i18n.T("Save to File"))
@@ -702,7 +719,7 @@ func (a *App) pgpPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		saveBtn.ConnectClicked(func() {
 			key, err := a.acc.OwnPublicKey(addr.ID)
 			if err != nil {
-				d.AddToast(adw.NewToast(err.Error()))
+				d.AddToast(newToast(err.Error()))
 				return
 			}
 			dlg := gtk.NewFileDialog()
@@ -713,7 +730,7 @@ func (a *App) pgpPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 					return
 				}
 				if err := os.WriteFile(file.Path(), []byte(key), 0o644); err != nil {
-					d.AddToast(adw.NewToast(err.Error()))
+					d.AddToast(newToast(err.Error()))
 				}
 			})
 		})
@@ -736,6 +753,7 @@ func (a *App) pgpPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		for _, email := range pgp.LocalKeys() {
 			email := email
 			row := adw.NewActionRow()
+			row.SetUseMarkup(false) // names and addresses may contain & or <
 			row.SetTitle(email)
 			row.SetSubtitle(contactKeySubtitle(email))
 			if pgp.PendingKey(email) != nil {
@@ -763,15 +781,15 @@ func (a *App) pgpPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 			}
 			b, err := os.ReadFile(file.Path())
 			if err != nil {
-				d.AddToast(adw.NewToast(err.Error()))
+				d.AddToast(newToast(err.Error()))
 				return
 			}
 			emails, err := pgp.ImportKey(string(b))
 			if err != nil {
-				d.AddToast(adw.NewToast(err.Error()))
+				d.AddToast(newToast(err.Error()))
 				return
 			}
-			d.AddToast(adw.NewToast(i18n.T("Imported for: ") + strings.Join(emails, ", ")))
+			d.AddToast(newToast(i18n.T("Imported for: ") + strings.Join(emails, ", ")))
 			refresh()
 		})
 	})
@@ -782,6 +800,7 @@ func (a *App) pgpPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	sg := adw.NewPreferencesGroup()
 	sg.SetTitle(i18n.T("Sending"))
 	req := adw.NewSwitchRow()
+	req.SetUseMarkup(false) // names and addresses may contain & or <
 	req.SetTitle(i18n.T("Send only encrypted"))
 	req.SetSubtitle(i18n.T("A message is not sent while some recipient has no key; it can be turned off for one message in the compose window"))
 	req.SetActive(a.cfg.RequireEncryption)
@@ -797,6 +816,7 @@ func (a *App) pgpPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		lg.SetTitle(i18n.T("Finding Recipients' Keys"))
 		lg.SetDescription(i18n.T("Klient always asks the recipient's domain (Web Key Directory) and learns keys from the Autocrypt header of received mail."))
 		vks := adw.NewSwitchRow()
+		vks.SetUseMarkup(false) // names and addresses may contain & or <
 		vks.SetTitle(i18n.T("Also search keys.openpgp.org"))
 		vks.SetSubtitle(i18n.T("Finds more keys, but the server learns the addresses you write to"))
 		vks.SetActive(a.cfg.KeyServerLookup)
@@ -807,6 +827,7 @@ func (a *App) pgpPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		})
 		lg.Add(vks)
 		ps := adw.NewSwitchRow()
+		ps.SetUseMarkup(false) // names and addresses may contain & or <
 		ps.SetTitle(i18n.T("Encrypt the subject too"))
 		ps.SetSubtitle(i18n.T("Recipients' mail apps show the real subject from inside the encryption (protected headers, e.g. Thunderbird); outside it reads “...”. Older apps show only “...”."))
 		ps.SetActive(a.cfg.ProtectSubject)
@@ -842,6 +863,7 @@ func (a *App) rulesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		for i, r := range a.cfg.Rules {
 			i, r := i, r
 			row := adw.NewActionRow()
+			row.SetUseMarkup(false) // names and addresses may contain & or <
 			row.SetTitle(orDefault(r.Name, i18n.T("Rule")))
 			sub := fmt.Sprintf(i18n.T("%s contains “%s” → %s"), rules.FieldName(r.Field), r.Contains, rules.ActionName(r.Action))
 			row.SetSubtitle(sub)
@@ -872,6 +894,7 @@ func (a *App) rulesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		}
 		if len(a.cfg.Rules) == 0 {
 			row := adw.NewActionRow()
+			row.SetUseMarkup(false) // names and addresses may contain & or <
 			row.SetTitle(i18n.T("No rules yet"))
 			g.Add(row)
 			rows = append(rows, row)
@@ -890,6 +913,7 @@ func (a *App) languageGroup(d *adw.PreferencesDialog) *adw.PreferencesGroup {
 	g := adw.NewPreferencesGroup()
 	g.SetTitle(i18n.T("Language"))
 	row := adw.NewComboRow()
+	row.SetUseMarkup(false) // names and addresses may contain & or <
 	row.SetTitle(i18n.T("Interface language"))
 	row.SetSubtitle(i18n.T("AI answers, summaries and suggested replies follow it too"))
 	codes := []string{""}
@@ -911,7 +935,7 @@ func (a *App) languageGroup(d *adw.PreferencesDialog) *adw.PreferencesGroup {
 		}
 		a.cfg.Language = c
 		a.saveConfig()
-		t := adw.NewToast(i18n.T("The language changes after Klient restarts"))
+		t := newToast(i18n.T("The language changes after Klient restarts"))
 		t.SetButtonLabel(i18n.T("Restart"))
 		t.ConnectButtonClicked(a.restartApp)
 		d.AddToast(t)

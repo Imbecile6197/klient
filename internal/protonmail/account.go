@@ -164,6 +164,9 @@ type Account struct {
 	userAt time.Time // when user was fetched
 	addrs  []proton.Address
 	userKR *crypto.KeyRing
+	// Copies of a message hidden in conversations (same Message-ID, e.g.
+	// sent to two of the user's addresses): shown ID -> hidden IDs.
+	copies map[string][]string
 	// Encryption settings from the Proton contacts, by address.
 	contactCache map[string]cachedContact
 	addrKRs      map[string]*crypto.KeyRing // address ID -> unlocked keyring

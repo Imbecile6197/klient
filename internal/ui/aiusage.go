@@ -132,6 +132,7 @@ func (a *App) showUsage() {
 		page := adw.NewPreferencesPage()
 		top := adw.NewPreferencesGroup()
 		period := adw.NewComboRow()
+		period.SetUseMarkup(false) // names and addresses may contain & or <
 		period.SetTitle(i18n.T("Period"))
 		var names []string
 		for _, p := range periods {
@@ -146,6 +147,7 @@ func (a *App) showUsage() {
 		p := periods[sel]
 		lines := a.usage.Lines(p.from(now), p.to(now), a.cfg.AIPrices)
 		total := adw.NewActionRow()
+		total.SetUseMarkup(false) // names and addresses may contain & or <
 		total.SetTitle(i18n.T("Total"))
 		var req, tokens int64
 		for _, l := range lines {

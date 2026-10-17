@@ -149,6 +149,7 @@ func (a *App) updateGroup() *adw.PreferencesGroup {
 	g.SetTitle(i18n.T("Updates"))
 	g.SetDescription(fmt.Sprintf(i18n.T("New versions are downloaded from GitHub (%s). The package is verified by its checksum before installation, and installing asks for the administrator password."), update.Repo))
 	auto := adw.NewSwitchRow()
+	auto.SetUseMarkup(false) // names and addresses may contain & or <
 	auto.SetTitle(i18n.T("Check for updates automatically"))
 	auto.SetSubtitle(i18n.T("Once a day, not on a metered connection; a new version is downloaded right away"))
 	auto.SetActive(a.cfg.AutoUpdate)
@@ -159,6 +160,7 @@ func (a *App) updateGroup() *adw.PreferencesGroup {
 	g.Add(auto)
 
 	check := adw.NewActionRow()
+	check.SetUseMarkup(false) // names and addresses may contain & or <
 	check.SetTitle(fmt.Sprintf(i18n.T("Installed version %s"), Version))
 	if last, err := time.Parse(time.RFC3339, a.cfg.UpdateLastCheck); err == nil {
 		check.SetSubtitle(fmt.Sprintf(i18n.T("Last checked %s"), last.Format(i18n.T("Jan 2 15:04"))))

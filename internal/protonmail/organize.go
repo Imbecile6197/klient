@@ -55,6 +55,7 @@ func (a *Account) UserLabels(ctx context.Context) ([]UserLabel, error) {
 
 // SetLabel adds or removes a label (or star) on messages.
 func (a *Account) SetLabel(ctx context.Context, labelID string, on bool, ids ...string) error {
+	ids = a.withCopies(ids)
 	if on {
 		return a.client.LabelMessages(ctx, ids, labelID)
 	}
@@ -62,7 +63,7 @@ func (a *Account) SetLabel(ctx context.Context, labelID string, on bool, ids ...
 }
 
 func (a *Account) MarkUnread(ctx context.Context, ids ...string) error {
-	return a.client.MarkMessagesUnread(ctx, ids...)
+	return a.client.MarkMessagesUnread(ctx, a.withCopies(ids)...)
 }
 
 // Contact is one address from the Proton address book (or, with Recent set,

@@ -82,6 +82,12 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.11.2" date="2026-10-17">
+      <description>
+        <p>No doubled messages on Proton, arrow-key browsing opens messages, error messages with addresses are shown.</p>
+        <p xml:lang="cs">Na Protonu žádné zdvojené zprávy, procházení šipkami otevírá zprávy, chybové hlášky s adresami se zobrazí.</p>
+      </description>
+    </release>
     <release version="0.11.1" date="2026-10-16">
       <description>
         <p>Attachments of IMAP messages open in the combined view of all accounts.</p>

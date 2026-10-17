@@ -100,5 +100,89 @@ func (a *Account) ThreadMessages(ctx context.Context, conversationID string, inc
 		out = append(out, m)
 	}
 	sort.SliceStable(out, func(i, j int) bool { return out[i].Time < out[j].Time })
-	return out, nil
+	kept, hidden := uniqueCopies(out)
+	a.rememberCopies(hidden)
+	return kept, nil
+}
+
+// uniqueCopies keeps one copy of each Message-ID: mail sent to several of
+// the user's addresses (or forwarded in from elsewhere) is stored once per
+// address. The copy in the inbox is kept; hidden maps it to the others.
+func uniqueCopies(in []Summary) (kept []Summary, hidden map[string][]string) {
+	groups := map[string][]int{} // Message-ID -> indexes in in
+	var order []string
+	for i, m := range in {
+		k := m.ExternalID
+		if k == "" {
+			k = "\x00" + m.ID // no Message-ID: always its own
+		}
+		if _, ok := groups[k]; !ok {
+			order = append(order, k)
+		}
+		groups[k] = append(groups[k], i)
+	}
+	hidden = map[string][]string{}
+	for _, k := range order {
+		idx := groups[k]
+		pick := idx[0]
+		for _, i := range idx {
+			if hasLabel(in[i], InboxID) {
+				pick = i
+				break
+			}
+		}
+		m := in[pick]
+		for _, i := range idx {
+			if i == pick {
+				continue
+			}
+			hidden[m.ID] = append(hidden[m.ID], in[i].ID)
+			// An unread hidden copy makes the shown one unread, so opening
+			// it marks both read.
+			if bool(in[i].Unread) {
+				m.Unread = true
+			}
+		}
+		kept = append(kept, m)
+	}
+	return kept, hidden
+}
+
+// rememberCopies records hidden copies so that actions on the shown
+// message (read, move, labels) apply to them too.
+func (a *Account) rememberCopies(hidden map[string][]string) {
+	if len(hidden) == 0 {
+		return
+	}
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	if a.copies == nil {
+		a.copies = map[string][]string{}
+	}
+	for id, others := range hidden {
+		a.copies[id] = others
+	}
+}
+
+// withCopies adds the hidden copies of the messages to ids.
+func (a *Account) withCopies(ids []string) []string {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+	if len(a.copies) == 0 {
+		return ids
+	}
+	out := append([]string{}, ids...)
+	for _, id := range ids {
+		out = append(out, a.copies[id]...)
+	}
+	return out
+}
+
+func hasLabel(m Summary, id string) bool {
+	for _, l := range m.LabelIDs {
+		if l == id {
+			return true
+		}
+	}
+	return false
 }

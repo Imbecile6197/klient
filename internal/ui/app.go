@@ -428,13 +428,13 @@ func (a *App) saveConfig() {
 }
 
 func (a *App) toast(msg string) {
-	t := adw.NewToast(msg)
+	t := newToast(msg)
 	t.SetTimeout(5)
 	a.toasts.AddToast(t)
 }
 
 func (a *App) toastWithAction(msg, button string, action func()) {
-	t := adw.NewToast(msg)
+	t := newToast(msg)
 	t.SetTimeout(8)
 	t.SetButtonLabel(button)
 	t.ConnectButtonClicked(action)
@@ -1037,3 +1037,11 @@ func (a *App) confirmLogout() {
 }
 
 func (a *App) gtkWindow() *gtk.Window { return &a.win.ApplicationWindow.Window }
+
+// newToast makes a toast showing text as it is: messages often contain
+// addresses like "Jana <jana@example.org>", which would break as markup.
+func newToast(text string) *adw.Toast {
+	t := adw.NewToast(text)
+	t.SetUseMarkup(false)
+	return t
+}

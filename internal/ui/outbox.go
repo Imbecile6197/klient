@@ -238,6 +238,7 @@ func (a *App) showOutbox() {
 		for _, it := range items {
 			it := it
 			row := adw.NewActionRow()
+			row.SetUseMarkup(false) // names and addresses may contain & or <
 			row.SetTitle(orDefault(it.Draft.Subject, i18n.T("(no subject)")))
 			var to []string
 			for _, r := range append(append([]*mail.Address{}, it.Draft.To...), it.Draft.CC...) {

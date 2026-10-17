@@ -74,15 +74,19 @@ type mainView struct {
 	moveBtn      *gtk.MenuButton
 	labelBtn     *gtk.MenuButton
 
-	folder   protonmail.Folder
-	page     int
-	msgs     []protonmail.Summary // raw list as loaded, newest first
-	items    []protonmail.Thread  // rows of the list (threads, or single messages)
-	thread   *threadState         // conversation open in the reader
-	current  *protonmail.Message  // newest loaded message of that conversation
-	loadSeq  int
-	pending  bool
-	bannerFn func()
+	folder  protonmail.Folder
+	page    int
+	msgs    []protonmail.Summary // raw list as loaded, newest first
+	items   []protonmail.Thread  // rows of the list (threads, or single messages)
+	thread  *threadState         // conversation open in the reader
+	current *protonmail.Message  // newest loaded message of that conversation
+	loadSeq int
+	pending bool
+	// The list is being rebuilt: selection changes are not the user's.
+	quietSelect bool
+	// A conversation selected with the keyboard opens after a short pause.
+	pendingOpen glib.SourceHandle
+	bannerFn    func()
 
 	countdowns  []countdownLabel // "za 2 h" labels of scheduled messages
 	checking    *gtk.Revealer    // "Kontroluje se N nových zpráv…"
@@ -545,6 +549,7 @@ func (m *mainView) buildList() gtk.Widgetter {
 	m.msgList = gtk.NewListBox()
 	m.msgList.AddCSSClass("navigation-sidebar")
 	m.msgList.ConnectRowActivated(func(row *gtk.ListBoxRow) {
+		m.cancelPendingOpen()
 		i := row.Index()
 		if i < 0 || i >= len(m.items) {
 			return
@@ -554,6 +559,25 @@ func (m *mainView) buildList() gtk.Widgetter {
 			return
 		}
 		m.openThread(m.items[i])
+	})
+	// Moving through the list with the arrow keys opens the selected
+	// conversation too (after a pause, so passing rows are not opened).
+	m.msgList.ConnectRowSelected(func(row *gtk.ListBoxRow) {
+		if row == nil || m.quietSelect || m.selecting {
+			return
+		}
+		i := row.Index()
+		if i < 0 || i >= len(m.items) || m.isOpen(m.items[i]) {
+			return
+		}
+		m.cancelPendingOpen()
+		m.pendingOpen = glib.TimeoutAdd(250, func() bool {
+			m.pendingOpen = 0
+			if sel := m.msgList.SelectedRow(); sel != nil && sel.Index() == i && i < len(m.items) && !m.isOpen(m.items[i]) {
+				m.openThread(m.items[i])
+			}
+			return false
+		})
 	})
 	m.msgList.SetSelectionMode(gtk.SelectionBrowse)
 	m.selected = map[int]bool{}
@@ -647,6 +671,7 @@ func (m *mainView) buildReader() gtk.Widgetter {
 	m.unsnoozeBtn.SetVisible(false)
 
 	m.spamBtn = gtk.NewButtonFromIconName("mail-mark-junk-symbolic")
+	m.spamBtn.SetTooltipText(i18n.T("Mark as Spam"))
 	m.spamBtn.ConnectClicked(m.toggleSpam)
 
 	trash := gtk.NewButtonFromIconName("user-trash-symbolic")
@@ -670,6 +695,7 @@ func (m *mainView) buildReader() gtk.Widgetter {
 	tv.AddTopBar(hb)
 
 	m.banner = adw.NewBanner("")
+	m.banner.SetUseMarkup(false) // AI reasons and addresses are plain text
 	m.banner.ConnectButtonClicked(func() {
 		if m.bannerFn != nil {
 			m.bannerFn()
@@ -1043,4 +1069,20 @@ func (m *mainView) runSearch(query string) {
 			m.listTitle.SetSubtitle(fmt.Sprintf(i18n.N("%d result in %s", "%d results in %s", len(res)), len(res), scope.Name))
 		})
 	}()
+}
+
+func (m *mainView) cancelPendingOpen() {
+	if m.pendingOpen != 0 {
+		glib.SourceRemove(m.pendingOpen)
+		m.pendingOpen = 0
+	}
+}
+
+// isOpen reports whether a list item is the conversation in the reader.
+func (m *mainView) isOpen(t protonmail.Thread) bool {
+	if m.thread == nil {
+		return false
+	}
+	o := m.thread.item
+	return t.Latest.ID == o.Latest.ID || (t.ConversationID != "" && t.ConversationID == o.ConversationID)
 }

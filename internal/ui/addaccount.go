@@ -158,6 +158,7 @@ func (a *App) imapLogin(prefill config.MailServer) {
 	sg := adw.NewPreferencesGroup()
 	sg.SetTitle(i18n.T("Servers"))
 	servers := adw.NewExpanderRow()
+	servers.SetUseMarkup(false) // names and addresses may contain & or <
 	servers.SetTitle(i18n.T("Server settings"))
 	servers.SetSubtitle(i18n.T("Detected automatically"))
 	user := adw.NewEntryRow()
@@ -172,9 +173,11 @@ func (a *App) imapLogin(prefill config.MailServer) {
 	smtpPort.SetTitle("SMTP port")
 	secNames := []string{"SSL/TLS", "STARTTLS"}
 	imapSec := adw.NewComboRow()
+	imapSec.SetUseMarkup(false) // names and addresses may contain & or <
 	imapSec.SetTitle(i18n.T("IMAP security"))
 	imapSec.SetModel(gtk.NewStringList(secNames))
 	smtpSec := adw.NewComboRow()
+	smtpSec.SetUseMarkup(false) // names and addresses may contain & or <
 	smtpSec.SetTitle(i18n.T("SMTP security"))
 	smtpSec.SetModel(gtk.NewStringList(secNames))
 	for _, r := range []gtk.Widgetter{user, imapHost, imapPort, imapSec, smtpHost, smtpPort, smtpSec} {
@@ -249,7 +252,7 @@ func (a *App) imapLogin(prefill config.MailServer) {
 				fill(s)
 				if err != nil {
 					servers.SetExpanded(true)
-					toasts.AddToast(adw.NewToast(err.Error()))
+					toasts.AddToast(newToast(err.Error()))
 				}
 				done()
 			})
@@ -260,7 +263,7 @@ func (a *App) imapLogin(prefill config.MailServer) {
 	var run func()
 	run = func() {
 		if strings.TrimSpace(email.Text()) == "" || pass.Text() == "" {
-			toasts.AddToast(adw.NewToast(i18n.T("Fill in the address and password")))
+			toasts.AddToast(newToast(i18n.T("Fill in the address and password")))
 			return
 		}
 		login.SetSensitive(false)
@@ -271,7 +274,7 @@ func (a *App) imapLogin(prefill config.MailServer) {
 			if err != nil {
 				login.SetSensitive(true)
 				login.SetLabel(i18n.T("Log In"))
-				toasts.AddToast(adw.NewToast(err.Error()))
+				toasts.AddToast(newToast(err.Error()))
 				return
 			}
 			if len(pins) > 0 {
@@ -319,7 +322,7 @@ func (a *App) imapLogin(prefill config.MailServer) {
 					}
 					if err := secrets.SaveMailPassword(s.ID(), password); err != nil {
 						acc.Close()
-						toasts.AddToast(adw.NewToast(i18n.T("The password cannot be saved to the keyring: ") + err.Error()))
+						toasts.AddToast(newToast(i18n.T("The password cannot be saved to the keyring: ") + err.Error()))
 						return
 					}
 					a.saveMailServer(s)

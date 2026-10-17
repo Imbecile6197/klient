@@ -122,6 +122,7 @@ func (a *App) openContacts() {
 		for _, c := range shown {
 			c := c
 			row := adw.NewActionRow()
+			row.SetUseMarkup(false) // names and addresses may contain & or <
 			row.SetTitle(orDefault(c.Name, c.Email))
 			row.SetSubtitle(c.Email)
 			row.AddPrefix(adw.NewAvatar(36, orDefault(c.Name, c.Email), true))
@@ -151,7 +152,7 @@ func (a *App) openContacts() {
 						err := a.acc.DeleteContact(a.ctx, c.ContactID)
 						ui(func() {
 							if err != nil {
-								toasts.AddToast(adw.NewToast(i18n.T("Deleting failed: ") + err.Error()))
+								toasts.AddToast(newToast(i18n.T("Deleting failed: ") + err.Error()))
 								return
 							}
 							var keep []protonmail.Contact
@@ -183,7 +184,7 @@ func (a *App) openContacts() {
 			c, err := a.acc.Contacts(a.ctx)
 			ui(func() {
 				if err != nil {
-					toasts.AddToast(adw.NewToast(i18n.T("The contacts could not be loaded: ") + err.Error()))
+					toasts.AddToast(newToast(i18n.T("The contacts could not be loaded: ") + err.Error()))
 				}
 				contacts = c
 				render()

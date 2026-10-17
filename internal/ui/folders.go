@@ -150,6 +150,7 @@ func (m *mainView) folderNameDialog(f protonmail.Folder) {
 	name.SetText(f.Name)
 	group.Add(name)
 	label := adw.NewSwitchRow()
+	label.SetUseMarkup(false) // names and addresses may contain & or <
 	label.SetTitle(i18n.T("Label instead of a folder"))
 	label.SetSubtitle(i18n.T("A message can have several labels but be in only one folder"))
 	label.SetVisible(!rename && acc.Caps().Labels && acc.Kind() == mailbox.KindProton)
@@ -268,7 +269,7 @@ func (m *mainView) confirmEmpty(f protonmail.Folder) {
 		if f.ID == protonmail.SpamID {
 			busy = i18n.T("Emptying Spam…")
 		}
-		progressToast := adw.NewToast(busy)
+		progressToast := newToast(busy)
 		progressToast.SetTimeout(0)
 		m.a.toasts.AddToast(progressToast)
 		go func() {

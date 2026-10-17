@@ -47,6 +47,7 @@ func contactKeySubtitle(email string) string {
 func keyRows(g *adw.PreferencesGroup, key *crypto.Key) {
 	det := pgp.Details(key)
 	fp := adw.NewActionRow()
+	fp.SetUseMarkup(false) // names and addresses may contain & or <
 	fp.SetTitle(i18n.T("Fingerprint"))
 	fp.SetSubtitle(pgp.GroupFingerprint(det.Fingerprint))
 	fp.SetSubtitleSelectable(true)
@@ -99,7 +100,7 @@ func (a *App) contactKeyDialog(email string, onChange func()) {
 	toasts := adw.NewToastOverlay()
 	toasts.SetChild(tv)
 	d.SetChild(toasts)
-	toast := func(s string) { toasts.AddToast(adw.NewToast(s)) }
+	toast := func(s string) { toasts.AddToast(newToast(s)) }
 	changed := func() {
 		if onChange != nil {
 			onChange()
@@ -146,12 +147,14 @@ func (a *App) contactKeyDialog(email string, onChange func()) {
 		}
 		if m.ReplacedFP != "" {
 			r := adw.NewActionRow()
+			r.SetUseMarkup(false) // names and addresses may contain & or <
 			r.SetTitle(i18n.T("Previous key"))
 			r.SetSubtitle(fmt.Sprintf(i18n.T("%s, replaced %s"), shortFP(m.ReplacedFP), keyDate(m.ReplacedAt)))
 			r.AddCSSClass("property")
 			g.Add(r)
 		}
 		ver := adw.NewSwitchRow()
+		ver.SetUseMarkup(false) // names and addresses may contain & or <
 		ver.SetTitle(i18n.T("Verified"))
 		ver.SetSubtitle(i18n.T("You compared the fingerprint with the contact (in person, by phone). A verified key is never replaced automatically."))
 		ver.SetActive(m.Verified)

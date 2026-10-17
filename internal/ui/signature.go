@@ -105,6 +105,7 @@ func (a *App) signatureGroup(d *adw.PreferencesDialog) *adw.PreferencesGroup {
 	g.SetDescription(i18n.T("Added below new messages, replies and forwards."))
 
 	format := adw.NewComboRow()
+	format.SetUseMarkup(false) // names and addresses may contain & or <
 	format.SetTitle(i18n.T("Format"))
 	format.SetModel(gtk.NewStringList([]string{i18n.T("Plain Text"), i18n.T("HTML")}))
 	g.Add(format)
@@ -157,7 +158,7 @@ func (a *App) signatureGroup(d *adw.PreferencesDialog) *adw.PreferencesGroup {
 			}
 			b, err := os.ReadFile(file.Path())
 			if err != nil {
-				d.AddToast(adw.NewToast(err.Error()))
+				d.AddToast(newToast(err.Error()))
 				return
 			}
 			htmlView.Buffer().SetText(richtext.CleanSignature(string(b)))
@@ -218,7 +219,7 @@ func (a *App) signatureGroup(d *adw.PreferencesDialog) *adw.PreferencesGroup {
 		a.cfg.SignatureHTML = richtext.CleanSignature(bufferText(htmlView.Buffer()))
 		a.cfg.SignatureUseHTML = format.Selected() == 1
 		a.saveConfig()
-		d.AddToast(adw.NewToast(i18n.T("Signature saved")))
+		d.AddToast(newToast(i18n.T("Signature saved")))
 	})
 	box := gtk.NewBox(gtk.OrientationVertical, 0)
 	box.Append(stack)

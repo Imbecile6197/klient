@@ -70,6 +70,14 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Sat Oct 17 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.11.2-1
+- Proton conversations show one copy per Message-ID; actions apply to the
+  hidden copies too
+- Keyboard selection in the message list opens the conversation
+- Toasts, the banner and preference rows show text without markup (errors
+  with "<address>" were not shown)
+- Spam button has a tooltip from the start
+
 * Fri Oct 16 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.11.1-1
 - Unified view: attachments of IMAP messages (no attachment ID) open and
   save instead of failing with "account no longer open"

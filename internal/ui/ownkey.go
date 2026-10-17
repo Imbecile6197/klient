@@ -44,10 +44,10 @@ func (a *App) ownKeyGroup(d *adw.PreferencesDialog, page *adw.PreferencesPage) *
 				return
 			}
 			if err := os.WriteFile(file.Path(), []byte(data), 0o600); err != nil {
-				d.AddToast(adw.NewToast(err.Error()))
+				d.AddToast(newToast(err.Error()))
 				return
 			}
-			d.AddToast(adw.NewToast(i18n.T("Saved")))
+			d.AddToast(newToast(i18n.T("Saved")))
 		})
 	}
 	refresh = func() {
@@ -58,6 +58,7 @@ func (a *App) ownKeyGroup(d *adw.PreferencesDialog, page *adw.PreferencesPage) *
 		if !pgp.HasOwnKey(email) {
 			g.SetDescription(i18n.T("Without a key, mail from this account goes out unencrypted and unsigned. With a key, Klient encrypts messages to everyone whose key it knows (WKD, Autocrypt, imported keys) and signs them for everyone else. Drafts and copies in Sent are stored encrypted on the server."))
 			validity := adw.NewComboRow()
+			validity.SetUseMarkup(false) // names and addresses may contain & or <
 			validity.SetTitle(i18n.T("Validity of a new key"))
 			validity.SetSubtitle(i18n.T("An expiring key stops being used by itself if you lose it; you can extend it any time before"))
 			validity.SetModel(gtk.NewStringList(validityNames()))
@@ -74,10 +75,10 @@ func (a *App) ownKeyGroup(d *adw.PreferencesDialog, page *adw.PreferencesPage) *
 					ui(func() {
 						create.SetSensitive(true)
 						if err != nil {
-							d.AddToast(adw.NewToast(i18n.T("Creating the key failed: ") + err.Error()))
+							d.AddToast(newToast(i18n.T("Creating the key failed: ") + err.Error()))
 							return
 						}
-						d.AddToast(adw.NewToast(i18n.T("Key created – from now on your mail is encrypted and signed")))
+						d.AddToast(newToast(i18n.T("Key created – from now on your mail is encrypted and signed")))
 						refresh()
 					})
 				}()
@@ -96,7 +97,7 @@ func (a *App) ownKeyGroup(d *adw.PreferencesDialog, page *adw.PreferencesPage) *
 					}
 					b, err := os.ReadFile(file.Path())
 					if err != nil {
-						d.AddToast(adw.NewToast(err.Error()))
+						d.AddToast(newToast(err.Error()))
 						return
 					}
 					a.askText(i18n.T("Key Passphrase"), i18n.T("If the key has no passphrase, leave the field empty."), true, func(pass string, ok bool) {
@@ -104,10 +105,10 @@ func (a *App) ownKeyGroup(d *adw.PreferencesDialog, page *adw.PreferencesPage) *
 							return
 						}
 						if err := pgp.ImportOwnKey(string(b), pass, email); err != nil {
-							d.AddToast(adw.NewToast(err.Error()))
+							d.AddToast(newToast(err.Error()))
 							return
 						}
-						d.AddToast(adw.NewToast(i18n.T("Key imported")))
+						d.AddToast(newToast(i18n.T("Key imported")))
 						refresh()
 					})
 				})
@@ -118,6 +119,7 @@ func (a *App) ownKeyGroup(d *adw.PreferencesDialog, page *adw.PreferencesPage) *
 		g.SetDescription(i18n.T("Messages to people with a known key are encrypted; the others are signed. Send your public key to your contacts (Klient also adds it to the Autocrypt header)."))
 		pub, k, err := pgp.OwnPublicKey(email)
 		row := adw.NewActionRow()
+		row.SetUseMarkup(false) // names and addresses may contain & or <
 		row.SetTitle(i18n.T("Key fingerprint"))
 		if err != nil {
 			row.SetSubtitle(err.Error())
@@ -126,7 +128,7 @@ func (a *App) ownKeyGroup(d *adw.PreferencesDialog, page *adw.PreferencesPage) *
 			row.SetSubtitleSelectable(true)
 			row.AddSuffix(button("edit-copy-symbolic", i18n.T("Copy the Public Key"), func() {
 				a.win.Clipboard().SetText(pub)
-				d.AddToast(adw.NewToast(i18n.T("Public key copied")))
+				d.AddToast(newToast(i18n.T("Public key copied")))
 			}))
 			row.AddSuffix(button("document-save-symbolic", i18n.T("Save the Public Key"), func() { saveFile(email+".asc", pub) }))
 		}
@@ -134,6 +136,7 @@ func (a *App) ownKeyGroup(d *adw.PreferencesDialog, page *adw.PreferencesPage) *
 		if err == nil {
 			det := pgp.Details(k)
 			exp := adw.NewActionRow()
+			exp.SetUseMarkup(false) // names and addresses may contain & or <
 			exp.SetTitle(i18n.T("Valid until"))
 			switch {
 			case det.Expires.IsZero():
@@ -165,10 +168,10 @@ func (a *App) ownKeyGroup(d *adw.PreferencesDialog, page *adw.PreferencesPage) *
 						return
 					}
 					if err := pgp.SetOwnExpiry(email, validityYears[i]); err != nil {
-						d.AddToast(adw.NewToast(err.Error()))
+						d.AddToast(newToast(err.Error()))
 						return
 					}
-					d.AddToast(adw.NewToast(i18n.T("The key validity was changed")))
+					d.AddToast(newToast(i18n.T("The key validity was changed")))
 					refresh()
 				})
 				q.Present(d)
@@ -196,13 +199,13 @@ func (a *App) ownKeyGroup(d *adw.PreferencesDialog, page *adw.PreferencesPage) *
 							publish.SetSensitive(true)
 							switch {
 							case err != nil:
-								d.AddToast(adw.NewToast(err.Error()))
+								d.AddToast(newToast(err.Error()))
 							case st[email] == "published":
-								d.AddToast(adw.NewToast(i18n.T("The key is already published for this address")))
+								d.AddToast(newToast(i18n.T("The key is already published for this address")))
 							case st[email] == "pending":
-								d.AddToast(adw.NewToast(fmt.Sprintf(i18n.T("Check your mail: keys.openpgp.org sent a confirmation link to %s"), email)))
+								d.AddToast(newToast(fmt.Sprintf(i18n.T("Check your mail: keys.openpgp.org sent a confirmation link to %s"), email)))
 							default:
-								d.AddToast(adw.NewToast(i18n.T("The key was uploaded, but the address could not be confirmed")))
+								d.AddToast(newToast(i18n.T("The key was uploaded, but the address could not be confirmed")))
 							}
 						})
 					}()
@@ -226,7 +229,7 @@ func (a *App) ownKeyGroup(d *adw.PreferencesDialog, page *adw.PreferencesPage) *
 					}
 					cert, err := pgp.RevocationCertificate(email)
 					if err != nil {
-						d.AddToast(adw.NewToast(err.Error()))
+						d.AddToast(newToast(err.Error()))
 						return
 					}
 					saveFile(email+"-"+i18n.T("revocation")+"-"+time.Now().Format("2006-01-02")+".asc", cert)
@@ -245,7 +248,7 @@ func (a *App) ownKeyGroup(d *adw.PreferencesDialog, page *adw.PreferencesPage) *
 				}
 				armored, err := pgp.ExportOwnPrivate(email, pass)
 				if err != nil {
-					d.AddToast(adw.NewToast(err.Error()))
+					d.AddToast(newToast(err.Error()))
 					return
 				}
 				saveFile(email+"-soukromy-klic-"+time.Now().Format("2006-01-02")+".asc", armored)
@@ -267,7 +270,7 @@ func (a *App) ownKeyGroup(d *adw.PreferencesDialog, page *adw.PreferencesPage) *
 					return
 				}
 				if err := pgp.DeleteOwnKey(email); err != nil {
-					d.AddToast(adw.NewToast(err.Error()))
+					d.AddToast(newToast(err.Error()))
 				}
 				refresh()
 			})

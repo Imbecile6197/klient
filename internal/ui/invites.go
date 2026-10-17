@@ -325,6 +325,7 @@ func (a *App) openAutoReply() {
 	g := adw.NewPreferencesGroup()
 	g.SetDescription(i18n.T("Proton replies on its own on the server, even when your computer is off. Each sender gets the reply at most once in a while. This feature requires a paid Proton plan."))
 	enabled := adw.NewSwitchRow()
+	enabled.SetUseMarkup(false) // names and addresses may contain & or <
 	enabled.SetTitle(i18n.T("Reply automatically"))
 	enabled.SetSubtitle(a.acc.Email())
 	subject := adw.NewEntryRow()
@@ -336,10 +337,12 @@ func (a *App) openAutoReply() {
 	tg := adw.NewPreferencesGroup()
 	tg.SetTitle(i18n.T("Duration"))
 	untilRow := adw.NewSwitchRow()
+	untilRow.SetUseMarkup(false) // names and addresses may contain & or <
 	untilRow.SetTitle(i18n.T("End automatically"))
 	untilRow.SetSubtitle(i18n.T("Otherwise it stays on until you turn it off"))
 	cal := gtk.NewCalendar()
 	calRow := adw.NewActionRow()
+	calRow.SetUseMarkup(false) // names and addresses may contain & or <
 	calRow.SetTitle(i18n.T("Last day"))
 	dateBtn := gtk.NewMenuButton()
 	dateBtn.SetVAlign(gtk.AlignCenter)
@@ -391,7 +394,7 @@ func (a *App) openAutoReply() {
 			stack.SetVisibleChildName("form")
 			save.SetSensitive(true)
 			if err != nil {
-				toasts.AddToast(adw.NewToast(err.Error()))
+				toasts.AddToast(newToast(err.Error()))
 			}
 			enabled.SetActive(ar.Enabled)
 			subject.SetText(orDefault(ar.Subject, i18n.T("Out of office")))
@@ -419,7 +422,7 @@ func (a *App) openAutoReply() {
 		}
 		if untilRow.Active() {
 			if end.Before(time.Now()) {
-				toasts.AddToast(adw.NewToast(i18n.T("The last day has already passed")))
+				toasts.AddToast(newToast(i18n.T("The last day has already passed")))
 				return
 			}
 			r.End = end
@@ -430,7 +433,7 @@ func (a *App) openAutoReply() {
 			ui(func() {
 				save.SetSensitive(true)
 				if err != nil {
-					toasts.AddToast(adw.NewToast(err.Error()))
+					toasts.AddToast(newToast(err.Error()))
 					return
 				}
 				d.Close()

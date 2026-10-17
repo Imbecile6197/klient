@@ -84,6 +84,9 @@ func (m *mainView) setChecking(n int) {
 
 // rebuildList regroups the loaded messages and redraws the list.
 func (m *mainView) rebuildList() {
+	// Rows selected here (keeping the open conversation) must not open it again.
+	m.quietSelect = true
+	defer func() { m.quietSelect = false }()
 	msgs := m.visibleMsgs()
 	if m.threadsOn() {
 		m.items = protonmail.GroupThreads(msgs)
@@ -842,6 +845,7 @@ func (m *mainView) openAttachment(att protonmail.Attachment) {
 
 func (m *mainView) attachmentRow(att protonmail.Attachment) gtk.Widgetter {
 	row := adw.NewActionRow()
+	row.SetUseMarkup(false) // names and addresses may contain & or <
 	row.SetTitle(orDefault(att.Name, i18n.T("attachment")))
 	row.SetSubtitle(fmt.Sprintf("%s · %s", att.MIMEType, humanSize(att.Size)))
 	btn := gtk.NewButtonFromIconName("document-save-symbolic")

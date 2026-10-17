@@ -261,12 +261,12 @@ func (a *Account) AttachmentData(ctx context.Context, att Attachment) ([]byte, e
 }
 
 func (a *Account) MarkRead(ctx context.Context, ids ...string) error {
-	return a.client.MarkMessagesRead(ctx, ids...)
+	return a.client.MarkMessagesRead(ctx, a.withCopies(ids)...)
 }
 
 // Move puts messages into a system folder (Inbox, Spam, Trash, Archive).
 func (a *Account) Move(ctx context.Context, folderID string, ids ...string) error {
-	return a.client.LabelMessages(ctx, ids, folderID)
+	return a.client.LabelMessages(ctx, a.withCopies(ids), folderID)
 }
 
 // Recipient encryption decided per address when sending.
