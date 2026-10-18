@@ -2,20 +2,31 @@
 #
 # The build runs fully offline (no --share=network): Go modules are vendored
 # into the source tree by packaging/flatpak.sh before flatpak-builder is
-# invoked, and the build uses -mod=vendor with GOPROXY=off. The GNOME 49
-# runtime already provides GTK 4, libadwaita and WebKitGTK 6.0, so only the
-# Go binary is compiled here. Go itself comes from the SDK golang extension
-# (25.08 ships Go 1.27.1, which satisfies go.mod's "go 1.26.8").
+# invoked, and the build uses -mod=vendor with GOPROXY=off. The runtime
+# provides GTK 4, libadwaita, WebKitGTK 6.0 and GLib, so only the Go binary
+# is compiled here.
 #
-# For a Flathub submission, replace the `dir` source with a tagged `archive`
-# or `git` source that already contains the vendored modules, and drop the
-# in-app self-updater (see README).
+# RUNTIME CHOICE: Klient's GTK bindings (gotk4) use GLib symbols added in
+# 2.88+/2.89.3 (e.g. g_get_monotonic_time_ns). The stable GNOME 49 runtime
+# only has GLib 2.86.5, so the build fails against it. The GNOME nightly
+# runtime (master) ships GLib 2.91, which works. This means the Flatpak is
+# NOT Flathub-submittable until a stable GNOME runtime catches up to GLib
+# >= 2.89.3 (the same leading-edge requirement as the Arch package).
+#
+# GO TOOLCHAIN: the SDK golang extension is only published for stable
+# freedesktop branches, which do not pair with the nightly (master) runtime.
+# So Go is bundled directly as an `archive` source (official go.dev tarball,
+# pinned by sha256) and used from $GOROOT. This keeps the build offline and
+# independent of the runtime's base version.
+#
+# For a future Flathub submission (once a stable runtime has new-enough GLib):
+# switch runtime-version to that stable branch, consider the golang SDK
+# extension again, replace the `dir` source with a tagged `git`/`archive`
+# source containing vendor/, and drop the in-app self-updater.
 app-id: eu.libormacak.Klient
 runtime: org.gnome.Platform
-runtime-version: '49'
+runtime-version: master
 sdk: org.gnome.Sdk
-sdk-extensions:
-  - org.freedesktop.Sdk.Extension.golang
 command: klient
 
 finish-args:
@@ -39,20 +50,30 @@ modules:
   - name: klient
     buildsystem: simple
     build-options:
-      append-path: /usr/lib/sdk/golang/bin
       env:
+        GOROOT: /run/build/klient/go
         GOFLAGS: -mod=vendor
         GOPROXY: 'off'
         GOTOOLCHAIN: local
         GOCACHE: /run/build/klient/.gocache
+        GOPATH: /run/build/klient/.gopath
     build-commands:
-      - . /usr/lib/sdk/golang/enable.sh && go build -trimpath -mod=vendor -ldflags "-s -w -X github.com/Imbecile6197/klient/internal/ui.Version=${KLIENT_VERSION:-dev}" -o klient ./cmd/klient
+      - export PATH="$GOROOT/bin:$PATH" && go build -trimpath -mod=vendor -ldflags "-s -w -X github.com/Imbecile6197/klient/internal/ui.Version=${KLIENT_VERSION:-dev}" -o klient ./cmd/klient
       - install -Dm755 klient /app/bin/klient
       - install -Dm644 data/eu.libormacak.Klient.desktop /app/share/applications/eu.libormacak.Klient.desktop
       - install -Dm644 data/eu.libormacak.Klient.svg /app/share/icons/hicolor/scalable/apps/eu.libormacak.Klient.svg
       - install -Dm644 data/eu.libormacak.Klient-symbolic.svg /app/share/icons/hicolor/symbolic/apps/eu.libormacak.Klient-symbolic.svg
       - install -Dm644 data/eu.libormacak.Klient.metainfo.xml /app/share/metainfo/eu.libormacak.Klient.metainfo.xml
     sources:
+      # Official Go toolchain (newer than go.mod's "go 1.26.8"), unpacked to
+      # ./go so GOROOT=/run/build/klient/go. Pinned by sha256 for offline,
+      # reproducible builds.
+      - type: archive
+        url: https://go.dev/dl/go1.27.1.linux-amd64.tar.gz
+        sha256: 63d339f0da5ab53635a56f2490a7984dfe12dfcff22ad749f63edaf590168445
+        dest: go
+        only-arches:
+          - x86_64
       # packaging/flatpak.sh builds against a vendored export of the checkout
       # (it writes a temporary manifest pointing at that export). This source
       # is the canonical reference: it expects ./vendor to be present (run

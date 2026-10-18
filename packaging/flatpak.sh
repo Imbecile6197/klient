@@ -17,18 +17,25 @@ cd "$(dirname "$0")/.."
 VERSION=${1:?usage: packaging/flatpak.sh VERSION [--bundle]}
 BUNDLE=${2:-}
 APP_ID=eu.libormacak.Klient
-RUNTIME_VER=49
+# Klient's GTK bindings need GLib >= 2.89.3, newer than the stable GNOME 49
+# runtime (2.86.5). The GNOME nightly runtime (master) ships GLib 2.91.
+RUNTIME_VER=master
 GO=$(command -v go || echo /bin/go)
 
 for tool in flatpak flatpak-builder "$GO"; do
 	command -v "$tool" >/dev/null 2>&1 || { echo "missing tool: $tool" >&2; exit 1; }
 done
 
-# Runtime, SDK and the Go SDK extension (no-op if already installed).
-flatpak install -y --user flathub \
+# Ensure the GNOME nightly remote (its master runtime has a new-enough GLib;
+# the system remotes are not visible to --user installs). Idempotent.
+# The Go toolchain is bundled by the manifest, so no SDK extension is needed.
+flatpak remote-add --user --if-not-exists gnome-nightly \
+	https://nightly.gnome.org/gnome-nightly.flatpakrepo
+
+# Runtime and SDK from nightly.
+flatpak install -y --user gnome-nightly \
 	org.gnome.Platform//$RUNTIME_VER \
-	org.gnome.Sdk//$RUNTIME_VER \
-	org.freedesktop.Sdk.Extension.golang//25.08
+	org.gnome.Sdk//$RUNTIME_VER
 
 OUT=build/flatpak
 SRC=$OUT/src
