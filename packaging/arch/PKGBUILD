@@ -1,0 +1,59 @@
+# Maintainer: Imbecile6197 <Imbecile6197@users.noreply.github.com>
+#
+# Built by packaging/arch.sh inside an Arch container. The source tree is
+# mounted at $srcdir/klient (no download), the host Go toolchain and module
+# cache are mounted read-only, so the build runs fully offline. The resulting
+# binary links against Arch's GTK 4, libadwaita and WebKitGTK.
+pkgname=klient
+pkgver=0.0.0            # stamped in by arch.sh (sed) before makepkg runs
+pkgrel=1
+pkgdesc="Mail client for GNOME with Proton Mail, PGP, an AI assistant and an AI spam filter"
+arch=('x86_64')
+url="https://github.com/Imbecile6197/klient"
+license=('GPL-3.0-or-later')
+depends=('gtk4' 'libadwaita' 'webkitgtk-6.0' 'glib2' 'hicolor-icon-theme')
+# A Secret Service keyring for the session and API keys; spell checking.
+optdepends=('gnome-keyring: store secrets in the GNOME keyring'
+            'kwallet: store secrets in the KDE wallet'
+            'keepassxc: store secrets via Secret Service'
+            'gnome-shell-extension-appindicator: tray icon on GNOME'
+            'enchant: spell checking while writing'
+            'hunspell-en_US: English dictionary for spell checking'
+            'hunspell-cs: Czech dictionary for spell checking')
+makedepends=('gcc' 'pkgconf' 'gobject-introspection' 'desktop-file-utils' 'appstream')
+options=('!debug' '!lto')
+
+_appid=eu.libormacak.Klient
+
+build() {
+	cd "$srcdir/klient"
+	export CGO_ENABLED=1
+	# Offline: toolchain and modules come from the read-only mounts.
+	export GOFLAGS=-mod=readonly GOPROXY=off GOTOOLCHAIN=local
+	# -trimpath keeps the build path ($srcdir) out of the binary.
+	go build -trimpath \
+		-ldflags "-s -w -X github.com/Imbecile6197/klient/internal/ui.Version=$pkgver" \
+		-o bin/klient ./cmd/klient
+}
+
+check() {
+	cd "$srcdir/klient"
+	desktop-file-validate "data/$_appid.desktop"
+	appstreamcli validate --no-net "data/$_appid.metainfo.xml" >/dev/null \
+		|| appstreamcli validate --no-net "data/$_appid.metainfo.xml"
+}
+
+package() {
+	cd "$srcdir/klient"
+	install -Dm755 bin/klient "$pkgdir/usr/bin/klient"
+	install -Dm644 "data/$_appid.desktop" \
+		"$pkgdir/usr/share/applications/$_appid.desktop"
+	install -Dm644 "data/$_appid.svg" \
+		"$pkgdir/usr/share/icons/hicolor/scalable/apps/$_appid.svg"
+	install -Dm644 "data/$_appid-symbolic.svg" \
+		"$pkgdir/usr/share/icons/hicolor/symbolic/apps/$_appid-symbolic.svg"
+	install -Dm644 "data/$_appid.metainfo.xml" \
+		"$pkgdir/usr/share/metainfo/$_appid.metainfo.xml"
+	install -Dm644 README.md "$pkgdir/usr/share/doc/klient/README.md"
+	install -Dm644 LICENSE "$pkgdir/usr/share/licenses/klient/LICENSE"
+}

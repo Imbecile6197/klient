@@ -1,0 +1,26 @@
+# Build environment for the Arch/Manjaro package (packaging/arch.sh).
+# Arch is a rolling release, but the GTK stack this project binds to is ahead
+# of Arch stable: the gotk4 bindings need GLib/GIO >= 2.89.3, which is still in
+# the [core-testing]/[extra-testing] repos (stable [core] is 2.88.x). Those
+# repos are enabled here so gtk4, libadwaita and webkitgtk-6.0 pull the newer
+# GLib. Go is NOT installed: the host toolchain and module cache are mounted
+# read-only (like packaging/deb.sh), so the build stays offline and uses the
+# exact Go version go.mod needs (1.26.x).
+FROM docker.io/library/archlinux:latest
+
+# Enable testing repos (must precede the stable ones to take precedence).
+RUN printf '%s\n' \
+	'[core-testing]' 'Include = /etc/pacman.d/mirrorlist' \
+	'[extra-testing]' 'Include = /etc/pacman.d/mirrorlist' \
+	> /tmp/testing.conf \
+	&& cat /etc/pacman.conf >> /tmp/testing.conf \
+	&& mv /tmp/testing.conf /etc/pacman.conf
+
+RUN pacman -Syu --noconfirm --needed \
+	base-devel gcc pkgconf fakeroot \
+	gtk4 libadwaita webkitgtk-6.0 gobject-introspection \
+	desktop-file-utils appstream \
+	&& pacman -Scc --noconfirm
+
+# makepkg refuses to run as root; build under an unprivileged user.
+RUN useradd -m build
