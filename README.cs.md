@@ -67,6 +67,17 @@ Flatpak tenhle problém obchází: běží proti běhovému prostředí GNOME s 
 
 Protože vazby na GTK potřebují GLib ≥ 2.89.3, Flatpak zatím cílí na **nightly** běhové prostředí GNOME (`master`, GLib 2.91); stabilní GNOME 49 má jen GLib 2.86.5. Go toolchain se stahuje z go.dev místo rozšíření SDK (to pro nightly základ není vydané). Flatpak proto **zatím nelze odeslat na Flathub**. Až stabilní prostředí GNOME dostane GLib ≥ 2.89.3, přepněte `runtime-version` na tuto větev a pro odeslání nahraďte zdroj `dir` taggovaným zdrojem `git`/`archive`, jehož strom obsahuje `vendor/`, a vypněte vestavěný aktualizátor Klienta z GitHubu (aktualizace řeší Flatpak a aplikace aktualizující se samy Flathub nepřijímá).
 
+Instalace balíčku `klient.flatpak` na jiném počítači: balíček obsahuje jen aplikaci, ne běhové prostředí, takže je tam potřeba nejdřív nainstalovat nightly běhové prostředí GNOME.
+
+```bash
+flatpak remote-add --user --if-not-exists gnome-nightly https://nightly.gnome.org/gnome-nightly.flatpakrepo
+flatpak install --user gnome-nightly org.gnome.Platform//master   # ~400 MB, jednou
+flatpak install --user ./klient.flatpak
+flatpak run eu.libormacak.Klient
+```
+
+Běhové prostředí a balíček nainstalujte přibližně ve stejnou dobu, protože nightly prostředí se průběžně mění.
+
 Vydání nové verze (potřebuje `gh` a commitnutý strom): poznámky zapište do `packaging/release-notes/X.Y.Z.md` (oddíly „## English“ a „## Česky“ – Klient je ukáže v okně Co je nového a zveřejní se na GitHubu), pak `git tag -a vX.Y.Z -m "Klient X.Y.Z" && make release VERSION=X.Y.Z`.
 
 ## První spuštění

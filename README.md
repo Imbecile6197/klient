@@ -67,6 +67,17 @@ The Flatpak sidesteps that: it runs against the GNOME runtime's own GLib, GTK 4,
 
 Because the GTK bindings need GLib ≥ 2.89.3, the Flatpak currently targets the **GNOME nightly** runtime (`master`, GLib 2.91); the stable GNOME 49 runtime only has GLib 2.86.5. The Go toolchain is bundled from go.dev rather than the SDK extension (the extension is not published for the nightly base). As a result the Flatpak is **not Flathub-submittable yet**. Once a stable GNOME runtime ships GLib ≥ 2.89.3, switch `runtime-version` to that branch, and for submission replace the `dir` source with a tagged `git`/`archive` source whose tree contains `vendor/`, and disable Klient's built-in GitHub updater (Flatpak handles updates, and self-updating apps are not accepted).
 
+Installing the `klient.flatpak` bundle on another computer: a bundle contains only the app, not its runtime, so the GNOME nightly runtime has to be installed there first.
+
+```bash
+flatpak remote-add --user --if-not-exists gnome-nightly https://nightly.gnome.org/gnome-nightly.flatpakrepo
+flatpak install --user gnome-nightly org.gnome.Platform//master   # ~400 MB, once
+flatpak install --user ./klient.flatpak
+flatpak run eu.libormacak.Klient
+```
+
+Install the runtime and the bundle at about the same time, since the nightly runtime moves on.
+
 Publishing a release (needs `gh` and a committed tree): write the notes to `packaging/release-notes/X.Y.Z.md` (an “## English” and a “## Česky” section – they are shown in Klient as What's New and published on GitHub), then `git tag -a vX.Y.Z -m "Klient X.Y.Z" && make release VERSION=X.Y.Z`.
 
 ## First start
