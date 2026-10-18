@@ -61,6 +61,8 @@ packaging/arch.sh 0.7.3  # balíček pro Arch/Manjaro do build/arch/, sestaví s
 packaging/flatpak.sh 0.7.3  # Flatpak, sestaví se offline a nainstaluje přes --user
 ```
 
+Sestavení pro Arch a Flatpak udržuje komunita a autor je netestuje; oficiální balíčky jsou jen RPM a deb ve vydáních. Potíže s nimi hlaste v Issues.
+
 Balíček pro Arch potřebuje GLib ≥ 2.89.3 (kvůli vazbám na GTK), která je zatím v repozitářích `core-testing`/`extra-testing`; `packaging/arch/Containerfile` je zapíná. Manjaro za Archem zaostává, takže nemusí mít dost novou GLib k instalaci balíčku.
 
 Flatpak tenhle problém obchází: běží proti běhovému prostředí GNOME s vlastní GLib, GTK 4, libadwaitou a WebKitGTK, takže funguje i tam, kde jsou systémové knihovny pro nativní balíček příliš staré (třeba Manjaro s GLib 2.88). Potřebuje `flatpak` a `flatpak-builder`; `packaging/flatpak.sh` nainstaluje běhové prostředí a SDK, zavendoruje Go moduly do čistého exportu a pak sestaví v sandboxu flatpak-builderu bez sítě (`-mod=vendor`, `GOPROXY=off`). Přepínač `--bundle` navíc vyexportuje `build/flatpak/klient.flatpak`. Manifest je `packaging/flatpak/eu.libormacak.Klient.yml`.

@@ -61,6 +61,8 @@ packaging/arch.sh 0.7.3  # an Arch/Manjaro package in build/arch/, built in a po
 packaging/flatpak.sh 0.7.3  # a Flatpak, built offline and installed with --user
 ```
 
+The Arch and Flatpak builds are community-maintained and untested by the author; the official packages are only the RPM and deb in the releases. Please report problems with them in Issues.
+
 The Arch package needs GLib ≥ 2.89.3 (for the GTK bindings), which currently lives in Arch's `core-testing`/`extra-testing`; `packaging/arch/Containerfile` enables them. Manjaro stable lags Arch, so it may not have a new enough GLib to install the package yet.
 
 The Flatpak sidesteps that: it runs against the GNOME runtime's own GLib, GTK 4, libadwaita and WebKitGTK, so it works even where the system libraries are too old for the native package (for example Manjaro with GLib 2.88). It needs `flatpak` and `flatpak-builder`; `packaging/flatpak.sh` installs the runtime and SDK, vendors the Go modules into a clean checkout, then builds in flatpak-builder's sandbox with no network (`-mod=vendor`, `GOPROXY=off`). Pass `--bundle` to also export `build/flatpak/klient.flatpak`. The manifest is `packaging/flatpak/eu.libormacak.Klient.yml`.
