@@ -70,6 +70,10 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Mon Oct 19 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.11.4-1
+- IMAP watching: the answer to our own "UID n:*" (the newest message) is no
+  longer taken for a change; it refreshed the lists without end in 0.11.3
+
 * Mon Oct 19 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.11.3-1
 - IMAP watching: time limit for server answers (IDLE end, NOOP, FETCH) and
   IDLE renewed every 10 minutes; a silent connection no longer stops it

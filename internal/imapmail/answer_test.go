@@ -137,3 +137,66 @@ func TestEventsSilentConnection(t *testing.T) {
 		t.Fatal("new mail never reached the spam check")
 	}
 }
+
+// With mail in the inbox and nothing new, the watching must stay quiet: the
+// server answers "UID n:*" with the newest message even when it is older
+// than n, and treating that as a change refreshed the lists without end.
+func TestEventsQuietInbox(t *testing.T) {
+	set, u, _ := startServers(t)
+	appendMsg(t, u, "INBOX", hello)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	acc, err := Open(ctx, set, "tajne")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer acc.Close()
+	var changes atomic.Int32
+	news := make(chan string, 4)
+	if err := acc.Events(ctx, func(s protonmail.Summary) { news <- s.Subject }, func() { changes.Add(1) }); err != nil {
+		t.Fatal(err)
+	}
+	time.Sleep(2 * time.Second)
+	if n := changes.Load(); n > 1 {
+		t.Fatalf("%d list refreshes without any change", n)
+	}
+	select {
+	case s := <-news:
+		t.Fatalf("old message reported as new: %q", s)
+	default:
+	}
+}
+
+// A change made elsewhere (here: read through the other connection) still
+// refreshes the lists.
+func TestEventsFlagChange(t *testing.T) {
+	set, u, _ := startServers(t)
+	appendMsg(t, u, "INBOX", hello)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	acc, err := Open(ctx, set, "tajne")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer acc.Close()
+	msgs, err := acc.List(ctx, protonmail.InboxID, 0, 10)
+	if err != nil || len(msgs) != 1 {
+		t.Fatalf("list: %v, %d", err, len(msgs))
+	}
+	var changes atomic.Int32
+	if err := acc.Events(ctx, func(protonmail.Summary) {}, func() { changes.Add(1) }); err != nil {
+		t.Fatal(err)
+	}
+	time.Sleep(time.Second)
+	before := changes.Load()
+	if err := acc.MarkRead(ctx, msgs[0].ID); err != nil {
+		t.Fatal(err)
+	}
+	deadline := time.Now().Add(10 * time.Second)
+	for changes.Load() == before && time.Now().Before(deadline) {
+		time.Sleep(50 * time.Millisecond)
+	}
+	if changes.Load() == before {
+		t.Fatal("flag change made elsewhere did not refresh the lists")
+	}
+}

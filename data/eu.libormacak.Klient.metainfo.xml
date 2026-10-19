@@ -82,6 +82,12 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.11.4" date="2026-10-19">
+      <description>
+        <p>Fixes the message list that kept loading in 0.11.3 with IMAP accounts.</p>
+        <p xml:lang="cs">Opravuje seznam zpráv, který se ve verzi 0.11.3 u účtů IMAP pořád načítal.</p>
+      </description>
+    </release>
     <release version="0.11.3" date="2026-10-19">
       <description>
         <p>New mail on IMAP accounts is always checked for spam again, even after a network change or a suspend.</p>

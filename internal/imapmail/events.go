@@ -3,6 +3,7 @@ package imapmail
 import (
 	"context"
 	"errors"
+	"io"
 	"log"
 	"sort"
 	"time"
@@ -109,12 +110,26 @@ func (a *Account) watch(ctx context.Context, last *watchState, onNew func(proton
 		},
 		Expunge: func(uint32) { notify(changed) },
 		// The data must be read out: until it is, the library stops reading
-		// the connection, and the watching would wait for good (this
-		// happened on Gmail, which reports flag changes made elsewhere).
+		// the connection and the watching waits for good. Data with an
+		// envelope is no change made elsewhere but the answer to our own
+		// "UID n:*", which servers give the newest message even when it is
+		// older than n; taking it for a change refreshed the lists without
+		// end.
 		Fetch: func(m *imapclient.FetchMessageData) {
-			for m.Next() != nil {
+			own := false
+			for item := m.Next(); item != nil; item = m.Next() {
+				switch it := item.(type) {
+				case imapclient.FetchItemDataEnvelope:
+					own = true
+				case imapclient.FetchItemDataBodySection:
+					_, _ = io.Copy(io.Discard, it.Literal)
+				case imapclient.FetchItemDataBinarySection:
+					_, _ = io.Copy(io.Discard, it.Literal)
+				}
 			}
-			notify(changed)
+			if !own {
+				notify(changed)
+			}
 		},
 	})
 	if err != nil {
