@@ -20,6 +20,7 @@ type cacheAccount struct {
 }
 
 func (f *cacheAccount) Cache() *cache.Cache { return f.c }
+func (f *cacheAccount) Kind() mailbox.Kind  { return mailbox.KindIMAP }
 
 // Waiting messages survive a restart, attachments included, and stay with
 // their own account.
@@ -79,5 +80,30 @@ func TestNetworkError(t *testing.T) {
 		if got := networkError(c.err); got != c.want {
 			t.Errorf("networkError(%v) = %v", c.err, got)
 		}
+	}
+}
+
+// The combined view has no cache of its own: the preferences show (and
+// clear) the caches of all accounts, a single account only its own.
+func TestCachedAccounts(t *testing.T) {
+	c1, err := cache.Open(filepath.Join(t.TempDir(), "1.db"), make([]byte, 32))
+	if err != nil {
+		t.Fatal(err)
+	}
+	acc1 := &cacheAccount{c: c1}
+	acc2 := &cacheAccount{} // e.g. the demo account: no cache
+	a := &App{sessions: []*session{{acc: acc1}, {acc: acc2}}}
+
+	a.acc = mailbox.NewUnified(func() []mailbox.Account { return []mailbox.Account{acc1, acc2} })
+	if got := a.cachedAccounts(); len(got) != 1 || got[0] != acc1 {
+		t.Fatalf("combined view: %v", got)
+	}
+	a.acc = acc1
+	if got := a.cachedAccounts(); len(got) != 1 || got[0] != acc1 {
+		t.Fatalf("single account: %v", got)
+	}
+	a.acc = acc2
+	if got := a.cachedAccounts(); len(got) != 0 {
+		t.Fatalf("account without cache: %v", got)
 	}
 }

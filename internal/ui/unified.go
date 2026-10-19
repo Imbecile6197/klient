@@ -26,6 +26,27 @@ func (a *App) isUnified() bool {
 	return a.acc != nil && a.acc.Kind() == mailbox.KindUnified
 }
 
+// cachedAccounts are the accounts whose offline cache the preferences show:
+// the shown account, or in the combined view every account (the combined
+// view has no cache of its own).
+func (a *App) cachedAccounts() []mailbox.Account {
+	var accs []mailbox.Account
+	if a.isUnified() {
+		for _, s := range a.sessions {
+			accs = append(accs, s.acc)
+		}
+	} else if a.acc != nil {
+		accs = append(accs, a.acc)
+	}
+	var out []mailbox.Account
+	for _, acc := range accs {
+		if acc.Cache() != nil {
+			out = append(out, acc)
+		}
+	}
+	return out
+}
+
 // showing reports whether the window currently shows mail of acc (alone or
 // in the combined view).
 func (a *App) showing(acc mailbox.Account) bool {

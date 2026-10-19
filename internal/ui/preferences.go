@@ -554,11 +554,16 @@ func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	stats.SetUseMarkup(false) // names and addresses may contain & or <
 	stats.SetTitle(i18n.T("Stored"))
 	setStats := func() {
-		if a.acc == nil || a.acc.Cache() == nil {
+		accs := a.cachedAccounts()
+		if len(accs) == 0 {
 			stats.SetSubtitle(i18n.T("the cache is not available"))
 			return
 		}
-		msgs, bodies := a.acc.Cache().Stats()
+		msgs, bodies := 0, 0
+		for _, acc := range accs {
+			m, b := acc.Cache().Stats()
+			msgs, bodies = msgs+m, bodies+b
+		}
 		stats.SetSubtitle(fmt.Sprintf(i18n.N("%d message, %d of them with content", "%d messages, %d of them with content", msgs), msgs, bodies))
 	}
 	setStats()
@@ -566,9 +571,12 @@ func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	clearBtn.SetVAlign(gtk.AlignCenter)
 	clearBtn.AddCSSClass("destructive-action")
 	clearBtn.ConnectClicked(func() {
-		if a.acc != nil && a.acc.Cache() != nil {
-			_ = a.acc.Cache().Clear()
-			a.saveOutbox(a.acc) // the Outbox lives in the cache too: keep it
+		accs := a.cachedAccounts()
+		for _, acc := range accs {
+			_ = acc.Cache().Clear()
+			a.saveOutbox(acc) // the Outbox lives in the cache too: keep it
+		}
+		if len(accs) > 0 {
 			setStats()
 			d.AddToast(newToast(i18n.T("Offline cache cleared")))
 		}
