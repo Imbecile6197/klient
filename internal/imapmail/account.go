@@ -511,7 +511,8 @@ func (a *Account) Cache() *cache.Cache  { return a.cache }
 func (a *Account) Close() {
 	a.mu.Lock()
 	if a.c != nil {
-		a.c.Logout().Wait()
+		// A dead connection must not keep Klient from quitting.
+		_ = answered(a.c, 5*time.Second, func() error { return a.c.Logout().Wait() })
 		a.c.Close()
 		a.c = nil
 	}

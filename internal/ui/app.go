@@ -49,6 +49,29 @@ type session struct {
 	// the event goroutine, read by the UI, hence the mutex.
 	mu      sync.Mutex
 	checked map[string]time.Time // message ID -> when it arrived
+	// Messages the spam filter is judging right now, so the periodic sweep
+	// and the event stream do not check one twice.
+	judging map[string]bool
+}
+
+// begin marks a message as being judged; false when it already is.
+func (s *session) begin(id string) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.judging[id] {
+		return false
+	}
+	if s.judging == nil {
+		s.judging = map[string]bool{}
+	}
+	s.judging[id] = true
+	return true
+}
+
+func (s *session) end(id string) {
+	s.mu.Lock()
+	delete(s.judging, id)
+	s.mu.Unlock()
 }
 
 // maxHold releases a message even if its check never finishes (e.g. the
@@ -734,7 +757,8 @@ func (a *App) startEvents(s *session) {
 	}
 	s.events = true
 	acc := s.acc
-	go a.catchUp(s)
+	go a.catchUp(s, true)
+	go a.sweepLoop(s)
 	go func() {
 		err := acc.Events(a.ctx, func(meta protonmail.Summary) { a.onNewMessage(s, meta) }, func() {
 			ui(func() {
@@ -848,8 +872,17 @@ func (a *App) holdNew(s *session, meta protonmail.Summary) bool {
 // message and notifies about it (when notify).
 func (a *App) checkNew(s *session, meta protonmail.Summary, held, notify bool) {
 	acc := s.acc
+	if !s.begin(meta.ID) {
+		return // already being judged; that check releases and notifies
+	}
+	// Judged before (by the sweep, or the message came back to the inbox):
+	// the user has been told about it already.
+	if _, known := a.filter.Decision(meta.ID); known {
+		notify = false
+	}
 	func() {
 		d, moved, err := a.filter.ProcessNew(a.ctx, acc, meta)
+		s.end(meta.ID)
 		var applied []string
 		if err == nil && !moved {
 			applied = a.applyRules(a.ctx, acc, meta)
@@ -912,20 +945,53 @@ func (a *App) checkNew(s *session, meta protonmail.Summary, held, notify bool) {
 // running is checked.
 const catchUpMax = 7 * 24 * time.Hour
 
+// sweepEvery is how often the inbox is looked through for unread mail the
+// spam filter has not judged; sweepSettle leaves the newest mail to the event
+// stream, which is about to report it.
+const (
+	sweepEvery  = 5 * time.Minute
+	sweepSettle = 3 * time.Minute
+)
+
+// sweepLoop is the safety net behind the event streams: should one stop
+// reporting mail without an error (a connection that silently stopped
+// answering), the mail would otherwise reach the list unchecked.
+func (a *App) sweepLoop(s *session) {
+	t := time.NewTicker(sweepEvery)
+	defer t.Stop()
+	for {
+		select {
+		case <-a.ctx.Done():
+			return
+		case <-t.C:
+		}
+		if a.sessionOf(s.acc) != s {
+			return
+		}
+		a.catchUp(s, false)
+	}
+}
+
 // catchUp checks the unread inbox mail that arrived while Klient was not
 // running (or offline): the event streams report only mail that comes after
 // they start, so it would never meet the spam filter and the rules. One
-// message at a time, without a notification for each.
-func (a *App) catchUp(s *session) {
+// message at a time; at start without a notification for each, later (the
+// sweep) with one for mail of the last hour.
+func (a *App) catchUp(s *session, start bool) {
 	acc := s.acc
 	msgs, err := acc.List(a.ctx, protonmail.InboxID, 0, 50)
 	if err != nil {
 		return
 	}
 	since := time.Now().Add(-catchUpMax).Unix()
+	settled := time.Now().Add(-sweepSettle).Unix()
+	recent := time.Now().Add(-time.Hour).Unix()
 	n := 0
 	for _, m := range msgs {
 		if !bool(m.Unread) || m.Time < since || !hasLabel(m, protonmail.InboxID) {
+			continue
+		}
+		if !start && m.Time > settled {
 			continue
 		}
 		if _, known := a.filter.Decision(m.ID); known {
@@ -934,11 +1000,17 @@ func (a *App) catchUp(s *session) {
 		if a.ctx.Err() != nil || a.sessionOf(acc) != s {
 			return
 		}
-		a.checkNew(s, m, a.holdNew(s, m), false)
+		// The sweep finds mail the list already shows; hiding it now would
+		// only make it blink.
+		held := start && a.holdNew(s, m)
+		a.checkNew(s, m, held, !start && m.Time > recent)
 		n++
 	}
-	if n > 0 {
+	switch {
+	case n > 0 && start:
 		log.Printf("spamfilter: checked %d messages of %s that arrived while Klient was not running", n, acc.Email())
+	case n > 0:
+		log.Printf("spamfilter: checked %d messages of %s that the watching for new mail missed", n, acc.Email())
 	}
 }
 

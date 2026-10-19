@@ -82,6 +82,12 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.11.3" date="2026-10-19">
+      <description>
+        <p>New mail on IMAP accounts is always checked for spam again, even after a network change or a suspend.</p>
+        <p xml:lang="cs">Nová pošta na účtech IMAP zase vždy projde spam filtrem, i po změně sítě nebo uspání.</p>
+      </description>
+    </release>
     <release version="0.11.2" date="2026-10-17">
       <description>
         <p>No doubled messages on Proton, arrow-key browsing opens messages, error messages with addresses are shown.</p>

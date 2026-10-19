@@ -20,11 +20,12 @@ import (
 func (a *Account) Events(ctx context.Context, onNew func(protonmail.Summary), onChange func()) error {
 	go a.localLoop(ctx, onChange)
 	go func() {
-		var lastUID imap.UID
+		// The time limits are read once, here, so that tests can set them.
+		last := watchState{renew: idleRenew, answer: idleAnswer}
 		wait := 5 * time.Second
 		for ctx.Err() == nil {
 			start := time.Now()
-			err := a.watch(ctx, &lastUID, onNew, onChange)
+			err := a.watch(ctx, &last, onNew, onChange)
 			if ctx.Err() != nil {
 				return
 			}
@@ -49,6 +50,38 @@ func (a *Account) Events(ctx context.Context, onNew func(protonmail.Summary), on
 	return nil
 }
 
+// idleRenew is how long one IDLE runs; idleAnswer is how long the server may
+// take to end it. The IMAP library waits for an answer without a time
+// limit, so a connection that silently stopped answering (after a network
+// change, a VPN reconnect or a suspend) would stop the watching for good –
+// new mail then reached the list without the spam check.
+var (
+	idleRenew  = 10 * time.Minute
+	idleAnswer = 30 * time.Second
+)
+
+// answered runs a command on the watching connection; without an answer in
+// time it closes the connection so that Events reconnects.
+func answered(c *imapclient.Client, limit time.Duration, f func() error) error {
+	done := make(chan error, 1)
+	go func() { done <- f() }()
+	select {
+	case err := <-done:
+		return err
+	case <-time.After(limit):
+		c.Close()
+		// The library does not always end a pending command when the
+		// connection closes; do not wait for it for long.
+		select {
+		case <-done:
+		case <-time.After(5 * time.Second):
+		}
+		return errNoAnswer
+	}
+}
+
+var errNoAnswer = errors.New("the server stopped answering")
+
 func notify(ch chan struct{}) {
 	select {
 	case ch <- struct{}{}:
@@ -56,7 +89,16 @@ func notify(ch chan struct{}) {
 	}
 }
 
-func (a *Account) watch(ctx context.Context, lastUID *imap.UID, onNew func(protonmail.Summary), onChange func()) error {
+// watchState is kept across reconnects. uid is the newest inbox message the
+// watching knows; set lets an empty inbox (UID 0) count as known, so that
+// mail arriving while the watching reconnects is not skipped.
+type watchState struct {
+	uid           imap.UID
+	set           bool
+	renew, answer time.Duration
+}
+
+func (a *Account) watch(ctx context.Context, last *watchState, onNew func(protonmail.Summary), onChange func()) error {
 	arrived := make(chan struct{}, 1)
 	changed := make(chan struct{}, 1)
 	c, err := a.dialWith(&imapclient.UnilateralDataHandler{
@@ -66,7 +108,14 @@ func (a *Account) watch(ctx context.Context, lastUID *imap.UID, onNew func(proto
 			}
 		},
 		Expunge: func(uint32) { notify(changed) },
-		Fetch:   func(*imapclient.FetchMessageData) { notify(changed) },
+		// The data must be read out: until it is, the library stops reading
+		// the connection, and the watching would wait for good (this
+		// happened on Gmail, which reports flag changes made elsewhere).
+		Fetch: func(m *imapclient.FetchMessageData) {
+			for m.Next() != nil {
+			}
+			notify(changed)
+		},
 	})
 	if err != nil {
 		return err
@@ -83,12 +132,12 @@ func (a *Account) watch(ctx context.Context, lastUID *imap.UID, onNew func(proto
 		onChange()
 	}
 
-	if *lastUID == 0 {
+	if !last.set {
 		st, err := c.Status("INBOX", &imap.StatusOptions{UIDNext: true}).Wait()
 		if err != nil {
 			return err
 		}
-		*lastUID = st.UIDNext - 1
+		last.uid, last.set = st.UIDNext-1, true
 	}
 	sel, err := c.Select("INBOX", nil).Wait()
 	if err != nil {
@@ -96,18 +145,22 @@ func (a *Account) watch(ctx context.Context, lastUID *imap.UID, onNew func(proto
 	}
 
 	fetchNew := func() error {
-		set := imap.UIDSet{imap.UIDRange{Start: *lastUID + 1, Stop: 0}} // lastUID+1:*
-		msgs, err := c.Fetch(set, fetchMeta).Collect()
+		set := imap.UIDSet{imap.UIDRange{Start: last.uid + 1, Stop: 0}} // lastUID+1:*
+		var msgs []*imapclient.FetchMessageBuffer
+		err := answered(c, 2*time.Minute, func() (err error) {
+			msgs, err = c.Fetch(set, fetchMeta).Collect()
+			return err
+		})
 		if err != nil {
 			return err
 		}
 		sort.Slice(msgs, func(i, j int) bool { return msgs[i].UID < msgs[j].UID })
 		var fresh []protonmail.Summary
 		for _, m := range msgs {
-			if m.UID <= *lastUID { // "n:*" always returns the last message
+			if m.UID <= last.uid { // "n:*" always returns the last message
 				continue
 			}
-			*lastUID = m.UID
+			last.uid = m.UID
 			s := a.summary("INBOX", sel.UIDValidity, m)
 			fresh = append(fresh, s)
 		}
@@ -136,8 +189,9 @@ func (a *Account) watch(ctx context.Context, lastUID *imap.UID, onNew func(proto
 			if err != nil {
 				return err
 			}
-			// Servers drop IDLE after ~30 minutes; renew before that.
-			timer := time.NewTimer(25 * time.Minute)
+			// Servers drop IDLE after ~30 minutes; renew well before that,
+			// which also finds out soon when the connection died silently.
+			timer := time.NewTimer(last.renew)
 			gotChange := false
 			select {
 			case <-ctx.Done():
@@ -149,7 +203,7 @@ func (a *Account) watch(ctx context.Context, lastUID *imap.UID, onNew func(proto
 			}
 			timer.Stop()
 			_ = cmd.Close()
-			if err := cmd.Wait(); err != nil {
+			if err := answered(c, last.answer, cmd.Wait); err != nil {
 				return err
 			}
 			if ctx.Err() != nil {
@@ -165,7 +219,7 @@ func (a *Account) watch(ctx context.Context, lastUID *imap.UID, onNew func(proto
 			return ctx.Err()
 		case <-time.After(time.Minute):
 		}
-		if err := c.Noop().Wait(); err != nil {
+		if err := answered(c, last.answer, func() error { return c.Noop().Wait() }); err != nil {
 			return err
 		}
 		select {

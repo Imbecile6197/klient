@@ -70,6 +70,14 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Mon Oct 19 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.11.3-1
+- IMAP watching: time limit for server answers (IDLE end, NOOP, FETCH) and
+  IDLE renewed every 10 minutes; a silent connection no longer stops it
+- Spam filter sweep every 5 minutes for unread inbox mail without a verdict
+- Unsolicited FETCH data is read out; an empty inbox no longer makes the
+  watcher skip mail after a reconnect; quitting does not wait for a dead
+  connection
+
 * Sat Oct 17 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.11.2-1
 - Proton conversations show one copy per Message-ID; actions apply to the
   hidden copies too
