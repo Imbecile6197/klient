@@ -61,28 +61,6 @@ var (
 	idleAnswer = 30 * time.Second
 )
 
-// answered runs a command on the watching connection; without an answer in
-// time it closes the connection so that Events reconnects.
-func answered(c *imapclient.Client, limit time.Duration, f func() error) error {
-	done := make(chan error, 1)
-	go func() { done <- f() }()
-	select {
-	case err := <-done:
-		return err
-	case <-time.After(limit):
-		c.Close()
-		// The library does not always end a pending command when the
-		// connection closes; do not wait for it for long.
-		select {
-		case <-done:
-		case <-time.After(5 * time.Second):
-		}
-		return errNoAnswer
-	}
-}
-
-var errNoAnswer = errors.New("the server stopped answering")
-
 func notify(ch chan struct{}) {
 	select {
 	case ch <- struct{}{}:
@@ -148,13 +126,21 @@ func (a *Account) watch(ctx context.Context, last *watchState, onNew func(proton
 	}
 
 	if !last.set {
-		st, err := c.Status("INBOX", &imap.StatusOptions{UIDNext: true}).Wait()
+		var st *imap.StatusData
+		err := answered(c, last.answer, func() (err error) {
+			st, err = c.Status("INBOX", &imap.StatusOptions{UIDNext: true}).Wait()
+			return err
+		})
 		if err != nil {
 			return err
 		}
 		last.uid, last.set = st.UIDNext-1, true
 	}
-	sel, err := c.Select("INBOX", nil).Wait()
+	var sel *imap.SelectData
+	err = answered(c, last.answer, func() (err error) {
+		sel, err = c.Select("INBOX", nil).Wait()
+		return err
+	})
 	if err != nil {
 		return err
 	}
@@ -200,7 +186,12 @@ func (a *Account) watch(ctx context.Context, last *watchState, onNew func(proton
 			return err
 		}
 		if idle {
-			cmd, err := c.Idle()
+			// Starting IDLE waits for the server's go-ahead too.
+			var cmd *imapclient.IdleCommand
+			err := answered(c, last.answer, func() (err error) {
+				cmd, err = c.Idle()
+				return err
+			})
 			if err != nil {
 				return err
 			}

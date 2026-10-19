@@ -82,6 +82,12 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.11.6" date="2026-10-19">
+      <description>
+        <p>IMAP accounts no longer wait for a server that stopped answering; the spam filter's safety net reads more of the inbox.</p>
+        <p xml:lang="cs">Účty IMAP už nečekají na server, který přestal odpovídat; pojistka spam filtru prochází víc Doručené pošty.</p>
+      </description>
+    </release>
     <release version="0.11.5" date="2026-10-19">
       <description>
         <p>The offline cache is shown and cleared correctly in the All Accounts view.</p>

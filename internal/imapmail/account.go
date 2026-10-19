@@ -4,6 +4,7 @@ package imapmail
 
 import (
 	"context"
+	"crypto/tls"
 	"crypto/x509"
 	"encoding/base64"
 	"errors"
@@ -58,6 +59,7 @@ type Account struct {
 	cache   *cache.Cache
 	offline bool
 	deauth  func()
+	lim     limits
 }
 
 var wordDecoder = &mime.WordDecoder{CharsetReader: charset.Reader}
@@ -77,20 +79,44 @@ func (a *Account) dialWith(handler *imapclient.UnilateralDataHandler) (*imapclie
 	opts := &imapclient.Options{
 		TLSConfig:             tlsConfig(a.set.IMAPHost, a.set.IMAPPort, a.trusted()),
 		WordDecoder:           wordDecoder,
-		Dialer:                &net.Dialer{Timeout: 30 * time.Second},
 		UnilateralDataHandler: handler,
 	}
-	var c *imapclient.Client
-	var err error
-	if a.set.IMAPSecurity == "starttls" {
-		c, err = imapclient.DialStartTLS(addr, opts)
-	} else {
-		c, err = imapclient.DialTLS(addr, opts)
-	}
+	lim := a.limits()
+	raw, err := (&net.Dialer{Timeout: lim.dial}).Dial("tcp", addr)
 	if err != nil {
 		return nil, connErr(err)
 	}
-	if err := c.Login(a.set.Username, a.password).Wait(); err != nil {
+	conn := newActiveConn(raw)
+	// TLS, STARTTLS and the login each wait for the server: all of it must
+	// be done in time, or the connection is given up.
+	var c *imapclient.Client
+	err = within(lim.dial, func() { raw.Close() }, func() error {
+		if a.set.IMAPSecurity == "starttls" {
+			var err error
+			c, err = imapclient.NewStartTLS(conn, opts)
+			return err
+		}
+		cfg := opts.TLSConfig.Clone()
+		if cfg.NextProtos == nil {
+			cfg.NextProtos = []string{"imap"}
+		}
+		tc := tls.Client(conn, cfg)
+		if err := tc.Handshake(); err != nil {
+			return err
+		}
+		c = imapclient.New(tc, opts)
+		return nil
+	})
+	if errors.Is(err, errNoAnswer) {
+		raw.Close()
+		return nil, &netErr{err}
+	}
+	if err != nil {
+		raw.Close()
+		return nil, connErr(err)
+	}
+	err = within(lim.dial, func() { c.Close() }, func() error { return c.Login(a.set.Username, a.password).Wait() })
+	if err != nil {
 		c.Close()
 		var ie *imap.Error
 		if errors.As(err, &ie) && (ie.Code == imap.ResponseCodeAuthenticationFailed || ie.Code == imap.ResponseCodeAuthorizationFailed || ie.Type == imap.StatusResponseTypeNo) {
@@ -98,6 +124,7 @@ func (a *Account) dialWith(handler *imapclient.UnilateralDataHandler) (*imapclie
 		}
 		return nil, &netErr{err}
 	}
+	track(c, conn)
 	return c, nil
 }
 
@@ -126,7 +153,7 @@ func IsOffline(err error) bool {
 // Open logs in, reads the folder list and opens the offline cache. Without
 // network it starts from the cache if possible.
 func Open(ctx context.Context, set config.MailServer, password string) (*Account, error) {
-	a := &Account{set: set, password: password}
+	a := &Account{set: set, password: password, lim: defaultLimits}
 	a.openCache()
 	c, err := a.dial()
 	if err != nil {
@@ -143,7 +170,7 @@ func Open(ctx context.Context, set config.MailServer, password string) (*Account
 		return nil, err
 	}
 	a.c = c
-	if err := a.loadFolders(); err != nil {
+	if err := progressing(c, a.limits().quiet, a.loadFolders); err != nil {
 		c.Close()
 		return nil, err
 	}
@@ -153,7 +180,7 @@ func Open(ctx context.Context, set config.MailServer, password string) (*Account
 
 // Test checks the IMAP login (for the account wizard).
 func Test(ctx context.Context, set config.MailServer, password string) error {
-	a := &Account{set: set, password: password}
+	a := &Account{set: set, password: password, lim: defaultLimits}
 	c, err := a.dial()
 	if err != nil {
 		return err
@@ -201,7 +228,7 @@ func (a *Account) conn() (*imapclient.Client, error) {
 	a.c = c
 	if a.offline {
 		a.offline = false
-		_ = a.loadFolders()
+		_ = progressing(c, a.limits().quiet, a.loadFolders)
 	}
 	return c, nil
 }
@@ -216,7 +243,7 @@ func (a *Account) with(f func(c *imapclient.Client) error) error {
 		if err != nil {
 			return err
 		}
-		err = f(c)
+		err = progressing(c, a.limits().quiet, func() error { return f(c) })
 		if err == nil || try > 0 {
 			return err
 		}

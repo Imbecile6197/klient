@@ -195,6 +195,9 @@ msgid "the attachment has no data"
 msgstr "příloha nemá data"
 
 #: internal/imapmail/message.go
+msgid "the server stopped answering"
+msgstr "server přestal odpovídat"
+
 msgid "the message is no longer on the server"
 msgstr "zpráva už na serveru není"
 

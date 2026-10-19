@@ -880,9 +880,10 @@ func (a *App) checkNew(s *session, meta protonmail.Summary, held, notify bool) {
 	if _, known := a.filter.Decision(meta.ID); known {
 		notify = false
 	}
+	// The guard holds until the rules and the AI label are done too.
+	defer s.end(meta.ID)
 	func() {
 		d, moved, err := a.filter.ProcessNew(a.ctx, acc, meta)
-		s.end(meta.ID)
 		var applied []string
 		if err == nil && !moved {
 			applied = a.applyRules(a.ctx, acc, meta)
@@ -942,8 +943,43 @@ func (a *App) checkNew(s *session, meta protonmail.Summary, held, notify bool) {
 }
 
 // catchUpMax limits how far back mail that arrived while Klient was not
-// running is checked.
-const catchUpMax = 7 * 24 * time.Hour
+// running is checked; the inbox is read catchUpPage messages at a time, at
+// most catchUpPages pages at start and sweepPages in the periodic sweep.
+const (
+	catchUpMax   = 7 * 24 * time.Hour
+	catchUpPage  = 50
+	catchUpPages = 20
+	sweepPages   = 4
+)
+
+// unjudged returns the unread inbox mail of the last catchUpMax that the
+// spam filter has not judged, newest first. All pages are read before any
+// message is checked: moving spam away would shift the pages.
+func unjudged(ctx context.Context, acc mailbox.Account, known func(id string) bool, now time.Time, pages int) []protonmail.Summary {
+	since := now.Add(-catchUpMax).Unix()
+	var out []protonmail.Summary
+	for page := 0; page < pages && ctx.Err() == nil; page++ {
+		msgs, err := acc.List(ctx, protonmail.InboxID, page, catchUpPage)
+		if err != nil {
+			break
+		}
+		older := false
+		for _, m := range msgs {
+			if m.Time < since {
+				older = true
+				continue
+			}
+			if !bool(m.Unread) || !hasLabel(m, protonmail.InboxID) || known(m.ID) {
+				continue
+			}
+			out = append(out, m)
+		}
+		if older || len(msgs) < catchUpPage {
+			break
+		}
+	}
+	return out
+}
 
 // sweepEvery is how often the inbox is looked through for unread mail the
 // spam filter has not judged; sweepSettle leaves the newest mail to the event
@@ -979,22 +1015,23 @@ func (a *App) sweepLoop(s *session) {
 // sweep) with one for mail of the last hour.
 func (a *App) catchUp(s *session, start bool) {
 	acc := s.acc
-	msgs, err := acc.List(a.ctx, protonmail.InboxID, 0, 50)
-	if err != nil {
-		return
+	pages := catchUpPages
+	if !start {
+		pages = sweepPages // every few minutes: lighter on the server
 	}
-	since := time.Now().Add(-catchUpMax).Unix()
+	known := func(id string) bool {
+		_, ok := a.filter.Decision(id)
+		return ok
+	}
+	msgs := unjudged(a.ctx, acc, known, time.Now(), pages)
 	settled := time.Now().Add(-sweepSettle).Unix()
 	recent := time.Now().Add(-time.Hour).Unix()
 	n := 0
 	for _, m := range msgs {
-		if !bool(m.Unread) || m.Time < since || !hasLabel(m, protonmail.InboxID) {
-			continue
-		}
 		if !start && m.Time > settled {
 			continue
 		}
-		if _, known := a.filter.Decision(m.ID); known {
+		if known(m.ID) { // judged meanwhile by the event stream
 			continue
 		}
 		if a.ctx.Err() != nil || a.sessionOf(acc) != s {

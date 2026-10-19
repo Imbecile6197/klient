@@ -70,6 +70,12 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Mon Oct 19 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.11.6-1
+- IMAP: time limits for connecting, TLS, login, STATUS, SELECT and the start
+  of IDLE; the command connection is given up when no data moves for 60 s
+- Spam catch-up reads further inbox pages (up to a week back)
+- The per-message guard covers rules and the AI label too
+
 * Mon Oct 19 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.11.5-1
 - Preferences: offline cache stats and Clear cover all accounts in the
   combined view (it said the cache was not available)
