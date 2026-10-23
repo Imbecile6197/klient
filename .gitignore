@@ -8,3 +8,6 @@
 .idea/
 .vscode/
 .DS_Store
+
+# macOS local build
+macos/build/

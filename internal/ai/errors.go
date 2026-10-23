@@ -1,6 +1,7 @@
 package ai
 
 import (
+	"errors"
 	"regexp"
 	"strings"
 
@@ -25,16 +26,24 @@ func Explain(provider string, err error) Explanation {
 		return Explanation{i18n.T("Local AI is not ready yet. In Preferences → AI, click “Install” next to Ollama and download a model."), ""}
 	case provider == ProviderOllama && strings.Contains(low, "not found") && strings.Contains(low, "model"):
 		return Explanation{i18n.T("The selected local model is not downloaded. Download it in Preferences → AI (Local AI)."), ""}
+	case provider == ProviderOllama && (strings.Contains(low, "llama-server") || strings.Contains(low, "cannot be started") || strings.Contains(low, "did not start")):
+		return Explanation{i18n.T("Local AI could not start. Try “Install / Start Ollama” again in Preferences → AI."), ""}
 	case provider == ProviderOllama && (strings.Contains(low, "deadline") || strings.Contains(low, "timeout")):
 		return Explanation{i18n.T("The local model did not answer in time. It is slow on a processor without a graphics card – try a shorter text or a smaller model."), ""}
 	case provider == ProviderOllama && strings.Contains(low, "memory"):
 		return Explanation{i18n.T("There is not enough memory left for the local model. Close demanding applications or choose a smaller model."), ""}
+	case errors.Is(err, ErrNoAPIKey) || strings.Contains(low, strings.ToLower(i18n.T("no API key is set"))):
+		info, _ := ProviderByID(provider)
+		return Explanation{i18n.T("No API key is saved for this provider. Paste a key in Preferences → AI and save it."), info.KeyURL}
 	case provider == ProviderOpenAI && (strings.Contains(low, "insufficient_quota") || strings.Contains(low, "credit_balance")):
 		return Explanation{i18n.T("The OpenAI account has no credit. The API is billed separately from a ChatGPT subscription – add credit in the billing settings."),
 			"https://platform.openai.com/settings/organization/billing"}
 	case provider == ProviderMistral && (strings.Contains(low, "402") || strings.Contains(low, "payment") || strings.Contains(low, "billing")):
 		return Explanation{i18n.T("The Mistral account has no active plan or credit. Choose a plan (the free “Experiment” plan works too) in the Mistral console."),
 			"https://console.mistral.ai/billing"}
+	case provider == ProviderGrok && (strings.Contains(low, "402") || strings.Contains(low, "payment") || strings.Contains(low, "billing") || strings.Contains(low, "credits")):
+		return Explanation{i18n.T("The xAI account has no credit. Add some in the xAI console."),
+			"https://console.x.ai"}
 	case provider == ProviderClaude && strings.Contains(low, "credit balance"):
 		return Explanation{i18n.T("The Anthropic account has no credit. Add some in the Billing section."), "https://platform.claude.com"}
 	case provider == ProviderGemini && strings.Contains(low, "service_disabled"):

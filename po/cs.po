@@ -39,6 +39,10 @@ msgid "The Mistral account has no active plan or credit. Choose a plan (the free
 msgstr "Účet Mistral nemá aktivní platební tarif nebo kredit. Zvolte tarif (i bezplatný „Experiment“) v konzoli Mistral."
 
 #: internal/ai/errors.go
+msgid "The xAI account has no credit. Add some in the xAI console."
+msgstr "Účet xAI nemá kredit. Doplňte ho v konzoli xAI."
+
+#: internal/ai/errors.go
 msgid "The OpenAI account has no credit. The API is billed separately from a ChatGPT subscription – add credit in the billing settings."
 msgstr "Na účtu OpenAI není kredit. API se platí zvlášť od předplatného ChatGPT – nahrajte kredit v nastavení fakturace."
 
@@ -57,6 +61,14 @@ msgstr "Překročen limit požadavků nebo kvóta. Zkuste to později, případn
 #: internal/ai/errors.go
 msgid "The selected local model is not downloaded. Download it in Preferences → AI (Local AI)."
 msgstr "Zvolený lokální model není stažený. Stáhněte ho v Předvolbách → AI (Lokální AI)."
+
+#: internal/ai/errors.go
+msgid "Local AI could not start. Try “Install / Start Ollama” again in Preferences → AI."
+msgstr "Lokální AI se nepodařilo spustit. Zkuste znovu „Nainstalovat / Spustit Ollamu“ v Předvolbách → AI."
+
+#: internal/ai/errors.go
+msgid "No API key is saved for this provider. Paste a key in Preferences → AI and save it."
+msgstr "Pro tohoto poskytovatele není uložený API klíč. Vložte ho v Předvolbách → AI a uložte."
 
 #: internal/ai/errors.go
 msgid "The selected model no longer exists or your account has no access to it. Choose another one in Preferences → AI with the model list button."
@@ -290,8 +302,8 @@ msgid "the Ollama release has no checksum"
 msgstr "k vydání Ollamy chybí kontrolní součet"
 
 #: internal/ollama/runtime.go
-msgid "the archive does not contain bin/ollama"
-msgstr "archiv neobsahuje bin/ollama"
+msgid "the archive does not contain the Ollama binary"
+msgstr "archiv neobsahuje binárku Ollama"
 
 #: internal/ollama/runtime.go
 msgid "the checksum of the downloaded Ollama does not match – the file was discarded"

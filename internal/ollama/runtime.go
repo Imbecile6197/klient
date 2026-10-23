@@ -22,15 +22,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/klauspost/compress/zstd"
-
 	"github.com/Imbecile6197/klient/internal/i18n"
 )
 
-const (
-	releaseAPI = "https://api.github.com/repos/ollama/ollama/releases/latest"
-	assetName  = "ollama-linux-amd64.tar.zst"
-)
+const releaseAPI = "https://api.github.com/repos/ollama/ollama/releases/latest"
 
 // Runtime is the managed Ollama installation and its server process.
 type Runtime struct {
@@ -51,15 +46,21 @@ func (r *Runtime) ModelsDir() string { return filepath.Join(r.dir, "models") }
 
 func (r *Runtime) current() string { return filepath.Join(r.dir, "current") }
 
-func (r *Runtime) binary() string { return filepath.Join(r.current(), "bin", "ollama") }
+func (r *Runtime) binary() string { return filepath.Join(r.current(), binaryRel) }
 
-// Installed returns the installed version ("" if none).
+// Installed returns the installed version ("" if none or incomplete).
 func (r *Runtime) Installed() string {
 	target, err := os.Readlink(r.current())
 	if err != nil {
 		return ""
 	}
 	if _, err := os.Stat(r.binary()); err != nil {
+		return ""
+	}
+	dir, err := filepath.EvalSymlinks(r.current())
+	if err != nil || !runtimeComplete(dir) {
+		// Incomplete Darwin extract (e.g. missing llama-server) must not
+		// look "installed" — the UI offers Install / Start again.
 		return ""
 	}
 	return strings.TrimPrefix(filepath.Base(target), "v")
@@ -163,25 +164,6 @@ func Newer(a, b string) bool {
 // Progress reports downloaded bytes of total.
 type Progress func(done, total int64)
 
-// keep reports whether a file of the archive is needed. The CPU build needs
-// the binary and the CPU/Vulkan backends; the NVIDIA and AMD runtimes are
-// most of the archive and are skipped.
-func keep(name string) bool {
-	name = strings.TrimPrefix(name, "./")
-	if name == "bin/ollama" {
-		return true
-	}
-	if !strings.HasPrefix(name, "lib/ollama/") {
-		return false
-	}
-	for _, skip := range []string{"cuda", "rocm", "mlx", "jetpack"} {
-		if strings.Contains(strings.ToLower(name), skip) {
-			return false
-		}
-	}
-	return true
-}
-
 // Install downloads, verifies and unpacks a release next to the current
 // one and switches to it. A running server keeps the old files until
 // Restart.
@@ -242,8 +224,12 @@ func (r *Runtime) Install(ctx context.Context, rel Release, progress Progress) e
 		_ = os.RemoveAll(dest)
 		return fmt.Errorf(i18n.T("unpacking Ollama failed: %w"), err)
 	}
+	if !runtimeComplete(dest) {
+		_ = os.RemoveAll(dest)
+		return errors.New(i18n.T("the archive does not contain the Ollama binary"))
+	}
 	// Sanity check before switching.
-	if out, err := exec.CommandContext(ctx, filepath.Join(dest, "bin", "ollama"), "--version").CombinedOutput(); err != nil {
+	if out, err := exec.CommandContext(ctx, filepath.Join(dest, binaryRel), "--version").CombinedOutput(); err != nil {
 		_ = os.RemoveAll(dest)
 		return fmt.Errorf(i18n.T("the new Ollama cannot be started: %v %s"), err, out)
 	}
@@ -287,12 +273,12 @@ func extract(f *os.File, dest string) error {
 	if _, err := f.Seek(0, io.SeekStart); err != nil {
 		return err
 	}
-	zr, err := zstd.NewReader(f)
+	rd, err := openArchive(f)
 	if err != nil {
 		return err
 	}
-	defer zr.Close()
-	tr := tar.NewReader(zr)
+	defer rd.Close()
+	tr := tar.NewReader(rd)
 	for {
 		hdr, err := tr.Next()
 		if err == io.EOF {
@@ -332,8 +318,8 @@ func extract(f *os.File, dest string) error {
 			_ = os.Symlink(hdr.Linkname, target)
 		}
 	}
-	if _, err := os.Stat(filepath.Join(dest, "bin", "ollama")); err != nil {
-		return errors.New(i18n.T("the archive does not contain bin/ollama"))
+	if _, err := os.Stat(filepath.Join(dest, binaryRel)); err != nil {
+		return errors.New(i18n.T("the archive does not contain the Ollama binary"))
 	}
 	return nil
 }
@@ -398,7 +384,7 @@ func (r *Runtime) Start(ctx context.Context) error {
 		// Never offload prompts to Ollama's cloud models.
 		"OLLAMA_NO_CLOUD=1",
 	)
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true, Pdeathsig: syscall.SIGTERM}
+	cmd.SysProcAttr = serveSysProcAttr()
 	logf, _ := os.OpenFile(filepath.Join(r.dir, "server.log"), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o600)
 	if logf != nil {
 		cmd.Stdout, cmd.Stderr = logf, logf

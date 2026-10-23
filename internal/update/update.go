@@ -1,6 +1,7 @@
-// Package update finds new Klient releases on GitHub, downloads the RPM or
-// DEB package (the kind Klient was installed from) and verifies its checksum.
-// Installing it needs root and is done by the UI through pkexec.
+// Package update finds new Klient releases on GitHub, downloads the RPM, DEB
+// or macOS DMG (the kind Klient was installed from) and verifies its checksum.
+// On Linux, installing needs root and is done by the UI through pkexec.
+// On macOS the UI opens the verified DMG for the user to replace Klient.app.
 package update
 
 import (
@@ -16,6 +17,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 
@@ -43,11 +45,15 @@ type Release struct {
 const (
 	RPM = "rpm" // Fedora: klient-VERSION-1.fcNN.x86_64.rpm
 	DEB = "deb" // Debian, Ubuntu: klient_VERSION_amd64.deb
+	DMG = "dmg" // macOS: Klient-VERSION-macos-arm64.dmg
 )
 
 // Format is the kind of package this Klient was installed from, or "" when it
 // was not installed from a package. Replaced in tests.
 var Format = sync.OnceValue(func() string {
+	if runtime.GOOS == "darwin" {
+		return DMG
+	}
 	if exe, err := os.Executable(); err != nil || exe != "/usr/bin/klient" {
 		return ""
 	}
@@ -65,10 +71,33 @@ var Format = sync.OnceValue(func() string {
 // The copies with a fixed name (klient.x86_64.rpm, klient_amd64.deb) serve
 // only as stable links for the first installation.
 func asset(name, format string) bool {
-	if format == DEB {
+	switch format {
+	case DEB:
 		return strings.HasPrefix(name, "klient_") && strings.HasSuffix(name, "_amd64.deb") && name != "klient_amd64.deb"
+	case DMG:
+		lower := strings.ToLower(name)
+		if !strings.HasSuffix(lower, ".dmg") {
+			return false
+		}
+		return strings.Contains(lower, "macos") || strings.Contains(lower, "darwin") ||
+			strings.HasPrefix(name, "Klient-") || strings.HasPrefix(lower, "klient-")
+	default: // RPM (also when format is empty and Latest falls back)
+		return strings.HasPrefix(name, "klient-") && strings.HasSuffix(name, ".x86_64.rpm")
 	}
-	return strings.HasPrefix(name, "klient-") && strings.HasSuffix(name, ".x86_64.rpm")
+}
+
+// PreferArchDMG picks the DMG matching GOARCH when several are listed
+// (e.g. arm64 vs amd64). Returns the first match if none match the arch.
+func preferArchDMG(name string) int {
+	arch := runtime.GOARCH
+	lower := strings.ToLower(name)
+	if strings.Contains(lower, arch) {
+		return 0
+	}
+	if arch == "amd64" && strings.Contains(lower, "x86_64") {
+		return 0
+	}
+	return 1
 }
 
 // Latest asks GitHub for the newest release and its package in the format
@@ -104,13 +133,24 @@ func Latest(ctx context.Context) (Release, error) {
 	}
 	out := Release{Version: strings.TrimPrefix(rel.TagName, "v"), Notes: rel.Body, Page: rel.HTMLURL}
 	sums := ""
+	bestRank := 99
 	for _, a := range rel.Assets {
 		switch {
 		case asset(a.Name, format):
-			out.Name, out.URL, out.Size = a.Name, a.URL, a.Size
-			out.SHA256 = strings.TrimPrefix(a.Digest, "sha256:")
-		case a.Name == "SHA256SUMS":
-			sums = a.URL
+			rank := 0
+			if format == DMG {
+				rank = preferArchDMG(a.Name)
+			}
+			if out.URL == "" || rank < bestRank {
+				bestRank = rank
+				out.Name, out.URL, out.Size = a.Name, a.URL, a.Size
+				out.SHA256 = strings.TrimPrefix(a.Digest, "sha256:")
+			}
+		case a.Name == "SHA256SUMS" || a.Name == "SHA256SUMS-macos.txt":
+			// Prefer the macOS-specific list when looking for a DMG.
+			if a.Name == "SHA256SUMS-macos.txt" || sums == "" {
+				sums = a.URL
+			}
 		}
 	}
 	if out.URL == "" {
@@ -127,7 +167,10 @@ func Latest(ctx context.Context) (Release, error) {
 		}
 		out.SHA256 = sum
 	}
-	if len(out.SHA256) != 64 {
+	// Linux packages always require a checksum before download. A macOS DMG
+	// may be offered without one (open the release page / browser download);
+	// update.Download still refuses a missing checksum.
+	if format != DMG && len(out.SHA256) != 64 {
 		return Release{}, errors.New(i18n.T("the release has no checksum – for security reasons it will not be downloaded"))
 	}
 	return out, nil
@@ -249,13 +292,26 @@ func verify(path, sum string) (bool, error) {
 
 // Installable reports whether this Klient came from a package, so a new
 // package can replace it. Builds run from the source tree are not.
+// On macOS a .app under /Applications (or any .app bundle) can be replaced
+// by opening a downloaded DMG; source-tree / bare binaries are not.
 func Installable() bool {
+	if runtime.GOOS == "darwin" {
+		exe, err := os.Executable()
+		if err != nil {
+			return false
+		}
+		return strings.Contains(exe, ".app/")
+	}
 	return Format() != ""
 }
 
-// Install installs the downloaded package. pkexec shows the system password
-// dialog; dnf or apt checks the package's dependencies.
+// Install installs the downloaded package. On Linux, pkexec shows the system
+// password dialog; dnf or apt checks the package's dependencies. On macOS the
+// UI opens the DMG instead — this function is not used there.
 func Install(ctx context.Context, path string) error {
+	if runtime.GOOS == "darwin" || Format() == DMG {
+		return errors.New(i18n.T("open the DMG and drag Klient to Applications"))
+	}
 	cmd := []string{"pkexec", "dnf", "install", "-y", path}
 	if Format() == DEB {
 		cmd = []string{"pkexec", "env", "DEBIAN_FRONTEND=noninteractive", "apt-get", "install", "-y", path}
@@ -272,4 +328,14 @@ func Install(ctx context.Context, path string) error {
 		return fmt.Errorf(i18n.T("installation failed: %s"), msg)
 	}
 	return nil
+}
+
+// StripChannel removes a build channel suffix ("0.11.6-macos" → "0.11.6")
+// so release tags compare cleanly with the embedded version.
+func StripChannel(v string) string {
+	v = strings.TrimPrefix(v, "v")
+	if i := strings.Index(v, "-"); i > 0 {
+		return v[:i]
+	}
+	return v
 }

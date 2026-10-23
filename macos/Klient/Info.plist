@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>cs</string>
+	</array>
+	<key>CFBundleDisplayName</key>
+	<string>Klient</string>
+	<key>CFBundleExecutable</key>
+	<string>Klient</string>
+	<key>CFBundleIdentifier</key>
+	<string>eu.libormacak.Klient</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Klient</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.11.6</string>
+	<key>CFBundleVersion</key>
+	<string>0.11.6</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>14.0</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>Email Address</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>mailto</string>
+			</array>
+		</dict>
+	</array>
+	<key>NSUserNotificationAlertStyle</key>
+	<string>alert</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Klient uses Contacts to suggest email recipients when you compose messages.</string>
+</dict>
+</plist>

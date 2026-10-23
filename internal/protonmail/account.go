@@ -86,7 +86,9 @@ func Login(ctx context.Context, mgr *proton.Manager, username string, password [
 		}
 		return nil, err
 	}
-	return &PendingLogin{mgr: mgr, client: c, auth: auth, username: username, password: password}, nil
+	// Own a copy: callers may clear the slice they passed (e.g. after HV).
+	pw := append([]byte(nil), password...)
+	return &PendingLogin{mgr: mgr, client: c, auth: auth, username: username, password: pw}, nil
 }
 
 func (p *PendingLogin) SubmitTOTP(ctx context.Context, code string) error {

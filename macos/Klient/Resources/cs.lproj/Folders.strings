@@ -1,0 +1,15 @@
+/* Well-known mailbox / system folder display names (IDs stay English for API). */
+
+"Inbox" = "Doručené";
+"Drafts" = "Koncepty";
+"Sent" = "Odeslané";
+"Trash" = "Koš";
+"Spam" = "Spam";
+"Junk" = "Spam";
+"Starred" = "S hvězdičkou";
+"Archive" = "Archiv";
+"All Mail" = "Veškerá pošta";
+"Snoozed" = "Odložené";
+"Snooze" = "Odložené";
+"Scheduled" = "Naplánované";
+"Outbox" = "Odchozí";

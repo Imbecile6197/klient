@@ -82,6 +82,64 @@ func TestSetAndLookup(t *testing.T) {
 	}
 }
 
+func TestApplyConfigLanguage(t *testing.T) {
+	defer Set(Lang())
+	Apply("cs")
+	if Lang() != "cs" {
+		t.Fatalf("Apply(cs) = %q", Lang())
+	}
+	Apply("en")
+	if Lang() != "en" {
+		t.Fatalf("Apply(en) = %q", Lang())
+	}
+	// Empty = system; KLIENT_LANGUAGE wins over OS.
+	t.Setenv("KLIENT_LANGUAGE", "cs")
+	Apply("")
+	if Lang() != "cs" {
+		t.Fatalf("Apply(\"\") with KLIENT_LANGUAGE=cs = %q", Lang())
+	}
+	t.Setenv("KLIENT_LANGUAGE", "en")
+	Apply("")
+	if Lang() != "en" {
+		t.Fatalf("Apply(\"\") with KLIENT_LANGUAGE=en = %q", Lang())
+	}
+}
+
+func TestPOSIXLocale(t *testing.T) {
+	for _, v := range []string{"C", "POSIX", "C.UTF-8", "c.utf8", "C.utf8", "  C.UTF-8  "} {
+		if !isPOSIXLocale(v) {
+			t.Errorf("%q should be ignored as a UI language", v)
+		}
+	}
+	for _, v := range []string{"cs_CZ.UTF-8", "en_US", "en"} {
+		if isPOSIXLocale(v) {
+			t.Errorf("%q should not be treated as POSIX/C", v)
+		}
+	}
+}
+
+func TestDetectSystemIgnoresCUTF8(t *testing.T) {
+	defer Set(Lang())
+	t.Setenv("KLIENT_LANGUAGE", "")
+	t.Setenv("LANGUAGE", "")
+	t.Setenv("LC_ALL", "")
+	t.Setenv("LC_MESSAGES", "")
+	t.Setenv("LANG", "C.UTF-8")
+	got := detectSystem()
+	// Must not treat C.UTF-8 as English; fall through to platform / "en".
+	// On this Mac with Czech AppleLanguages, platformLang returns "cs".
+	if got == "en" && platformLang() == "cs" {
+		t.Fatalf("LANG=C.UTF-8 made detectSystem return en; platformLang=%q", platformLang())
+	}
+	if pl := platformLang(); pl != "" && got != pl && got != "en" {
+		t.Fatalf("detectSystem=%q platformLang=%q", got, pl)
+	}
+	Apply("")
+	if pl := platformLang(); pl == "cs" && Lang() != "cs" {
+		t.Fatalf("Apply(\"\") with LANG=C.UTF-8 → %q, want cs from AppleLanguages", Lang())
+	}
+}
+
 var verbs = regexp.MustCompile(`%[-+# 0]*[0-9]*(?:\.[0-9]+)?[vTtbcdoOqxXUeEfFgGsqpw%]`)
 
 func verbList(s string) []string {

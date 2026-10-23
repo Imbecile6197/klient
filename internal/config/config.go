@@ -223,13 +223,6 @@ func ConfigDir() string {
 	return filepath.Join(dir, appName)
 }
 
-func DataDir() string {
-	if dir := os.Getenv("XDG_DATA_HOME"); dir != "" {
-		return filepath.Join(dir, appName)
-	}
-	return filepath.Join(os.Getenv("HOME"), ".local", "share", appName)
-}
-
 func path() string { return filepath.Join(ConfigDir(), "config.json") }
 
 // Load reads the config file, creating it with defaults if it is missing.

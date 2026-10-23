@@ -16,6 +16,7 @@ const (
 	ProviderOpenAI  = "openai"
 	ProviderGemini  = "gemini"
 	ProviderMistral = "mistral"
+	ProviderGrok    = "grok"
 	ProviderOllama  = "ollama"
 )
 
@@ -32,8 +33,9 @@ type ProviderInfo struct {
 var Providers = []ProviderInfo{
 	{ProviderClaude, "Claude (Anthropic)", "https://platform.claude.com", "claude-opus-5", "claude-opus-5"},
 	{ProviderOpenAI, "ChatGPT (OpenAI)", "https://platform.openai.com/api-keys", "gpt-5.5", "gpt-5.4-mini"},
-	{ProviderGemini, "Gemini (Google)", "https://aistudio.google.com/apikey", "gemini-3.1-pro-preview", "gemini-3-flash-preview"},
+	{ProviderGemini, "Google Gemini", "https://aistudio.google.com/apikey", "gemini-3.1-pro-preview", "gemini-3-flash-preview"},
 	{ProviderMistral, i18n.T("Mistral (EU servers)"), "https://console.mistral.ai/api-keys", "mistral-medium-latest", "mistral-small-latest"},
+	{ProviderGrok, "Grok (xAI)", "https://console.x.ai/team/default/api-keys", "grok-4.7", "grok-4.7"},
 	{ProviderOllama, i18n.T("Local AI (Ollama, on this computer)"), "", "qwen3.5:4b", "qwen3.5:4b"},
 }
 
@@ -87,6 +89,8 @@ func NewProvider(ctx context.Context, id, apiKey string) (Provider, error) {
 		p, err = newGemini(ctx, apiKey)
 	case ProviderMistral:
 		p = newMistral(apiKey)
+	case ProviderGrok:
+		p = newGrok(apiKey)
 	default:
 		return nil, fmt.Errorf(i18n.T("unknown AI provider %q"), id)
 	}

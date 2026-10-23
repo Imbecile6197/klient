@@ -20,4 +20,12 @@ func TestExplain(t *testing.T) {
 	if ex := Explain(ProviderClaude, errors.New("boom")); ex.Text != "boom" || ex.URL != "" {
 		t.Errorf("fallback: %+v", ex)
 	}
+	ex = Explain(ProviderGrok, ErrNoAPIKey)
+	if !strings.Contains(ex.Text, "API") || ex.URL == "" {
+		t.Errorf("grok no key: %+v", ex)
+	}
+	ex = Explain(ProviderOllama, errors.New("Ollama: error starting llama-server: binary not found"))
+	if !strings.Contains(strings.ToLower(ex.Text), "ollama") && !strings.Contains(ex.Text, "Local AI") && !strings.Contains(ex.Text, "Lokální") {
+		t.Errorf("ollama start: %+v", ex)
+	}
 }

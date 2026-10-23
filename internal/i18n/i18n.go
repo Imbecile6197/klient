@@ -28,15 +28,12 @@ var (
 
 type key struct{ ctx, id string }
 
-func init() { Set(detect()) }
+func init() { Apply(configured()) }
 
-// detect picks the language: the "language" setting of Klient, then the
-// usual locale variables. Anything that is not Czech gets English.
-func detect() string {
+// detectSystem picks the language from the environment / OS, ignoring the
+// Klient config file. Used when Preferences → Language is "System".
+func detectSystem() string {
 	if l := os.Getenv("KLIENT_LANGUAGE"); l != "" {
-		return normalize(l)
-	}
-	if l := configured(); l != "" {
 		return normalize(l)
 	}
 	for _, v := range []string{"LANGUAGE", "LC_ALL", "LC_MESSAGES", "LANG"} {
@@ -45,11 +42,36 @@ func detect() string {
 			// A priority list such as "cs:en".
 			val = strings.Split(val, ":")[0]
 		}
-		if val != "" && val != "C" && val != "POSIX" {
-			return normalize(val)
+		// C / POSIX / C.UTF-8 are not UI languages. macOS GUI apps (and many
+		// terminals) set LANG=C.UTF-8; treating that as English skipped
+		// AppleLanguages and left What's New / Help / AI in English while the
+		// system was Czech.
+		if val == "" || isPOSIXLocale(val) {
+			continue
 		}
+		return normalize(val)
+	}
+	if l := platformLang(); l != "" {
+		return l
 	}
 	return "en"
+}
+
+// isPOSIXLocale reports locales that mean "unspecified", not English.
+func isPOSIXLocale(val string) bool {
+	u := strings.ToUpper(strings.TrimSpace(val))
+	return u == "C" || u == "POSIX" || strings.HasPrefix(u, "C.")
+}
+
+// Apply sets the UI language from the Preferences value: "en", "cs", or
+// "" to follow the system. Call after loading or saving config.
+func Apply(configuredLang string) {
+	configuredLang = strings.TrimSpace(configuredLang)
+	if configuredLang == "" {
+		Set(detectSystem())
+		return
+	}
+	Set(configuredLang)
 }
 
 func normalize(l string) string {

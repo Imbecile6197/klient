@@ -100,6 +100,13 @@ var builtinPrices = map[string]config.ModelPrice{
 	"gemini-3-flash":        {In: 0.50, Cached: 0.05, Out: 3},
 	"gemini-3.6-flash":      {In: 0.75, Cached: 0.075, Out: 3.75},
 	"gemini-3.8-flash":      {In: 0.75, Cached: 0.075, Out: 3.75},
+	// xAI – docs.x.ai/docs/models
+	"grok-4.7": {In: 2, Cached: 0.20, Out: 6},
+	"grok-4.6": {In: 2, Cached: 0.20, Out: 6},
+	"grok-4.5": {In: 2, Cached: 0.20, Out: 6},
+	"grok-4":   {In: 3, Cached: 0.30, Out: 15},
+	"grok-3":   {In: 3, Cached: 0.30, Out: 15},
+	"grok-2":   {In: 2, Cached: 0.20, Out: 10},
 }
 
 // PriceFor finds the price of a model: the user's own price first, then

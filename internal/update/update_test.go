@@ -91,9 +91,27 @@ func TestAsset(t *testing.T) {
 		{"klient_amd64.deb", DEB, false},
 		{"klient-0.7.3-1.fc44.x86_64.rpm", DEB, false},
 		{"SHA256SUMS", DEB, false},
+		{"Klient-0.11.6-macos-arm64.dmg", DMG, true},
+		{"klient-0.11.6-macos-amd64.dmg", DMG, true},
+		{"Klient-0.11.6.dmg", DMG, true},
+		{"other.dmg", DMG, false},
+		{"Klient-0.11.6-macos-arm64.dmg", RPM, false},
 	} {
 		if asset(c.name, c.format) != c.want {
 			t.Errorf("asset(%s, %s) != %v", c.name, c.format, c.want)
+		}
+	}
+}
+
+func TestStripChannel(t *testing.T) {
+	for _, c := range []struct{ in, want string }{
+		{"0.11.6-macos", "0.11.6"},
+		{"v0.11.6", "0.11.6"},
+		{"0.11.6", "0.11.6"},
+		{"0.11.6-dev", "0.11.6"},
+	} {
+		if got := StripChannel(c.in); got != c.want {
+			t.Errorf("StripChannel(%q)=%q want %q", c.in, got, c.want)
 		}
 	}
 }

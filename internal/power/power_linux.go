@@ -1,5 +1,5 @@
-// Package power tells whether the laptop runs on mains power, so heavy
-// background work (local AI) can wait for the charger.
+//go:build linux
+
 package power
 
 import (

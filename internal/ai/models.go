@@ -70,6 +70,18 @@ func ListModels(ctx context.Context, provider, apiKey string) ([]string, error) 
 			return nil, err
 		}
 		out = slices.Compact(slices.Sorted(slices.Values(out)))
+	case ProviderGrok:
+		c := grokClient(apiKey)
+		it := c.Models.ListAutoPaging(ctx)
+		for it.Next() {
+			if id := it.Current().ID; isGrokChatModel(id) {
+				out = append(out, id)
+			}
+		}
+		if err := it.Err(); err != nil {
+			return nil, err
+		}
+		out = slices.Compact(slices.Sorted(slices.Values(out)))
 	default:
 		return nil, fmt.Errorf(i18n.T("unknown provider %q"), provider)
 	}
