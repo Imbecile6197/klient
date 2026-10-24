@@ -75,6 +75,24 @@ func (e *Engine) sweepLoop(s *session) {
 // (or offline). At start without a notification for each; later (sweep) with
 // one for mail of the last hour.
 func (e *Engine) catchUp(s *session, start bool) {
+	if s == nil {
+		return
+	}
+	// StatusUp can restart events while sweepLoop is mid-catchUp; overlapping
+	// List/Get storms hit Proton rate limits and can trigger spurious deauth.
+	s.mu.Lock()
+	if s.catchingUp {
+		s.mu.Unlock()
+		return
+	}
+	s.catchingUp = true
+	s.mu.Unlock()
+	defer func() {
+		s.mu.Lock()
+		s.catchingUp = false
+		s.mu.Unlock()
+	}()
+
 	acc := s.acc
 	pages := catchUpPages
 	if !start {

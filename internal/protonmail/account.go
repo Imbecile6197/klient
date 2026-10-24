@@ -357,6 +357,11 @@ func IsOffline(err error) bool {
 
 // IsAuthLost reports whether err means the Proton session/refresh token is
 // gone (re-login required), as opposed to a transient network or server error.
+//
+// Do NOT treat every HTTP 400/401/422 as auth loss — those statuses appear on
+// ordinary API failures and were causing forceProtonDeauth / login storms.
+// Genuine refresh death is AuthRefreshTokenInvalid, PasswordWrong, or the
+// go-proton-api "de-auth" wrap after a hard refresh failure.
 func IsAuthLost(err error) bool {
 	if err == nil || IsOffline(err) {
 		return false
@@ -366,12 +371,6 @@ func IsAuthLost(err error) bool {
 		switch api.Code {
 		case proton.AuthRefreshTokenInvalid, proton.PasswordWrong:
 			return true
-		}
-		switch api.Status {
-		case 400, 401, 422:
-			return true
-		case 409, 429, 500, 502, 503:
-			return false
 		}
 	}
 	// go-proton-api marks hard refresh failures with this phrase.

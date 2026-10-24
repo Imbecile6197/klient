@@ -2,9 +2,11 @@ import AppKit
 import Foundation
 import UserNotifications
 import CoreServices
+import os
 
 @MainActor
 final class AppState: ObservableObject {
+    private static let log = Logger(subsystem: "app.klient", category: "ui")
     @Published var version: String = ""
     @Published var accounts: [AccountRow] = []
     @Published var selectedAccount: String?
@@ -156,6 +158,12 @@ final class AppState: ObservableObject {
     private var undoSendRestore: [String: Any]?
     private var undoSendTimer: Timer?
     private var digestTimer: Timer?
+    /// Coalesce mailChanged / newMail bursts (Linux scheduleRefresh ≈ 2s).
+    private var mailRefreshPending = false
+    private var mailListGen = 0
+    private var foldersGen = 0
+    private var openGen = 0
+    private var unreadGen = 0
 
     /// Custom snooze date picker sheet.
     @Published var showSnoozePicker = false
@@ -707,49 +715,73 @@ final class AppState: ObservableObject {
         }
     }
 
+    /// Debounced list + unread refresh after event storms (Linux `scheduleRefresh`).
+    func scheduleMailRefresh() {
+        if mailRefreshPending { return }
+        mailRefreshPending = true
+        Self.log.debug("mail refresh scheduled")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+            guard let self else { return }
+            self.mailRefreshPending = false
+            self.reloadMessages()
+            self.refreshUnreadCounts()
+        }
+    }
+
     func loadFoldersAndMail() {
         guard let acc = selectedAccount else { return }
-        if let caps = try? Bridge.call("mail.caps", params: ["account": acc]) as? [String: Any] {
-            accountE2E = boolVal(caps["e2e"])
-            accountStartedOffline = boolVal(caps["startedOffline"])
-            refreshOfflineBanner()
-            if let addrs = caps["sendAddresses"] as? [[String: Any]] {
-                sendAddresses = addrs.compactMap { a in
-                    guard let id = a["id"] as? String, let email = a["email"] as? String else { return nil }
-                    return SendAddress(id: id, email: email, name: a["name"] as? String ?? "")
+        foldersGen &+= 1
+        let gen = foldersGen
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            let caps = (try? Bridge.call("mail.caps", params: ["account": acc])) as? [String: Any]
+            let folderRows = (try? Bridge.call("folders.list", params: ["account": acc])) as? [[String: Any]]
+            let cfg = (try? Bridge.call("config.get")) as? [String: Any]
+            let hiddenMap = cfg?["hidden_folders"] as? [String: [String]]
+            DispatchQueue.main.async {
+                guard let self, gen == self.foldersGen, self.selectedAccount == acc else { return }
+                if let caps {
+                    self.accountE2E = self.boolVal(caps["e2e"])
+                    self.accountStartedOffline = self.boolVal(caps["startedOffline"])
+                    self.refreshOfflineBanner()
+                    if let addrs = caps["sendAddresses"] as? [[String: Any]] {
+                        self.sendAddresses = addrs.compactMap { a in
+                            guard let id = a["id"] as? String, let email = a["email"] as? String else { return nil }
+                            return SendAddress(id: id, email: email, name: a["name"] as? String ?? "")
+                        }
+                    }
+                    if let st = caps["storage"] as? [String: Any] {
+                        var next = self.filterStatus
+                        next.storageUsed = self.uint64Val(st["used"])
+                        next.storageMax = self.uint64Val(st["max"])
+                        next.storageMail = self.uint64Val(st["mail"])
+                        next.storageDrive = self.uint64Val(st["drive"])
+                        next.storageDriveMax = self.uint64Val(st["driveMax"])
+                        next.storageSplit = self.boolVal(st["split"])
+                        next.storageUpdated = self.timeVal(st["updated"])
+                        self.filterStatus = next
+                    }
                 }
-            }
-            if let st = caps["storage"] as? [String: Any] {
-                var next = filterStatus
-                next.storageUsed = uint64Val(st["used"])
-                next.storageMax = uint64Val(st["max"])
-                next.storageMail = uint64Val(st["mail"])
-                next.storageDrive = uint64Val(st["drive"])
-                next.storageDriveMax = uint64Val(st["driveMax"])
-                next.storageSplit = boolVal(st["split"])
-                next.storageUpdated = timeVal(st["updated"])
-                filterStatus = next
-            }
-        }
-        if let result = try? Bridge.call("folders.list", params: ["account": acc]) as? [[String: Any]] {
-            folders = result.compactMap { row in
-                guard let id = row["id"] as? String, let name = row["name"] as? String else { return nil }
-                let custom = boolVal(row["custom"])
-                // folder==false means Proton label (tag); missing/true = exclusive folder.
-                let isFolder = boolVal(row["folder"], default: true)
-                return FolderRow(
-                    id: id, name: name, custom: custom,
-                    isLabel: custom && !isFolder,
-                    color: row["color"] as? String ?? ""
-                )
-            }
-            if selectedFolder.isEmpty || folders.first(where: { $0.id == selectedFolder }) == nil {
-                selectedFolder = folders.first?.id ?? ""
+                if let folderRows {
+                    self.folders = folderRows.compactMap { row in
+                        guard let id = row["id"] as? String, let name = row["name"] as? String else { return nil }
+                        let custom = self.boolVal(row["custom"])
+                        // folder==false means Proton label (tag); missing/true = exclusive folder.
+                        let isFolder = self.boolVal(row["folder"], default: true)
+                        return FolderRow(
+                            id: id, name: name, custom: custom,
+                            isLabel: custom && !isFolder,
+                            color: row["color"] as? String ?? ""
+                        )
+                    }
+                    if self.selectedFolder.isEmpty || self.folders.first(where: { $0.id == self.selectedFolder }) == nil {
+                        self.selectedFolder = self.folders.first?.id ?? ""
+                    }
+                }
+                self.hiddenFolderIDs = Set(hiddenMap?[acc] ?? [])
+                self.refreshUnreadCounts()
+                self.reloadMessages()
             }
         }
-        refreshUnreadCounts()
-        loadHiddenFolders(for: acc)
-        reloadMessages()
     }
 
     /// Inbox unread across accounts (Linux tray parity) → Dock badge + menu bar.
@@ -764,25 +796,34 @@ final class AppState: ObservableObject {
             if let acc = selectedAccount, acc != "unified" { return [acc] }
             return []
         }()
-        var total = 0
-        for name in targets {
-            guard let raw = try? Bridge.call("mail.unreadCounts", params: ["account": name]) as? [String: Any] else {
-                continue
+        unreadGen &+= 1
+        let gen = unreadGen
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            var total = 0
+            for name in targets {
+                guard let raw = try? Bridge.call("mail.unreadCounts", params: ["account": name]) as? [String: Any] else {
+                    continue
+                }
+                total += JSONVal.int(raw[inbox])
             }
-            total += intVal(raw[inbox])
+            DispatchQueue.main.async {
+                guard let self, gen == self.unreadGen else { return }
+                self.unreadTotal = total
+                NSApp.dockTile.badgeLabel = total > 0 ? "\(total)" : nil
+                MenuBarController.shared.rebuildMenu()
+            }
         }
-        unreadTotal = total
-        NSApp.dockTile.badgeLabel = total > 0 ? "\(total)" : nil
-        MenuBarController.shared.rebuildMenu()
     }
 
     private func loadHiddenFolders(for acc: String) {
-        guard let cfg = try? Bridge.call("config.get") as? [String: Any],
-              let hidden = cfg["hidden_folders"] as? [String: [String]] else {
-            hiddenFolderIDs = []
-            return
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            let cfg = (try? Bridge.call("config.get")) as? [String: Any]
+            let hidden = cfg?["hidden_folders"] as? [String: [String]]
+            DispatchQueue.main.async {
+                guard let self, self.selectedAccount == acc else { return }
+                self.hiddenFolderIDs = Set(hidden?[acc] ?? [])
+            }
         }
-        hiddenFolderIDs = Set(hidden[acc] ?? [])
     }
 
     func toggleFolderHidden(_ folderID: String) {
@@ -805,15 +846,27 @@ final class AppState: ObservableObject {
             runSearch()
             return
         }
-        let params: [String: Any] = [
-            "account": acc, "folder": selectedFolder, "page": 0, "pageSize": 50,
-        ]
-        guard let result = try? Bridge.call("mail.list", params: params) as? [[String: Any]] else {
-            messages = []
-            return
+        let folder = selectedFolder
+        let threadsOn = threadsEnabled
+        mailListGen &+= 1
+        let gen = mailListGen
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            let params: [String: Any] = [
+                "account": acc, "folder": folder, "page": 0, "pageSize": 50,
+            ]
+            let result = (try? Bridge.call("mail.list", params: params)) as? [[String: Any]]
+            let rows = result?.map { Self.parseMessageRowStatic($0) } ?? []
+            DispatchQueue.main.async {
+                guard let self, gen == self.mailListGen,
+                      self.selectedAccount == acc, self.selectedFolder == folder else { return }
+                if threadsOn {
+                    self.messages = self.groupThreads(rows)
+                } else {
+                    self.messages = rows
+                }
+                self.syncOnlineIfNeeded()
+            }
         }
-        applyMessageList(result.map(parseMessageRow))
-        syncOnlineIfNeeded()
     }
 
     func runSearch() {
@@ -823,13 +876,25 @@ final class AppState: ObservableObject {
             reloadMessages()
             return
         }
-        guard let result = try? Bridge.call("mail.search", params: [
-            "account": acc, "folder": selectedFolder, "query": q, "max": 50,
-        ]) as? [[String: Any]] else {
-            messages = []
-            return
+        let folder = selectedFolder
+        let threadsOn = threadsEnabled
+        mailListGen &+= 1
+        let gen = mailListGen
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            let result = (try? Bridge.call("mail.search", params: [
+                "account": acc, "folder": folder, "query": q, "max": 50,
+            ])) as? [[String: Any]]
+            let rows = result?.map { Self.parseMessageRowStatic($0) } ?? []
+            DispatchQueue.main.async {
+                guard let self, gen == self.mailListGen,
+                      self.selectedAccount == acc else { return }
+                if threadsOn {
+                    self.messages = self.groupThreads(rows)
+                } else {
+                    self.messages = rows
+                }
+            }
         }
-        applyMessageList(result.map(parseMessageRow))
     }
 
     private func applyMessageList(_ rows: [MessageRow]) {
@@ -861,19 +926,40 @@ final class AppState: ObservableObject {
     }
 
     private func parseMessageRow(_ row: [String: Any]) -> MessageRow {
+        Self.parseMessageRowStatic(row)
+    }
+
+    /// Safe to call off the main actor (no AppState mutation).
+    nonisolated private static func parseMessageRowStatic(_ row: [String: Any]) -> MessageRow {
         MessageRow(
             id: row["id"] as? String ?? "",
             subject: row["subject"] as? String ?? "(no subject)",
             sender: row["sender"] as? String ?? "",
             senderEmail: row["senderEmail"] as? String ?? "",
             time: (row["time"] as? Int64) ?? Int64(row["time"] as? Int ?? 0),
-            unread: boolVal(row["unread"]),
+            unread: JSONVal.bool(row["unread"]),
             conversationId: row["conversationId"] as? String ?? (row["id"] as? String ?? ""),
-            hasAttachments: boolVal(row["hasAttachments"]),
+            hasAttachments: JSONVal.bool(row["hasAttachments"]),
             labels: row["labels"] as? [String] ?? [],
-            isSpam: boolVal(row["isSpam"]),
+            isSpam: JSONVal.bool(row["isSpam"]),
             spamCategory: row["spamCategory"] as? String ?? ""
         )
+    }
+
+    /// Optimistic unread clear so the list updates before mail.list returns.
+    private func markMessageReadLocally(_ id: String) {
+        guard let i = messages.firstIndex(where: { $0.id == id }), messages[i].unread else { return }
+        let row = messages[i]
+        messages[i] = MessageRow(
+            id: row.id, subject: row.subject, sender: row.sender, senderEmail: row.senderEmail,
+            time: row.time, unread: false, conversationId: row.conversationId,
+            threadCount: row.threadCount, hasAttachments: row.hasAttachments,
+            labels: row.labels, isSpam: row.isSpam, spamCategory: row.spamCategory
+        )
+        if unreadTotal > 0 {
+            unreadTotal -= 1
+            NSApp.dockTile.badgeLabel = unreadTotal > 0 ? "\(unreadTotal)" : nil
+        }
     }
 
     /// Custom Proton folders (exclusive), excluding labels.
@@ -892,24 +978,36 @@ final class AppState: ObservableObject {
         if !selectedMessageIDs.contains(id) {
             selectedMessageIDs = [id]
         }
-        guard let result = try? Bridge.call("mail.getFull", params: ["account": acc, "id": id]) as? [String: Any] else {
-            status = String(localized: "Failed to open message")
-            return
-        }
-        openMessage = parseDetail(result, fallbackID: id)
+        // Instant UI feedback — do not wait for getFull on the main thread.
+        markMessageReadLocally(id)
         messageSummary = ""
         messageSummaryBusy = false
-        applySummaryLayoutFixtureIfNeeded()
-        loadSpamDecision(for: id, account: acc, evaluateIfNeeded: true)
-        loadInvites(for: id)
-        loadThread(for: openMessage?.conversationId ?? id)
-        refreshSenderKeyNotice()
-        if isDraftsFolder {
-            // Drafts open in the composer (Linux openDraft).
-            openDraft(id)
-            return
+        openGen &+= 1
+        let gen = openGen
+        let drafts = isDraftsFolder
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            let result = (try? Bridge.call("mail.getFull", params: ["account": acc, "id": id])) as? [String: Any]
+            DispatchQueue.main.async {
+                guard let self, gen == self.openGen, self.selectedMessageID == id else { return }
+                guard let result else {
+                    self.status = String(localized: "Failed to open message")
+                    return
+                }
+                self.openMessage = self.parseDetail(result, fallbackID: id)
+                self.applySummaryLayoutFixtureIfNeeded()
+                self.loadSpamDecision(for: id, account: acc, evaluateIfNeeded: true)
+                self.loadInvites(for: id)
+                self.loadThread(for: self.openMessage?.conversationId ?? id)
+                self.refreshSenderKeyNotice()
+                if drafts {
+                    // Drafts open in the composer (Linux openDraft).
+                    self.openDraft(id)
+                    return
+                }
+                // Coalesce badge/list sync; avoid a second sync mail.list freeze.
+                self.scheduleMailRefresh()
+            }
         }
-        reloadMessages()
     }
 
     private func parseDetail(_ result: [String: Any], fallbackID: String) -> MessageDetail {
@@ -942,26 +1040,27 @@ final class AppState: ObservableObject {
             expandedThreadIDs = []
             return
         }
-        guard let result = try? Bridge.call("mail.thread", params: [
-            "account": acc, "conversationId": conversationId,
-        ]) as? [[String: Any]] else {
-            threadMessages = []
-            expandedThreadIDs = []
-            return
+        let openID = openMessage?.id
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            let result = (try? Bridge.call("mail.thread", params: [
+                "account": acc, "conversationId": conversationId,
+            ])) as? [[String: Any]]
+            let rows = result?.map { Self.parseMessageRowStatic($0) } ?? []
+            DispatchQueue.main.async {
+                guard let self, self.selectedAccount == acc else { return }
+                self.threadMessages = rows
+                // Expand the open message and any unread ones (Linux openThread).
+                var expand = Set<String>()
+                if let openID { expand.insert(openID) }
+                for tm in rows where tm.unread {
+                    expand.insert(tm.id)
+                }
+                if expand.isEmpty, let last = rows.last {
+                    expand.insert(last.id)
+                }
+                self.expandedThreadIDs = expand
+            }
         }
-        threadMessages = result.map(parseMessageRow)
-        // Expand the open message and any unread ones (Linux openThread).
-        var expand = Set<String>()
-        if let openID = openMessage?.id {
-            expand.insert(openID)
-        }
-        for tm in threadMessages where tm.unread {
-            expand.insert(tm.id)
-        }
-        if expand.isEmpty, let last = threadMessages.last {
-            expand.insert(last.id)
-        }
-        expandedThreadIDs = expand
     }
 
     func toggleThreadCard(_ id: String) {
@@ -981,11 +1080,15 @@ final class AppState: ObservableObject {
 
     func syncOnlineIfNeeded() {
         guard accountStartedOffline, let acc = selectedAccount else { return }
-        guard let caps = try? Bridge.call("mail.caps", params: ["account": acc]) as? [String: Any] else { return }
-        if !boolVal(caps["startedOffline"]) {
-            accountStartedOffline = false
-            refreshOfflineBanner()
-            loadFoldersAndMail()
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            let caps = (try? Bridge.call("mail.caps", params: ["account": acc])) as? [String: Any]
+            DispatchQueue.main.async {
+                guard let self, self.selectedAccount == acc else { return }
+                guard let caps, !self.boolVal(caps["startedOffline"]) else { return }
+                self.accountStartedOffline = false
+                self.refreshOfflineBanner()
+                self.loadFoldersAndMail()
+            }
         }
     }
 
@@ -1015,18 +1118,27 @@ final class AppState: ObservableObject {
             return
         }
         let sender = msg.senderEmail.isEmpty ? msg.sender : msg.senderEmail
-        guard !sender.isEmpty,
-              let r = try? Bridge.call("pgp.senderKeyNotice", params: ["sender": sender]) as? [String: Any],
-              boolVal(r["show"]) else {
+        guard !sender.isEmpty else {
             senderKeyNotice = nil
             return
         }
-        senderKeyNotice = SenderKeyNotice(
-            email: r["email"] as? String ?? sender,
-            text: r["text"] as? String ?? "",
-            warn: boolVal(r["warn"]),
-            pending: boolVal(r["pending"])
-        )
+        let msgID = msg.id
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            let r = (try? Bridge.call("pgp.senderKeyNotice", params: ["sender": sender])) as? [String: Any]
+            DispatchQueue.main.async {
+                guard let self, self.openMessage?.id == msgID else { return }
+                guard let r, self.boolVal(r["show"]) else {
+                    self.senderKeyNotice = nil
+                    return
+                }
+                self.senderKeyNotice = SenderKeyNotice(
+                    email: r["email"] as? String ?? sender,
+                    text: r["text"] as? String ?? "",
+                    warn: self.boolVal(r["warn"]),
+                    pending: self.boolVal(r["pending"])
+                )
+            }
+        }
     }
 
     func acceptSenderPendingKey() {
@@ -1381,9 +1493,15 @@ final class AppState: ObservableObject {
 
     func loadInvites(for msgID: String) {
         guard let acc = selectedAccount else { invites = []; return }
-        invites = (try? Bridge.call("invite.parse", params: [
-            "account": acc, "messageId": msgID,
-        ]) as? [[String: Any]]) ?? []
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            let rows = (try? Bridge.call("invite.parse", params: [
+                "account": acc, "messageId": msgID,
+            ]) as? [[String: Any]]) ?? []
+            DispatchQueue.main.async {
+                guard let self, self.selectedMessageID == msgID else { return }
+                self.invites = rows
+            }
+        }
     }
 
     func replyInvite(status: String, invite: [String: Any]) {
@@ -1455,31 +1573,28 @@ final class AppState: ObservableObject {
             return
         }
         let acc = account ?? selectedAccount ?? ""
-        if applySpamDecisionResult(
-            try? Bridge.call("spam.decision", params: ["messageId": id, "account": acc]) as? [String: Any]
-        ) {
-            spamDecisionBusy = false
-            return
-        }
-        guard evaluateIfNeeded, !acc.isEmpty else {
-            spamDecision = nil
-            spamDecisionBusy = false
-            return
-        }
-        spamDecisionBusy = true
-        DispatchQueue.global(qos: .userInitiated).async {
-            let result = try? Bridge.call("spam.decision", params: [
-                "messageId": id,
-                "account": acc,
-                "evaluate": true,
+        spamDecisionBusy = evaluateIfNeeded
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            var result = try? Bridge.call("spam.decision", params: [
+                "messageId": id, "account": acc,
             ]) as? [String: Any]
+            let known = JSONVal.bool(result?["known"])
+            if !known, evaluateIfNeeded, !acc.isEmpty {
+                result = try? Bridge.call("spam.decision", params: [
+                    "messageId": id,
+                    "account": acc,
+                    "evaluate": true,
+                ]) as? [String: Any]
+            }
             DispatchQueue.main.async {
-                guard self.selectedMessageID == id else { return }
-                _ = self.applySpamDecisionResult(result)
+                guard let self, self.selectedMessageID == id else { return }
+                if !self.applySpamDecisionResult(result) {
+                    self.spamDecision = nil
+                }
                 self.spamDecisionBusy = false
                 // Ham/spam badge may have appeared for the list row.
                 if self.boolVal(result?["evaluated"]) {
-                    self.reloadMessages()
+                    self.scheduleMailRefresh()
                     self.refreshFilterStatus()
                 }
             }
@@ -2243,16 +2358,20 @@ final class AppState: ObservableObject {
             if type == "sessionRecovered" {
                 // Silent keyring re-auth succeeded — never leave LoginSheet up.
                 showLogin = false
+                Self.log.info("session recovered for \(obj["account"] as? String ?? "?", privacy: .public)")
             }
-            refreshUnreadCounts()
-            if let acc = obj["account"] as? String, acc == selectedAccount || selectedAccount == "unified" {
-                reloadMessages()
+            // Debounce: catch-up / events can emit many mailChanged in a burst.
+            if let acc = obj["account"] as? String, acc == selectedAccount || selectedAccount == "unified" || type == "sessionRecovered" {
+                scheduleMailRefresh()
+            } else {
+                refreshUnreadCounts()
             }
         case "sessionRecoverFailed":
             if let payload = obj["payload"] as? [String: Any],
                let msg = payload["message"] as? String, !msg.isEmpty {
                 status = String(localized: "Connection problem: ") + msg
             }
+            Self.log.info("session recover failed (kept session): \(obj["account"] as? String ?? "?", privacy: .public)")
         case "offlineStatus":
             if let payload = obj["payload"] as? [String: Any] {
                 let offline = boolVal(payload["offline"])
@@ -2289,22 +2408,17 @@ final class AppState: ObservableObject {
                     payload["account"] = acc
                 }
                 notifyNewMail(payload)
-                refreshUnreadCounts()
-                if let acc = obj["account"] as? String, acc == selectedAccount {
-                    reloadMessages()
-                }
+                scheduleMailRefresh()
             }
         case "spamMoved":
             status = String(localized: "Spam filter moved a message")
-            refreshUnreadCounts()
-            reloadMessages()
+            scheduleMailRefresh()
         case "rulesApplied":
             if let payload = obj["payload"] as? [String: Any],
                let rules = payload["rules"] as? [String] {
                 status = String(format: String(localized: "Rules: %@"), rules.joined(separator: ", "))
             }
-            refreshUnreadCounts()
-            reloadMessages()
+            scheduleMailRefresh()
         case "usageChanged":
             refreshFilterStatus()
         case "blocklistsUpdated", "configChanged":
@@ -2331,6 +2445,7 @@ final class AppState: ObservableObject {
                 status = String(localized: "Session expired – please sign in again")
             }
             let dead = obj["account"] as? String
+            Self.log.info("deauth account=\(dead ?? "?", privacy: .public) needsLogin=\(String(describing: payload?["needsLogin"]), privacy: .public)")
             if let dead, dead == selectedAccount {
                 openMessage = nil
                 messages = []
@@ -2347,6 +2462,7 @@ final class AppState: ObservableObject {
             guard needsLogin else { return }
             if let dead, accounts.contains(where: { $0.username == dead }) {
                 // Session was not removed — spurious / non-fatal; keep UI.
+                Self.log.info("deauth ignored – session still listed for \(dead, privacy: .public)")
                 return
             }
             let real = accounts.filter { $0.username != "unified" && $0.kind != "unified" }

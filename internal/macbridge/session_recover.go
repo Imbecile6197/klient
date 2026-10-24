@@ -66,6 +66,7 @@ func (e *Engine) recoverSession(s *session) {
 			return
 		}
 		if st == nil {
+			log.Printf("macbridge: recover %s: no session in keyring – requiring login", id)
 			e.forceProtonDeauth(s, old, id)
 			return
 		}
@@ -78,11 +79,12 @@ func (e *Engine) recoverSession(s *session) {
 		cancel()
 		if rerr != nil {
 			if protonmail.IsAuthLost(rerr) {
-				log.Printf("macbridge: recover %s: auth lost: %v", id, rerr)
+				log.Printf("macbridge: recover %s: auth lost (logout): %v", id, rerr)
 				e.forceProtonDeauth(s, old, id)
 				return
 			}
-			log.Printf("macbridge: recover %s: resume transient failure: %v (not logging out)", id, rerr)
+			// Keep the live session entry; Swift must not open LoginSheet.
+			log.Printf("macbridge: recover %s: resume transient failure: %v (keeping session, retry)", id, rerr)
 			e.emit(Event{
 				Type:    "sessionRecoverFailed",
 				Account: id,

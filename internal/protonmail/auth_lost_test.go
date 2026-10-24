@@ -19,7 +19,10 @@ func TestIsAuthLost(t *testing.T) {
 		{"offline", &proton.NetError{Message: "down", Cause: errors.New("dial")}, false},
 		{"refresh invalid", &proton.APIError{Status: 422, Code: proton.AuthRefreshTokenInvalid, Message: "bad"}, true},
 		{"password wrong", &proton.APIError{Status: 401, Code: proton.PasswordWrong, Message: "no"}, true},
-		{"http 400", &proton.APIError{Status: 400, Message: "bad request"}, true},
+		// Generic 4xx without an auth code must NOT force logout.
+		{"http 400", &proton.APIError{Status: 400, Message: "bad request"}, false},
+		{"http 401", &proton.APIError{Status: 401, Message: "unauthorized"}, false},
+		{"http 422", &proton.APIError{Status: 422, Message: "unprocessable"}, false},
 		{"http 500", &proton.APIError{Status: 500, Message: "oops"}, false},
 		{"http 503", &proton.APIError{Status: 503, Message: "busy"}, false},
 		{"de-auth wrap", fmt.Errorf("failed to refresh auth, de-auth: %w", errors.New("no")), true},

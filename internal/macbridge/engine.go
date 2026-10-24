@@ -59,13 +59,14 @@ type hvLogin struct {
 }
 
 type session struct {
-	acc        mailbox.Account
-	ctx        context.Context
-	cancel     context.CancelFunc
+	acc          mailbox.Account
+	ctx          context.Context
+	cancel       context.CancelFunc
 	checked      map[string]time.Time // hold until spam filter decides
 	guard        map[string]bool
 	events       bool
 	loopsStarted bool // catch-up + sweep once per session
+	catchingUp   bool // one catchUp at a time (StatusUp + sweep overlap)
 	recovering   bool
 	mu           sync.Mutex
 }
