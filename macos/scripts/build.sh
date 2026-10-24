@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 MACOS="$ROOT/macos"
 BUILD="$MACOS/build"
 APP="$BUILD/Klient.app"
-VERSION="${VERSION:-0.11.6}"
+VERSION="${VERSION:-0.11.7}"
 export PATH="/usr/local/go/bin:${PATH:-}"
 
 mkdir -p "$BUILD"
@@ -64,6 +64,7 @@ swiftc -parse-as-library \
   -framework Security \
   -framework CoreFoundation \
   -framework Contacts \
+  -framework ServiceManagement \
   -o "$APP/Contents/MacOS/Klient"
 
 chmod +x "$APP/Contents/MacOS/Klient"

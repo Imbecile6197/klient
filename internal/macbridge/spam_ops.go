@@ -83,9 +83,21 @@ func (e *Engine) spamScanInbox(params json.RawMessage) Response {
 	if err != nil {
 		return Response{OK: false, Error: err.Error()}
 	}
+	// Unified list IDs are wrapped; ProcessNew / decisions use account-own IDs
+	// (same as catch-up and Linux scanInbox over each real account).
+	u, unified := s.acc.(*mailbox.Unified)
 	moved := 0
 	for _, m := range list {
-		_, did, err := e.filter.ProcessNew(ctx, s.acc, m)
+		acc := s.acc
+		meta := m
+		if unified {
+			real, unwrapped, ok := u.UnwrapSummary(m)
+			if !ok {
+				continue
+			}
+			acc, meta = real, unwrapped
+		}
+		_, did, err := e.filter.ProcessNew(ctx, acc, meta)
 		if err == nil && did {
 			moved++
 		}

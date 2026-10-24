@@ -429,7 +429,14 @@ final class AppState: ObservableObject {
                 self.unifiedEnabled = true
                 self.refreshAccounts()
                 if self.accounts.isEmpty {
-                    self.showLogin = true
+                    // Saved accounts that failed to resume (network blip) must not
+                    // flash the Proton login sheet — only a truly empty install.
+                    let saved = (try? Bridge.call("config.get") as? [String: Any])?["accounts"] as? [String] ?? []
+                    if saved.isEmpty {
+                        self.showLogin = true
+                    } else {
+                        self.status = String(localized: "Could not restore accounts – check the connection")
+                    }
                 } else if self.selectedAccount == nil {
                     self.selectedAccount = self.accounts.first(where: { $0.username == "unified" })?.username
                         ?? self.accounts.first?.username
@@ -1723,7 +1730,7 @@ final class AppState: ObservableObject {
     }
 
     func summarizeOpen() {
-        guard let msg = openMessage else { return }
+        guard let acc = selectedAccount, let msg = openMessage else { return }
         let msgID = msg.id
         messageSummaryBusy = true
         messageSummary = ""
@@ -1731,7 +1738,13 @@ final class AppState: ObservableObject {
         DispatchQueue.global().async {
             do {
                 let result = try Bridge.call("ai.summarize", params: [
-                    "from": msg.sender, "subject": msg.subject, "body": msg.text,
+                    "account": acc,
+                    "messageId": msg.id,
+                    "conversationId": msg.conversationId,
+                    "from": msg.sender,
+                    "subject": msg.subject,
+                    "body": msg.text,
+                    "html": msg.html,
                 ]) as? [String: Any]
                 let summary = result?["summary"] as? String ?? String(localized: "No summary")
                 DispatchQueue.main.async {
@@ -1774,17 +1787,22 @@ final class AppState: ObservableObject {
 
     func scanSpam() {
         guard let acc = selectedAccount else { return }
-        status = "Scanning inbox…"
+        status = String(localized: "Checking the inbox…")
         DispatchQueue.global().async {
             do {
                 let result = try Bridge.call("spam.scanInbox", params: ["account": acc, "max": 40]) as? [String: Any]
                 DispatchQueue.main.async {
-                    let moved = result?["moved"] as? Int ?? 0
-                    self.status = "Spam scan done – moved \(moved)"
+                    let moved = JSONVal.int(result?["moved"])
+                    self.status = String(
+                        format: String(localized: "Done, moved to spam: %d"),
+                        moved
+                    )
                     self.reloadMessages()
                 }
             } catch {
-                DispatchQueue.main.async { self.status = error.localizedDescription }
+                DispatchQueue.main.async {
+                    self.status = String(localized: "The check failed: ") + error.localizedDescription
+                }
             }
         }
     }
@@ -2130,8 +2148,17 @@ final class AppState: ObservableObject {
               let type = obj["type"] as? String else { return }
         switch type {
         case "mailChanged", "sessionRecovered":
+            if type == "sessionRecovered" {
+                // Silent keyring re-auth succeeded — never leave LoginSheet up.
+                showLogin = false
+            }
             if let acc = obj["account"] as? String, acc == selectedAccount || selectedAccount == "unified" {
                 reloadMessages()
+            }
+        case "sessionRecoverFailed":
+            if let payload = obj["payload"] as? [String: Any],
+               let msg = payload["message"] as? String, !msg.isEmpty {
+                status = String(localized: "Connection problem: ") + msg
             }
         case "offlineStatus":
             if let payload = obj["payload"] as? [String: Any] {
@@ -2201,18 +2228,43 @@ final class AppState: ObservableObject {
                 }
             }
         case "deauth":
-            if let payload = obj["payload"] as? [String: Any],
-               let msg = payload["message"] as? String, !msg.isEmpty {
+            let payload = obj["payload"] as? [String: Any]
+            if let msg = payload?["message"] as? String, !msg.isEmpty {
                 status = msg
             } else {
                 status = String(localized: "Session expired – please sign in again")
             }
-            if let acc = obj["account"] as? String, acc == selectedAccount {
+            let dead = obj["account"] as? String
+            if let dead, dead == selectedAccount {
                 openMessage = nil
                 messages = []
             }
             refreshAccounts()
-            showLogin = true
+            // Only open Proton LoginSheet on genuine auth loss (needsLogin),
+            // never for IMAP password rejects or when the session is still live.
+            let kind = payload?["kind"] as? String ?? ""
+            let needsLogin: Bool = {
+                if let b = payload?["needsLogin"] as? Bool { return b }
+                if let n = payload?["needsLogin"] as? NSNumber { return n.boolValue }
+                return kind != "imap"
+            }()
+            guard needsLogin else { return }
+            if let dead, accounts.contains(where: { $0.username == dead }) {
+                // Session was not removed — spurious / non-fatal; keep UI.
+                return
+            }
+            let real = accounts.filter { $0.username != "unified" && $0.kind != "unified" }
+            if real.isEmpty {
+                if let dead, !dead.isEmpty { loginUsername = dead }
+                showLogin = true
+            } else if let dead, selectedAccount == dead || selectedAccount == "unified" {
+                // Linux parity: login only when the active view lost its account.
+                loginUsername = dead
+                showLogin = true
+                selectedAccount = real.first?.username
+                loadFoldersAndMail()
+            }
+            // Secondary account died while another remains: status only, no sheet.
         case "outboxChanged":
             if let payload = obj["payload"] as? [String: Any],
                let raw = payload["items"] as? [[String: Any]] {

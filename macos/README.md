@@ -64,8 +64,8 @@ Focus: Linux → macOS gaps only; macOS-only extras (System Contacts, …) are f
 ## Release helpers
 
 ```bash
-VERSION=0.11.6 ./macos/scripts/build.sh
-VERSION=0.11.6 ./macos/scripts/package-dmg.sh
+VERSION=0.11.7 ./macos/scripts/build.sh
+VERSION=0.11.7 ./macos/scripts/package-dmg.sh
 # SIGN_IDENTITY=… ./macos/scripts/sign-notarize.sh
 ```
 

@@ -115,6 +115,30 @@ var linkRe = regexp.MustCompile(`https?://[^\s<>"'\)\]]+`)
 
 func FindLinks(s string) []string { return linkRe.FindAllString(s, -1) }
 
+// BodyForAI picks the plain body to send to an assistant. Many senders ship a
+// short text/plain stub ("view this e-mail in a browser") next to a full HTML
+// part; preferring the stub alone yields fragment summaries and weak drafts.
+func BodyForAI(text, html string) string {
+	text = strings.TrimSpace(text)
+	if html == "" {
+		return text
+	}
+	fromHTML, _ := HTMLToText(html)
+	fromHTML = strings.TrimSpace(fromHTML)
+	if text == "" {
+		return fromHTML
+	}
+	if fromHTML == "" {
+		return text
+	}
+	tr, hr := []rune(text), []rune(fromHTML)
+	// Prefer HTML when the plain part is clearly a stub of the rich body.
+	if len(hr) > len(tr)+200 || (len(tr) < 400 && len(hr) > 2*len(tr)) {
+		return fromHTML
+	}
+	return text
+}
+
 // HTMLToText is a small HTML to text converter: it keeps block structure and
 // shows link targets next to their text, which also makes phishing links
 // ("paypal.com" pointing elsewhere) visible to the reader.

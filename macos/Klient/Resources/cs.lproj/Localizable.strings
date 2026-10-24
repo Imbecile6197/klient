@@ -16,6 +16,9 @@
 "New Message" = "Nová zpráva";
 "Refresh" = "Obnovit";
 "Scan Inbox for Spam" = "Prohledat doručenou poštu na spam";
+"Checking the inbox…" = "Prověřuji doručenou poštu…";
+"Done, moved to spam: %d" = "Hotovo, do spamu přesunuto: %d";
+"The check failed: " = "Prověření selhalo: ";
 "Mail" = "Pošta";
 "%lld messages" = "%lld zpráv";
 "Select a message to read." = "Vyberte zprávu ke čtení.";
@@ -187,6 +190,13 @@
 "No DMG is available for this release." = "Pro toto vydání není k dispozici DMG.";
 "A New Version of Klient Is Ready" = "Je připravena nová verze Klienta";
 "Version %@ is available on GitHub." = "Verze %@ je dostupná na GitHubu.";
+"Startup" = "Spuštění";
+"Open at Login" = "Spouštět při přihlášení";
+"Launch Klient when you log in to this Mac." = "Spustí Klienta při přihlášení k tomuto Macu.";
+"Klient needs approval in System Settings → General → Login Items." = "Klient potřebuje schválení v Nastavení systému → Obecné → Přihlašovací položky.";
+"Open Login Items Settings…" = "Otevřít nastavení přihlašovacích položek…";
+"Klient will open at login." = "Klient se bude spouštět při přihlášení.";
+"Klient will not open at login." = "Klient se při přihlášení spouštět nebude.";
 "Check for updates automatically" = "Kontrolovat aktualizace automaticky";
 "Once a day from GitHub. A new version can be downloaded as a DMG; drag Klient to Applications to install." = "Jednou denně z GitHubu. Novou verzi lze stáhnout jako DMG; pro instalaci přetáhněte Klient do Složky Aplikace.";
 "Show Window" = "Zobrazit okno";
@@ -220,6 +230,8 @@
 "Spam filter moved a message" = "Filtr spamu přesunul zprávu";
 "Rules: %@" = "Pravidla: %@";
 "Session expired – please sign in again" = "Relace vypršela – přihlaste se znovu";
+"Could not restore accounts – check the connection" = "Účty se nepodařilo obnovit – zkontrolujte připojení";
+"Connection problem: " = "Problém s připojením: ";
 "AI spam filter" = "AI filtr spamu";
 "Filter incoming mail with AI" = "Filtrovat příchozí poštu pomocí AI";
 "Hold new mail until checked" = "Nezobrazovat novou poštu, dokud není zkontrolována";

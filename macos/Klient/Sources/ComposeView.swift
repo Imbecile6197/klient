@@ -545,16 +545,23 @@ struct ComposeView: View {
 
     private func draftReplyAI() {
         guard let msg = replyTo else { return }
+        let acc = state.selectedAccount ?? ""
         sending = true
         status = String(localized: "Drafting…")
         DispatchQueue.global().async {
             do {
-                let result = try Bridge.call("ai.draftReply", params: [
+                var params: [String: Any] = [
                     "from": msg.sender,
                     "subject": msg.subject,
                     "body": msg.text,
+                    "html": msg.html,
                     "instruction": "",
-                ]) as? [String: Any]
+                ]
+                if !acc.isEmpty {
+                    params["account"] = acc
+                    params["messageId"] = msg.id
+                }
+                let result = try Bridge.call("ai.draftReply", params: params) as? [String: Any]
                 DispatchQueue.main.async {
                     sending = false
                     if let t = (result?["reply"] as? String) ?? (result?["text"] as? String) {

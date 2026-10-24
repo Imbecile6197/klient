@@ -42,6 +42,12 @@ func (g *geminiProvider) Complete(ctx context.Context, req Request) (string, err
 	if res.PromptFeedback != nil && res.PromptFeedback.BlockReason != "" {
 		return "", errors.New(i18n.T("Gemini blocked the request: ") + string(res.PromptFeedback.BlockReason))
 	}
+	if len(res.Candidates) > 0 {
+		switch res.Candidates[0].FinishReason {
+		case genai.FinishReasonMaxTokens:
+			return "", errors.New(i18n.T("the model's answer was cut off (max_tokens)"))
+		}
+	}
 	text := res.Text()
 	if text == "" {
 		return "", errors.New(i18n.T("Gemini returned an empty answer"))

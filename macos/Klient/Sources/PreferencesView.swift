@@ -14,6 +14,9 @@ struct PreferencesView: View {
     @State private var threads = true
     @State private var sendDelay = 5
     @State private var autoUpdate = true
+    @State private var launchAtLogin = false
+    @State private var launchAtLoginNeedsApproval = false
+    @State private var suppressLaunchAtLoginChange = false
     @State private var assistantProvider = "claude"
     @State private var assistantModel = ""
     @State private var spamProvider = "claude"
@@ -368,6 +371,7 @@ struct PreferencesView: View {
             .onChange(of: threads) { _, _ in scheduleSave() }
             .onChange(of: sendDelay) { _, _ in scheduleSave() }
             .onChange(of: autoUpdate) { _, _ in scheduleSave() }
+            .onChange(of: launchAtLogin) { _, on in applyLaunchAtLogin(on) }
             .onChange(of: signature) { _, _ in scheduleSave() }
             .onChange(of: signatureHTML) { _, _ in scheduleSave() }
             .onChange(of: signatureUseHTML) { _, _ in scheduleSave() }
@@ -558,6 +562,22 @@ struct PreferencesView: View {
                 Text(String(localized: "Notification Actions"))
             } footer: {
                 Text(String(localized: "Buttons shown on new-mail notifications."))
+            }
+
+            Section {
+                Toggle(String(localized: "Open at Login"), isOn: $launchAtLogin)
+                if launchAtLoginNeedsApproval {
+                    Text(String(localized: "Klient needs approval in System Settings → General → Login Items."))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Button(String(localized: "Open Login Items Settings…")) {
+                        LoginItem.openSystemSettingsLoginItems()
+                    }
+                }
+            } header: {
+                Text(String(localized: "Startup"))
+            } footer: {
+                Text(String(localized: "Launch Klient when you log in to this Mac."))
             }
 
             Section {
@@ -1201,6 +1221,9 @@ struct PreferencesView: View {
         threads = cfgBool(cfg["threads"], true)
         sendDelay = cfgInt(cfg["send_delay"], 5)
         autoUpdate = cfgBool(cfg["auto_update"], true)
+        launchAtLogin = LoginItem.isEnabled
+        launchAtLoginNeedsApproval = LoginItem.requiresApproval
+        LoginItem.desired = launchAtLogin
         assistantProvider = cfg["assistant_provider"] as? String ?? "claude"
         assistantModel = cfg["assistant_model"] as? String ?? ""
         spamProvider = cfg["spam_provider"] as? String ?? "claude"
@@ -1534,6 +1557,35 @@ struct PreferencesView: View {
         let work = DispatchWorkItem { save(immediate: false) }
         saveWork = work
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.45, execute: work)
+    }
+
+    private func applyLaunchAtLogin(_ enabled: Bool) {
+        guard loaded, !suppressLaunchAtLoginChange else { return }
+        do {
+            try LoginItem.setEnabled(enabled)
+            launchAtLoginNeedsApproval = LoginItem.requiresApproval
+            // Reflect OS truth (register may leave requiresApproval without .enabled).
+            let osOn = LoginItem.isEnabled
+            if launchAtLogin != osOn {
+                suppressLaunchAtLoginChange = true
+                launchAtLogin = osOn
+                suppressLaunchAtLoginChange = false
+            }
+            if LoginItem.requiresApproval {
+                status = String(localized: "Klient needs approval in System Settings → General → Login Items.")
+                LoginItem.openSystemSettingsLoginItems()
+            } else if enabled && osOn {
+                status = String(localized: "Klient will open at login.")
+            } else if !enabled {
+                status = String(localized: "Klient will not open at login.")
+            }
+        } catch {
+            suppressLaunchAtLoginChange = true
+            launchAtLogin = LoginItem.isEnabled
+            suppressLaunchAtLoginChange = false
+            launchAtLoginNeedsApproval = LoginItem.requiresApproval
+            status = error.localizedDescription
+        }
     }
 
     private func save(immediate: Bool) {

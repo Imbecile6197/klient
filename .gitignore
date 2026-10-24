@@ -9,5 +9,9 @@
 .vscode/
 .DS_Store
 
-# macOS local build
+# macOS local build + local signing material (never commit keys)
 macos/build/
+*.p12
+*.cer
+KlientDeveloperID.key
+KlientDeveloperID.csr

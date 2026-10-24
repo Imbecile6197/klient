@@ -1221,9 +1221,12 @@ struct MessageSummaryBanner: View {
                             .foregroundStyle(.secondary)
                     }
                 } else {
+                    // fixedSize: HTMLView below is greedy; without this SwiftUI
+                    // compresses multiline summary to a clipped fragment.
                     Text(summary)
                         .font(.subheadline)
                         .textSelection(.enabled)
+                        .fixedSize(horizontal: false, vertical: true)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
@@ -1492,10 +1495,11 @@ struct AskAISheet: View {
             ScrollView {
                 Text(state.askAnswer.isEmpty ? String(localized: "Answers stay on your machine when using local AI.") : state.askAnswer)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .fixedSize(horizontal: false, vertical: true)
                     .foregroundStyle(state.askAnswer.isEmpty ? .secondary : .primary)
                     .textSelection(.enabled)
             }
-            .frame(maxHeight: 220)
+            .frame(maxHeight: 280)
             HStack {
                 Spacer()
                 Button(String(localized: "Done")) { dismiss() }

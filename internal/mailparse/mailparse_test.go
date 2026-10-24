@@ -8,6 +8,26 @@ import (
 	"github.com/Imbecile6197/klient/internal/i18n"
 )
 
+func TestBodyForAIPrefersHTMLWhenPlainIsStub(t *testing.T) {
+	plain := "Please view this e-mail in a browser."
+	html := `<html><body><p>Dobrý den,</p><p>Vaše pojistka č. 12345 je splatná do 15. 11. Částka 2 450 Kč.</p><p>S pozdravem pojišťovna</p></body></html>`
+	got := BodyForAI(plain, html)
+	if !strings.Contains(got, "pojistka") || !strings.Contains(got, "2 450") {
+		t.Fatalf("want full HTML body, got %q", got)
+	}
+	if got == plain {
+		t.Fatal("kept stub plain part")
+	}
+}
+
+func TestBodyForAIKeepsGoodPlain(t *testing.T) {
+	plain := "Ahoj, tady je delší text zprávy bez HTML stubu, stačí na shrnutí a odpověď."
+	html := `<html><body><p>Ahoj, tady je delší text zprávy bez HTML stubu, stačí na shrnutí a odpověď.</p></body></html>`
+	if got := BodyForAI(plain, html); got != plain {
+		t.Fatalf("got %q", got)
+	}
+}
+
 func TestHTMLToText(t *testing.T) {
 	defer i18n.Set(i18n.Lang())
 	i18n.Set("cs")

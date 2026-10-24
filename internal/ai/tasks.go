@@ -198,9 +198,7 @@ func (c *Client) assist(ctx context.Context, prompt string) (string, error) {
 // Summarize returns a short summary of a message with action items.
 func (c *Client) Summarize(ctx context.Context, from, subject, body string) (string, error) {
 	ctx = withTask(ctx, TaskSummary)
-	if c.assistantLocal {
-		body = truncate(body, 8000)
-	}
+	body = truncate(body, c.limit(40000, 8000))
 	return c.assist(ctx, fmt.Sprintf("Summarize this e-mail in %s, in 2–4 sentences. If it gives me any tasks or deadlines, list them at the end as bullet points.\n\n<email>\nFrom: %s\nSubject: %s\n\n%s\n</email>", i18n.LanguageName(), from, subject, body)+outputLanguage())
 }
 
@@ -208,9 +206,7 @@ func (c *Client) Summarize(ctx context.Context, from, subject, body string) (str
 // to say (may be empty).
 func (c *Client) DraftReply(ctx context.Context, from, subject, body, instruction string) (string, error) {
 	ctx = withTask(ctx, TaskReply)
-	if c.assistantLocal {
-		body = truncate(body, 5000)
-	}
+	body = truncate(body, c.limit(30000, 5000))
 	if instruction == "" {
 		instruction = "Write a suitable, brief reply."
 	}

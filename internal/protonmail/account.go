@@ -355,6 +355,32 @@ func IsOffline(err error) bool {
 	return errors.As(err, &ne)
 }
 
+// IsAuthLost reports whether err means the Proton session/refresh token is
+// gone (re-login required), as opposed to a transient network or server error.
+func IsAuthLost(err error) bool {
+	if err == nil || IsOffline(err) {
+		return false
+	}
+	var api *proton.APIError
+	if errors.As(err, &api) {
+		switch api.Code {
+		case proton.AuthRefreshTokenInvalid, proton.PasswordWrong:
+			return true
+		}
+		switch api.Status {
+		case 400, 401, 422:
+			return true
+		case 409, 429, 500, 502, 503:
+			return false
+		}
+	}
+	// go-proton-api marks hard refresh failures with this phrase.
+	if strings.Contains(err.Error(), "de-auth") {
+		return true
+	}
+	return false
+}
+
 func cachePath(userID string) string {
 	return filepath.Join(config.DataDir(), "cache", userID+".db")
 }
