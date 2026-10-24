@@ -5,7 +5,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 BUILD="$ROOT/macos/build"
 APP="$BUILD/Klient.app"
-VERSION="${VERSION:-0.11.7}"
+VERSION="${VERSION:-0.11.8}"
 DMG="$BUILD/Klient-${VERSION}-macos-arm64.dmg"
 STAGE="$BUILD/dmg-stage"
 

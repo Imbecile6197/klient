@@ -866,6 +866,7 @@ final class AppState: ObservableObject {
         openMessage = parseDetail(result, fallbackID: id)
         messageSummary = ""
         messageSummaryBusy = false
+        applySummaryLayoutFixtureIfNeeded()
         loadSpamDecision(for: id, account: acc, evaluateIfNeeded: true)
         loadInvites(for: id)
         loadThread(for: openMessage?.conversationId ?? id)
@@ -1768,6 +1769,25 @@ final class AppState: ObservableObject {
     func dismissMessageSummary() {
         messageSummary = ""
         messageSummaryBusy = false
+    }
+
+    /// Layout-debug only (`KLIENT_SUMMARY_FIXTURE=short|long|busy`). Injects a
+    /// synthetic summary when opening mail so NavigationSplitView height can be
+    /// verified without a live AI provider.
+    private func applySummaryLayoutFixtureIfNeeded() {
+        switch ProcessInfo.processInfo.environment["KLIENT_SUMMARY_FIXTURE"] {
+        case "short":
+            messageSummary = "Krátké shrnutí: schůzka zítra v 10:00."
+        case "long":
+            messageSummary = String(
+                repeating: "Dlouhé AI shrnutí e-mailu s více větami a kontextem. ",
+                count: 60
+            )
+        case "busy":
+            messageSummaryBusy = true
+        default:
+            break
+        }
     }
 
     func askAboutOpenMail() {

@@ -1200,6 +1200,11 @@ struct MessageSummaryBanner: View {
     let busy: Bool
     var onDismiss: () -> Void
 
+    /// Soft Mail-like cap so the reader header cannot displace the split view.
+    private static let summaryMaxHeight: CGFloat = 160
+    /// Banner chrome (padding + title row) above the scroll area — used for DEBUG assert.
+    private static let bannerChromeHeight: CGFloat = 56
+
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: "sparkles")
@@ -1221,13 +1226,19 @@ struct MessageSummaryBanner: View {
                             .foregroundStyle(.secondary)
                     }
                 } else {
-                    // fixedSize: HTMLView below is greedy; without this SwiftUI
-                    // compresses multiline summary to a clipped fragment.
-                    Text(summary)
-                        .font(.subheadline)
-                        .textSelection(.enabled)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    // Scroll + height cap: never unconstrained .fixedSize(vertical:)
+                    // on this text — it fights NavigationSplitView + greedy HTMLView
+                    // and can crush the three-column layout (same class of bug as
+                    // FilterStatusStrip). fixedSize on the *capped* ScrollView only
+                    // shrink-wraps short summaries; long ones scroll within maxHeight.
+                    ScrollView(.vertical, showsIndicators: true) {
+                        Text(summary)
+                            .font(.subheadline)
+                            .textSelection(.enabled)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .frame(maxHeight: Self.summaryMaxHeight)
+                    .fixedSize(horizontal: false, vertical: true)
                 }
             }
 
@@ -1247,8 +1258,29 @@ struct MessageSummaryBanner: View {
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .strokeBorder(KlientTheme.brand.opacity(0.22), lineWidth: 1)
         )
+        .background(
+            GeometryReader { geo in
+                Color.clear.preference(key: SummaryBannerHeightKey.self, value: geo.size.height)
+            }
+        )
+        .onPreferenceChange(SummaryBannerHeightKey.self) { height in
+            guard ProcessInfo.processInfo.environment["KLIENT_LAYOUT_DEBUG"] != nil else { return }
+            let limit = Self.summaryMaxHeight + Self.bannerChromeHeight + 24
+            if height > limit + 1 {
+                print("[Klient][layout] MessageSummaryBanner height \(Int(height)) exceeds cap \(Int(limit)) — split view at risk")
+            } else if !summary.isEmpty || busy {
+                print("[Klient][layout] MessageSummaryBanner height=\(Int(height)) chars=\(summary.count) busy=\(busy) ok")
+            }
+        }
         .accessibilityElement(children: .contain)
         .accessibilityLabel(String(localized: "AI Summary"))
+    }
+}
+
+private struct SummaryBannerHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
     }
 }
 
@@ -1492,6 +1524,9 @@ struct AskAISheet: View {
             Button(String(localized: "Ask")) { state.runAskAI() }
                 .buttonStyle(.borderedProminent)
                 .disabled(state.askQuestion.trimmingCharacters(in: .whitespaces).isEmpty)
+            // Safe here: modal sheet with fixed frame; fixedSize only expands
+            // text inside a height-capped ScrollView (unlike MessageSummaryBanner
+            // which lived unconstrained inside NavigationSplitView).
             ScrollView {
                 Text(state.askAnswer.isEmpty ? String(localized: "Answers stay on your machine when using local AI.") : state.askAnswer)
                     .frame(maxWidth: .infinity, alignment: .leading)
