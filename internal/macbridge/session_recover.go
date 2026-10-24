@@ -119,7 +119,7 @@ func (e *Engine) recoverSession(s *session) {
 		acc.OnDeauth(func() { e.recoverSession(s) })
 		e.startEvents(s)
 		go e.offlineSyncLoop(s)
-		e.emit(Event{Type: "mailChanged", Account: id})
+		e.emitMailChanged(id)
 		e.emit(Event{Type: "sessionRecovered", Account: id})
 		log.Printf("macbridge: recovered Proton session for %s", id)
 	}()

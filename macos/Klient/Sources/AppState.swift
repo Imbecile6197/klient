@@ -4,9 +4,11 @@ import UserNotifications
 import CoreServices
 import os
 
+/// Off-main timing / event logs (must not be MainActor-isolated).
+private let klientUILog = Logger(subsystem: "app.klient", category: "ui")
+
 @MainActor
 final class AppState: ObservableObject {
-    private static let log = Logger(subsystem: "app.klient", category: "ui")
     @Published var version: String = ""
     @Published var accounts: [AccountRow] = []
     @Published var selectedAccount: String?
@@ -386,44 +388,15 @@ final class AppState: ObservableObject {
 
     func start() {
         Bridge.initEngine { [weak self] json in
-            Task { @MainActor in self?.handleEvent(json) }
-        }
-        version = Bridge.version()
-        KlientLocale.applyFromConfig()
-        refreshLocale()
-        requestNotifications()
-        loadSystemLabels()
-        if let cfg = try? Bridge.call("config.get") as? [String: Any] {
-            signatureText = cfg["signature"] as? String
-            signatureHTML = cfg["signature_html"] as? String
-            threadsEnabled = boolVal(cfg["threads"], default: true)
-            if let n = cfg["send_delay"] as? Int {
-                sendDelaySeconds = n
-            } else if let n = cfg["send_delay"] as? NSNumber {
-                sendDelaySeconds = n.intValue
+            // Parse off-main so event storms don't burn MainActor on JSON.
+            DispatchQueue.global(qos: .utility).async {
+                guard let data = json.data(using: .utf8),
+                      let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                      let type = obj["type"] as? String else { return }
+                DispatchQueue.main.async {
+                    self?.handleParsedEvent(type: type, obj: obj)
+                }
             }
-            if let b = cfg["signature_use_html"] as? Bool {
-                signatureUseHTML = b
-            } else if let n = cfg["signature_use_html"] as? NSNumber {
-                signatureUseHTML = n.boolValue
-            } else {
-                signatureUseHTML = false
-            }
-            spellCheckEnabled = boolVal(cfg["spell_check"], default: true)
-            digestEnabled = boolVal(cfg["digest"], default: false)
-            if let n = cfg["digest_hour"] as? Int {
-                digestHour = n
-            } else if let n = cfg["digest_hour"] as? NSNumber {
-                digestHour = n.intValue
-            }
-            requireEncryptionDefault = boolVal(cfg["require_encryption"], default: false)
-            attachPublicKeyDefault = boolVal(cfg["attach_public_key"], default: false)
-            if let nb = cfg["notify_buttons"] as? [String] {
-                notifyActionIDs = nb
-            }
-        }
-        if let about = try? Bridge.call("about") as? [String: Any] {
-            aboutInfo = about
         }
         status = String(localized: "Connecting…")
         MenuBarController.shared.attach(state: self)
@@ -437,8 +410,24 @@ final class AppState: ObservableObject {
         }
         // Never block the AppKit main thread on Proton Resume / IMAP open —
         // that freezes the window before first paint (looks like "won't start").
+        // Phase 1: cheap config/labels off-main → paint. Phase 2: resumeAll.
         let demo = ProcessInfo.processInfo.environment["KLIENT_DEMO"] != nil
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            let ver = Bridge.version()
+            let cfg = (try? Bridge.call("config.get")) as? [String: Any]
+            let about = (try? Bridge.call("about")) as? [String: Any]
+            let labelMap = (try? Bridge.call("mail.systemLabels")) as? [String: String]
+            let savedAccounts = cfg?["accounts"] as? [String] ?? []
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.version = ver
+                if let about { self.aboutInfo = about }
+                if let labelMap { self.applySystemLabels(labelMap) }
+                if let cfg { self.applyStartupConfig(cfg) }
+                KlientLocale.applyFromConfig()
+                self.refreshLocale()
+                self.requestNotifications()
+            }
             if demo {
                 _ = try? Bridge.call("demo.start")
             } else {
@@ -452,8 +441,7 @@ final class AppState: ObservableObject {
                 if self.accounts.isEmpty {
                     // Saved accounts that failed to resume (network blip) must not
                     // flash the Proton login sheet — only a truly empty install.
-                    let saved = (try? Bridge.call("config.get") as? [String: Any])?["accounts"] as? [String] ?? []
-                    if saved.isEmpty {
+                    if savedAccounts.isEmpty {
                         self.showLogin = true
                     } else {
                         self.status = String(localized: "Could not restore accounts – check the connection")
@@ -465,12 +453,56 @@ final class AppState: ObservableObject {
                 }
                 self.refreshFilterStatus()
                 self.refreshOutbox()
-                self.status = "Klient \(self.version)"
+                // Keep status empty after connect (reader no longer shows "Klient version").
+                self.status = ""
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in
                     self?.checkWhatsNew()
                 }
             }
         }
+    }
+
+    private func applyStartupConfig(_ cfg: [String: Any]) {
+        signatureText = cfg["signature"] as? String
+        signatureHTML = cfg["signature_html"] as? String
+        threadsEnabled = boolVal(cfg["threads"], default: true)
+        if let n = cfg["send_delay"] as? Int {
+            sendDelaySeconds = n
+        } else if let n = cfg["send_delay"] as? NSNumber {
+            sendDelaySeconds = n.intValue
+        }
+        if let b = cfg["signature_use_html"] as? Bool {
+            signatureUseHTML = b
+        } else if let n = cfg["signature_use_html"] as? NSNumber {
+            signatureUseHTML = n.boolValue
+        } else {
+            signatureUseHTML = false
+        }
+        spellCheckEnabled = boolVal(cfg["spell_check"], default: true)
+        digestEnabled = boolVal(cfg["digest"], default: false)
+        if let n = cfg["digest_hour"] as? Int {
+            digestHour = n
+        } else if let n = cfg["digest_hour"] as? NSNumber {
+            digestHour = n.intValue
+        }
+        requireEncryptionDefault = boolVal(cfg["require_encryption"], default: false)
+        attachPublicKeyDefault = boolVal(cfg["attach_public_key"], default: false)
+        if let nb = cfg["notify_buttons"] as? [String] {
+            notifyActionIDs = nb
+        }
+    }
+
+    private func applySystemLabels(_ m: [String: String]) {
+        labels.inbox = m["inbox"] ?? labels.inbox
+        labels.spam = m["spam"] ?? labels.spam
+        labels.trash = m["trash"] ?? labels.trash
+        labels.archive = m["archive"] ?? labels.archive
+        labels.starred = m["starred"] ?? labels.starred
+        labels.drafts = m["drafts"] ?? labels.drafts
+        labels.sent = m["sent"] ?? labels.sent
+        labels.allMail = m["allMail"] ?? labels.allMail
+        labels.scheduled = m["scheduled"] ?? labels.scheduled
+        labels.snoozed = m["snoozed"] ?? labels.snoozed
     }
 
     private func startDigestTimer() {
@@ -687,19 +719,11 @@ final class AppState: ObservableObject {
 
     func loadSystemLabels() {
         guard let m = try? Bridge.call("mail.systemLabels") as? [String: String] else { return }
-        labels.inbox = m["inbox"] ?? labels.inbox
-        labels.spam = m["spam"] ?? labels.spam
-        labels.trash = m["trash"] ?? labels.trash
-        labels.archive = m["archive"] ?? labels.archive
-        labels.starred = m["starred"] ?? labels.starred
-        labels.drafts = m["drafts"] ?? labels.drafts
-        labels.sent = m["sent"] ?? labels.sent
-        labels.allMail = m["allMail"] ?? labels.allMail
-        labels.scheduled = m["scheduled"] ?? labels.scheduled
-        labels.snoozed = m["snoozed"] ?? labels.snoozed
+        applySystemLabels(m)
     }
 
     func refreshAccounts() {
+        // Local session map — cheap; callers (start / deauth) need a sync result.
         guard let result = try? Bridge.call("accounts.list") as? [[String: Any]] else { return }
         accounts = result.compactMap { row in
             guard let username = row["username"] as? String else { return nil }
@@ -719,10 +743,13 @@ final class AppState: ObservableObject {
     func scheduleMailRefresh() {
         if mailRefreshPending { return }
         mailRefreshPending = true
-        Self.log.debug("mail refresh scheduled")
+        let t0 = CFAbsoluteTimeGetCurrent()
+        klientUILog.debug("mail refresh scheduled")
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
             guard let self else { return }
             self.mailRefreshPending = false
+            let dt = CFAbsoluteTimeGetCurrent() - t0
+            klientUILog.debug("mail refresh fire after \(Int(dt * 1000))ms")
             self.reloadMessages()
             self.refreshUnreadCounts()
         }
@@ -833,11 +860,14 @@ final class AppState: ObservableObject {
         } else {
             hiddenFolderIDs.insert(folderID)
         }
-        guard var cfg = try? Bridge.call("config.get") as? [String: Any] else { return }
-        var map = cfg["hidden_folders"] as? [String: [String]] ?? [:]
-        map[acc] = Array(hiddenFolderIDs)
-        cfg["hidden_folders"] = map
-        _ = try? Bridge.call("config.save", params: cfg)
+        let hidden = Array(hiddenFolderIDs)
+        DispatchQueue.global(qos: .utility).async {
+            guard var cfg = try? Bridge.call("config.get") as? [String: Any] else { return }
+            var map = cfg["hidden_folders"] as? [String: [String]] ?? [:]
+            map[acc] = hidden
+            cfg["hidden_folders"] = map
+            _ = try? Bridge.call("config.save", params: cfg)
+        }
     }
 
     func reloadMessages() {
@@ -850,12 +880,15 @@ final class AppState: ObservableObject {
         let threadsOn = threadsEnabled
         mailListGen &+= 1
         let gen = mailListGen
+        let t0 = CFAbsoluteTimeGetCurrent()
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             let params: [String: Any] = [
                 "account": acc, "folder": folder, "page": 0, "pageSize": 50,
             ]
             let result = (try? Bridge.call("mail.list", params: params)) as? [[String: Any]]
             let rows = result?.map { Self.parseMessageRowStatic($0) } ?? []
+            let ms = (CFAbsoluteTimeGetCurrent() - t0) * 1000
+            klientUILog.debug("mail.list \(acc, privacy: .public)/\(folder, privacy: .public) \(Int(ms))ms rows=\(rows.count)")
             DispatchQueue.main.async {
                 guard let self, gen == self.mailListGen,
                       self.selectedAccount == acc, self.selectedFolder == folder else { return }
@@ -972,6 +1005,10 @@ final class AppState: ObservableObject {
         folders.filter { $0.isLabel }
     }
 
+    /// Warm getFull results for adjacent list rows (markRead:false). Consumed once.
+    private var fullPrefetch: [String: [String: Any]] = [:]
+    private var prefetchGen = 0
+
     func open(_ id: String) {
         guard let acc = selectedAccount else { return }
         selectedMessageID = id
@@ -982,32 +1019,138 @@ final class AppState: ObservableObject {
         markMessageReadLocally(id)
         messageSummary = ""
         messageSummaryBusy = false
+        let switching = openMessage?.id != id
+        if switching {
+            // Header + empty body from the list/thread row while getFull loads.
+            let stubRow = messages.first(where: { $0.id == id })
+                ?? threadMessages.first(where: { $0.id == id })
+            // Drop previous message chrome so banners don't flash on the new mail.
+            spamDecision = nil
+            spamDecisionBusy = false
+            invites = []
+            senderKeyNotice = nil
+            threadMessages = []
+            expandedThreadIDs = []
+            if let stubRow {
+                openMessage = stubDetail(from: stubRow)
+            } else {
+                openMessage = nil
+            }
+        }
         openGen &+= 1
         let gen = openGen
         let drafts = isDraftsFolder
+        // Prefer a warm neighbor prefetch (no MarkRead was done there).
+        if let cached = fullPrefetch.removeValue(forKey: id),
+           ((cached["bodyHTML"] as? String)?.isEmpty == false)
+            || ((cached["html"] as? String)?.isEmpty == false)
+            || ((cached["text"] as? String)?.isEmpty == false) {
+            applyOpenResult(cached, id: id, account: acc, drafts: drafts, gen: gen)
+            // Prefetch skipped MarkRead — finish it off-main without blocking paint.
+            DispatchQueue.global(qos: .utility).async {
+                _ = try? Bridge.call("mail.markRead", params: ["account": acc, "ids": [id]])
+            }
+            prefetchNeighbors(of: id, account: acc)
+            return
+        }
+        let t0 = CFAbsoluteTimeGetCurrent()
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             let result = (try? Bridge.call("mail.getFull", params: ["account": acc, "id": id])) as? [String: Any]
+            let ms = (CFAbsoluteTimeGetCurrent() - t0) * 1000
+            klientUILog.debug("mail.getFull \(id, privacy: .public) \(Int(ms))ms")
             DispatchQueue.main.async {
                 guard let self, gen == self.openGen, self.selectedMessageID == id else { return }
                 guard let result else {
                     self.status = String(localized: "Failed to open message")
                     return
                 }
-                self.openMessage = self.parseDetail(result, fallbackID: id)
-                self.applySummaryLayoutFixtureIfNeeded()
-                self.loadSpamDecision(for: id, account: acc, evaluateIfNeeded: true)
-                self.loadInvites(for: id)
-                self.loadThread(for: self.openMessage?.conversationId ?? id)
-                self.refreshSenderKeyNotice()
-                if drafts {
-                    // Drafts open in the composer (Linux openDraft).
-                    self.openDraft(id)
-                    return
-                }
-                // Coalesce badge/list sync; avoid a second sync mail.list freeze.
-                self.scheduleMailRefresh()
+                self.applyOpenResult(result, id: id, account: acc, drafts: drafts, gen: gen)
+                self.prefetchNeighbors(of: id, account: acc)
             }
         }
+    }
+
+    private func stubDetail(from row: MessageRow) -> MessageDetail {
+        MessageDetail(
+            id: row.id,
+            subject: row.subject,
+            sender: row.sender,
+            senderEmail: row.senderEmail,
+            to: "",
+            html: "",
+            text: "",
+            bodyHTML: "",
+            hasRemoteContent: false,
+            remoteAllowed: false,
+            unsubscribe: nil,
+            conversationId: row.conversationId,
+            attachments: [],
+            labels: row.labels,
+            time: row.time
+        )
+    }
+
+    private func applyOpenResult(
+        _ result: [String: Any], id: String, account: String, drafts: Bool, gen: Int
+    ) {
+        guard gen == openGen, selectedMessageID == id else { return }
+        openMessage = parseDetail(result, fallbackID: id)
+        applySummaryLayoutFixtureIfNeeded()
+        loadSpamDecision(for: id, account: account, evaluateIfNeeded: true)
+        loadInvites(for: id)
+        loadThread(for: openMessage?.conversationId ?? id)
+        refreshSenderKeyNotice()
+        if drafts {
+            openDraft(id)
+            return
+        }
+        // Optimistic unread clear is enough; MarkRead → events refresh badges.
+        // Avoid a full unreadCounts sweep on every click (Bridge + all accounts).
+    }
+
+    /// Prefetch next/prev list rows only (utility QoS, markRead:false).
+    private func prefetchNeighbors(of id: String, account: String) {
+        guard let i = messages.firstIndex(where: { $0.id == id }) else { return }
+        var ids: [String] = []
+        if i > 0 { ids.append(messages[i - 1].id) }
+        if i + 1 < messages.count { ids.append(messages[i + 1].id) }
+        ids = ids.filter { $0 != id && fullPrefetch[$0] == nil }
+        guard !ids.isEmpty else { return }
+        prefetchGen &+= 1
+        let gen = prefetchGen
+        let keep = Set(ids)
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            for nid in ids {
+                let result = (try? Bridge.call("mail.getFull", params: [
+                    "account": account, "id": nid, "markRead": false,
+                ])) as? [String: Any]
+                guard let result else { continue }
+                DispatchQueue.main.async {
+                    guard let self, gen == self.prefetchGen else { return }
+                    // Drop if user moved far away; keep only current neighbors.
+                    if self.openMessage?.id == id || keep.contains(self.selectedMessageID ?? "") {
+                        self.fullPrefetch[nid] = result
+                    }
+                    if self.fullPrefetch.count > 4 {
+                        self.fullPrefetch = self.fullPrefetch.filter { keep.contains($0.key) }
+                    }
+                }
+            }
+        }
+    }
+
+    /// Patch one list row (spam badge / labels) without a full mail.list.
+    private func patchMessageRow(_ id: String, isSpam: Bool? = nil, spamCategory: String? = nil, labels: [String]? = nil) {
+        guard let i = messages.firstIndex(where: { $0.id == id }) else { return }
+        let row = messages[i]
+        messages[i] = MessageRow(
+            id: row.id, subject: row.subject, sender: row.sender, senderEmail: row.senderEmail,
+            time: row.time, unread: row.unread, conversationId: row.conversationId,
+            threadCount: row.threadCount, hasAttachments: row.hasAttachments,
+            labels: labels ?? row.labels,
+            isSpam: isSpam ?? row.isSpam,
+            spamCategory: spamCategory ?? row.spamCategory
+        )
     }
 
     private func parseDetail(_ result: [String: Any], fallbackID: String) -> MessageDetail {
@@ -1196,13 +1339,16 @@ final class AppState: ObservableObject {
             let row = messages.first(where: { $0.id == id })
             return !(row?.labels.contains(labels.starred) ?? false)
         }
-        _ = try? Bridge.call("mail.setLabel", params: [
-            "account": acc, "label": labels.starred, "on": anyUnstarred, "ids": ids,
-        ])
+        let starred = labels.starred
         status = anyUnstarred
             ? String(localized: "Starred")
             : String(localized: "Star removed")
-        reloadMessages()
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            _ = try? Bridge.call("mail.setLabel", params: [
+                "account": acc, "label": starred, "on": anyUnstarred, "ids": ids,
+            ])
+            DispatchQueue.main.async { self?.reloadMessages() }
+        }
     }
 
     func allowRemoteContent() {
@@ -1287,18 +1433,23 @@ final class AppState: ObservableObject {
         guard !ids.isEmpty else { return }
         // Proton labels are tags: add via setLabel, do not Move (Linux parity).
         if folder == labels.starred || folders.first(where: { $0.id == folder })?.isLabel == true {
-            _ = try? Bridge.call("mail.setLabel", params: [
-                "account": acc, "label": folder, "on": true, "ids": ids,
-            ])
             let name = folders.first(where: { $0.id == folder })?.name ?? folder
             status = String(format: String(localized: "Added: %@"), name)
-            reloadMessages()
-            if let openID = openMessage?.id, ids.contains(openID) {
-                open(openID)
+            let reopen: String? = {
+                if let openID = openMessage?.id, ids.contains(openID) { return openID }
+                return nil
+            }()
+            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                _ = try? Bridge.call("mail.setLabel", params: [
+                    "account": acc, "label": folder, "on": true, "ids": ids,
+                ])
+                DispatchQueue.main.async {
+                    self?.reloadMessages()
+                    if let reopen { self?.open(reopen) }
+                }
             }
             return
         }
-        _ = try? Bridge.call("mail.move", params: ["account": acc, "folder": folder, "ids": ids])
         openMessage = nil
         messageSummary = ""
         messageSummaryBusy = false
@@ -1306,7 +1457,15 @@ final class AppState: ObservableObject {
         spamDecisionBusy = false
         selectedMessageIDs = []
         selectedMessageID = nil
-        reloadMessages()
+        // Optimistic remove from list while the move runs off-main.
+        messages.removeAll { ids.contains($0.id) }
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            _ = try? Bridge.call("mail.move", params: ["account": acc, "folder": folder, "ids": ids])
+            DispatchQueue.main.async {
+                self?.reloadMessages()
+                self?.refreshUnreadCounts()
+            }
+        }
     }
 
     /// Adds or removes a Proton label (tag) on the current selection / open message.
@@ -1331,17 +1490,23 @@ final class AppState: ObservableObject {
         guard let acc = selectedAccount, acc != "unified" else { return }
         let targetIDs = ids ?? targetMessageIDs()
         guard !targetIDs.isEmpty else { return }
-        _ = try? Bridge.call("mail.setLabel", params: [
-            "account": acc, "label": labelID, "on": on, "ids": targetIDs,
-        ])
         let name = folders.first(where: { $0.id == labelID })?.name ?? labelID
         status = on
             ? String(format: String(localized: "Label %@ added"), name)
             : String(format: String(localized: "Label %@ removed"), name)
-        if let openID = openMessage?.id, targetIDs.contains(openID) {
-            open(openID)
+        let reopen: String? = {
+            if let openID = openMessage?.id, targetIDs.contains(openID) { return openID }
+            return nil
+        }()
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            _ = try? Bridge.call("mail.setLabel", params: [
+                "account": acc, "label": labelID, "on": on, "ids": targetIDs,
+            ])
+            DispatchQueue.main.async {
+                self?.reloadMessages()
+                if let reopen { self?.open(reopen) }
+            }
         }
-        reloadMessages()
     }
 
     func messageHasLabel(_ labelID: String) -> Bool {
@@ -1360,8 +1525,24 @@ final class AppState: ObservableObject {
         let ids = targetMessageIDs()
         guard !ids.isEmpty else { return }
         let method = read ? "mail.markRead" : "mail.markUnread"
-        _ = try? Bridge.call(method, params: ["account": acc, "ids": ids])
-        reloadMessages()
+        // Optimistic list update while the Bridge call runs off-main.
+        for id in ids {
+            if let i = messages.firstIndex(where: { $0.id == id }), messages[i].unread == read {
+                let row = messages[i]
+                messages[i] = MessageRow(
+                    id: row.id, subject: row.subject, sender: row.sender, senderEmail: row.senderEmail,
+                    time: row.time, unread: !read, conversationId: row.conversationId,
+                    threadCount: row.threadCount, hasAttachments: row.hasAttachments,
+                    labels: row.labels, isSpam: row.isSpam, spamCategory: row.spamCategory
+                )
+            }
+        }
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            _ = try? Bridge.call(method, params: ["account": acc, "ids": ids])
+            DispatchQueue.main.async {
+                self?.refreshUnreadCounts()
+            }
+        }
     }
 
     func createFolder(name: String, asLabel: Bool = false) {
@@ -1543,24 +1724,32 @@ final class AppState: ObservableObject {
     func toggleStar() {
         guard let acc = selectedAccount, let msg = openMessage else { return }
         let starred = msg.labels.contains(labels.starred)
-        _ = try? Bridge.call("mail.setLabel", params: [
-            "account": acc, "label": labels.starred, "on": !starred, "ids": [msg.id],
-        ])
-        open(msg.id)
+        let label = labels.starred
+        let id = msg.id
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            _ = try? Bridge.call("mail.setLabel", params: [
+                "account": acc, "label": label, "on": !starred, "ids": [id],
+            ])
+            DispatchQueue.main.async { self?.open(id) }
+        }
     }
 
     func markSpam(_ isSpam: Bool) {
         guard let msg = openMessage else { return }
-        _ = try? Bridge.call("spam.feedback", params: [
-            "messageId": msg.id, "from": msg.sender, "isSpam": isSpam,
-        ])
+        let msgID = msg.id
+        let sender = msg.sender
         if !isSpam {
             spamDecision = nil
         }
-        moveSelected(to: isSpam ? labels.spam : labels.inbox)
         status = isSpam
             ? String(localized: "Marked as spam")
             : String(localized: "Marked as not spam")
+        DispatchQueue.global(qos: .userInitiated).async {
+            _ = try? Bridge.call("spam.feedback", params: [
+                "messageId": msgID, "from": sender, "isSpam": isSpam,
+            ])
+        }
+        moveSelected(to: isSpam ? labels.spam : labels.inbox)
     }
 
     /// Fetch spam-filter verdict for the reader banner (Linux `updateSpamUI`).
@@ -1592,9 +1781,13 @@ final class AppState: ObservableObject {
                     self.spamDecision = nil
                 }
                 self.spamDecisionBusy = false
-                // Ham/spam badge may have appeared for the list row.
-                if self.boolVal(result?["evaluated"]) {
-                    self.scheduleMailRefresh()
+                // Ham/spam badge may have appeared for the list row — patch locally.
+                if self.boolVal(result?["evaluated"]),
+                   let decision = result?["decision"] as? [String: Any] {
+                    let spam = self.boolVal(decision["spam"])
+                    let verdict = decision["verdict"] as? [String: Any] ?? [:]
+                    let cat = verdict["category"] as? String ?? ""
+                    self.patchMessageRow(id, isSpam: spam, spamCategory: cat)
                     self.refreshFilterStatus()
                 }
             }
@@ -2353,12 +2546,16 @@ final class AppState: ObservableObject {
         guard let data = json.data(using: .utf8),
               let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let type = obj["type"] as? String else { return }
+        handleParsedEvent(type: type, obj: obj)
+    }
+
+    private func handleParsedEvent(type: String, obj: [String: Any]) {
         switch type {
         case "mailChanged", "sessionRecovered":
             if type == "sessionRecovered" {
                 // Silent keyring re-auth succeeded — never leave LoginSheet up.
                 showLogin = false
-                Self.log.info("session recovered for \(obj["account"] as? String ?? "?", privacy: .public)")
+                klientUILog.info("session recovered for \(obj["account"] as? String ?? "?", privacy: .public)")
             }
             // Debounce: catch-up / events can emit many mailChanged in a burst.
             if let acc = obj["account"] as? String, acc == selectedAccount || selectedAccount == "unified" || type == "sessionRecovered" {
@@ -2371,7 +2568,7 @@ final class AppState: ObservableObject {
                let msg = payload["message"] as? String, !msg.isEmpty {
                 status = String(localized: "Connection problem: ") + msg
             }
-            Self.log.info("session recover failed (kept session): \(obj["account"] as? String ?? "?", privacy: .public)")
+            klientUILog.info("session recover failed (kept session): \(obj["account"] as? String ?? "?", privacy: .public)")
         case "offlineStatus":
             if let payload = obj["payload"] as? [String: Any] {
                 let offline = boolVal(payload["offline"])
@@ -2423,18 +2620,22 @@ final class AppState: ObservableObject {
             refreshFilterStatus()
         case "blocklistsUpdated", "configChanged":
             refreshFilterStatus()
-            if let cfg = try? Bridge.call("config.get") as? [String: Any] {
-                let on = boolVal(cfg["threads"], default: true)
-                if on != threadsEnabled {
-                    threadsEnabled = on
-                    reloadMessages()
-                } else {
-                    threadsEnabled = on
-                }
-                let lang = cfg["language"] as? String ?? ""
-                if lang != KlientLocale.configCode {
-                    KlientLocale.apply(lang)
-                    refreshLocale()
+            DispatchQueue.global(qos: .utility).async { [weak self] in
+                let cfg = (try? Bridge.call("config.get")) as? [String: Any]
+                DispatchQueue.main.async {
+                    guard let self, let cfg else { return }
+                    let on = self.boolVal(cfg["threads"], default: true)
+                    if on != self.threadsEnabled {
+                        self.threadsEnabled = on
+                        self.reloadMessages()
+                    } else {
+                        self.threadsEnabled = on
+                    }
+                    let lang = cfg["language"] as? String ?? ""
+                    if lang != KlientLocale.configCode {
+                        KlientLocale.apply(lang)
+                        self.refreshLocale()
+                    }
                 }
             }
         case "deauth":
@@ -2445,7 +2646,7 @@ final class AppState: ObservableObject {
                 status = String(localized: "Session expired – please sign in again")
             }
             let dead = obj["account"] as? String
-            Self.log.info("deauth account=\(dead ?? "?", privacy: .public) needsLogin=\(String(describing: payload?["needsLogin"]), privacy: .public)")
+            klientUILog.info("deauth account=\(dead ?? "?", privacy: .public) needsLogin=\(String(describing: payload?["needsLogin"]), privacy: .public)")
             if let dead, dead == selectedAccount {
                 openMessage = nil
                 messages = []
@@ -2462,7 +2663,7 @@ final class AppState: ObservableObject {
             guard needsLogin else { return }
             if let dead, accounts.contains(where: { $0.username == dead }) {
                 // Session was not removed — spurious / non-fatal; keep UI.
-                Self.log.info("deauth ignored – session still listed for \(dead, privacy: .public)")
+                klientUILog.info("deauth ignored – session still listed for \(dead, privacy: .public)")
                 return
             }
             let real = accounts.filter { $0.username != "unified" && $0.kind != "unified" }
@@ -2553,29 +2754,36 @@ final class AppState: ObservableObject {
     func handleNotificationAction(_ action: String, messageId: String, account: String) {
         let acc = account.isEmpty ? (selectedAccount ?? "") : account
         guard !acc.isEmpty, !messageId.isEmpty else { return }
-        switch action {
-        case "read":
-            _ = try? Bridge.call("mail.markRead", params: ["account": acc, "ids": [messageId]])
-        case "archive":
-            _ = try? Bridge.call("mail.move", params: [
-                "account": acc, "ids": [messageId], "folder": labels.archive,
-            ])
-        case "trash":
-            _ = try? Bridge.call("mail.move", params: [
-                "account": acc, "ids": [messageId], "folder": labels.trash,
-            ])
-        case "spam":
-            _ = try? Bridge.call("spam.feedback", params: [
-                "messageId": messageId, "from": "", "isSpam": true,
-            ])
-            _ = try? Bridge.call("mail.move", params: [
-                "account": acc, "ids": [messageId], "folder": labels.spam,
-            ])
-        default:
-            break
+        let archive = labels.archive
+        let trash = labels.trash
+        let spam = labels.spam
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            switch action {
+            case "read":
+                _ = try? Bridge.call("mail.markRead", params: ["account": acc, "ids": [messageId]])
+            case "archive":
+                _ = try? Bridge.call("mail.move", params: [
+                    "account": acc, "ids": [messageId], "folder": archive,
+                ])
+            case "trash":
+                _ = try? Bridge.call("mail.move", params: [
+                    "account": acc, "ids": [messageId], "folder": trash,
+                ])
+            case "spam":
+                _ = try? Bridge.call("spam.feedback", params: [
+                    "messageId": messageId, "from": "", "isSpam": true,
+                ])
+                _ = try? Bridge.call("mail.move", params: [
+                    "account": acc, "ids": [messageId], "folder": spam,
+                ])
+            default:
+                break
+            }
+            DispatchQueue.main.async {
+                self?.reloadMessages()
+                self?.refreshUnreadCounts()
+            }
         }
-        reloadMessages()
-        refreshUnreadCounts()
     }
 
     func registerMailtoDefault() {

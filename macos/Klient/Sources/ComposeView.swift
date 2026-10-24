@@ -134,15 +134,18 @@ struct ComposeView: View {
 
     private var fields: some View {
         VStack(spacing: 0) {
-            if !state.sendAddresses.isEmpty {
+            // Snapshot identities so unrelated AppState publishes don't rebuild the picker.
+            let identities = state.sendAddresses
+            if !identities.isEmpty {
                 fieldRow(String(localized: "From")) {
                     Picker("", selection: $fromAddressId) {
-                        ForEach(state.sendAddresses, id: \.id) { a in
+                        ForEach(identities, id: \.id) { a in
                             Text(a.email).tag(a.id)
                         }
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)
+                    .id(identities.map(\.id).joined(separator: ","))
                 }
             }
             fieldRow(String(localized: "To")) {

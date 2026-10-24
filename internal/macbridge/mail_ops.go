@@ -201,6 +201,9 @@ func (e *Engine) mailGetFull(params json.RawMessage) Response {
 		Account     string `json:"account"`
 		ID          string `json:"id"`
 		AllowRemote *bool  `json:"allowRemote"`
+		// MarkRead defaults to true. Prefetch of next/prev passes false so
+		// warming the cache does not clear unread before the user opens it.
+		MarkRead *bool `json:"markRead"`
 	}
 	if err := parseParams(params, &p); err != nil {
 		return Response{OK: false, Error: err.Error()}
@@ -215,7 +218,20 @@ func (e *Engine) mailGetFull(params json.RawMessage) Response {
 	if err != nil {
 		return Response{OK: false, Error: err.Error()}
 	}
-	_ = s.acc.MarkRead(ctx, p.ID)
+	doMark := true
+	if p.MarkRead != nil {
+		doMark = *p.MarkRead
+	}
+	// Do not block the reader on MarkRead — Swift already clears unread
+	// optimistically; Proton events refresh badges. Saves one API RTT on open.
+	if doMark && bool(msg.Meta.Unread) {
+		acc, id := s.acc, p.ID
+		go func() {
+			mctx, mcancel := context.WithTimeout(e.ctx, 30*time.Second)
+			defer mcancel()
+			_ = acc.MarkRead(mctx, id)
+		}()
+	}
 	dto := messageToDTO(msg)
 	atts := make([]map[string]any, 0, len(msg.Attachments))
 	for _, a := range msg.Attachments {
@@ -242,12 +258,18 @@ func (e *Engine) mailGetFull(params json.RawMessage) Response {
 			"http": u.HTTP, "mailto": u.Mailto, "oneClick": u.OneClick,
 		}
 	}
+	// Prefer bodyHTML in the Swift reader; skip shipping a second full HTML
+	// copy (often 100KB+) across the bridge when PrepareHTML already ran.
+	rawHTML := ""
+	if bodyHTML == "" {
+		rawHTML = dto.HTML
+	}
 	return Response{OK: true, Result: map[string]any{
 		"id": dto.ID, "subject": dto.Subject, "sender": sender, "senderEmail": senderAddr,
-		"to": dto.To, "time": dto.Time, "unread": dto.Unread, "text": dto.Text, "html": dto.HTML,
+		"to": dto.To, "time": dto.Time, "unread": dto.Unread, "text": dto.Text, "html": rawHTML,
 		"bodyHTML": bodyHTML, "hasRemoteContent": hasRemote, "remoteAllowed": allow,
 		"unsubscribe": unsub,
-		"labels": msg.Meta.LabelIDs, "attachments": atts, "inlineImages": inline,
+		"labels": msg.Meta.LabelIDs, "attachments": atts,
 		"encryption": msg.Encryption, "conversationId": msg.Meta.ConversationID,
 	}}
 }

@@ -1,11 +1,17 @@
 import SwiftUI
 
 /// Compact Mail / Airmail–style message row.
-struct MessageRowView: View {
+struct MessageRowView: View, Equatable {
     let message: AppState.MessageRow
     let selected: Bool
     /// When browsing Scheduled / Snoozed, show countdown instead of relative date.
     var countdownMode: Bool = false
+
+    static func == (lhs: MessageRowView, rhs: MessageRowView) -> Bool {
+        lhs.message == rhs.message
+            && lhs.selected == rhs.selected
+            && lhs.countdownMode == rhs.countdownMode
+    }
 
     var body: some View {
         HStack(alignment: .top, spacing: 8) {

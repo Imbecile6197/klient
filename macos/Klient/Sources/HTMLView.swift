@@ -2,12 +2,19 @@ import SwiftUI
 import WebKit
 
 /// Safe HTML mail view. Prefer `bodyHTML` from Go (`mailparse.PrepareHTML` + CSP).
-struct HTMLView: NSViewRepresentable {
+struct HTMLView: NSViewRepresentable, Equatable {
     /// Pre-sanitized fragment/document from the bridge (includes CSP meta).
     var bodyHTML: String = ""
     let html: String
     let textFallback: String
     var printToken: Int = 0
+
+    static func == (lhs: HTMLView, rhs: HTMLView) -> Bool {
+        lhs.bodyHTML == rhs.bodyHTML
+            && lhs.html == rhs.html
+            && lhs.textFallback == rhs.textFallback
+            && lhs.printToken == rhs.printToken
+    }
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
@@ -21,8 +28,17 @@ struct HTMLView: NSViewRepresentable {
     }
 
     func updateNSView(_ webView: WKWebView, context: Context) {
-        let body = buildDocument()
-        if context.coordinator.lastHTML != body {
+        // Compare inputs first — avoid rebuilding a multi-100KB document string
+        // on every SwiftUI body pass (spam banner, summary, status, etc.).
+        let sameContent =
+            context.coordinator.lastBodyHTML == bodyHTML
+            && context.coordinator.lastHTMLSrc == html
+            && context.coordinator.lastText == textFallback
+        if !sameContent {
+            context.coordinator.lastBodyHTML = bodyHTML
+            context.coordinator.lastHTMLSrc = html
+            context.coordinator.lastText = textFallback
+            let body = buildDocument()
             context.coordinator.lastHTML = body
             webView.loadHTMLString(body, baseURL: nil)
         }
@@ -40,18 +56,23 @@ struct HTMLView: NSViewRepresentable {
 
     private func buildDocument() -> String {
         if !bodyHTML.isEmpty {
+            // PrepareHTML = CSP metas + baseStyle + fragment. Keep CSP in <head>
+            // (http-equiv is ignored if left inside the body wrap) and avoid a
+            // second nested style/CSP shell around the same payload.
+            let (headExtra, fragment) = Self.splitPrepared(bodyHTML)
             return """
             <!DOCTYPE html><html><head><meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
             <meta name="color-scheme" content="light dark">
             <base target="_blank">
+            \(headExtra)
             <style>
             html, body { margin: 0; padding: 0; background: transparent; color: CanvasText;
               font: 15px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; }
             .wrap { padding: 20px 24px 32px; max-width: 72ch; }
             img { max-width: 100%; height: auto; }
             a { color: LinkText; }
-            </style></head><body><div class="wrap">\(bodyHTML)</div></body></html>
+            </style></head><body><div class="wrap">\(fragment)</div></body></html>
             """
         }
         if !html.isEmpty {
@@ -87,8 +108,19 @@ struct HTMLView: NSViewRepresentable {
         """
     }
 
+    /// Split Go PrepareHTML output into head extras (CSP + style) and body fragment.
+    private static func splitPrepared(_ prepared: String) -> (String, String) {
+        if let range = prepared.range(of: "</style>") {
+            return (String(prepared[..<range.upperBound]), String(prepared[range.upperBound...]))
+        }
+        return ("", prepared)
+    }
+
     final class Coordinator: NSObject, WKNavigationDelegate {
         var lastHTML = ""
+        var lastBodyHTML = ""
+        var lastHTMLSrc = ""
+        var lastText = ""
         var lastPrintToken = 0
 
         func webView(_ webView: WKWebView,
@@ -96,11 +128,7 @@ struct HTMLView: NSViewRepresentable {
                      decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
             if navigationAction.navigationType == .linkActivated,
                let url = navigationAction.request.url {
-                if url.scheme?.lowercased() == "mailto" {
-                    NSWorkspace.shared.open(url)
-                } else {
-                    NSWorkspace.shared.open(url)
-                }
+                NSWorkspace.shared.open(url)
                 decisionHandler(.cancel)
                 return
             }

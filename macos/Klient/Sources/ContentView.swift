@@ -465,6 +465,7 @@ struct ContentView: View {
                             selected: state.selectedMessageIDs.contains(m.id),
                             countdownMode: state.isScheduledFolder || state.isSnoozedFolder
                         )
+                        .equatable()
                         .tag(m.id)
                         .listRowInsets(EdgeInsets(top: 4, leading: 10, bottom: 4, trailing: 12))
                         .draggable(m.id)
@@ -868,8 +869,16 @@ struct ContentView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(20)
                 }
+            } else if msg.bodyHTML.isEmpty && msg.html.isEmpty && msg.text.isEmpty {
+                // List-row stub while getFull / prefetch fills the body.
+                ProgressView()
+                    .controlSize(.regular)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
+                // Equatable: spam/summary/@Published churn must not rebuild WKWebView HTML.
                 HTMLView(bodyHTML: msg.bodyHTML, html: msg.html, textFallback: msg.text, printToken: printToken)
+                    .equatable()
+                    .id(msg.id)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }

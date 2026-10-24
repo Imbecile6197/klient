@@ -81,8 +81,9 @@ enum Bridge {
     }
 
     fileprivate static func deliverEvent(_ json: String) {
-        let handler = eventHandler
-        DispatchQueue.main.async { handler?(json) }
+        // Deliver on the Go callback thread; AppState parses off-main and
+        // hops to MainActor only for state updates (avoids event-storm jank).
+        eventHandler?(json)
     }
 }
 

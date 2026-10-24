@@ -261,7 +261,7 @@ func (e *Engine) watchEvents(s *session) {
 			e.onNewMessage(s, meta)
 		},
 		func() {
-			e.emit(Event{Type: "mailChanged", Account: acc.Username()})
+			e.emitMailChanged(acc.Username())
 		},
 	)
 	if err != nil {
@@ -297,7 +297,7 @@ func (e *Engine) holdNew(s *session, meta protonmail.Summary) bool {
 	}
 	if held {
 		s.hold(meta.ID)
-		e.emit(Event{Type: "mailChanged", Account: s.acc.Username()})
+		e.emitMailChanged(s.acc.Username())
 	}
 	return held
 }
@@ -320,7 +320,7 @@ func (e *Engine) checkNew(s *session, meta protonmail.Summary, held, notify bool
 	d, moved, err := e.filter.ProcessNew(e.ctx, s.acc, meta)
 	if held {
 		s.release(meta.ID)
-		e.emit(Event{Type: "mailChanged", Account: s.acc.Username()})
+		e.emitMailChanged(s.acc.Username())
 	}
 	if err != nil {
 		log.Printf("macbridge spam: %v", err)

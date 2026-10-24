@@ -114,6 +114,5 @@ func prepareMessageHTML(html, text string, inline map[string]string, allowRemote
 	if src == "" {
 		src = mailparse.PlainToHTML(text)
 	}
-	hasRemote = mailparse.HasRemoteContent(src)
-	return mailparse.PrepareHTML(src, inline, allowRemote), hasRemote
+	return mailparse.PrepareHTMLEx(src, inline, allowRemote)
 }

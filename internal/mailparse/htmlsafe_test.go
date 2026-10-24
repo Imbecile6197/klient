@@ -39,6 +39,14 @@ func TestPrepareHTML(t *testing.T) {
 	if !strings.Contains(PrepareHTML("x", nil, true), "img-src data: https:") {
 		t.Error("remote allowed CSP missing")
 	}
+	remote, has := PrepareHTMLEx(`<img src="https://t.example/p.gif">`, nil, false)
+	if !has || !strings.HasPrefix(remote, `<meta http-equiv="Content-Security-Policy"`) {
+		t.Errorf("PrepareHTMLEx remote=%v doc=%s", has, remote)
+	}
+	plain, has := PrepareHTMLEx(`<p>hi</p>`, nil, false)
+	if has || !strings.Contains(plain, "<p>hi</p>") {
+		t.Errorf("PrepareHTMLEx plain hasRemote=%v", has)
+	}
 }
 
 func TestParseHeaderBlock(t *testing.T) {

@@ -49,6 +49,11 @@ type Engine struct {
 	ctx       context.Context
 	cancel    context.CancelFunc
 	demoMode  bool
+
+	// Coalesce Proton event-stream mailChanged bursts (MarkRead + spam hold
+	// + folder edits often fire many times in <1s). Swift still debounces
+	// list reload (~2s); this cuts MainActor event hops.
+	mailChangedSoon map[string]bool
 }
 
 // hvLogin is a Proton login waiting for the user to finish verify.proton.me.
@@ -233,6 +238,32 @@ func (e *Engine) emit(ev Event) {
 		return
 	}
 	e.onEvent(string(b))
+}
+
+// emitMailChanged coalesces mailbox-change notifications per account (~400ms).
+// Prefer this over emit(mailChanged) for event-stream / catch-up storms.
+// Immediate events (newMail, spamMoved, deauth) must keep using emit().
+func (e *Engine) emitMailChanged(account string) {
+	if account == "" {
+		e.emit(Event{Type: "mailChanged"})
+		return
+	}
+	e.mu.Lock()
+	if e.mailChangedSoon == nil {
+		e.mailChangedSoon = map[string]bool{}
+	}
+	if e.mailChangedSoon[account] {
+		e.mu.Unlock()
+		return
+	}
+	e.mailChangedSoon[account] = true
+	e.mu.Unlock()
+	time.AfterFunc(400*time.Millisecond, func() {
+		e.mu.Lock()
+		delete(e.mailChangedSoon, account)
+		e.mu.Unlock()
+		e.emit(Event{Type: "mailChanged", Account: account})
+	})
 }
 
 // Call runs one JSON request and returns a JSON response.

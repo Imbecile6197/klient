@@ -74,7 +74,7 @@ func (e *Engine) autoEmptyLoop() {
 					log.Printf("macbridge auto-empty: %s of %s: %v", protonmail.FolderByID(f).Name, acc.Email(), err)
 				case n > 0:
 					log.Printf("macbridge auto-empty: %d messages older than %d days deleted from %s of %s", n, days, protonmail.FolderByID(f).Name, acc.Email())
-					e.emit(Event{Type: "mailChanged", Account: acc.Username()})
+					e.emitMailChanged(acc.Username())
 				}
 			}
 		}

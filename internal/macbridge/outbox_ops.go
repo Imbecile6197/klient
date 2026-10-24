@@ -243,7 +243,7 @@ func (e *Engine) sendFromOutbox(it *outboxItem, manual bool) {
 			e.emit(Event{Type: "outboxSent", Account: it.account, Payload: map[string]any{
 				"subject": subj,
 			}})
-			e.emit(Event{Type: "mailChanged", Account: it.account})
+			e.emitMailChanged(it.account)
 			return
 		}
 		e.mu.Lock()

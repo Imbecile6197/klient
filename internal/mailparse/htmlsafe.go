@@ -29,6 +29,14 @@ func HasRemoteContent(html string) bool { return remoteRef.MatchString(html) }
 // (cid:) replaced with data: URIs from inline, and a CSP that blocks remote
 // content unless allowRemote.
 func PrepareHTML(html string, inline map[string]string, allowRemote bool) string {
+	out, _ := PrepareHTMLEx(html, inline, allowRemote)
+	return out
+}
+
+// PrepareHTMLEx is PrepareHTML plus a one-pass remote-content check (avoids
+// a second full-string regex before rendering).
+func PrepareHTMLEx(html string, inline map[string]string, allowRemote bool) (string, bool) {
+	hasRemote := remoteRef.MatchString(html)
 	html = cidRef.ReplaceAllStringFunc(html, func(m string) string {
 		id := cidRef.FindStringSubmatch(m)[1]
 		if uri, ok := inline[id]; ok {
@@ -41,7 +49,7 @@ func PrepareHTML(html string, inline map[string]string, allowRemote bool) string
 		csp = cspRemote
 	}
 	return `<meta http-equiv="Content-Security-Policy" content="` + csp + `">` +
-		`<meta name="referrer" content="no-referrer">` + baseStyle + html
+		`<meta name="referrer" content="no-referrer">` + baseStyle + html, hasRemote
 }
 
 // PlainToHTML renders a plain-text body as HTML (for printing and for

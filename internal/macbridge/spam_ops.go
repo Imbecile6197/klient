@@ -102,6 +102,6 @@ func (e *Engine) spamScanInbox(params json.RawMessage) Response {
 			moved++
 		}
 	}
-	e.emit(Event{Type: "mailChanged", Account: p.Account})
+	e.emitMailChanged(p.Account)
 	return Response{OK: true, Result: map[string]int{"checked": len(list), "moved": moved}}
 }
