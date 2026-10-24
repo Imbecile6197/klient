@@ -216,6 +216,13 @@ func Default() Config {
 }
 
 func ConfigDir() string {
+	// Honour XDG_CONFIG_HOME even on macOS. os.UserConfigDir on Darwin always
+	// returns ~/Library/Application Support and ignores XDG, so KLIENT_DEMO's
+	// temporary config would otherwise write LocalOnly/Ollama into the real
+	// user settings and lock the AI provider picker.
+	if dir := os.Getenv("XDG_CONFIG_HOME"); dir != "" {
+		return filepath.Join(dir, appName)
+	}
 	dir, err := os.UserConfigDir()
 	if err != nil {
 		dir = filepath.Join(os.Getenv("HOME"), ".config")

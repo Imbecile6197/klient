@@ -145,7 +145,11 @@ func Init(onEvent EventHandler) *Engine {
 	}
 	if os.Getenv("KLIENT_DEMO") != "" {
 		e.demoMode = true
-		_ = prepareDemoEnv()
+		if err := prepareDemoEnv(); err != nil {
+			// Never fall through to the real Application Support config —
+			// startDemo sets LocalOnly and would permanently lock AI providers.
+			log.Fatalf("macbridge: demo env: %v", err)
+		}
 	}
 	cfg, err := config.Load()
 	if err != nil {

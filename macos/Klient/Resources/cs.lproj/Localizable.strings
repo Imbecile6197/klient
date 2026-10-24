@@ -244,6 +244,7 @@
 "Spam probability at which a message is moved to Spam." = "Pravděpodobnost spamu, při které se zpráva přesune do Spamu.";
 "Local AI only" = "Jen lokální AI";
 "When on, only Ollama on this Mac can be used — message content stays on this computer." = "Je-li zapnuto, lze použít jen Ollamu na tomto Macu — obsah zpráv zůstává v počítači.";
+"On: only Ollama on this Mac. Turn this off (or pick a cloud provider below) to use a saved API key." = "Zapnuto: jen Ollama na tomto Macu. Vypněte to (nebo níže zvolte cloudového poskytovatele), abyste použili uložený API klíč.";
 "Assistant" = "Asistent";
 "Assistant provider" = "Poskytovatel asistenta";
 "Assistant model" = "Model asistenta";
@@ -258,6 +259,7 @@
 "API key" = "API klíč";
 "Save API Key" = "Uložit API klíč";
 "API key saved" = "API klíč uložen";
+"API key saved – using %@" = "API klíč uložen – používá se %@";
 "API key removed" = "API klíč odstraněn";
 "Keys are stored in the macOS Keychain." = "Klíče jsou uloženy v Klíčence macOS.";
 "Ollama" = "Ollama";

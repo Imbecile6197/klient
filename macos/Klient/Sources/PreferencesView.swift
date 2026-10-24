@@ -386,11 +386,20 @@ struct PreferencesView: View {
                 scheduleSave()
             }
             .onChange(of: assistantProvider) { old, new in
+                // Cloud pick while "Local AI only" is on → turn that off (Linux
+                // shows a toast and reverts; users here expect the pick to win,
+                // especially after demo mode polluted local_only into real config).
+                if new != "ollama" && localOnly {
+                    localOnly = false
+                }
                 switchProviderRole(role: "assistant", from: old, to: new, model: $assistantModel)
                 scheduleSave()
             }
             .onChange(of: assistantModel) { _, _ in scheduleSave() }
             .onChange(of: spamProvider) { old, new in
+                if new != "ollama" && localOnly {
+                    localOnly = false
+                }
                 switchProviderRole(role: "spam", from: old, to: new, model: $spamModel)
                 scheduleSave()
             }
@@ -727,7 +736,9 @@ struct PreferencesView: View {
             Section {
                 Toggle(String(localized: "Local AI only"), isOn: $localOnly)
             } footer: {
-                Text(String(localized: "When on, only Ollama on this Mac can be used — message content stays on this computer."))
+                Text(localOnly
+                     ? String(localized: "On: only Ollama on this Mac. Turn this off (or pick a cloud provider below) to use a saved API key.")
+                     : String(localized: "When on, only Ollama on this Mac can be used — message content stays on this computer."))
             }
 
             Section {
@@ -1187,10 +1198,10 @@ struct PreferencesView: View {
     }
 
     private var availableProviders: [(id: String, name: String)] {
-        if localOnly {
-            return providers.filter { $0.id == "ollama" }
-        }
-        return providers
+        // Always list every provider (Linux parity). Selecting a cloud provider
+        // while local-only is on clears that toggle in onChange — hiding the
+        // list made it look like provider switching was broken.
+        providers
     }
 
     // MARK: - Load / save
@@ -1662,14 +1673,30 @@ struct PreferencesView: View {
 
     private func saveAPIKey() {
         let key = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        let provider = apiKeyProvider
         do {
             _ = try Bridge.call("secrets.saveAPIKey", params: [
-                "provider": apiKeyProvider, "key": key,
+                "provider": provider, "key": key,
             ])
             apiKey = ""
-            status = key.isEmpty
-                ? String(localized: "API key removed")
-                : String(localized: "API key saved")
+            if key.isEmpty {
+                status = String(localized: "API key removed")
+                refreshAIStatus()
+                return
+            }
+            // Saving a cloud key means the user wants that provider active —
+            // not to stay stuck on Ollama because "Local AI only" was left on
+            // (or written by a leaked demo session).
+            if localOnly { localOnly = false }
+            if assistantProvider != provider {
+                assistantProvider = provider
+            }
+            if spamProvider != provider {
+                spamProvider = provider
+            }
+            save(immediate: true)
+            status = String(format: String(localized: "API key saved – using %@"),
+                            providers.first(where: { $0.id == provider })?.name ?? provider)
             refreshAIStatus()
         } catch {
             status = error.localizedDescription

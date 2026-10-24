@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 MACOS="$ROOT/macos"
 BUILD="$MACOS/build"
 APP="$BUILD/Klient.app"
-VERSION="${VERSION:-0.11.8}"
+VERSION="${VERSION:-0.11.9}"
 export PATH="/usr/local/go/bin:${PATH:-}"
 
 mkdir -p "$BUILD"

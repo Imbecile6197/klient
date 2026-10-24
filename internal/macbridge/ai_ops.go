@@ -565,12 +565,13 @@ func (e *Engine) secretsSaveAPIKey(params json.RawMessage) Response {
 	if err := secrets.SaveAPIKey(p.Provider, p.Key); err != nil {
 		return Response{OK: false, Error: err.Error()}
 	}
-	// Rebuild AI client with new keys.
+	// Rebuild AI client with new keys; keep the Ollama backend if running.
 	e.mu.Lock()
 	cfg := e.cfg
-	e.mu.Unlock()
-	e.ai = newAIClient(e.ctx, cfg)
+	local := e.ollama
+	e.ai = newAIClientWithLocal(e.ctx, cfg, local)
 	e.filter.SetAI(e.ai)
+	e.mu.Unlock()
 	return Response{OK: true}
 }
 
