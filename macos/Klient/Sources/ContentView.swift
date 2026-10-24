@@ -1125,6 +1125,9 @@ struct SpamFilterBanner: View {
     let decision: AppState.SpamDecision
     var onNotSpam: () -> Void
 
+    /// Same soft cap as MessageSummaryBanner — long AI reasons must not crush the split view.
+    private static let ratingMaxHeight: CGFloat = 160
+
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: decision.spam ? "xmark.bin.fill" : "checkmark.shield.fill")
@@ -1137,10 +1140,17 @@ struct SpamFilterBanner: View {
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(decision.spam ? Color.orange : KlientTheme.brand)
 
-                Text(decision.bannerText)
-                    .font(.subheadline)
-                    .textSelection(.enabled)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                // Scroll + height cap (not unbounded fixedSize): long category/reason/feeds
+                // text was truncated in the reader; mirror MessageSummaryBanner.
+                ScrollView(.vertical, showsIndicators: true) {
+                    Text(decision.bannerText)
+                        .font(.subheadline)
+                        .lineLimit(nil)
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .frame(maxHeight: Self.ratingMaxHeight)
+                .fixedSize(horizontal: false, vertical: true)
             }
 
             if decision.showsNotSpamAction {
@@ -1528,13 +1538,44 @@ struct AskAISheet: View {
             // text inside a height-capped ScrollView (unlike MessageSummaryBanner
             // which lived unconstrained inside NavigationSplitView).
             ScrollView {
-                Text(state.askAnswer.isEmpty ? String(localized: "Answers stay on your machine when using local AI.") : state.askAnswer)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .foregroundStyle(state.askAnswer.isEmpty ? .secondary : .primary)
-                    .textSelection(.enabled)
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(state.askAnswer.isEmpty
+                         ? String(localized: "Answers stay on your machine when using local AI.")
+                         : state.askAnswer)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .foregroundStyle(state.askAnswer.isEmpty ? .secondary : .primary)
+                        .textSelection(.enabled)
+
+                    // Linux-parity Sources: [n] maps to docs sent to AnswerFromMail.
+                    if !state.askHits.isEmpty {
+                        Text(String(localized: "Sources"))
+                            .font(.headline)
+                        ForEach(state.askHits) { hit in
+                            Button {
+                                state.openAskHit(hit)
+                            } label: {
+                                HStack(spacing: 8) {
+                                    Text("[\(hit.index)] \(hit.subject)")
+                                        .font(.callout)
+                                        .multilineTextAlignment(.leading)
+                                        .lineLimit(2)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    Image(systemName: "chevron.right")
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(.tertiary)
+                                }
+                                .padding(.vertical, 6)
+                                .padding(.horizontal, 8)
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                            .background(.quaternary.opacity(0.35), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                        }
+                    }
+                }
             }
-            .frame(maxHeight: 280)
+            .frame(maxHeight: 320)
             HStack {
                 Spacer()
                 Button(String(localized: "Done")) { dismiss() }
@@ -1542,6 +1583,6 @@ struct AskAISheet: View {
             }
         }
         .padding(24)
-        .frame(width: 520, height: 400)
+        .frame(width: 520, height: 460)
     }
 }

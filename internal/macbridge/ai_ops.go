@@ -217,6 +217,7 @@ func (e *Engine) aiAskMail(params json.RawMessage) Response {
 	}
 
 	var docs []ai.MailDoc
+	var used []protonmail.Summary
 	for _, m := range found {
 		msg, gerr := s.acc.Get(ctx, m.ID)
 		if gerr != nil {
@@ -231,16 +232,46 @@ func (e *Engine) aiAskMail(params json.RawMessage) Response {
 			Body: mailparse.BodyForAI(msg.Text, msg.HTML),
 			Date: time.Unix(msg.Meta.Time, 0).Format("2006-01-02 15:04"),
 		})
+		used = append(used, m)
 	}
 	if len(docs) == 0 {
 		msg := fmt.Sprintf(i18n.T("No messages found (searched for: %s). Try rephrasing the question, for example with the sender's name."), strings.Join(queries, ", "))
-		return Response{OK: true, Result: map[string]any{"answer": msg, "docs": 0, "queries": queries}}
+		return Response{OK: true, Result: map[string]any{"answer": msg, "docs": 0, "queries": queries, "hits": []any{}}}
 	}
 	answer, err := e.ai.AnswerFromMail(ctx, p.Question, today, docs)
 	if err != nil {
 		return Response{OK: false, Error: err.Error()}
 	}
-	return Response{OK: true, Result: map[string]any{"answer": strings.TrimSpace(answer), "docs": len(docs), "queries": queries}}
+	// hits[i] is citation [i+1] from AnswerFromMail (<email id="n">).
+	hits := make([]map[string]any, 0, len(used))
+	for i, m := range used {
+		from := ""
+		if m.Sender != nil {
+			from = mailparse.DisplayName(m.Sender)
+			if from == "" {
+				from = mailparse.DisplayAddress(m.Sender)
+			}
+		}
+		subj := m.Subject
+		if strings.TrimSpace(subj) == "" {
+			subj = i18n.T("(no subject)")
+		}
+		hits = append(hits, map[string]any{
+			"index":          i + 1,
+			"id":             m.ID,
+			"account":        p.Account,
+			"subject":        subj,
+			"from":           from,
+			"date":           time.Unix(m.Time, 0).Format("2006-01-02 15:04"),
+			"conversationId": m.ConversationID,
+		})
+	}
+	return Response{OK: true, Result: map[string]any{
+		"answer":  strings.TrimSpace(answer),
+		"docs":    len(docs),
+		"queries": queries,
+		"hits":    hits,
+	}}
 }
 
 func (e *Engine) aiDigest(params json.RawMessage) Response {

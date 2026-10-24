@@ -58,6 +58,8 @@ final class AppState: ObservableObject {
     @Published var showAskAI = false
     @Published var askQuestion = ""
     @Published var askAnswer = ""
+    /// Citation sources from `ai.askMail` — hit index n matches answer markers [n].
+    @Published var askHits: [AskMailHit] = []
     /// Visible AI summary panel in the message reader (not only the status strip).
     @Published var messageSummary = ""
     @Published var messageSummaryBusy = false
@@ -253,6 +255,17 @@ final class AppState: ObservableObject {
         /// Local spam-filter marked this as spam (list junk badge).
         var isSpam: Bool = false
         var spamCategory: String = ""
+    }
+
+    /// One source message for Ask Your Mail; `index` is the [n] citation id.
+    struct AskMailHit: Identifiable, Hashable {
+        let index: Int
+        let id: String
+        let account: String
+        let subject: String
+        let from: String
+        let date: String
+        let conversationId: String
     }
 
     /// Stored outcome from the local spam filter (`spam.decision`).
@@ -734,13 +747,33 @@ final class AppState: ObservableObject {
                 selectedFolder = folders.first?.id ?? ""
             }
         }
-        if let counts = try? Bridge.call("mail.unreadCounts", params: ["account": acc]) as? [String: Int] {
-            unreadTotal = counts.values.reduce(0, +)
-            NSApp.dockTile.badgeLabel = unreadTotal > 0 ? "\(unreadTotal)" : nil
-            MenuBarController.shared.rebuildMenu()
-        }
+        refreshUnreadCounts()
         loadHiddenFolders(for: acc)
         reloadMessages()
+    }
+
+    /// Inbox unread across accounts (Linux tray parity) → Dock badge + menu bar.
+    /// Parse via `[String: Any]` + intVal (JSON numbers are NSNumber; match other Bridge callers).
+    func refreshUnreadCounts() {
+        let inbox = labels.inbox
+        let names = accounts
+            .filter { $0.username != "unified" && $0.kind != "unified" }
+            .map(\.username)
+        let targets: [String] = {
+            if !names.isEmpty { return names }
+            if let acc = selectedAccount, acc != "unified" { return [acc] }
+            return []
+        }()
+        var total = 0
+        for name in targets {
+            guard let raw = try? Bridge.call("mail.unreadCounts", params: ["account": name]) as? [String: Any] else {
+                continue
+            }
+            total += intVal(raw[inbox])
+        }
+        unreadTotal = total
+        NSApp.dockTile.badgeLabel = total > 0 ? "\(total)" : nil
+        MenuBarController.shared.rebuildMenu()
     }
 
     private func loadHiddenFolders(for acc: String) {
@@ -1796,6 +1829,7 @@ final class AppState: ObservableObject {
             askQuestion = String(format: String(localized: "What is this message about: %@?"), subj)
         }
         askAnswer = ""
+        askHits = []
         showAskAI = true
     }
 
@@ -1830,6 +1864,7 @@ final class AppState: ObservableObject {
     func runAskAI() {
         guard let acc = selectedAccount else { return }
         askAnswer = "Thinking…"
+        askHits = []
         let q = askQuestion
         DispatchQueue.global().async {
             do {
@@ -1838,11 +1873,48 @@ final class AppState: ObservableObject {
                 ]) as? [String: Any]
                 DispatchQueue.main.async {
                     self.askAnswer = result?["answer"] as? String ?? ""
+                    self.askHits = Self.parseAskHits(result?["hits"])
                     self.refreshFilterStatus()
                 }
             } catch {
-                DispatchQueue.main.async { self.askAnswer = error.localizedDescription }
+                DispatchQueue.main.async {
+                    self.askAnswer = error.localizedDescription
+                    self.askHits = []
+                }
             }
+        }
+    }
+
+    /// Open a citation source like clicking a list row (account + message → reader).
+    func openAskHit(_ hit: AskMailHit) {
+        if !hit.account.isEmpty, selectedAccount != hit.account {
+            selectedAccount = hit.account
+        }
+        showAskAI = false
+        open(hit.id)
+    }
+
+    private static func parseAskHits(_ raw: Any?) -> [AskMailHit] {
+        let rows: [[String: Any]]
+        if let typed = raw as? [[String: Any]] {
+            rows = typed
+        } else if let anyRows = raw as? [Any] {
+            rows = anyRows.compactMap { $0 as? [String: Any] }
+        } else {
+            return []
+        }
+        return rows.compactMap { row in
+            let id = row["id"] as? String ?? ""
+            guard !id.isEmpty else { return nil }
+            return AskMailHit(
+                index: JSONVal.int(row["index"]),
+                id: id,
+                account: row["account"] as? String ?? "",
+                subject: row["subject"] as? String ?? "",
+                from: row["from"] as? String ?? "",
+                date: row["date"] as? String ?? "",
+                conversationId: row["conversationId"] as? String ?? ""
+            )
         }
     }
 
@@ -2172,6 +2244,7 @@ final class AppState: ObservableObject {
                 // Silent keyring re-auth succeeded — never leave LoginSheet up.
                 showLogin = false
             }
+            refreshUnreadCounts()
             if let acc = obj["account"] as? String, acc == selectedAccount || selectedAccount == "unified" {
                 reloadMessages()
             }
@@ -2216,18 +2289,21 @@ final class AppState: ObservableObject {
                     payload["account"] = acc
                 }
                 notifyNewMail(payload)
+                refreshUnreadCounts()
                 if let acc = obj["account"] as? String, acc == selectedAccount {
                     reloadMessages()
                 }
             }
         case "spamMoved":
             status = String(localized: "Spam filter moved a message")
+            refreshUnreadCounts()
             reloadMessages()
         case "rulesApplied":
             if let payload = obj["payload"] as? [String: Any],
                let rules = payload["rules"] as? [String] {
                 status = String(format: String(localized: "Rules: %@"), rules.joined(separator: ", "))
             }
+            refreshUnreadCounts()
             reloadMessages()
         case "usageChanged":
             refreshFilterStatus()
@@ -2356,7 +2432,6 @@ final class AppState: ObservableObject {
         UNUserNotificationCenter.current().add(
             UNNotificationRequest(identifier: "mail-\(id)", content: content, trigger: nil)
         )
-        MenuBarController.shared.rebuildMenu()
     }
 
     func handleNotificationAction(_ action: String, messageId: String, account: String) {
@@ -2384,7 +2459,7 @@ final class AppState: ObservableObject {
             break
         }
         reloadMessages()
-        MenuBarController.shared.rebuildMenu()
+        refreshUnreadCounts()
     }
 
     func registerMailtoDefault() {
