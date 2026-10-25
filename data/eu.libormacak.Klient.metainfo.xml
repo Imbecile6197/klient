@@ -82,6 +82,12 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.12.2" date="2026-10-25">
+      <description>
+        <p>mailto: links fill in the address without a leading slash.</p>
+        <p xml:lang="cs">Odkazy mailto: vyplní adresu bez lomítka na začátku.</p>
+      </description>
+    </release>
     <release version="0.12.1" date="2026-10-25">
       <description>
         <p>Sync messages no longer pop up as new mail; updates skip macOS-only releases; spam checks are retried; messages open faster; IMAP snoozed and scheduled mail is shared between computers.</p>

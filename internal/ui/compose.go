@@ -132,22 +132,14 @@ func (a *App) openMailto(uri string) {
 	if a.acc == nil {
 		return
 	}
-	u, err := url.Parse(uri)
-	if err != nil || !strings.EqualFold(u.Scheme, "mailto") {
+	to, q, ok := parseMailto(uri)
+	if !ok {
 		return
 	}
 	d := &protonmail.Draft{SignExternal: true}
-	q := u.Query()
 	addrs := func(s string) []*mail.Address {
 		l, _ := parseAddrs(s)
 		return l
-	}
-	to := u.Opaque
-	if to == "" {
-		to = u.Path
-	}
-	if dec, err := url.PathUnescape(to); err == nil {
-		to = dec
 	}
 	d.To = addrs(strings.Join(append([]string{to}, q["to"]...), ","))
 	d.CC = addrs(strings.Join(q["cc"], ","))
@@ -155,6 +147,23 @@ func (a *App) openMailto(uri string) {
 	d.Subject = q.Get("subject")
 	d.Body = q.Get("body")
 	a.composer(d, nil, protonmail.ActionNew)
+}
+
+// parseMailto splits a mailto: URI into its addresses and fields. The
+// desktop hands the link over as a file URI, which turns "mailto:a@b" into
+// "mailto:///a@b": the slashes are not part of the address.
+func parseMailto(uri string) (to string, q url.Values, ok bool) {
+	scheme, rest, found := strings.Cut(uri, ":")
+	if !found || !strings.EqualFold(scheme, "mailto") {
+		return "", nil, false
+	}
+	rest = strings.TrimLeft(rest, "/")
+	rest, query, _ := strings.Cut(rest, "?")
+	if dec, err := url.PathUnescape(rest); err == nil {
+		rest = dec
+	}
+	q, _ = url.ParseQuery(query)
+	return rest, q, true
 }
 
 // openDraft loads a saved draft into the composer.

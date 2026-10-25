@@ -70,6 +70,10 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Sun Oct 25 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.12.2-1
+- mailto: links handed over as file URIs (mailto:///addr) no longer put a
+  slash before the address
+
 * Sun Oct 25 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.12.1-1
 - Sync messages are recognised ("[Klient sync]" subject) and never notified
   or listed
