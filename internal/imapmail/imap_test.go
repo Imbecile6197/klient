@@ -522,3 +522,60 @@ func TestGmailThreadNoDuplicates(t *testing.T) {
 		t.Error("the copy from the inbox should be shown")
 	}
 }
+
+// Two computers know the same scheduled message (shared plan): the one
+// that carries out the plan sends it; the other must not send it again,
+// even with a copy in its offline cache, and drops it from its plan.
+func TestScheduledSentElsewhere(t *testing.T) {
+	set, _, smtpBe := startServers(t)
+	ctx := context.Background()
+	open := func(name string) *Account {
+		acc, err := Open(ctx, set, "tajne")
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Cleanup(acc.Close)
+		c, err := cache.Open(filepath.Join(t.TempDir(), name+".db"), make([]byte, 32))
+		if err != nil {
+			t.Fatal(err)
+		}
+		acc.cache = c
+		return acc
+	}
+	fedora, ubuntu := open("fedora"), open("ubuntu")
+	sd := &protonmail.Draft{To: []*mail.Address{{Address: "petr@example.org"}}, Subject: "Později", Body: "text", DeliveryTime: time.Now().Add(time.Hour)}
+	if err := ubuntu.Send(ctx, sd); err != nil {
+		t.Fatal(err)
+	}
+	plan := ubuntu.Plan()
+	for id := range plan.Scheduled {
+		plan.Scheduled[id] = time.Now().Add(-time.Second).Unix() // due
+		if _, err := fedora.Get(ctx, id); err != nil {           // a copy in Fedora's cache
+			t.Fatal(err)
+		}
+	}
+	_ = ubuntu.SetPlan(plan)
+	_ = fedora.SetPlan(plan) // from the sync
+
+	// Ubuntu is not the one carrying out the plan.
+	ubuntu.RunsDue(func() bool { return false })
+	ubuntu.runDue(ctx, nil)
+	if len(smtpBe.mail) != 0 {
+		t.Fatal("a computer not carrying out the plan sent the message")
+	}
+
+	fedora.runDue(ctx, nil)
+	if len(smtpBe.mail) != 1 {
+		t.Fatalf("scheduled message sent %d times, want 1", len(smtpBe.mail))
+	}
+
+	// Ubuntu takes over later (Fedora switched off) with the old plan.
+	ubuntu.RunsDue(nil)
+	ubuntu.runDue(ctx, nil)
+	if len(smtpBe.mail) != 1 {
+		t.Fatalf("message sent again by the second computer (%d)", len(smtpBe.mail))
+	}
+	if len(ubuntu.Plan().Scheduled) != 0 {
+		t.Fatal("the sent message stayed in the plan")
+	}
+}

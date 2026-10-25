@@ -70,6 +70,15 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Sun Oct 25 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.12.1-1
+- Sync messages are recognised ("[Klient sync]" subject) and never notified
+  or listed
+- Updater takes the newest release with a package for this system
+- Fallback spam verdicts (AI unavailable) are retried after 30 minutes
+- Opening: the clicked message is fetched early, marking read in background
+- IMAP snooze and scheduled send shared between computers; only one carries
+  them out and a scheduled message is checked on the server before sending
+
 * Sun Oct 25 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.12.0-1
 - Sync between computers through a folder in the Proton account (spam
   verdicts, sender lists, rules, signatures, AI settings and spending,

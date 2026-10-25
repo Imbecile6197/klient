@@ -60,6 +60,7 @@ type Account struct {
 	offline bool
 	deauth  func()
 	lim     limits
+	hooks   planHooks
 }
 
 var wordDecoder = &mime.WordDecoder{CharsetReader: charset.Reader}

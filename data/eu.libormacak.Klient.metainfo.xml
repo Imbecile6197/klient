@@ -82,6 +82,12 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.12.1" date="2026-10-25">
+      <description>
+        <p>Sync messages no longer pop up as new mail; updates skip macOS-only releases; spam checks are retried; messages open faster; IMAP snoozed and scheduled mail is shared between computers.</p>
+        <p xml:lang="cs">Synchronizační zprávy už nevyskakují jako nová pošta; aktualizace přeskočí vydání jen pro macOS; kontrola spamu se zopakuje; zprávy se otevírají rychleji; odložená a naplánovaná pošta IMAP se sdílí mezi počítači.</p>
+      </description>
+    </release>
     <release version="0.12.0" date="2026-10-25">
       <description>
         <p>Sync between your computers through the Proton account; one main computer does the AI work. The tray envelope turns blue for unread mail.</p>

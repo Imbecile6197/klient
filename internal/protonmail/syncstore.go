@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"mime"
+	"strings"
 	"sync"
 	"time"
 
@@ -22,8 +23,56 @@ import (
 // user's key, so only the user's Klient can read it.
 const SyncFolderName = "Klient"
 
-// syncHeader marks Klient's sync messages.
-const syncHeader = "X-Klient-Sync"
+// syncHeader marks Klient's sync messages; so does the host part of their
+// Message-ID, which (unlike the subject) is the same in every language and
+// is known from the metadata alone.
+const (
+	syncHeader = "X-Klient-Sync"
+	syncIDHost = "klient.local"
+)
+
+// syncSubject starts the subject of every sync message: plain ASCII and the
+// same in every language, so it is recognised from the metadata alone.
+const syncSubject = "[Klient sync] Data shared between your computers - do not change or delete"
+
+// Subjects of the sync messages Klient 0.12.0 wrote (translated).
+var legacySyncSubjects = []string{
+	"Klient – data shared between your computers (do not change or delete)",
+	"Klient – data sdílená mezi vašimi počítači (neměňte ani nemažte)",
+}
+
+// IsSyncMessage reports whether m is one of Klient's sync messages: they
+// are Klient's own data, never mail for the user – no notification, not in
+// any list.
+func IsSyncMessage(m Summary) bool {
+	if strings.HasSuffix(strings.ToLower(strings.Trim(m.ExternalID, "<> ")), "@"+syncIDHost) {
+		return true
+	}
+	subject := m.Subject
+	if dec, err := new(mime.WordDecoder).DecodeHeader(subject); err == nil {
+		subject = dec
+	}
+	if strings.HasPrefix(subject, "[Klient sync]") {
+		return true
+	}
+	for _, s := range legacySyncSubjects {
+		if subject == s {
+			return true
+		}
+	}
+	return false
+}
+
+// withoutSync drops Klient's sync messages from a list.
+func withoutSync(ms []Summary) []Summary {
+	out := ms[:0:0]
+	for _, m := range ms {
+		if !IsSyncMessage(m) {
+			out = append(out, m)
+		}
+	}
+	return out
+}
 
 var syncLabelID struct {
 	sync.Mutex
@@ -199,10 +248,10 @@ func (p protonSync) Delete(ctx context.Context, ids []string) error {
 func syncMessage(addr string, data []byte) []byte {
 	idb := make([]byte, 12)
 	_, _ = rand.Read(idb)
-	host := "klient.local"
+	host := syncIDHost
 	head := fmt.Sprintf("From: Klient <%s>\r\nTo: <%s>\r\nSubject: %s\r\nDate: %s\r\nMessage-ID: <%s@%s>\r\n%s: 1\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Transfer-Encoding: 8bit\r\n\r\n",
 		addr, addr,
-		mime.QEncoding.Encode("utf-8", i18n.T("Klient – data shared between your computers (do not change or delete)")),
+		syncSubject,
 		time.Now().Format(time.RFC1123Z),
 		hex.EncodeToString(idb), host, syncHeader)
 	note := i18n.T("Klient keeps the data it shares between your computers here (spam verdicts, sender lists, rules, settings). Klient replaces this message itself; please do not change or delete it.") + "\r\n\r\n"

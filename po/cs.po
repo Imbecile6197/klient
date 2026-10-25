@@ -4373,10 +4373,6 @@ msgid "no address to store the shared data under"
 msgstr "chybí adresa, pod kterou by se sdílená data uložila"
 
 #: internal
-msgid "Klient – data shared between your computers (do not change or delete)"
-msgstr "Klient – data sdílená mezi vašimi počítači (neměňte ani nemažte)"
-
-#: internal
 msgid "Klient keeps the data it shares between your computers here (spam verdicts, sender lists, rules, settings). Klient replaces this message itself; please do not change or delete it."
 msgstr "Klient tu uchovává data, která sdílí mezi vašimi počítači (verdikty spam filtru, seznamy odesílatelů, pravidla, nastavení). Tuto zprávu Klient sám nahrazuje; prosím neměňte ji ani nemažte."
 

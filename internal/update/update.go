@@ -71,11 +71,14 @@ func asset(name, format string) bool {
 	return strings.HasPrefix(name, "klient-") && strings.HasSuffix(name, ".x86_64.rpm")
 }
 
-// Latest asks GitHub for the newest release and its package in the format
-// Klient was installed from (RPM when it was not installed from a package).
+// Latest asks GitHub for the newest release that has a package in the
+// format Klient was installed from (RPM when it was not installed from a
+// package). The repository also holds releases of the macOS version, with
+// no package for Linux: they are skipped, so they neither hide a Linux
+// release nor are offered here.
 func Latest(ctx context.Context) (Release, error) {
 	format := Format()
-	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, apiBase+"/repos/"+Repo+"/releases/latest", nil)
+	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, apiBase+"/repos/"+Repo+"/releases?per_page=30", nil)
 	req.Header.Set("Accept", "application/vnd.github+json")
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -88,19 +91,44 @@ func Latest(ctx context.Context) (Release, error) {
 	if res.StatusCode != http.StatusOK {
 		return Release{}, fmt.Errorf(i18n.T("GitHub responded with %s"), res.Status)
 	}
-	var rel struct {
-		TagName string `json:"tag_name"`
-		Body    string `json:"body"`
-		HTMLURL string `json:"html_url"`
-		Assets  []struct {
+	type ghRelease struct {
+		TagName    string `json:"tag_name"`
+		Body       string `json:"body"`
+		HTMLURL    string `json:"html_url"`
+		Draft      bool   `json:"draft"`
+		Prerelease bool   `json:"prerelease"`
+		Assets     []struct {
 			Name   string `json:"name"`
 			URL    string `json:"browser_download_url"`
 			Size   int64  `json:"size"`
 			Digest string `json:"digest"`
 		} `json:"assets"`
 	}
-	if err := json.NewDecoder(io.LimitReader(res.Body, 4<<20)).Decode(&rel); err != nil {
+	var list []ghRelease
+	if err := json.NewDecoder(io.LimitReader(res.Body, 16<<20)).Decode(&list); err != nil {
 		return Release{}, err
+	}
+	if len(list) == 0 {
+		return Release{}, errors.New(i18n.T("there is no release on GitHub yet"))
+	}
+	// Newest first; the first one with a package for this system wins.
+	var rel ghRelease
+	for _, r := range list {
+		if r.Draft || r.Prerelease {
+			continue
+		}
+		for _, a := range r.Assets {
+			if asset(a.Name, format) {
+				rel = r
+				break
+			}
+		}
+		if rel.TagName != "" {
+			break
+		}
+	}
+	if rel.TagName == "" {
+		rel = list[0] // reported below: no package for this system
 	}
 	out := Release{Version: strings.TrimPrefix(rel.TagName, "v"), Notes: rel.Body, Page: rel.HTMLURL}
 	sums := ""

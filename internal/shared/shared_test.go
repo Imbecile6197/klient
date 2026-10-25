@@ -261,3 +261,30 @@ func TestUsageAndDigest(t *testing.T) {
 		t.Fatal("unchanged usage made a change")
 	}
 }
+
+// Snoozing and scheduling on one computer reaches the other; done (sent,
+// returned, cancelled) stays done.
+func TestPlan(t *testing.T) {
+	b, dir := &mem{}, t.TempDir()
+	f, u := hub(t, b, dir, "fedora"), hub(t, b, dir, "ubuntu")
+	acct := "imap:info@firma.cz"
+	f.SharedPlan(acct)
+	f.SeedPlan(acct, Plan{Scheduled: map[string]int64{"Sched.1.5": 100}})
+	f.PushPlan(acct, Plan{Snoozed: map[string]int64{"conv1": 200}, Scheduled: map[string]int64{"Sched.1.5": 100}})
+	sync2(t, f, u)
+	p := u.SharedPlan(acct)
+	if p.Snoozed["conv1"] != 200 || p.Scheduled["Sched.1.5"] != 100 {
+		t.Fatalf("plan on ubuntu: %+v", p)
+	}
+	if len(u.SharedPlan("imap:other@x.cz").Scheduled) != 0 {
+		t.Fatal("another account's plan leaked in")
+	}
+	// Ubuntu sends the scheduled message; Fedora, offline, still has it.
+	u.PushPlan(acct, Plan{Snoozed: map[string]int64{"conv1": 200}})
+	sync2(t, u)
+	f.SeedPlan(acct, Plan{Scheduled: map[string]int64{"Sched.1.5": 100}}) // restart seeds
+	sync2(t, f, u)
+	if _, ok := f.SharedPlan(acct).Scheduled["Sched.1.5"]; ok {
+		t.Fatal("a sent message came back into the plan")
+	}
+}

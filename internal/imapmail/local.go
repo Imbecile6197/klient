@@ -212,7 +212,11 @@ func (a *Account) saveLocal(st localState) error {
 	if a.cache == nil {
 		return errors.New(i18n.T("without the offline cache Klient cannot remember the time – turn it on in Preferences"))
 	}
-	return a.cache.Set("imap-local", st)
+	if err := a.cache.Set("imap-local", st); err != nil {
+		return err
+	}
+	a.planChanged()
+	return nil
 }
 
 // inFolder returns the IDs of a conversation's messages in one folder.
@@ -334,6 +338,9 @@ func (a *Account) localLoop(ctx context.Context, onChange func()) {
 }
 
 func (a *Account) runDue(ctx context.Context, onChange func()) {
+	if !a.runsDueHere() {
+		return // another computer carries out the plan
+	}
 	st := a.loadLocal()
 	now := time.Now().Unix()
 	changed := false
@@ -349,6 +356,19 @@ func (a *Account) runDue(ctx context.Context, onChange func()) {
 	st = a.loadLocal()
 	for id, t := range st.Scheduled {
 		if t > now {
+			continue
+		}
+		// Sent by another computer meanwhile (or deleted): the offline cache
+		// may still hold a copy, so ask the server, never send twice.
+		there, err := a.onServer(ctx, id)
+		if err != nil {
+			continue // retried on the next tick
+		}
+		if !there {
+			st = a.loadLocal()
+			delete(st.Scheduled, id)
+			_ = a.saveLocal(st)
+			changed = true
 			continue
 		}
 		d, _, err := a.OpenDraft(ctx, id)

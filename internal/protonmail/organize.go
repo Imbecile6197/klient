@@ -224,12 +224,12 @@ func (a *Account) Search(ctx context.Context, labelID, query string, maxMessages
 		msgs, err := a.client.GetMessageMetadataPage(ctx, p, page, proton.MessageFilter{LabelID: labelID, Desc: true})
 		if err != nil {
 			if IsOffline(err) && a.cache != nil {
-				return a.cache.Search(labelID, func(m Summary) bool { return matches(m, words) }, maxMessages)
+				return a.cache.Search(labelID, func(m Summary) bool { return matches(m, words) && !IsSyncMessage(m) }, maxMessages)
 			}
 			return out, err
 		}
 		for _, m := range msgs {
-			if matches(m, words) {
+			if matches(m, words) && !IsSyncMessage(m) {
 				out = append(out, m)
 			}
 		}

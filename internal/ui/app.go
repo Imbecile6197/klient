@@ -650,6 +650,7 @@ func (a *App) addSession(acc mailbox.Account) *session {
 	})
 	a.refreshUnread(s)
 	a.loadOutbox(acc)
+	a.attachPlan(acc)
 	a.kickSync() // the shared state may live in this account
 	// Show all accounts together again, as in the last run.
 	if a.restoreUnified && len(a.sessions) > 1 && a.mv != nil && !a.isUnified() {
@@ -844,6 +845,9 @@ func (a *App) offlineSyncLoop(s *session) {
 
 // onNewMessage runs on the event goroutine.
 func (a *App) onNewMessage(s *session, meta protonmail.Summary) {
+	if protonmail.IsSyncMessage(meta) {
+		return // Klient's own sync data, not mail
+	}
 	held := a.holdNew(s, meta)
 	go a.checkNew(s, meta, held, true, true)
 }
@@ -887,7 +891,7 @@ func (a *App) holdNew(s *session, meta protonmail.Summary) bool {
 // work, or here. elsewhere: the verdict came from another computer. Off the
 // UI thread.
 func (a *App) judge(acc mailbox.Account, meta protonmail.Summary, wait bool) (d spam.Decision, moved bool, err error, elsewhere bool) {
-	_, local := a.filter.Decision(meta.ID)
+	local := a.filter.Judged(meta.ID) // a fallback due for a retry does not count
 	if !local {
 		d, ok := a.sharedVerdict(meta)
 		if !ok && wait {
@@ -1066,8 +1070,7 @@ func (a *App) catchUp(s *session, start bool) {
 		pages = sweepPages // every few minutes: lighter on the server
 	}
 	known := func(id string) bool {
-		_, ok := a.filter.Decision(id)
-		return ok
+		return a.filter.Judged(id) // fallbacks made without the AI are retried
 	}
 	msgs := unjudged(a.ctx, acc, known, time.Now(), pages)
 	settled := time.Now().Add(-sweepSettle).Unix()

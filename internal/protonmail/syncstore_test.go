@@ -31,6 +31,24 @@ func login(t *testing.T, s *server.Server) *Account {
 // Two computers share state through the Proton test server: what one
 // stores, the other reads, and the stored mail is readable after Proton's
 // encryption.
+func TestIsSyncMessage(t *testing.T) {
+	for _, c := range []struct {
+		m    Summary
+		want bool
+	}{
+		{Summary{Subject: syncSubject}, true},
+		{Summary{ExternalID: "abc@klient.local"}, true},
+		{Summary{Subject: "Klient – data sdílená mezi vašimi počítači (neměňte ani nemažte)"}, true}, // 0.12.0
+		{Summary{Subject: "=?utf-8?q?Klient_=E2=80=93_data_sd=C3=ADlen=C3=A1_mezi_va=C5=A1imi_po?= =?utf-8?q?=C4=8D=C3=ADta=C4=8Di_(nem=C4=9B=C5=88te_ani_nema=C5=BEte)?="}, true},
+		{Summary{Subject: "Re: Klient sync"}, false},
+		{Summary{Subject: "Faktura", ExternalID: "x@klient.cz"}, false},
+	} {
+		if got := IsSyncMessage(c.m); got != c.want {
+			t.Errorf("%q %q: %v", c.m.Subject, c.m.ExternalID, got)
+		}
+	}
+}
+
 func TestProtonSync(t *testing.T) {
 	keyring.MockInit()
 	t.Setenv("XDG_DATA_HOME", t.TempDir())
@@ -92,6 +110,14 @@ func TestProtonSync(t *testing.T) {
 	if n != 1 {
 		t.Fatalf("%d sync folders", n)
 	}
+	// The stored versions are Klient's data, not mail: in no list.
+	all, err := fedora.List(ctx, AllMailID, 0, 50)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(all) != 0 {
+		t.Fatalf("%d sync messages shown as mail", len(all))
+	}
 	vs, err := ef.Versions(ctx)
 	if err != nil || len(vs) == 0 {
 		t.Fatalf("versions: %d, %v", len(vs), err)
@@ -99,6 +125,17 @@ func TestProtonSync(t *testing.T) {
 	for _, v := range vs {
 		if _, err := syncstate.Decode(v.Data); err != nil {
 			t.Fatalf("stored version unreadable: %v", err)
+		}
+	}
+	// And they are recognised from their metadata (no notification).
+	id, _ := fedora.syncFolder(ctx, false)
+	metas, err := fedora.client.GetMessageMetadataPage(ctx, 0, 50, proton.MessageFilter{LabelID: id})
+	if err != nil || len(metas) == 0 {
+		t.Fatalf("sync folder: %d, %v", len(metas), err)
+	}
+	for _, m := range metas {
+		if !IsSyncMessage(m) {
+			t.Fatalf("sync message not recognised: %q", m.ExternalID)
 		}
 	}
 }

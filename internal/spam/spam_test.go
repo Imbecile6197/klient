@@ -6,6 +6,7 @@ import (
 	"net/netip"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/Imbecile6197/klient/internal/config"
 	"github.com/Imbecile6197/klient/internal/protonmail"
@@ -155,5 +156,39 @@ func TestDangerousLinkIsSpam(t *testing.T) {
 	msg.Meta.ID = "m2"
 	if d := f.Evaluate(context.Background(), msg); d.Spam || d.Source != "allowlist" {
 		t.Errorf("only evidence: spam=%v source=%q", d.Spam, d.Source)
+	}
+}
+
+type oneMessage struct{ msg *protonmail.Message }
+
+func (o oneMessage) Get(context.Context, string) (*protonmail.Message, error) { return o.msg, nil }
+func (o oneMessage) Move(context.Context, string, ...string) error            { return nil }
+
+// A fallback verdict made while the AI could not be asked stands for
+// RetryAfter only; then the message is judged again.
+func TestFallbackRetried(t *testing.T) {
+	t.Setenv("XDG_DATA_HOME", t.TempDir())
+	f := NewFilter(config.Default(), NewBlocklists())
+	msg := &protonmail.Message{}
+	msg.Meta.ID = "m1"
+	msg.Meta.LabelIDs = []string{protonmail.InboxID}
+	msg.Meta.Sender = &mail.Address{Address: "who@example.org"}
+
+	f.Remember(Decision{MessageID: "m1", Source: "none", Retry: true, Time: time.Now()})
+	if !f.Judged("m1") {
+		t.Fatal("fresh fallback not standing")
+	}
+	f.Remember(Decision{MessageID: "m1", Source: "none", Retry: true, Time: time.Now().Add(-RetryAfter - time.Minute)})
+	if f.Judged("m1") {
+		t.Fatal("old fallback still standing")
+	}
+	d, _, err := f.ProcessNew(context.Background(), oneMessage{msg}, msg.Meta)
+	if err != nil || d.Time.Before(time.Now().Add(-time.Minute)) {
+		t.Fatalf("not judged again: %+v %v", d, err)
+	}
+	// A real verdict never expires.
+	f.Remember(Decision{MessageID: "m2", Source: "ai", Time: time.Now().AddDate(0, 0, -5)})
+	if !f.Judged("m2") {
+		t.Fatal("AI verdict expired")
 	}
 }

@@ -29,6 +29,7 @@ const (
 	mComputers = "computers"
 	mRoles     = "roles"
 	mDigest    = "digest"
+	mPlan      = "plan"
 )
 
 // Settings shared between the computers (config.json keys). API keys and
@@ -78,11 +79,13 @@ type Hub struct {
 	mu           sync.Mutex
 	seenSettings map[string]string // key -> JSON last applied or sent
 	seenLists    map[string]map[string]bool
+	seenPlans    map[string]map[string]int64 // account -> plan key -> time
 	now          func() time.Time
 }
 
 func NewHub(e *syncstate.Engine, node string) *Hub {
-	return &Hub{E: e, Node: node, seenSettings: map[string]string{}, seenLists: map[string]map[string]bool{}, now: time.Now}
+	return &Hub{E: e, Node: node, seenSettings: map[string]string{}, seenLists: map[string]map[string]bool{},
+		seenPlans: map[string]map[string]int64{}, now: time.Now}
 }
 
 // NormalizeID makes a Message-ID comparable ("<A@x>" -> "a@x").
@@ -498,4 +501,102 @@ func (h *Hub) MarkDigest(day, text string, n int) {
 	_ = h.E.Change(func(s *syncstate.State, st syncstate.Stamp) {
 		_ = s.Map(mDigest).Set(day, Digest{By: h.Node, Text: text, N: n}, st)
 	})
+}
+
+// ---- snoozed and scheduled mail (IMAP accounts) ---------------------------
+
+// Plan mirrors imapmail.Plan: conversation or message ID -> unix time.
+type Plan struct {
+	Snoozed, Scheduled map[string]int64
+}
+
+func planKeys(account string, p Plan) map[string]int64 {
+	account = strings.ToLower(account)
+	out := map[string]int64{}
+	for id, t := range p.Snoozed {
+		out[account+"|s|"+id] = t
+	}
+	for id, t := range p.Scheduled {
+		out[account+"|q|"+id] = t
+	}
+	return out
+}
+
+// SeedPlan shares what the account has planned and the shared state does
+// not know (also not as done).
+func (h *Hub) SeedPlan(account string, p Plan) {
+	local := planKeys(account, p)
+	_ = h.E.Change(func(s *syncstate.State, st syncstate.Stamp) {
+		m := s.Map(mPlan)
+		for k, t := range local {
+			if _, known := m[k]; !known {
+				_ = m.Set(k, t, st)
+			}
+		}
+	})
+}
+
+// PushPlan sends what changed in the account's plan on this computer
+// (snoozed, scheduled, returned, sent, cancelled).
+func (h *Hub) PushPlan(account string, p Plan) {
+	local := planKeys(account, p)
+	acct := strings.ToLower(account)
+	h.mu.Lock()
+	seen := h.seenPlans[acct]
+	set, del := map[string]int64{}, []string{}
+	for k, t := range local {
+		if v, ok := seen[k]; !ok || v != t {
+			set[k] = t
+		}
+	}
+	for k := range seen {
+		if _, ok := local[k]; !ok {
+			del = append(del, k)
+		}
+	}
+	h.seenPlans[acct] = local
+	h.mu.Unlock()
+	if len(set) == 0 && len(del) == 0 {
+		return
+	}
+	_ = h.E.Change(func(s *syncstate.State, st syncstate.Stamp) {
+		m := s.Map(mPlan)
+		for k, t := range set {
+			_ = m.Set(k, t, st)
+		}
+		for _, k := range del {
+			m.Delete(k, st)
+		}
+	})
+}
+
+// SharedPlan is the account's plan as shared; it also becomes the seen one.
+func (h *Hub) SharedPlan(account string) Plan {
+	acct := strings.ToLower(account)
+	out := Plan{Snoozed: map[string]int64{}, Scheduled: map[string]int64{}}
+	seen := map[string]int64{}
+	h.E.Read(func(s *syncstate.State) {
+		m := s.Map(mPlan)
+		for _, k := range m.Keys() {
+			rest, ok := strings.CutPrefix(k, acct+"|")
+			if !ok {
+				continue
+			}
+			var t int64
+			if !m.Get(k, &t) {
+				continue
+			}
+			seen[k] = t
+			switch {
+			case strings.HasPrefix(rest, "s|"):
+				out.Snoozed[rest[2:]] = t
+			case strings.HasPrefix(rest, "q|"):
+				out.Scheduled[rest[2:]] = t
+			}
+		}
+	})
+	h.mu.Lock()
+	h.seenPlans[acct] = seen
+	h.mu.Unlock()
+	return out
 }

@@ -20,11 +20,16 @@ func TestLatestAndDownload(t *testing.T) {
 	var srv *httptest.Server
 	srv = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case "/repos/" + Repo + "/releases/latest":
-			fmt.Fprintf(w, `{"tag_name":"v0.7.0","body":"notes","html_url":"%[1]s/rel","assets":[
+		case "/repos/" + Repo + "/releases":
+			// Newest first: a macOS-only release and a draft come before the
+			// Linux one, and must be skipped.
+			fmt.Fprintf(w, `[
+				{"tag_name":"v0.8.1","body":"mac","assets":[{"name":"Klient-0.8.1-macos-arm64.dmg","browser_download_url":"%[1]s/dmg","size":3}]},
+				{"tag_name":"v0.8.0","draft":true,"assets":[{"name":"klient-0.8.0-1.fc44.x86_64.rpm","browser_download_url":"%[1]s/x","size":3}]},
+				{"tag_name":"v0.7.0","body":"notes","html_url":"%[1]s/rel","assets":[
 				{"name":"klient_0.7.0_amd64.deb","browser_download_url":"%[1]s/deb","size":3,"digest":"sha256:%[3]s"},
 				{"name":"klient-0.7.0-1.fc44.x86_64.rpm","browser_download_url":"%[1]s/pkg","size":%[2]d,"digest":"sha256:%[3]s"},
-				{"name":"SHA256SUMS","browser_download_url":"%[1]s/sums","size":10}]}`, srv.URL, len(pkg), digest)
+				{"name":"SHA256SUMS","browser_download_url":"%[1]s/sums","size":10}]}]`, srv.URL, len(pkg), digest)
 		case "/sums":
 			fmt.Fprintf(w, "%s  klient-0.7.0-1.fc44.x86_64.rpm\n", hexSum)
 		case "/pkg":

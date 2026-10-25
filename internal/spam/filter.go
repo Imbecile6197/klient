@@ -32,6 +32,24 @@ type Decision struct {
 	Hits      []string   `json:"hits"`
 	Source    string     `json:"source"` // "ai", "blocklist", "dangerous-link", "allowlist", "denylist", "user"
 	Time      time.Time  `json:"time"`
+	// Retry: the AI could not be asked (no connection, the service down),
+	// so this is only a fallback; the message is judged again later.
+	Retry bool `json:"retry,omitempty"`
+}
+
+// RetryAfter is how long a fallback verdict stands before the AI is asked
+// again.
+const RetryAfter = 30 * time.Minute
+
+// Judged reports whether the message has a verdict that stands: a fallback
+// made while the AI was not available counts only until RetryAfter.
+func (f *Filter) Judged(id string) bool {
+	d, ok := f.Decision(id)
+	return ok && !retryDue(d, time.Now())
+}
+
+func retryDue(d Decision, now time.Time) bool {
+	return d.Retry && now.Sub(d.Time) >= RetryAfter
 }
 
 type state struct {
@@ -341,6 +359,7 @@ func (f *Filter) Evaluate(ctx context.Context, msg *protonmail.Message) Decision
 			return d
 		}
 		d.Verdict.Reason = i18n.T("AI unavailable: ") + err.Error()
+		d.Retry = true
 	}
 
 	// Fallback without AI.
@@ -396,7 +415,7 @@ func (f *Filter) ProcessNew(ctx context.Context, acc Mailbox, meta protonmail.Su
 	if !inInbox {
 		return Decision{}, false, nil
 	}
-	if d, ok := f.Decision(meta.ID); ok {
+	if d, ok := f.Decision(meta.ID); ok && !retryDue(d, time.Now()) {
 		return d, false, nil
 	}
 	msg, err := acc.Get(ctx, meta.ID)

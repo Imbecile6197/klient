@@ -85,7 +85,7 @@ func (a *Account) ThreadMessages(ctx context.Context, conversationID string, inc
 	}
 	var out []Summary
 	for _, m := range msgs {
-		if m.ConversationID != conversationID {
+		if m.ConversationID != conversationID || IsSyncMessage(m) {
 			continue
 		}
 		hidden := false

@@ -68,10 +68,11 @@ func (a *Account) List(ctx context.Context, labelID string, page, pageSize int) 
 		if a.cache != nil {
 			_ = a.cache.PutMetadata(msgs...)
 		}
-		return msgs, nil
+		return withoutSync(msgs), nil
 	}
 	if IsOffline(err) && a.cache != nil {
-		return a.cache.List(labelID, page, pageSize)
+		msgs, err := a.cache.List(labelID, page, pageSize)
+		return withoutSync(msgs), err
 	}
 	return nil, err
 }
@@ -424,7 +425,9 @@ func (a *Account) Events(ctx context.Context, onNew func(Summary), onChange func
 						_ = a.cache.PutMetadata(m.Message)
 					}
 				}
-				if m.Action == proton.EventCreate && m.Message.Flags.Has(proton.MessageFlagReceived) {
+				// Klient's own sync data (written by this or another computer)
+				// is not new mail.
+				if m.Action == proton.EventCreate && m.Message.Flags.Has(proton.MessageFlagReceived) && !IsSyncMessage(m.Message) {
 					onNew(m.Message)
 				}
 			}

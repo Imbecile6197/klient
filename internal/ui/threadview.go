@@ -3,6 +3,7 @@ package ui
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"sort"
@@ -307,11 +308,28 @@ func (m *mainView) openThread(t protonmail.Thread) {
 	go func() {
 		ctx, cancel := context.WithTimeout(m.a.ctx, 90*time.Second)
 		defer cancel()
+		started := time.Now()
+		// The message clicked is needed in any case: fetch it while the
+		// conversation is being listed instead of after.
+		type fetched struct {
+			msg *protonmail.Message
+			err error
+		}
+		early := map[string]chan fetched{}
+		if id := t.Latest.ID; id != "" && !t.Latest.IsDraft() {
+			ch := make(chan fetched, 1)
+			early[id] = ch
+			go func() {
+				msg, err := m.a.acc.Get(ctx, id)
+				ch <- fetched{msg, err}
+			}()
+		}
 		var metas []protonmail.Summary
 		var err error
 		if useConv {
 			metas, err = m.a.acc.ThreadMessages(ctx, t.ConversationID, includeHidden)
 		}
+		listed := time.Since(started)
 		if !useConv || err != nil || len(metas) == 0 {
 			metas = append([]protonmail.Summary{}, t.Messages...)
 			sort.SliceStable(metas, func(i, j int) bool { return metas[i].Time < metas[j].Time })
@@ -340,7 +358,14 @@ func (m *mainView) openThread(t protonmail.Thread) {
 			wg.Add(1)
 			go func(id string) {
 				defer wg.Done()
-				msg, e := m.a.acc.Get(ctx, id)
+				var msg *protonmail.Message
+				var e error
+				if ch, ok := early[id]; ok {
+					f := <-ch
+					msg, e = f.msg, f.err
+				} else {
+					msg, e = m.a.acc.Get(ctx, id)
+				}
 				mu.Lock()
 				defer mu.Unlock()
 				if e != nil {
@@ -353,10 +378,18 @@ func (m *mainView) openThread(t protonmail.Thread) {
 			}(id)
 		}
 		wg.Wait()
+		log.Printf("open: conversation listed in %s, shown after %s (%d of %d messages fetched)",
+			listed.Round(time.Millisecond), time.Since(started).Round(time.Millisecond), len(full), len(metas))
+		// Marking as read does not hold up showing the message.
 		if len(unread) > 0 {
-			if m.a.acc.MarkRead(ctx, unread...) == nil {
-				ui(m.updateCounts) // badges and the tray dot at once
-			}
+			acc := m.a.acc
+			go func() {
+				mctx, mcancel := context.WithTimeout(m.a.ctx, 60*time.Second)
+				defer mcancel()
+				if acc.MarkRead(mctx, unread...) == nil {
+					ui(m.updateCounts) // badges and the tray dot at once
+				}
+			}()
 		}
 		ui(func() {
 			if seq != m.loadSeq {

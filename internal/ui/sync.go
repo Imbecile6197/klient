@@ -12,6 +12,7 @@ import (
 
 	"github.com/Imbecile6197/klient/internal/ai"
 	"github.com/Imbecile6197/klient/internal/config"
+	"github.com/Imbecile6197/klient/internal/imapmail"
 	"github.com/Imbecile6197/klient/internal/mailbox"
 	"github.com/Imbecile6197/klient/internal/protonmail"
 	"github.com/Imbecile6197/klient/internal/shared"
@@ -115,6 +116,9 @@ func (a *App) startSync() {
 		a.applySharedSettings(cfg)
 	}
 	h.SharedLists()
+	for _, ss := range a.sessions {
+		a.attachPlan(ss.acc)
+	}
 	go a.syncLoop(ctx, s)
 }
 
@@ -195,6 +199,7 @@ func (a *App) syncOnce(ctx context.Context, s *syncer) {
 		ui(func() {
 			h.SeedSettings(a.cfg)
 			h.SeedLists(listsForSync(a.filter.SenderLists()))
+			a.seedPlans(h)
 			h.SeedMain()
 			close(done)
 		})
@@ -216,6 +221,7 @@ func (a *App) syncOnce(ctx context.Context, s *syncer) {
 		if h.ApplySettings(&cfg) {
 			a.applySharedSettings(cfg)
 		}
+		a.applyPlans(h)
 		l := h.SharedLists()
 		if !sameLists(l, listsForSync(a.filter.SenderLists())) {
 			a.filter.SetSenderLists(spam.SenderLists{Allow: l.Allow, Deny: l.Deny, Contacts: l.Contacts})
@@ -436,4 +442,74 @@ func (a *App) hasProton() bool {
 		}
 	}
 	return false
+}
+
+// ---- snoozed and scheduled mail of IMAP accounts ----------------------------
+
+// attachPlan connects an IMAP account's plan (snoozed and scheduled mail)
+// to the sync. Without sync the hooks do nothing and this computer carries
+// out its own plan, as before. UI thread.
+func (a *App) attachPlan(acc mailbox.Account) {
+	im, ok := acc.(*imapmail.Account)
+	if !ok {
+		return
+	}
+	user := acc.Username()
+	if h := a.hub(); h != nil {
+		h.SharedPlan(user) // what this computer last knew: only changes are sent
+	}
+	im.OnPlanChange(func() {
+		if h := a.hub(); h != nil {
+			p := im.Plan()
+			h.PushPlan(user, shared.Plan{Snoozed: p.Snoozed, Scheduled: p.Scheduled})
+			a.kickSync()
+		}
+	})
+	// With several computers only one returns snoozed mail and sends
+	// scheduled mail: the main one, when it runs and has this account.
+	im.RunsDue(func() bool {
+		h := a.hub()
+		return h == nil || h.IsMain() || !h.MainAlive() || !h.MainHas(user)
+	})
+}
+
+// seedPlans shares the plans of the open IMAP accounts (first sync of a
+// run). UI thread.
+func (a *App) seedPlans(h *shared.Hub) {
+	for _, s := range a.sessions {
+		if im, ok := s.acc.(*imapmail.Account); ok {
+			p := im.Plan()
+			h.SeedPlan(s.acc.Username(), shared.Plan{Snoozed: p.Snoozed, Scheduled: p.Scheduled})
+		}
+	}
+}
+
+// applyPlans takes over plans changed on other computers. UI thread.
+func (a *App) applyPlans(h *shared.Hub) {
+	for _, s := range a.sessions {
+		im, ok := s.acc.(*imapmail.Account)
+		if !ok {
+			continue
+		}
+		sp := h.SharedPlan(s.acc.Username())
+		local := im.Plan()
+		if sameTimes(sp.Snoozed, local.Snoozed) && sameTimes(sp.Scheduled, local.Scheduled) {
+			continue
+		}
+		if err := im.SetPlan(imapmail.Plan{Snoozed: sp.Snoozed, Scheduled: sp.Scheduled}); err == nil && a.mv != nil && a.showing(s.acc) {
+			a.mv.scheduleRefresh()
+		}
+	}
+}
+
+func sameTimes(x, y map[string]int64) bool {
+	if len(x) != len(y) {
+		return false
+	}
+	for k, v := range x {
+		if w, ok := y[k]; !ok || w != v {
+			return false
+		}
+	}
+	return true
 }
