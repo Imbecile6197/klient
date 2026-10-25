@@ -292,7 +292,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
       <rect x="4" y="12" width="56" height="40" rx="9" fill="#1c71d8"/>
       <path d="M10 20l22 16 22-16" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <div><b>Klient</b><span>Dokumentace · verze 0.11.6 · <a href="index.html" hreflang="en" lang="en">English</a></span></div>
+    <div><b>Klient</b><span>Dokumentace · verze 0.12.0 · <a href="index.html" hreflang="en" lang="en">English</a></span></div>
   </div>
   <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc">Obsah</button>
   <ol>
@@ -307,6 +307,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
     <li><a href="#ai">AI asistent</a></li>
     <li><a href="#lokalni-ai">Lokální AI</a></li>
     <li><a href="#kalendar">Pozvánky a nepřítomnost</a></li>
+    <li><a href="#synchronizace">Synchronizace</a></li>
     <li><a href="#pozadi">Běh na pozadí</a></li>
     <li><a href="#zkratky">Klávesové zkratky</a></li>
     <li><a href="#predvolby">Předvolby</a></li>
@@ -644,10 +645,24 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
 </section>
 
 <!-- ============================================================ -->
+<section id="synchronizace">
+  <h2>Synchronizace mezi počítači</h2>
+  <p>Používáte-li Klienta na více počítačích, mohou sdílet práci i nastavení. Zapnete to v Předvolbách → <b>Synchronizace</b> na každém počítači. Potřebuje účet Proton: sdílená data se ukládají do složky <b>Klient</b> ve vašem účtu, zašifrovaná Protonem, takže je přečte jen váš Klient. Klient tuto složku ve vlastním seznamu složek nezobrazuje; na webu Protonu ji neměňte ani nemažte.</p>
+  <ul>
+    <li><b>Co se sdílí:</b> verdikty spamfiltru, povolení a blokovaní odesílatelé, známé kontakty, pravidla, podpisy, nastavení AI (poskytovatelé, modely, práh spamu), útrata za AI (součet za všechny počítače) a ranní přehled.</li>
+    <li><b>Co se nesdílí:</b> účty a hesla, API klíče (zadáte je na každém počítači zvlášť), offline cache, jazyk a lokální AI.</li>
+    <li><b>Hlavní počítač</b> dělá práci pro AI – spamfiltr, ranní přehled a shrnutí. Ostatní na jeho verdikt chvíli počkají (nejvýš 3 minuty) a sami posoudí jen poštu, kterou hlavní počítač nemá, nebo když je vypnutý. Hlavním se stane první počítač, na kterém synchronizaci zapnete; změníte ho v Předvolbách → Synchronizace nebo AI.</li>
+    <li>Ranní přehled připraví hlavní počítač jednou a ostatní ho jen zobrazí.</li>
+    <li>Bez připojení pracuje každý počítač sám jako dřív a změny odešle, až bude připojený. Pošta se kvůli synchronizaci nikdy nezdrží déle než na pár minut.</li>
+    <li>Klient uchovává několik posledních verzí sdílených dat; v Předvolbách → Synchronizace → <b>Obnovit předchozí verzi</b> se k některé můžete vrátit.</li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
 <section id="pozadi">
   <h2>Běh na pozadí</h2>
   <ul>
-    <li>Po zavření okna Klient běží dál, hlídá novou poštu a ukazuje černobílou ikonu v horní liště (GNOME potřebuje rozšíření AppIndicator). Červená tečka na ikoně znamená nepřečtenou poštu. Nabídka ikony obsahuje Otevřít Klient, Nová zpráva a Ukončit; ukončit ho můžete také klávesami <kbd>Ctrl</kbd>+<kbd>Q</kbd>.</li>
+    <li>Po zavření okna Klient běží dál, hlídá novou poštu a ukazuje černobílou ikonu v horní liště (GNOME potřebuje rozšíření AppIndicator). Když máte nepřečtenou poštu, obálka zmodrá; po přečtení je zase černobílá. Nabídka ikony obsahuje Otevřít Klient, Nová zpráva a Ukončit; ukončit ho můžete také klávesami <kbd>Ctrl</kbd>+<kbd>Q</kbd>.</li>
     <li><b>Spouštět po přihlášení</b> – Klient se spustí rovnou na pozadí.</li>
     <li>Obojí zapnete nebo vypnete v Předvolbách → Obecné → <b>Na pozadí</b>.</li>
     <li>Oznámení o nové poště přijde až po kontrole spamfiltrem. Má až tři tlačítka – výchozí jsou <b>Označit jako přečtené</b>, <b>Archivovat</b> a <b>Smazat</b>; čtvrtou možností je <b>Spam</b>. Vyberete je v Předvolbách → Obecné → <b>Oznámení</b>.</li>
@@ -758,7 +773,7 @@ packaging/deb.sh 0.7.3   # balíček pro Ubuntu, sestaví se v kontejneru podman
   <p>Postaveno na GTK4, libadwaita, WebKitGTK, go-proton-api, gopenpgp a knihovnách go-imap/go-smtp.</p>
 </section>
 
-<footer>Dokumentace k verzi 0.11.6 · říjen 2026 · <a href="index.html" hreflang="en" lang="en">English version</a></footer>
+<footer>Dokumentace k verzi 0.12.0 · říjen 2026 · <a href="index.html" hreflang="en" lang="en">English version</a></footer>
 
 </div>
 </main>

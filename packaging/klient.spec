@@ -70,6 +70,12 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Sun Oct 25 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.12.0-1
+- Sync between computers through a folder in the Proton account (spam
+  verdicts, sender lists, rules, signatures, AI settings and spending,
+  morning overview); one main computer does the AI work
+- Tray icon: the envelope turns blue for unread mail instead of a red dot
+
 * Mon Oct 19 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.11.6-1
 - IMAP: time limits for connecting, TLS, login, STATUS, SELECT and the start
   of IDLE; the command connection is given up when no data moves for 60 s

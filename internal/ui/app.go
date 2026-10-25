@@ -154,6 +154,11 @@ type App struct {
 	restart       bool   // re-exec the (updated) binary after quitting
 	precompute    chan precomputeJob
 	actions       map[string]*gio.SimpleAction
+	// Sync with the user's other computers (sync.go); nil when off.
+	shareMu sync.Mutex
+	share   *syncer
+	// Refreshes of an open sync preferences page.
+	syncPrefs []func()
 }
 
 type notifiedMsg struct {
@@ -287,6 +292,8 @@ func (a *App) activate() {
 	}
 	a.checkWhatsNew()
 	go a.resumeAll()
+	a.filter.OnListsChange(func() { ui(a.syncListsChanged) })
+	a.startSync()
 	go a.digestLoop()
 	go a.ollamaUpdateLoop()
 	go a.selfUpdateLoop()
@@ -448,6 +455,7 @@ func (a *App) saveConfig() {
 		a.toast(i18n.T("The settings could not be saved: ") + err.Error())
 	}
 	a.filter.SetConfig(a.cfg)
+	a.syncSettingsChanged()
 }
 
 func (a *App) toast(msg string) {
@@ -642,6 +650,7 @@ func (a *App) addSession(acc mailbox.Account) *session {
 	})
 	a.refreshUnread(s)
 	a.loadOutbox(acc)
+	a.kickSync() // the shared state may live in this account
 	// Show all accounts together again, as in the last run.
 	if a.restoreUnified && len(a.sessions) > 1 && a.mv != nil && !a.isUnified() {
 		a.restoreUnified = false
@@ -836,7 +845,7 @@ func (a *App) offlineSyncLoop(s *session) {
 // onNewMessage runs on the event goroutine.
 func (a *App) onNewMessage(s *session, meta protonmail.Summary) {
 	held := a.holdNew(s, meta)
-	go a.checkNew(s, meta, held, true)
+	go a.checkNew(s, meta, held, true, true)
 }
 
 // holdNew hides an unchecked inbox message until the spam filter decides.
@@ -848,6 +857,11 @@ func (a *App) holdNew(s *session, meta protonmail.Summary) bool {
 	if held {
 		if _, known := a.filter.Decision(meta.ID); known {
 			held = false
+		} else if h := a.hub(); h != nil && meta.ExternalID != "" {
+			// Another computer found it fine already: show it at once.
+			if v, ok := h.Verdict(meta.ExternalID); ok && !v.Spam {
+				held = false
+			}
 		}
 	}
 	if held {
@@ -868,9 +882,39 @@ func (a *App) holdNew(s *session, meta protonmail.Summary) bool {
 	return held
 }
 
+// judge decides whether a new message is spam: with a verdict another
+// computer shared, after waiting for the main computer when it does the AI
+// work, or here. elsewhere: the verdict came from another computer. Off the
+// UI thread.
+func (a *App) judge(acc mailbox.Account, meta protonmail.Summary, wait bool) (d spam.Decision, moved bool, err error, elsewhere bool) {
+	_, local := a.filter.Decision(meta.ID)
+	if !local {
+		d, ok := a.sharedVerdict(meta)
+		if !ok && wait {
+			d, ok = a.awaitMain(acc, meta)
+		}
+		if ok {
+			// The other computer moved spam on the server already; make sure,
+			// as the message may still be in the inbox here.
+			if d.Spam && hasLabel(meta, protonmail.InboxID) {
+				if err := acc.Move(a.ctx, protonmail.SpamID, meta.ID); err == nil {
+					return d, true, nil, true
+				}
+			}
+			return d, false, nil, true
+		}
+	}
+	d, moved, err = a.filter.ProcessNew(a.ctx, acc, meta)
+	if err == nil && !local { // a verdict made just now
+		a.publishVerdict(meta, d)
+	}
+	return d, moved, err, false
+}
+
 // checkNew runs the spam filter, the rules and the AI label on a new
-// message and notifies about it (when notify).
-func (a *App) checkNew(s *session, meta protonmail.Summary, held, notify bool) {
+// message and notifies about it (when notify). wait: just arrived, so the
+// main computer is about to judge it too (worth waiting for).
+func (a *App) checkNew(s *session, meta protonmail.Summary, held, notify, wait bool) {
 	acc := s.acc
 	if !s.begin(meta.ID) {
 		return // already being judged; that check releases and notifies
@@ -883,9 +927,11 @@ func (a *App) checkNew(s *session, meta protonmail.Summary, held, notify bool) {
 	// The guard holds until the rules and the AI label are done too.
 	defer s.end(meta.ID)
 	func() {
-		d, moved, err := a.filter.ProcessNew(a.ctx, acc, meta)
+		d, moved, err, elsewhere := a.judge(acc, meta, wait)
 		var applied []string
-		if err == nil && !moved {
+		// Judged on another computer: that one ran the rules, the AI label
+		// and the summary already (and paid for them).
+		if err == nil && !moved && !elsewhere {
 			applied = a.applyRules(a.ctx, acc, meta)
 			if !d.Spam {
 				a.queuePrecompute(acc, meta)
@@ -1040,7 +1086,7 @@ func (a *App) catchUp(s *session, start bool) {
 		// The sweep finds mail the list already shows; hiding it now would
 		// only make it blink.
 		held := start && a.holdNew(s, m)
-		a.checkNew(s, m, held, !start && m.Time > recent)
+		a.checkNew(s, m, held, !start && m.Time > recent, false)
 		n++
 	}
 	switch {

@@ -48,9 +48,10 @@ type Filter struct {
 	Lists *Blocklists
 	cfg   config.Config
 
-	mu    sync.Mutex
-	st    state
-	aiCli *ai.Client
+	mu       sync.Mutex
+	st       state
+	aiCli    *ai.Client
+	onChange func()
 }
 
 func NewFilter(cfg config.Config, lists *Blocklists) *Filter {
@@ -124,9 +125,61 @@ func (f *Filter) Decision(id string) (Decision, bool) {
 // RecordContact remembers that the user sent mail to addr.
 func (f *Filter) RecordContact(addr string) {
 	f.mu.Lock()
-	f.st.Contacts[strings.ToLower(addr)] = true
+	addr = strings.ToLower(addr)
+	known := f.st.Contacts[addr]
+	f.st.Contacts[addr] = true
 	f.saveLocked()
 	f.mu.Unlock()
+	if !known {
+		f.changed()
+	}
+}
+
+// SenderLists are copies of the allowed and blocked senders and the
+// contacts.
+type SenderLists struct {
+	Allow, Deny, Contacts map[string]bool
+}
+
+func (f *Filter) SenderLists() SenderLists {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	return SenderLists{Allow: copySet(f.st.Allow), Deny: copySet(f.st.Deny), Contacts: copySet(f.st.Contacts)}
+}
+
+// SetSenderLists replaces the lists (with what the other computers share);
+// it does not report a change.
+func (f *Filter) SetSenderLists(l SenderLists) {
+	f.mu.Lock()
+	f.st.Allow, f.st.Deny, f.st.Contacts = copySet(l.Allow), copySet(l.Deny), copySet(l.Contacts)
+	f.saveLocked()
+	f.mu.Unlock()
+}
+
+func copySet(m map[string]bool) map[string]bool {
+	out := make(map[string]bool, len(m))
+	for k, v := range m {
+		if v {
+			out[k] = true
+		}
+	}
+	return out
+}
+
+// OnListsChange is called (outside the lock) when the user changed a list.
+func (f *Filter) OnListsChange(fn func()) {
+	f.mu.Lock()
+	f.onChange = fn
+	f.mu.Unlock()
+}
+
+func (f *Filter) changed() {
+	f.mu.Lock()
+	fn := f.onChange
+	f.mu.Unlock()
+	if fn != nil {
+		fn()
+	}
 }
 
 // Feedback records a user correction: the sender goes to the allow or deny
@@ -146,6 +199,7 @@ func (f *Filter) Feedback(msgID, from string, isSpam bool) {
 	d.MessageID, d.From, d.Spam, d.Source, d.Time = msgID, from, isSpam, "user", time.Now()
 	f.st.Decisions[msgID] = d
 	f.saveLocked()
+	go f.changed() // f.mu is held here
 }
 
 var ipRe = regexp.MustCompile(`\[(\d{1,3}(?:\.\d{1,3}){3}|[0-9a-fA-F:]{3,})\]`)

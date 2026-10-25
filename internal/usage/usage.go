@@ -39,6 +39,34 @@ type Store struct {
 	Days map[string]map[string]*Counts `json:"days"`
 	// OnChange is called after each new record (not on the UI thread).
 	OnChange func() `json:"-"`
+	// Others are the days of the user's other computers (from the sync),
+	// counted in the overview but not saved here.
+	others map[string]map[string]map[string]*Counts // computer -> day -> key
+}
+
+// SetOthers replaces the statistics of the other computers.
+func (s *Store) SetOthers(o map[string]map[string]map[string]*Counts) {
+	s.mu.Lock()
+	s.others = o
+	s.mu.Unlock()
+}
+
+// DaysSince copies this computer's days from day on (for the sync).
+func (s *Store) DaysSince(from string) map[string]map[string]Counts {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	out := map[string]map[string]Counts{}
+	for day, m := range s.Days {
+		if day < from {
+			continue
+		}
+		c := map[string]Counts{}
+		for k, v := range m {
+			c[k] = *v
+		}
+		out[day] = c
+	}
+	return out
 }
 
 // Path is where Klient keeps the statistics.
@@ -102,16 +130,22 @@ type Line struct {
 func (s *Store) Lines(from, to string, prices map[string]config.ModelPrice) []Line {
 	s.mu.Lock()
 	sum := map[string]*Counts{}
-	for day, m := range s.Days {
-		if day < from || day > to {
-			continue
-		}
-		for k, c := range m {
-			if sum[k] == nil {
-				sum[k] = &Counts{}
+	addDays := func(days map[string]map[string]*Counts) {
+		for day, m := range days {
+			if day < from || day > to {
+				continue
 			}
-			sum[k].add(*c)
+			for k, c := range m {
+				if sum[k] == nil {
+					sum[k] = &Counts{}
+				}
+				sum[k].add(*c)
+			}
 		}
+	}
+	addDays(s.Days)
+	for _, days := range s.others {
+		addDays(days)
 	}
 	s.mu.Unlock()
 	var out []Line

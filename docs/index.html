@@ -292,7 +292,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
       <rect x="4" y="12" width="56" height="40" rx="9" fill="#1c71d8"/>
       <path d="M10 20l22 16 22-16" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <div><b>Klient</b><span>Documentation · version 0.11.6 · <a href="index.cs.html" hreflang="cs" lang="cs">Česky</a></span></div>
+    <div><b>Klient</b><span>Documentation · version 0.12.0 · <a href="index.cs.html" hreflang="cs" lang="cs">Česky</a></span></div>
   </div>
   <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc">Contents</button>
   <ol>
@@ -307,6 +307,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
     <li><a href="#ai">AI Assistant</a></li>
     <li><a href="#local-ai">Local AI</a></li>
     <li><a href="#calendar">Invitations and Away Replies</a></li>
+    <li><a href="#sync">Sync</a></li>
     <li><a href="#background">Running in the Background</a></li>
     <li><a href="#shortcuts">Keyboard Shortcuts</a></li>
     <li><a href="#preferences">Preferences</a></li>
@@ -644,10 +645,24 @@ packaging/deb.sh 0.7.3   # Ubuntu package, built in a podman container</code></p
 </section>
 
 <!-- ============================================================ -->
+<section id="sync">
+  <h2>Sync Between Computers</h2>
+  <p>If you use Klient on several computers, they can share their work and settings. Switch it on in Preferences → <b>Sync</b> on each computer. It needs a Proton account: the shared data is kept in a folder <b>Klient</b> in your account, encrypted by Proton, so only your Klient can read it. Klient does not show this folder in its own folder list; please do not change or delete it on the Proton website.</p>
+  <ul>
+    <li><b>Shared:</b> spam filter verdicts, allowed and blocked senders, known contacts, rules, signatures, AI settings (providers, models, spam threshold), AI spending (summed over all computers) and the morning overview.</li>
+    <li><b>Not shared:</b> accounts and passwords, API keys (you enter them on each computer), the offline cache, the language and local AI.</li>
+    <li>The <b>main computer</b> does the AI work – the spam filter, the morning overview and summaries. The others wait a little for its verdict (at most 3 minutes) and judge mail themselves only when the main computer does not have that account or is switched off. The first computer where you switch sync on becomes the main one; change it in Preferences → Sync or AI.</li>
+    <li>The main computer prepares the morning overview once; the others only show it.</li>
+    <li>Without a connection every computer works on its own as before and sends its changes once it is connected. Sync never holds mail up for more than a few minutes.</li>
+    <li>Klient keeps the last few versions of the shared data; Preferences → Sync → <b>Restore an Earlier Version</b> takes you back to one.</li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
 <section id="background">
   <h2>Running in the Background</h2>
   <ul>
-    <li>After you close the window, Klient keeps running, watches for new mail and shows a monochrome icon in the top bar (GNOME needs the AppIndicator extension). A red dot on the icon means unread mail. The icon menu offers Open Klient, New Message and Quit; you can also quit with <kbd>Ctrl</kbd>+<kbd>Q</kbd>.</li>
+    <li>After you close the window, Klient keeps running, watches for new mail and shows a monochrome icon in the top bar (GNOME needs the AppIndicator extension). When you have unread mail the envelope turns blue; once it is read it is monochrome again. The icon menu offers Open Klient, New Message and Quit; you can also quit with <kbd>Ctrl</kbd>+<kbd>Q</kbd>.</li>
     <li><b>Start after login</b> – Klient starts straight in the background.</li>
     <li>You turn both on or off in Preferences → General → <b>Background</b>.</li>
     <li>The new-mail notification arrives only after the spam check. It has up to three buttons – by default <b>Mark as Read</b>, <b>Archive</b> and <b>Delete</b>; <b>Spam</b> is the fourth choice. You pick them in Preferences → General → <b>Notifications</b>.</li>
@@ -758,7 +773,7 @@ packaging/deb.sh 0.7.3   # Ubuntu package, built in a podman container</code></p
   <p>Built with GTK4, libadwaita, WebKitGTK, go-proton-api, GopenPGP and the go-imap/go-smtp libraries.</p>
 </section>
 
-<footer>Documentation for version 0.11.6 · September 2026 · <a href="index.cs.html" hreflang="cs" lang="cs">Česká verze</a></footer>
+<footer>Documentation for version 0.12.0 · September 2026 · <a href="index.cs.html" hreflang="cs" lang="cs">Česká verze</a></footer>
 
 </div>
 </main>

@@ -133,6 +133,12 @@ type Config struct {
 	// the user (model name -> price).
 	AIPrices map[string]ModelPrice `json:"ai_prices,omitempty"`
 
+	// Sync between the user's computers (through the Proton account). These
+	// three stay on this computer: on or off, its random ID and its name.
+	SyncEnabled bool   `json:"sync_enabled,omitempty"`
+	SyncNode    string `json:"sync_node,omitempty"`
+	SyncName    string `json:"sync_name,omitempty"`
+
 	// Blocklist feeds and refresh interval.
 	Feeds          []Feed   `json:"feeds"`
 	UpdateInterval Duration `json:"update_interval"`

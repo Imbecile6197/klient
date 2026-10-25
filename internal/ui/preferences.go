@@ -34,6 +34,9 @@ func (a *App) preferencesDialog() *adw.PreferencesDialog {
 	d.Add(a.spamPage(d))
 	d.Add(a.messagesPage(d))
 	d.Add(a.rulesPage(d))
+	if !demoMode() {
+		d.Add(a.syncPage(d))
+	}
 	if a.acc != nil && !a.isUnified() {
 		d.Add(a.pgpPage(d))
 	}
@@ -196,6 +199,9 @@ func (a *App) aiPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		&a.cfg.AssistantProvider, &a.cfg.AssistantModel, func(pr ai.ProviderInfo) string { return pr.AssistantModel }))
 	p.Add(role(i18n.T("Spam Filter"), i18n.T("Judges every new message – a cheaper and faster model is usually enough here."),
 		&a.cfg.SpamProvider, &a.cfg.SpamModel, func(pr ai.ProviderInfo) string { return pr.SpamModel }))
+	if g := a.aiComputerGroup(); g != nil {
+		p.Add(g)
+	}
 
 	keys := adw.NewPreferencesGroup()
 	keys.SetTitle(i18n.T("API Keys"))

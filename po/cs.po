@@ -4367,3 +4367,143 @@ msgstr "Vstup z mezipaměti"
 #: internal
 msgid "Output"
 msgstr "Výstup"
+
+#: internal
+msgid "no address to store the shared data under"
+msgstr "chybí adresa, pod kterou by se sdílená data uložila"
+
+#: internal
+msgid "Klient – data shared between your computers (do not change or delete)"
+msgstr "Klient – data sdílená mezi vašimi počítači (neměňte ani nemažte)"
+
+#: internal
+msgid "Klient keeps the data it shares between your computers here (spam verdicts, sender lists, rules, settings). Klient replaces this message itself; please do not change or delete it."
+msgstr "Klient tu uchovává data, která sdílí mezi vašimi počítači (verdikty spam filtru, seznamy odesílatelů, pravidla, nastavení). Tuto zprávu Klient sám nahrazuje; prosím neměňte ji ani nemažte."
+
+#: internal
+msgid "Sync is off"
+msgstr "Synchronizace je vypnutá"
+
+#: internal
+msgid "A newer Klient changed the shared data – update Klient on this computer"
+msgstr "Sdílená data změnil novější Klient – aktualizujte Klienta na tomto počítači"
+
+#: internal
+msgid "Waiting for the Proton account"
+msgstr "Čekám na účet Proton"
+
+#: internal
+msgid "Sync failed: %s"
+msgstr "Synchronizace selhala: %s"
+
+#: internal
+msgid "Last synced %s"
+msgstr "Naposledy synchronizováno %s"
+
+#: internal
+msgid " – changes are waiting to be sent"
+msgstr " – změny čekají na odeslání"
+
+#: internal
+msgid "Sync"
+msgstr "Synchronizace"
+
+#: internal
+msgid "Sync Between Computers"
+msgstr "Synchronizace mezi počítači"
+
+#: internal
+msgid "Klient on your other computers shares spam verdicts, sender lists, rules, signatures, AI settings and spending through your Proton account (a folder “Klient”, encrypted by Proton). API keys and passwords stay on each computer."
+msgstr "Klient na vašich dalších počítačích sdílí verdikty spam filtru, seznamy odesílatelů, pravidla, podpisy, nastavení AI a útratu přes váš účet Proton (složka „Klient“, zašifrovaná Protonem). API klíče a hesla zůstávají na každém počítači."
+
+#: internal
+msgid "Sync this computer"
+msgstr "Synchronizovat tento počítač"
+
+#: internal
+msgid "Needs a Proton account – the shared data is kept there"
+msgstr "Potřebuje účet Proton – sdílená data jsou uložená tam"
+
+#: internal
+msgid "Name of this computer"
+msgstr "Název tohoto počítače"
+
+#: internal
+msgid "Sync status"
+msgstr "Stav synchronizace"
+
+#: internal
+msgid "Sync Now"
+msgstr "Synchronizovat nyní"
+
+#: internal
+msgid "Syncing…"
+msgstr "Synchronizuji…"
+
+#: internal
+msgid "Your Computers"
+msgstr "Vaše počítače"
+
+#: internal
+msgid "The main computer does the AI work: the spam filter, the morning overview and summaries. The others wait for its results and do the work themselves only when it is switched off."
+msgstr "Hlavní počítač dělá práci pro AI: spam filtr, ranní přehled a shrnutí. Ostatní čekají na jeho výsledky a práci udělají samy, jen když je vypnutý."
+
+#: internal
+msgid "Restore an Earlier Version…"
+msgstr "Obnovit předchozí verzi…"
+
+#: internal
+msgid "%s (this computer)"
+msgstr "%s (tento počítač)"
+
+#: internal
+msgid "main computer"
+msgstr "hlavní počítač"
+
+#: internal
+msgid "last seen %s"
+msgstr "naposledy %s"
+
+#: internal
+msgid "Make Main"
+msgstr "Nastavit jako hlavní"
+
+#: internal
+msgid "Remove Computer"
+msgstr "Odebrat počítač"
+
+#: internal
+msgid "No other computer yet – switch sync on in Klient on the other computer too"
+msgstr "Zatím žádný další počítač – zapněte synchronizaci i v Klientovi na druhém počítači"
+
+#: internal
+msgid "No earlier version is stored"
+msgstr "Žádná předchozí verze není uložená"
+
+#: internal
+msgid "Earlier Versions"
+msgstr "Předchozí verze"
+
+#: internal
+msgid "Restore This Version"
+msgstr "Obnovit tuto verzi"
+
+#: internal
+msgid "The shared data as it was %s comes back on all computers. Changes made since then are undone."
+msgstr "Sdílená data se na všech počítačích vrátí do podoby, jakou měla %s. Změny provedené od té doby se zruší."
+
+#: internal
+msgid "The earlier version was restored"
+msgstr "Předchozí verze byla obnovena"
+
+#: internal
+msgid "Computer for AI Work"
+msgstr "Počítač pro úlohy AI"
+
+#: internal
+msgid "The spam filter, the morning overview and summaries run on this computer; the others wait for the results, so you do not pay twice."
+msgstr "Spam filtr, ranní přehled a shrnutí běží na tomto počítači; ostatní čekají na výsledky, takže neplatíte dvakrát."
+
+#: internal
+msgid "AI tasks are done by"
+msgstr "Úlohy AI provádí"

@@ -42,6 +42,11 @@ func (a *Account) UserLabels(ctx context.Context) ([]UserLabel, error) {
 		if len(l.Path) > 0 {
 			name = strings.Join(l.Path, "/")
 		}
+		// The folder of the sync between computers is Klient's, not the
+		// user's: not shown, so that it is not deleted by mistake.
+		if l.Type == proton.LabelTypeFolder && name == SyncFolderName {
+			continue
+		}
 		out = append(out, UserLabel{ID: l.ID, Name: name, Color: l.Color, Folder: l.Type == proton.LabelTypeFolder})
 	}
 	sort.Slice(out, func(i, j int) bool {

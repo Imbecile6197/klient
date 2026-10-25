@@ -348,14 +348,44 @@ func (a *App) digestLoop() {
 			return
 		case <-time.After(time.Minute):
 		}
-		ready := make(chan bool)
+		type state struct{ due, canBuild, late bool }
+		ready := make(chan state)
 		ui(func() {
 			now := time.Now()
-			ready <- a.cfg.Digest && a.ai.HasAssistant() && len(a.sessions) > 0 &&
-				now.Hour() >= a.cfg.DigestHour && a.cfg.DigestLast != now.Format("2006-01-02") &&
-				!now.Before(retryAt)
+			ready <- state{
+				due: a.cfg.Digest && len(a.sessions) > 0 &&
+					now.Hour() >= a.cfg.DigestHour && a.cfg.DigestLast != now.Format("2006-01-02") &&
+					!now.Before(retryAt),
+				canBuild: a.ai.HasAssistant(),
+				late:     now.Hour() > a.cfg.DigestHour, // an hour or more after the time
+			}
 		})
-		if !<-ready {
+		st := <-ready
+		if !st.due {
+			continue
+		}
+		today := time.Now().Format("2006-01-02")
+		if h := a.hub(); h != nil {
+			// Made by another computer: show it here too, do not pay twice.
+			if d, ok := h.DigestOf(today); ok {
+				ui(func() {
+					a.cfg.DigestLast = today
+					a.saveConfig()
+					if d.N >= 0 {
+						a.notifyDigest(d.Text, d.N)
+					}
+				})
+				continue
+			}
+			// The main computer runs and makes it: wait for it (not for
+			// ever – it may lack the AI key, for example).
+			if !h.IsMain() && h.MainAlive() && !st.late {
+				a.kickSync()
+				retryAt = time.Now().Add(5 * time.Minute)
+				continue
+			}
+		}
+		if !st.canBuild {
 			continue
 		}
 		text, n, failed, err := a.buildDigest()
@@ -370,6 +400,10 @@ func (a *App) digestLoop() {
 			// Do not keep paying for failing requests all day: say it once.
 			log.Printf("digest: the AI failed again, giving up for today: %v", err)
 			aiFailures = 0
+			if h := a.hub(); h != nil {
+				h.MarkDigest(today, "", -1) // the others need not try either
+				a.kickSync()
+			}
 			ui(func() {
 				a.cfg.DigestLast = time.Now().Format("2006-01-02")
 				a.saveConfig()
@@ -386,24 +420,33 @@ func (a *App) digestLoop() {
 		}
 		aiFailures = 0
 		log.Printf("digest: %d unread messages summarised (accounts not read: %d)", n, len(failed))
+		if h := a.hub(); h != nil {
+			h.MarkDigest(today, text, n)
+			a.kickSync()
+		}
 		ui(func() {
-			a.cfg.DigestLast = time.Now().Format("2006-01-02")
+			a.cfg.DigestLast = today
 			a.saveConfig()
-			title := i18n.T("Morning overview: no unread mail")
-			body := ""
-			if n > 0 {
-				a.digest = text
-				title = fmt.Sprintf(i18n.T("Morning overview: %s"), unreadText(n))
-				body, _, _ = strings.Cut(strings.TrimSpace(text), "\n")
-			}
-			note := gio.NewNotification(title)
-			if body != "" {
-				note.SetBody(body)
-				note.SetDefaultAction("app.digest")
-			}
-			a.app.SendNotification("digest", note)
+			a.notifyDigest(text, n)
 		})
 	}
+}
+
+// notifyDigest notifies about the morning overview. UI thread.
+func (a *App) notifyDigest(text string, n int) {
+	title := i18n.T("Morning overview: no unread mail")
+	body := ""
+	if n > 0 {
+		a.digest = text
+		title = fmt.Sprintf(i18n.T("Morning overview: %s"), unreadText(n))
+		body, _, _ = strings.Cut(strings.TrimSpace(text), "\n")
+	}
+	note := gio.NewNotification(title)
+	if body != "" {
+		note.SetBody(body)
+		note.SetDefaultAction("app.digest")
+	}
+	a.app.SendNotification("digest", note)
 }
 
 // buildDigest summarises the unread inbox of every account. Off the UI
