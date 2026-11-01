@@ -23,9 +23,19 @@ GOMODCACHE=$("$GO" env GOMODCACHE)
 podman build -q -t "$IMAGE" -f packaging/arch/Containerfile packaging/arch >/dev/null
 mkdir -p build/arch
 rm -f build/arch/*.pkg.tar.zst
+
+# Stage a self-contained copy of GOROOT. Distro Go packages (e.g. Debian's)
+# make $GOROOT/src a symlink into /usr/share, which would dangle inside the
+# container when only $GOROOT is mounted. Copying with -L dereferences such
+# symlinks so /goroot has a complete src/ tree.
+GOROOT_STAGE="$PWD/build/arch/goroot"
+rm -rf "$GOROOT_STAGE"
+mkdir -p "$GOROOT_STAGE"
+cp -aL "$GOROOT"/. "$GOROOT_STAGE"/
+
 # SELinux labels are disabled for the run so the host's Go can execute.
 podman run --rm --security-opt label=disable \
-	-v "$PWD":/src:ro -v "$GOROOT":/goroot:ro -v "$GOMODCACHE":/gomod:ro \
+	-v "$PWD":/src:ro -v "$GOROOT_STAGE":/goroot:ro -v "$GOMODCACHE":/gomod:ro \
 	-v "$PWD/build/arch":/out \
 	-e VERSION="$VERSION" \
 	"$IMAGE" bash -euo pipefail -c '
