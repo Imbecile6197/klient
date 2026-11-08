@@ -109,11 +109,13 @@ Texty v kódu jsou anglicky a překládají se přes katalogy gettext ve složce
 | `internal/ui` | Rozhraní pro GNOME |
 | `docs` | Uživatelská dokumentace, zobrazuje se i jako Nápověda |
 
-Soubory: nastavení v `~/.config/klient/config.json`, data (blocklisty, rozhodnutí filtru, klíče, cache, Ollama) v `~/.local/share/klient/`, tajné údaje v systémové klíčence (Secret Service, viz výše).
+Soubory: nastavení v `~/.config/klient/config.json`, data (blocklisty, rozhodnutí filtru, klíče, cache, Ollama) v `~/.local/share/klient/`, tajné údaje v systémové klíčence (Secret Service, viz níže).
 
 ## Správce hesel (KWallet, KeePassXC, GNOME Keyring)
 
-Klient ukládá hesla, API klíče a relace Protonu přes rozhraní **Secret Service** (freedesktop), tedy komunikuje s programem, který na sběrnici D-Bus (session bus) vlastní jméno `org.freedesktop.secrets`. Ve výchozím stavu je to GNOME Keyring, ale funguje i KWallet (KDE Plasma 5.97+/6, přes `ksecretd`) a KeePassXC. Jméno může vlastnit vždy jen jeden poskytovatel.
+Klient ukládá hesla, API klíče a relace Protonu přes rozhraní **Secret Service** (freedesktop), tedy komunikuje s programem, který na sběrnici D-Bus (session bus) vlastní jméno `org.freedesktop.secrets`. V GNOME je to obvykle GNOME Keyring nebo oo7. KeePassXC prokazatelně funguje na Manjaru s KDE. KWallet umí nabídnout stejné rozhraní, ale s Klientem není ověřený: na zmíněném systému s Manjarem se pod tímto jménem nezaregistroval. Jméno může vlastnit vždy jen jeden poskytovatel.
+
+Změnou poskytovatele se nic nepřenese: je potřeba se znovu přihlásit a znovu zadat API klíče a Klient vytvoří nový klíč pro offline cache, takže starou cache už nepřečte.
 
 Zjištění, která služba je zaregistrovaná:
 
@@ -129,9 +131,9 @@ busctl --user status org.freedesktop.secrets
 busctl --user list --activatable | grep -i secrets
 ```
 
-Volitelně můžete jako poskytovatele zaregistrovat např. KeePassXC:
+Jako poskytovatele můžete volitelně zaregistrovat třeba KeePassXC:
 
-1. Ukončete současného poskytovatele (například `gnome-keyring-daemon`), jinak si jméno ponechá.
+1. Ukončete současného poskytovatele (například `gnome-keyring-daemon` nebo `oo7-daemon`), jinak si jméno ponechá. Poskytovatel spouštěný na vyžádání si jméno může vzít zpátky, proto hned pokračujte dalším krokem.
 2. V KeePassXC otevřete **Nástroje → Nastavení → Integrace Secret Service** a zaškrtněte **Povolit integraci Secret Service (freedesktop.org) v KeePassXC**.
 3. Otevřete databázi, přejděte na **Databáze → Nastavení databáze → Integrace Secret Service**, zaškrtněte **Zpřístupnit položky v této skupině** a vyberte skupinu (například `Klient`).
 4. Nechte databázi odemčenou, zopakujte kontrolu výše a pak spusťte Klienta. Jako vlastník by se teď měl ukázat KeePassXC a položky Klienta se objeví ve zvolené skupině.

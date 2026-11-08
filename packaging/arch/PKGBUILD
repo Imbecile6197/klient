@@ -13,12 +13,13 @@ url="https://github.com/Imbecile6197/klient"
 license=('GPL-3.0-or-later')
 depends=('gtk4' 'libadwaita' 'webkitgtk-6.0' 'glib2' 'hicolor-icon-theme')
 # Secrets (session tokens, API keys, cache key, PGP passphrases) are stored
-# through the Secret Service D-Bus API (org.freedesktop.secrets). Any provider
-# works and none is a hard dependency: on GNOME install gnome-keyring, on KDE
-# Plasma install kwallet (+ kwallet-pam to unlock it at login). Also usable:
-# KeePassXC. Spell checking and the tray icon are optional too.
+# through the Secret Service D-Bus API (org.freedesktop.secrets). None is a
+# hard dependency: on GNOME install gnome-keyring; KeePassXC is confirmed on
+# Manjaro with KDE. KWallet (+ kwallet-pam to unlock it at login) can offer the
+# same interface but is not confirmed with Klient. Spell checking and the tray
+# icon are optional too.
 optdepends=('gnome-keyring: store secrets via Secret Service (GNOME)'
-            'kwallet: store secrets via Secret Service (KDE Plasma wallet)'
+            'kwallet: store secrets via Secret Service (KDE wallet, not confirmed with Klient)'
             'kwallet-pam: unlock the KDE wallet automatically at login'
             'kwalletmanager: manage the KDE wallet (view/change stored secrets)'
             'keepassxc: store secrets via Secret Service (KeePassXC)'

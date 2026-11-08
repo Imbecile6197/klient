@@ -109,11 +109,13 @@ The strings in the code are English and are translated through gettext catalogs 
 | `internal/ui` | The GNOME interface |
 | `docs` | User documentation, also shown as Help |
 
-Files: settings in `~/.config/klient/config.json`, data (blocklists, filter decisions, keys, cache, Ollama) in `~/.local/share/klient/`, secrets in the system keyring (Secret Service, see above).
+Files: settings in `~/.config/klient/config.json`, data (blocklists, filter decisions, keys, cache, Ollama) in `~/.local/share/klient/`, secrets in the system keyring (Secret Service, see below).
 
 ## Secret manager (KWallet, KeePassXC, GNOME Keyring)
 
-Klient stores passwords, API keys and Proton sessions through the freedesktop **Secret Service** API, i.e. it talks to whichever program owns the `org.freedesktop.secrets` name on the D-Bus session bus. That is GNOME Keyring by default, but KWallet (KDE Plasma 5.97+/6, via `ksecretd`) and KeePassXC work too. Only one provider can own the name at a time.
+Klient stores passwords, API keys and Proton sessions through the freedesktop **Secret Service** API, i.e. it talks to whichever program owns the `org.freedesktop.secrets` name on the D-Bus session bus. On GNOME that is usually GNOME Keyring or oo7. KeePassXC is confirmed to work on Manjaro with KDE. KWallet can offer the same interface, but it is not confirmed with Klient: on that Manjaro system it did not register the name. Only one provider can own the name at a time.
+
+Changing the provider does not move anything across: you have to sign in again and enter your API keys again, and Klient creates a new key for the offline cache, so the old cache can no longer be read.
 
 Check which service is registered:
 
@@ -129,9 +131,9 @@ busctl --user status org.freedesktop.secrets
 busctl --user list --activatable | grep -i secrets
 ```
 
-Optionally you can register e.g KeePassXC as the provider:
+Optionally you can register, for example, KeePassXC as the provider:
 
-1. Quit the current provider (for example `gnome-keyring-daemon`), or it keeps the name.
+1. Quit the current provider (for example `gnome-keyring-daemon` or `oo7-daemon`), or it keeps the name. A provider that starts on demand can take the name back, so go on to the next step straight away.
 2. In KeePassXC open **Tools → Settings → Secret Service Integration** and tick **Enable KeePassXC Freedesktop.org Secret Service integration**.
 3. Open your database, go to **Database → Database Settings → Secret Service Integration**, tick **Expose entries under this group** and choose a group (for example `Klient`).
 4. Keep the database unlocked, run the check above, then start Klient. It should now report KeePassXC as the owner and Klient's entries appear in the chosen group.
