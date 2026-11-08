@@ -12,7 +12,7 @@
 # which satisfy all of these, so that is the target. (Earlier GNOME runtimes
 # were too old: GNOME 49 had GLib 2.86.5, GNOME 50 had 2.88.1 — below the
 # 2.89.3 the WebKitGTK bindings need. GNOME 51 is the first stable runtime
-# that builds Klient, so this is now Flathub-submittable.)
+# and it no longer block submission
 #
 # GO TOOLCHAIN: Go is bundled directly as an `archive` source (official
 # go.dev tarball, pinned by sha256) and used from $GOROOT, rather than the
