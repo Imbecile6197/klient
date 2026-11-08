@@ -109,7 +109,32 @@ Texty v kódu jsou anglicky a překládají se přes katalogy gettext ve složce
 | `internal/ui` | Rozhraní pro GNOME |
 | `docs` | Uživatelská dokumentace, zobrazuje se i jako Nápověda |
 
-Soubory: nastavení v `~/.config/klient/config.json`, data (blocklisty, rozhodnutí filtru, klíče, cache, Ollama) v `~/.local/share/klient/`, tajné údaje v klíčence GNOME.
+Soubory: nastavení v `~/.config/klient/config.json`, data (blocklisty, rozhodnutí filtru, klíče, cache, Ollama) v `~/.local/share/klient/`, tajné údaje v systémové klíčence (Secret Service, viz výše).
+
+## Správce hesel (KWallet, KeePassXC, GNOME Keyring)
+
+Klient ukládá hesla, API klíče a relace Protonu přes rozhraní **Secret Service** (freedesktop), tedy komunikuje s programem, který na sběrnici D-Bus (session bus) vlastní jméno `org.freedesktop.secrets`. Ve výchozím stavu je to GNOME Keyring, ale funguje i KWallet (KDE Plasma 5.97+/6, přes `ksecretd`) a KeePassXC. Jméno může vlastnit vždy jen jeden poskytovatel.
+
+Zjištění, která služba je zaregistrovaná:
+
+```bash
+# kdo jméno právě vlastní (chyba znamená, že nikdo)
+gdbus call --session --dest org.freedesktop.DBus --object-path /org/freedesktop/DBus \
+  --method org.freedesktop.DBus.GetNameOwner org.freedesktop.secrets
+
+# nebo se systemd: ukáže vlastnící proces (PID, příkaz)
+busctl --user status org.freedesktop.secrets
+
+# poskytovatelé, které lze spustit na vyžádání
+busctl --user list --activatable | grep -i secrets
+```
+
+Volitelně můžete jako poskytovatele zaregistrovat např. KeePassXC:
+
+1. Ukončete současného poskytovatele (například `gnome-keyring-daemon`), jinak si jméno ponechá.
+2. V KeePassXC otevřete **Nástroje → Nastavení → Integrace Secret Service** a zaškrtněte **Povolit integraci Secret Service (freedesktop.org) v KeePassXC**.
+3. Otevřete databázi, přejděte na **Databáze → Nastavení databáze → Integrace Secret Service**, zaškrtněte **Zpřístupnit položky v této skupině** a vyberte skupinu (například `Klient`).
+4. Nechte databázi odemčenou, zopakujte kontrolu výše a pak spusťte Klienta. Jako vlastník by se teď měl ukázat KeePassXC a položky Klienta se objeví ve zvolené skupině.
 
 ## Soukromí a omezení
 

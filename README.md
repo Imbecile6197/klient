@@ -109,7 +109,32 @@ The strings in the code are English and are translated through gettext catalogs 
 | `internal/ui` | The GNOME interface |
 | `docs` | User documentation, also shown as Help |
 
-Files: settings in `~/.config/klient/config.json`, data (blocklists, filter decisions, keys, cache, Ollama) in `~/.local/share/klient/`, secrets in the GNOME keyring.
+Files: settings in `~/.config/klient/config.json`, data (blocklists, filter decisions, keys, cache, Ollama) in `~/.local/share/klient/`, secrets in the system keyring (Secret Service, see above).
+
+## Secret manager (KWallet, KeePassXC, GNOME Keyring)
+
+Klient stores passwords, API keys and Proton sessions through the freedesktop **Secret Service** API, i.e. it talks to whichever program owns the `org.freedesktop.secrets` name on the D-Bus session bus. That is GNOME Keyring by default, but KWallet (KDE Plasma 5.97+/6, via `ksecretd`) and KeePassXC work too. Only one provider can own the name at a time.
+
+Check which service is registered:
+
+```bash
+# who owns the name right now (an error means nobody does)
+gdbus call --session --dest org.freedesktop.DBus --object-path /org/freedesktop/DBus \
+  --method org.freedesktop.DBus.GetNameOwner org.freedesktop.secrets
+
+# or, with systemd: shows the owning process (PID, command)
+busctl --user status org.freedesktop.secrets
+
+# providers that can be started on demand
+busctl --user list --activatable | grep -i secrets
+```
+
+Optionally you can register e.g KeePassXC as the provider:
+
+1. Quit the current provider (for example `gnome-keyring-daemon`), or it keeps the name.
+2. In KeePassXC open **Tools → Settings → Secret Service Integration** and tick **Enable KeePassXC Freedesktop.org Secret Service integration**.
+3. Open your database, go to **Database → Database Settings → Secret Service Integration**, tick **Expose entries under this group** and choose a group (for example `Klient`).
+4. Keep the database unlocked, run the check above, then start Klient. It should now report KeePassXC as the owner and Klient's entries appear in the chosen group.
 
 ## Privacy and limitations
 
