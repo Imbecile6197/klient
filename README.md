@@ -68,18 +68,16 @@ The Arch package needs GLib ≥ 2.89.3 (for the GTK bindings), which currently l
 
 The Flatpak sidesteps that: it runs against the GNOME runtime's own GLib, GTK 4, libadwaita and WebKitGTK, so it works even where the system libraries are too old for the native package (for example Manjaro with GLib 2.88). It needs `flatpak` and `flatpak-builder`; `packaging/flatpak.sh` installs the runtime and SDK, vendors the Go modules into a clean checkout, then builds in flatpak-builder's sandbox with no network (`-mod=vendor`, `GOPROXY=off`). Pass `--bundle` to also export `build/flatpak/klient.flatpak`. The manifest is `packaging/flatpak/eu.libormacak.Klient.yml`.
 
-Because the GTK bindings need GLib ≥ 2.89.3, the Flatpak currently targets the **GNOME nightly** runtime (`master`, GLib 2.91); the stable GNOME 49 runtime only has GLib 2.86.5. The Go toolchain is bundled from go.dev rather than the SDK extension (the extension is not published for the nightly base). As a result the Flatpak is **not Flathub-submittable yet**. Once a stable GNOME runtime ships GLib ≥ 2.89.3, switch `runtime-version` to that branch, and for submission replace the `dir` source with a tagged `git`/`archive` source whose tree contains `vendor/`, and disable Klient's built-in GitHub updater (Flatpak handles updates, and self-updating apps are not accepted).
+The GTK bindings need GLib ≥ 2.89.3 and WebKitGTK 6.0; the stable **GNOME 51** runtime provides them (GLib 2.90.1, WebKitGTK 2.54, libadwaita 1.10), so that is the target. Earlier runtimes were too old (GNOME 49 had GLib 2.86.5, GNOME 50 had 2.88.1). The Go toolchain is bundled from go.dev (pinned by sha256) rather than the SDK extension, which keeps the build offline and independent of the runtime base. For a Flathub submission, replace the `dir` source with a tagged `git`/`archive` source whose tree contains `vendor/`, and disable Klient's built-in GitHub updater (Flatpak handles updates, and self-updating apps are not accepted).
 
-Installing the `klient.flatpak` bundle on another computer: a bundle contains only the app, not its runtime, so the GNOME nightly runtime has to be installed there first.
+Installing the `klient.flatpak` bundle on another computer: a bundle contains only the app, not its runtime, so the GNOME 51 runtime has to be installed there first (from Flathub).
 
 ```bash
-flatpak remote-add --user --if-not-exists gnome-nightly https://nightly.gnome.org/gnome-nightly.flatpakrepo
-flatpak install --user gnome-nightly org.gnome.Platform//master   # ~400 MB, once
+flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+flatpak install --user flathub org.gnome.Platform//51   # once
 flatpak install --user ./klient.flatpak
 flatpak run eu.libormacak.Klient
 ```
-
-Install the runtime and the bundle at about the same time, since the nightly runtime moves on.
 
 Publishing a release (needs `gh` and a committed tree): write the notes to `packaging/release-notes/X.Y.Z.md` (an “## English” and a “## Česky” section – they are shown in Klient as What's New and published on GitHub), then `git tag -a vX.Y.Z -m "Klient X.Y.Z" && make release VERSION=X.Y.Z`.
 
@@ -111,7 +109,32 @@ The strings in the code are English and are translated through gettext catalogs 
 | `internal/ui` | The GNOME interface |
 | `docs` | User documentation, also shown as Help |
 
-Files: settings in `~/.config/klient/config.json`, data (blocklists, filter decisions, keys, cache, Ollama) in `~/.local/share/klient/`, secrets in the GNOME keyring.
+Files: settings in `~/.config/klient/config.json`, data (blocklists, filter decisions, keys, cache, Ollama) in `~/.local/share/klient/`, secrets in the system keyring (Secret Service, see above).
+
+## Secret manager (KWallet, KeePassXC, GNOME Keyring)
+
+Klient stores passwords, API keys and Proton sessions through the freedesktop **Secret Service** API, i.e. it talks to whichever program owns the `org.freedesktop.secrets` name on the D-Bus session bus. That is GNOME Keyring by default, but KWallet (KDE Plasma 5.97+/6, via `ksecretd`) and KeePassXC work too. Only one provider can own the name at a time.
+
+Check which service is registered:
+
+```bash
+# who owns the name right now (an error means nobody does)
+gdbus call --session --dest org.freedesktop.DBus --object-path /org/freedesktop/DBus \
+  --method org.freedesktop.DBus.GetNameOwner org.freedesktop.secrets
+
+# or, with systemd: shows the owning process (PID, command)
+busctl --user status org.freedesktop.secrets
+
+# providers that can be started on demand
+busctl --user list --activatable | grep -i secrets
+```
+
+Optionally you can register e.g KeePassXC as the provider:
+
+1. Quit the current provider (for example `gnome-keyring-daemon`), or it keeps the name.
+2. In KeePassXC open **Tools → Settings → Secret Service Integration** and tick **Enable KeePassXC Freedesktop.org Secret Service integration**.
+3. Open your database, go to **Database → Database Settings → Secret Service Integration**, tick **Expose entries under this group** and choose a group (for example `Klient`).
+4. Keep the database unlocked, run the check above, then start Klient. It should now report KeePassXC as the owner and Klient's entries appear in the chosen group.
 
 ## Privacy and limitations
 

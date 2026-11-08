@@ -68,18 +68,16 @@ Balíček pro Arch potřebuje GLib ≥ 2.89.3 (kvůli vazbám na GTK), která je
 
 Flatpak tenhle problém obchází: běží proti běhovému prostředí GNOME s vlastní GLib, GTK 4, libadwaitou a WebKitGTK, takže funguje i tam, kde jsou systémové knihovny pro nativní balíček příliš staré (třeba Manjaro s GLib 2.88). Potřebuje `flatpak` a `flatpak-builder`; `packaging/flatpak.sh` nainstaluje běhové prostředí a SDK, zavendoruje Go moduly do čistého exportu a pak sestaví v sandboxu flatpak-builderu bez sítě (`-mod=vendor`, `GOPROXY=off`). Přepínač `--bundle` navíc vyexportuje `build/flatpak/klient.flatpak`. Manifest je `packaging/flatpak/eu.libormacak.Klient.yml`.
 
-Protože vazby na GTK potřebují GLib ≥ 2.89.3, Flatpak zatím cílí na **nightly** běhové prostředí GNOME (`master`, GLib 2.91); stabilní GNOME 49 má jen GLib 2.86.5. Go toolchain se stahuje z go.dev místo rozšíření SDK (to pro nightly základ není vydané). Flatpak proto **zatím nelze odeslat na Flathub**. Až stabilní prostředí GNOME dostane GLib ≥ 2.89.3, přepněte `runtime-version` na tuto větev a pro odeslání nahraďte zdroj `dir` taggovaným zdrojem `git`/`archive`, jehož strom obsahuje `vendor/`, a vypněte vestavěný aktualizátor Klienta z GitHubu (aktualizace řeší Flatpak a aplikace aktualizující se samy Flathub nepřijímá).
+Vazby na GTK potřebují GLib ≥ 2.89.3 a WebKitGTK 6.0; stabilní běhové prostředí **GNOME 51** je poskytuje (GLib 2.90.1, WebKitGTK 2.54, libadwaita 1.10), takže je cílem. Starší prostředí byla příliš stará (GNOME 49 mělo GLib 2.86.5, GNOME 50 mělo 2.88.1). Go toolchain se stahuje z go.dev (ověřený přes sha256) místo rozšíření SDK, což drží sestavení offline a nezávislé na základu prostředí. Pro odeslání na Flathub nahraďte zdroj `dir` taggovaným zdrojem `git`/`archive`, jehož strom obsahuje `vendor/`, a vypněte vestavěný aktualizátor Klienta z GitHubu (aktualizace řeší Flatpak a aplikace aktualizující se samy Flathub nepřijímá).
 
-Instalace balíčku `klient.flatpak` na jiném počítači: balíček obsahuje jen aplikaci, ne běhové prostředí, takže je tam potřeba nejdřív nainstalovat nightly běhové prostředí GNOME.
+Instalace balíčku `klient.flatpak` na jiném počítači: balíček obsahuje jen aplikaci, ne běhové prostředí, takže je tam potřeba nejdřív nainstalovat prostředí GNOME 51 (z Flathubu).
 
 ```bash
-flatpak remote-add --user --if-not-exists gnome-nightly https://nightly.gnome.org/gnome-nightly.flatpakrepo
-flatpak install --user gnome-nightly org.gnome.Platform//master   # ~400 MB, jednou
+flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+flatpak install --user flathub org.gnome.Platform//51   # jednou
 flatpak install --user ./klient.flatpak
 flatpak run eu.libormacak.Klient
 ```
-
-Běhové prostředí a balíček nainstalujte přibližně ve stejnou dobu, protože nightly prostředí se průběžně mění.
 
 Vydání nové verze (potřebuje `gh` a commitnutý strom): poznámky zapište do `packaging/release-notes/X.Y.Z.md` (oddíly „## English“ a „## Česky“ – Klient je ukáže v okně Co je nového a zveřejní se na GitHubu), pak `git tag -a vX.Y.Z -m "Klient X.Y.Z" && make release VERSION=X.Y.Z`.
 
@@ -111,7 +109,32 @@ Texty v kódu jsou anglicky a překládají se přes katalogy gettext ve složce
 | `internal/ui` | Rozhraní pro GNOME |
 | `docs` | Uživatelská dokumentace, zobrazuje se i jako Nápověda |
 
-Soubory: nastavení v `~/.config/klient/config.json`, data (blocklisty, rozhodnutí filtru, klíče, cache, Ollama) v `~/.local/share/klient/`, tajné údaje v klíčence GNOME.
+Soubory: nastavení v `~/.config/klient/config.json`, data (blocklisty, rozhodnutí filtru, klíče, cache, Ollama) v `~/.local/share/klient/`, tajné údaje v systémové klíčence (Secret Service, viz výše).
+
+## Správce hesel (KWallet, KeePassXC, GNOME Keyring)
+
+Klient ukládá hesla, API klíče a relace Protonu přes rozhraní **Secret Service** (freedesktop), tedy komunikuje s programem, který na sběrnici D-Bus (session bus) vlastní jméno `org.freedesktop.secrets`. Ve výchozím stavu je to GNOME Keyring, ale funguje i KWallet (KDE Plasma 5.97+/6, přes `ksecretd`) a KeePassXC. Jméno může vlastnit vždy jen jeden poskytovatel.
+
+Zjištění, která služba je zaregistrovaná:
+
+```bash
+# kdo jméno právě vlastní (chyba znamená, že nikdo)
+gdbus call --session --dest org.freedesktop.DBus --object-path /org/freedesktop/DBus \
+  --method org.freedesktop.DBus.GetNameOwner org.freedesktop.secrets
+
+# nebo se systemd: ukáže vlastnící proces (PID, příkaz)
+busctl --user status org.freedesktop.secrets
+
+# poskytovatelé, které lze spustit na vyžádání
+busctl --user list --activatable | grep -i secrets
+```
+
+Volitelně můžete jako poskytovatele zaregistrovat např. KeePassXC:
+
+1. Ukončete současného poskytovatele (například `gnome-keyring-daemon`), jinak si jméno ponechá.
+2. V KeePassXC otevřete **Nástroje → Nastavení → Integrace Secret Service** a zaškrtněte **Povolit integraci Secret Service (freedesktop.org) v KeePassXC**.
+3. Otevřete databázi, přejděte na **Databáze → Nastavení databáze → Integrace Secret Service**, zaškrtněte **Zpřístupnit položky v této skupině** a vyberte skupinu (například `Klient`).
+4. Nechte databázi odemčenou, zopakujte kontrolu výše a pak spusťte Klienta. Jako vlastník by se teď měl ukázat KeePassXC a položky Klienta se objeví ve zvolené skupině.
 
 ## Soukromí a omezení
 

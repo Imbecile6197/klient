@@ -6,28 +6,29 @@
 # provides GTK 4, libadwaita, WebKitGTK 6.0 and GLib, so only the Go binary
 # is compiled here.
 #
-# RUNTIME CHOICE: Klient's GTK bindings (gotk4) use GLib symbols added in
-# 2.88+/2.89.3 (e.g. g_get_monotonic_time_ns). The stable GNOME 49 runtime
-# only has GLib 2.86.5, so the build fails against it. The GNOME nightly
-# runtime (master) ships GLib 2.91, which works. This means the Flatpak is
-# NOT Flathub-submittable until a stable GNOME runtime catches up to GLib
-# >= 2.89.3 (the same leading-edge requirement as the Arch package).
+# RUNTIME CHOICE: Klient's GTK bindings (gotk4) use GLib symbols from
+# 2.88+/2.89.3 (e.g. g_get_monotonic_time_ns) and WebKitGTK 6.0. The stable
+# GNOME 51 runtime provides GLib 2.90.1, WebKitGTK 2.54 and libadwaita 1.10,
+# which satisfy all of these, so that is the target. (Earlier GNOME runtimes
+# were too old: GNOME 49 had GLib 2.86.5, GNOME 50 had 2.88.1 — below the
+# 2.89.3 the WebKitGTK bindings need. GNOME 51 is the first stable runtime
+# and it no longer block submission
 #
-# GO TOOLCHAIN: the SDK golang extension is only published for stable
-# freedesktop branches, which do not pair with the nightly (master) runtime.
-# So Go is bundled directly as an `archive` source (official go.dev tarball,
-# pinned by sha256) and used from $GOROOT. This keeps the build offline and
-# independent of the runtime's base version.
+# GO TOOLCHAIN: Go is bundled directly as an `archive` source (official
+# go.dev tarball, pinned by sha256) and used from $GOROOT, rather than the
+# SDK golang extension. This keeps the build offline and independent of the
+# runtime's freedesktop base version.
 #
-# For a future Flathub submission (once a stable runtime has new-enough GLib):
-# switch runtime-version to that stable branch, consider the golang SDK
-# extension again, replace the `dir` source with a tagged `git`/`archive`
-# source containing vendor/, and drop the in-app self-updater.
+# For a Flathub submission: replace the `dir` source with a tagged
+# `git`/`archive` source containing vendor/, and drop the in-app self-updater.
 app-id: eu.libormacak.Klient
 runtime: org.gnome.Platform
-runtime-version: master
+runtime-version: '51'
 sdk: org.gnome.Sdk
 command: klient
+# The app's own branch (independent of the runtime version). Used when
+# exporting a repo and building the .flatpak bundle.
+default-branch: stable
 
 finish-args:
   # Display and GPU.
