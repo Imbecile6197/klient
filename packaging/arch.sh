@@ -29,9 +29,12 @@ rm -f build/arch/*.pkg.tar.zst
 # container when only $GOROOT is mounted. Copying with -L dereferences such
 # symlinks so /goroot has a complete src/ tree.
 GOROOT_STAGE="$PWD/build/arch/goroot"
-rm -rf "$GOROOT_STAGE"
+if [[ -d "$GOROOT_STAGE" ]] ; then
+	rm -rf "$GOROOT_STAGE"
+fi
 mkdir -p "$GOROOT_STAGE"
 cp -aL "$GOROOT"/. "$GOROOT_STAGE"/
+chmod -R u+w "$GOROOT_STAGE"
 
 # SELinux labels are disabled for the run so the host's Go can execute.
 podman run --rm --security-opt label=disable \
