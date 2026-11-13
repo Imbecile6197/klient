@@ -9,7 +9,7 @@ VERSION=${1:-$(git describe --tags --abbrev=0 | sed 's/^v//')}
 BIN=$(mktemp -d)/klient
 go build -ldflags "-X github.com/Imbecile6197/klient/internal/ui.Version=$VERSION" -o "$BIN" ./cmd/klient
 
-for lang in en cs; do
+for lang in en cs de; do
 	out=docs/screenshots/$lang
 	rm -rf "$out"
 	KLIENT_DEMO=1 KLIENT_LANGUAGE=$lang KLIENT_SCREENSHOTS="$out" timeout 120 "$BIN"

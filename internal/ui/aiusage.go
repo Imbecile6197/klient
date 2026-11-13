@@ -39,7 +39,7 @@ func money(v float64) string {
 		return i18n.T("< $0.01")
 	}
 	s := strconv.FormatFloat(math.Round(v*100)/100, 'f', 2, 64)
-	if i18n.Lang() == "cs" {
+	if l := i18n.Lang(); l == "cs" || l == "de" {
 		return strings.ReplaceAll(s, ".", ",") + " $"
 	}
 	return "$" + s

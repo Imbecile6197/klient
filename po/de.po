@@ -1,0 +1,4476 @@
+# German translation of Klient.
+# This file is distributed under the same license as Klient (GPL-3.0).
+msgid ""
+msgstr ""
+"Project-Id-Version: klient\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: internal/ai/claude.go
+msgid "the model refused to process the request"
+msgstr "das Modell hat die Bearbeitung der Anfrage abgelehnt"
+
+#: internal/ai/claude.go
+msgid "the model's answer was cut off (max_tokens)"
+msgstr "die Antwort des Modells wurde abgeschnitten (max_tokens)"
+
+#: internal/ai/errors.go
+msgid "Local AI is not ready yet. In Preferences → AI, click “Install” next to Ollama and download a model."
+msgstr "Die lokale KI ist noch nicht bereit. Klicken Sie in Einstellungen → KI neben Ollama auf „Installieren“ und laden Sie ein Modell herunter."
+
+#: internal/ai/errors.go internal/ollama/runtime.go
+msgid "Ollama is not installed"
+msgstr "Ollama ist nicht installiert"
+
+#: internal/ai/errors.go
+msgid "The Anthropic account has no credit. Add some in the Billing section."
+msgstr "Das Anthropic-Konto hat kein Guthaben. Laden Sie es im Bereich Billing auf."
+
+#: internal/ai/errors.go
+msgid "The Gemini API is not enabled in the Google Cloud project the key belongs to. Enable it (the Enable button) and try again in a few minutes – or create a new key in Google AI Studio, which enables the API automatically."
+msgstr "Die Gemini-API ist in dem Google-Cloud-Projekt, zu dem der Schlüssel gehört, nicht aktiviert. Aktivieren Sie sie (Schaltfläche „Aktivieren“) und versuchen Sie es in ein paar Minuten erneut – oder erstellen Sie einen neuen Schlüssel in Google AI Studio, das die API automatisch aktiviert."
+
+#: internal/ai/errors.go
+msgid "The Mistral account has no active plan or credit. Choose a plan (the free “Experiment” plan works too) in the Mistral console."
+msgstr "Das Mistral-Konto hat keinen aktiven Tarif und kein Guthaben. Wählen Sie in der Mistral-Konsole einen Tarif (auch der kostenlose Tarif „Experiment“ funktioniert)."
+
+#: internal/ai/errors.go
+msgid "The OpenAI account has no credit. The API is billed separately from a ChatGPT subscription – add credit in the billing settings."
+msgstr "Das OpenAI-Konto hat kein Guthaben. Die API wird getrennt von einem ChatGPT-Abo abgerechnet – laden Sie in den Abrechnungseinstellungen Guthaben auf."
+
+#: internal/ai/errors.go
+msgid "The key is invalid or has been revoked. Create a new one and paste it again."
+msgstr "Der Schlüssel ist ungültig oder wurde widerrufen. Erstellen Sie einen neuen und fügen Sie ihn erneut ein."
+
+#: internal/ai/errors.go
+msgid "The local model did not answer in time. It is slow on a processor without a graphics card – try a shorter text or a smaller model."
+msgstr "Das lokale Modell hat nicht rechtzeitig geantwortet. Auf einem Prozessor ohne Grafikkarte ist es langsam – versuchen Sie einen kürzeren Text oder ein kleineres Modell."
+
+#: internal/ai/errors.go
+msgid "The request limit or quota has been exceeded. Try again later, or check the limits of your account."
+msgstr "Das Anfragelimit oder Kontingent wurde überschritten. Versuchen Sie es später erneut oder prüfen Sie die Limits Ihres Kontos."
+
+#: internal/ai/errors.go
+msgid "The selected local model is not downloaded. Download it in Preferences → AI (Local AI)."
+msgstr "Das ausgewählte lokale Modell ist nicht heruntergeladen. Laden Sie es in Einstellungen → KI (Lokale KI) herunter."
+
+#: internal/ai/errors.go
+msgid "The selected model no longer exists or your account has no access to it. Choose another one in Preferences → AI with the model list button."
+msgstr "Das ausgewählte Modell existiert nicht mehr oder Ihr Konto hat keinen Zugriff darauf. Wählen Sie in Einstellungen → KI über die Schaltfläche mit der Modellliste ein anderes."
+
+#: internal/ai/errors.go
+msgid "There is not enough memory left for the local model. Close demanding applications or choose a smaller model."
+msgstr "Für das lokale Modell ist nicht genug Arbeitsspeicher frei. Schließen Sie anspruchsvolle Anwendungen oder wählen Sie ein kleineres Modell."
+
+#: internal/ai/extra.go
+msgid "invalid answer from the AI: %w"
+msgstr "ungültige Antwort der KI: %w"
+
+#: internal/ai/gemini.go
+msgid "Gemini blocked the request: "
+msgstr "Gemini hat die Anfrage blockiert: "
+
+#: internal/ai/gemini.go
+msgid "Gemini returned an empty answer"
+msgstr "Gemini hat eine leere Antwort geliefert"
+
+#: internal/ai/mistral.go
+msgid "the model did not return valid JSON"
+msgstr "das Modell hat kein gültiges JSON geliefert"
+
+#: internal/ai/mistral.go
+msgid "the model returned an empty answer"
+msgstr "das Modell hat eine leere Antwort geliefert"
+
+#: internal/ai/mistral.go
+msgid "the model's answer is incomplete (max_output_tokens)"
+msgstr "die Antwort des Modells ist unvollständig (max_output_tokens)"
+
+#: internal/ai/models.go
+msgid "unknown provider %q"
+msgstr "unbekannter Anbieter %q"
+
+#: internal/ai/ollama.go
+msgid "local AI (Ollama) is not available"
+msgstr "lokale KI (Ollama) ist nicht verfügbar"
+
+#: internal/ai/openai.go
+msgid "the model's answer is incomplete ("
+msgstr "die Antwort des Modells ist unvollständig ("
+
+#: internal/ai/provider.go
+msgid "%w for %s"
+msgstr "%w für %s"
+
+#: internal/ai/provider.go
+msgid "Local AI (Ollama, on this computer)"
+msgstr "Lokale KI (Ollama, auf diesem Computer)"
+
+#: internal/ai/provider.go
+msgid "Mistral (EU servers)"
+msgstr "Mistral (EU-Server)"
+
+#: internal/ai/provider.go
+msgid "empty answer"
+msgstr "leere Antwort"
+
+#: internal/ai/provider.go
+msgid "unknown AI provider %q"
+msgstr "unbekannter KI-Anbieter %q"
+
+#: internal/ai/tasks.go
+msgid "invalid answer from the classifier: %w"
+msgstr "ungültige Antwort des Klassifikators: %w"
+
+#: internal/ai/tasks.go
+msgid "no API key is set"
+msgstr "kein API-Schlüssel festgelegt"
+
+#: internal/ical/ical.go
+msgid "invalid event start: %w"
+msgstr "ungültiger Beginn des Termins: %w"
+
+#: internal/ical/ical.go
+msgid "the invitation contains no event"
+msgstr "die Einladung enthält keinen Termin"
+
+#: internal/imapmail/account.go
+msgid "folder %s does not exist on the server"
+msgstr "der Ordner %s existiert auf dem Server nicht"
+
+#: internal/imapmail/account.go
+msgid "invalid message ID"
+msgstr "ungültige Nachrichten-ID"
+
+#: internal/imapmail/account.go
+msgid "server unavailable: "
+msgstr "Server nicht erreichbar: "
+
+#: internal/imapmail/account.go
+msgid "the server rejected the login – check the password"
+msgstr "der Server hat die Anmeldung abgelehnt – prüfen Sie das Passwort"
+
+#: internal/imapmail/discover.go
+msgid "could not find the server settings for %s – check the suggested ones"
+msgstr "die Servereinstellungen für %s wurden nicht gefunden – prüfen Sie die vorgeschlagenen"
+
+#: internal/imapmail/discover.go
+msgid "invalid email address"
+msgstr "ungültige E-Mail-Adresse"
+
+#: internal/imapmail/local.go internal/protonmail/messages.go
+msgid "Scheduled"
+msgstr "Geplant"
+
+#: internal/imapmail/local.go internal/protonmail/messages.go
+msgid "Snoozed"
+msgstr "Zurückgestellt"
+
+#: internal/imapmail/local.go
+msgid "cannot create folder %s on the server: %w"
+msgstr "der Ordner %s kann auf dem Server nicht angelegt werden: %w"
+
+#: internal/imapmail/local.go
+msgid "scheduling failed: %w"
+msgstr "das Planen ist fehlgeschlagen: %w"
+
+#: internal/imapmail/local.go
+msgid "the server did not return the ID of the saved message (no UIDPLUS support), so it cannot be scheduled"
+msgstr "der Server hat die ID der gespeicherten Nachricht nicht zurückgegeben (keine UIDPLUS-Unterstützung), daher kann sie nicht geplant werden"
+
+#: internal/imapmail/local.go
+msgid "without the offline cache Klient cannot remember the time – turn it on in Preferences"
+msgstr "ohne den Offline-Cache kann sich Klient den Zeitpunkt nicht merken – schalten Sie ihn in den Einstellungen ein"
+
+#: internal/imapmail/message.go
+msgid "Not end-to-end encrypted – the provider stores the message readably (TLS protects it in transit)"
+msgstr "Nicht Ende-zu-Ende-verschlüsselt – der Anbieter speichert die Nachricht lesbar (TLS schützt sie bei der Übertragung)"
+
+#: internal/imapmail/message.go
+msgid "the attachment has no data"
+msgstr "der Anhang enthält keine Daten"
+
+#: internal/imapmail/message.go
+msgid "the server stopped answering"
+msgstr "der Server antwortet nicht mehr"
+
+msgid "the message is no longer on the server"
+msgstr "die Nachricht ist nicht mehr auf dem Server"
+
+#: internal/imapmail/message.go
+msgid "the message is no longer on the server (the folder has changed); refresh the list"
+msgstr "die Nachricht ist nicht mehr auf dem Server (der Ordner hat sich geändert); aktualisieren Sie die Liste"
+
+#: internal/imapmail/message.go internal/protonmail/messages.go
+msgid "the message is not saved for offline reading and the server is unavailable"
+msgstr "die Nachricht ist nicht zum Offline-Lesen gespeichert und der Server ist nicht erreichbar"
+
+#: internal/imapmail/pgp.go internal/protonmail/messages.go
+msgid "End-to-end encrypted (PGP)"
+msgstr "Ende-zu-Ende-verschlüsselt (PGP)"
+
+#: internal/imapmail/send.go
+msgid "preparing the message failed: %w"
+msgstr "das Vorbereiten der Nachricht ist fehlgeschlagen: %w"
+
+#: internal/imapmail/send.go
+msgid "saving the draft failed: %w"
+msgstr "das Speichern des Entwurfs ist fehlgeschlagen: %w"
+
+#: internal/imapmail/send.go
+msgid "sending failed: %w"
+msgstr "das Senden ist fehlgeschlagen: %w"
+
+#: internal/imapmail/send.go
+msgid "the SMTP server rejected the login: %w"
+msgstr "der SMTP-Server hat die Anmeldung abgelehnt: %w"
+
+#: internal/imapmail/send.go
+msgid "the encrypted copy was sent, but the other recipients' copy was not: %w"
+msgstr "die verschlüsselte Kopie wurde gesendet, die Kopie für die übrigen Empfänger jedoch nicht: %w"
+
+#: internal/imapmail/send.go
+msgid "the mailbox has no Drafts folder"
+msgstr "das Postfach hat keinen Ordner „Entwürfe“"
+
+#: internal/imapmail/send.go
+msgid "the message was sent, but saving a copy to Sent failed: %w"
+msgstr "die Nachricht wurde gesendet, aber das Speichern einer Kopie in „Gesendet“ ist fehlgeschlagen: %w"
+
+#: internal/mailbox/mailbox.go
+msgid "this service does not support it"
+msgstr "dieser Dienst unterstützt das nicht"
+
+#: internal/mailparse/mailparse.go
+msgid "[image: "
+msgstr "[Bild: "
+
+#: internal/ollama/client.go
+msgid "Ollama cloud models are not used"
+msgstr "Cloud-Modelle von Ollama werden nicht verwendet"
+
+#: internal/ollama/client.go
+msgid "Ollama cloud models run outside this computer, so they are not used"
+msgstr "Cloud-Modelle von Ollama laufen außerhalb dieses Computers, daher werden sie nicht verwendet"
+
+#: internal/ollama/runtime.go internal/update/update.go
+msgid "GitHub responded with %s"
+msgstr "GitHub hat mit %s geantwortet"
+
+#: internal/ollama/runtime.go
+msgid "Ollama cannot be started: %w"
+msgstr "Ollama kann nicht gestartet werden: %w"
+
+#: internal/ollama/runtime.go
+msgid "Ollama did not start (details in ~/.local/share/klient/ollama/server.log)"
+msgstr "Ollama ist nicht gestartet (Details in ~/.local/share/klient/ollama/server.log)"
+
+#: internal/ollama/runtime.go
+msgid "downloading Ollama failed: %s"
+msgstr "das Herunterladen von Ollama ist fehlgeschlagen: %s"
+
+#: internal/ollama/runtime.go
+msgid "downloading Ollama failed: %w"
+msgstr "das Herunterladen von Ollama ist fehlgeschlagen: %w"
+
+#: internal/ollama/runtime.go
+msgid "no free port for Ollama"
+msgstr "kein freier Port für Ollama"
+
+#: internal/ollama/runtime.go
+msgid "release %s does not contain %s"
+msgstr "die Version %s enthält %s nicht"
+
+#: internal/ollama/runtime.go
+msgid "the Ollama release has no checksum"
+msgstr "die Ollama-Version hat keine Prüfsumme"
+
+#: internal/ollama/runtime.go
+msgid "the archive does not contain bin/ollama"
+msgstr "das Archiv enthält bin/ollama nicht"
+
+#: internal/ollama/runtime.go
+msgid "the checksum of the downloaded Ollama does not match – the file was discarded"
+msgstr "die Prüfsumme des heruntergeladenen Ollama stimmt nicht – die Datei wurde verworfen"
+
+#: internal/ollama/runtime.go
+msgid "the checksums of the Ollama release do not match"
+msgstr "die Prüfsummen der Ollama-Version stimmen nicht überein"
+
+#: internal/ollama/runtime.go
+msgid "the new Ollama cannot be started: %v %s"
+msgstr "das neue Ollama kann nicht gestartet werden: %v %s"
+
+#: internal/ollama/runtime.go
+msgid "unpacking Ollama failed: %w"
+msgstr "das Entpacken von Ollama ist fehlgeschlagen: %w"
+
+#: internal/pgp/own.go
+msgid "cannot save the key passphrase to the keyring: %w"
+msgstr "die Passphrase des Schlüssels kann nicht im Schlüsselbund gespeichert werden: %w"
+
+#: internal/pgp/own.go
+msgid "invalid key: %w"
+msgstr "ungültiger Schlüssel: %w"
+
+#: internal/pgp/own.go
+msgid "the key does not belong to %s"
+msgstr "der Schlüssel gehört nicht zu %s"
+
+#: internal/pgp/own.go
+msgid "the key passphrase is missing from the keyring: %w"
+msgstr "die Passphrase des Schlüssels fehlt im Schlüsselbund: %w"
+
+#: internal/pgp/own.go
+msgid "this is a public key – signing and decryption need the private key"
+msgstr "dies ist ein öffentlicher Schlüssel – Signieren und Entschlüsseln erfordern den privaten Schlüssel"
+
+#: internal/pgp/own.go
+msgid "wrong key passphrase"
+msgstr "falsche Passphrase des Schlüssels"
+
+#: internal/pgp/own.go
+msgid "you have no PGP key of your own for this address"
+msgstr "Sie haben für diese Adresse keinen eigenen PGP-Schlüssel"
+
+#: internal/pgp/pgp.go
+msgid "Not signed"
+msgstr "Nicht signiert"
+
+#: internal/pgp/pgp.go
+msgid "Sent from your account"
+msgstr "Von Ihrem Konto gesendet"
+
+#: internal/pgp/pgp.go
+msgid "Signature INVALID"
+msgstr "Signatur UNGÜLTIG"
+
+#: internal/pgp/pgp.go
+msgid "Signature verified"
+msgstr "Signatur überprüft"
+
+#: internal/pgp/pgp.go
+msgid "The signature cannot be verified (the sender's key is missing)"
+msgstr "Die Signatur kann nicht überprüft werden (der Schlüssel des Absenders fehlt)"
+
+#: internal/pgp/pgp.go
+msgid "invalid PGP key: %w"
+msgstr "ungültiger PGP-Schlüssel: %w"
+
+#: internal/pgp/pgp.go
+msgid "the key contains no email address"
+msgstr "der Schlüssel enthält keine E-Mail-Adresse"
+
+#: internal/pgp/pgp.go
+msgid "the key has expired or been revoked"
+msgstr "der Schlüssel ist abgelaufen oder wurde widerrufen"
+
+#: internal/pgpmime/pgpmime.go
+msgid "damaged encrypted message"
+msgstr "beschädigte verschlüsselte Nachricht"
+
+#: internal/pgpmime/pgpmime.go
+msgid "damaged encrypted message: %w"
+msgstr "beschädigte verschlüsselte Nachricht: %w"
+
+#: internal/pgpmime/pgpmime.go
+msgid "damaged signature"
+msgstr "beschädigte Signatur"
+
+#: internal/pgpmime/pgpmime.go
+msgid "the message is encrypted, but you have no key that can open it"
+msgstr "die Nachricht ist verschlüsselt, aber Sie haben keinen Schlüssel, der sie öffnen kann"
+
+#: internal/protonmail/account.go
+msgid ": the Proton server is unavailable"
+msgstr ": der Proton-Server ist nicht erreichbar"
+
+#: internal/protonmail/account.go
+msgid "Incorrect username or password. Check the keyboard layout and Caps Lock."
+msgstr "Benutzername oder Passwort ist falsch. Prüfen Sie die Tastaturbelegung und die Feststelltaste."
+
+#: internal/protonmail/account.go
+msgid "Proton rejected this client version (x-pm-appversion). Change proton_app_version in ~/.config/klient/config.json."
+msgstr "Proton hat diese Client-Version abgelehnt (x-pm-appversion). Ändern Sie proton_app_version in ~/.config/klient/config.json."
+
+#: internal/protonmail/account.go
+msgid "Proton requires human verification"
+msgstr "Proton verlangt eine Bestätigung, dass Sie ein Mensch sind"
+
+#: internal/protonmail/account.go
+msgid "Too many login attempts. Try again later."
+msgstr "Zu viele Anmeldeversuche. Versuchen Sie es später erneut."
+
+#: internal/protonmail/account.go
+msgid "could not unlock any address key"
+msgstr "kein Adressschlüssel konnte entsperrt werden"
+
+#: internal/protonmail/account.go
+msgid "could not unlock the keys (wrong mailbox password?): %w"
+msgstr "die Schlüssel konnten nicht entsperrt werden (falsches Postfach-Passwort?): %w"
+
+#: internal/protonmail/account.go
+msgid "no key for address %s"
+msgstr "kein Schlüssel für die Adresse %s"
+
+#: internal/protonmail/account.go
+msgid "offline and without a saved cache"
+msgstr "offline und ohne gespeicherten Cache"
+
+#: internal/protonmail/account.go
+msgid "offline, and the cache does not contain the account keys yet"
+msgstr "offline, und der Cache enthält die Schlüssel des Kontos noch nicht"
+
+#: internal/protonmail/compose.go
+msgid "attachment %s has no data"
+msgstr "der Anhang %s enthält keine Daten"
+
+#: internal/protonmail/compose.go internal/protonmail/messages.go
+msgid "attachment %s: %w"
+msgstr "Anhang %s: %w"
+
+#: internal/protonmail/compose.go
+msgid "encrypting the message failed: %w"
+msgstr "das Verschlüsseln der Nachricht ist fehlgeschlagen: %w"
+
+#: internal/protonmail/compose.go
+msgid "key of attachment %s: %w"
+msgstr "Schlüssel des Anhangs %s: %w"
+
+#: internal/protonmail/compose.go
+msgid "saving the draft failed"
+msgstr "das Speichern des Entwurfs ist fehlgeschlagen"
+
+#: internal/protonmail/compose.go
+msgid "sender address not found"
+msgstr "Absenderadresse nicht gefunden"
+
+#: internal/protonmail/compose.go
+msgid "sending failed"
+msgstr "das Senden ist fehlgeschlagen"
+
+#: internal/protonmail/compose.go
+msgid "updating the draft failed"
+msgstr "das Aktualisieren des Entwurfs ist fehlgeschlagen"
+
+#: internal/protonmail/compose.go
+msgid "uploading attachment %s failed"
+msgstr "das Hochladen des Anhangs %s ist fehlgeschlagen"
+
+#: internal/protonmail/messages.go
+msgid "All Mail"
+msgstr "Alle Nachrichten"
+
+#: internal/protonmail/messages.go internal/ui/extras.go internal/ui/mainview.go
+msgid "Archive"
+msgstr "Archiv"
+
+#: internal/protonmail/messages.go
+msgid "Drafts"
+msgstr "Entwürfe"
+
+#: internal/protonmail/messages.go
+msgid "End-to-end encrypted (Proton)"
+msgstr "Ende-zu-Ende-verschlüsselt (Proton)"
+
+#: internal/protonmail/messages.go internal/ui/extras.go internal/ui/mainview.go
+msgid "Inbox"
+msgstr "Posteingang"
+
+#: internal/protonmail/messages.go
+msgid "Received unencrypted, stored encrypted (zero-access)"
+msgstr "Unverschlüsselt empfangen, verschlüsselt gespeichert (Zero-Access)"
+
+#: internal/protonmail/messages.go
+msgid "Sent"
+msgstr "Gesendet"
+
+#: internal/protonmail/messages.go
+msgid "Sent message, stored encrypted (zero-access)"
+msgstr "Gesendete Nachricht, verschlüsselt gespeichert (Zero-Access)"
+
+#: internal/protonmail/messages.go internal/ui/extras.go internal/ui/mainview.go
+msgid "Spam"
+msgstr "Spam"
+
+#: internal/protonmail/messages.go
+msgid "Starred"
+msgstr "Mit Stern"
+
+#: internal/protonmail/messages.go
+msgid "Stored encrypted"
+msgstr "Verschlüsselt gespeichert"
+
+#: internal/protonmail/messages.go internal/ui/extras.go internal/ui/mainview.go
+msgid "Trash"
+msgstr "Papierkorb"
+
+#: internal/protonmail/messages.go
+msgid "decryption failed: %w"
+msgstr "das Entschlüsseln ist fehlgeschlagen: %w"
+
+#: internal/protonmail/messages.go
+msgid "invalid message body: %w"
+msgstr "ungültiger Nachrichtentext: %w"
+
+#: internal/protonmail/organize.go
+msgid "the contact was not saved: %s"
+msgstr "der Kontakt wurde nicht gespeichert: %s"
+
+#: internal/protonmail/schedule.go
+msgid "cancelling the scheduled sending failed"
+msgstr "das Abbrechen des geplanten Sendens ist fehlgeschlagen"
+
+#: internal/protonmail/schedule.go
+msgid "loading the automatic reply failed"
+msgstr "das Laden der automatischen Antwort ist fehlgeschlagen"
+
+#: internal/protonmail/schedule.go
+msgid "saving the automatic reply failed"
+msgstr "das Speichern der automatischen Antwort ist fehlgeschlagen"
+
+#: internal/protonmail/schedule.go
+msgid "snoozing failed"
+msgstr "das Zurückstellen ist fehlgeschlagen"
+
+#: internal/protonmail/schedule.go
+msgid "the message cannot be snoozed (the conversation ID is missing)"
+msgstr "die Nachricht kann nicht zurückgestellt werden (die ID der Unterhaltung fehlt)"
+
+#: internal/protonmail/schedule.go
+msgid "unsnoozing failed"
+msgstr "das Aufheben der Zurückstellung ist fehlgeschlagen"
+
+#: internal/rules/rules.go
+msgid "Add label"
+msgstr "Label hinzufügen"
+
+#: internal/rules/rules.go
+msgid "Add star"
+msgstr "Stern hinzufügen"
+
+#: internal/rules/rules.go
+msgid "Mark as read"
+msgstr "Als gelesen markieren"
+
+#: internal/rules/rules.go
+msgid "Move to"
+msgstr "Verschieben nach"
+
+#: internal/rules/rules.go
+msgid "Recipient"
+msgstr "Empfänger"
+
+#: internal/rules/rules.go
+msgid "Sender"
+msgstr "Absender"
+
+#: internal/rules/rules.go internal/ui/compose.go internal/ui/invites.go
+msgid "Subject"
+msgstr "Betreff"
+
+#: internal/spam/blocklist.go
+msgid "some feeds could not be downloaded: %s"
+msgstr "einige Listen konnten nicht heruntergeladen werden: %s"
+
+#: internal/spam/filter.go
+msgid "\n[… shortened …]"
+msgstr "\n[… gekürzt …]"
+
+#: internal/spam/filter.go
+msgid "AI unavailable: "
+msgstr "KI nicht verfügbar: "
+
+#: internal/spam/filter.go
+msgid "DKIM failed"
+msgstr "DKIM fehlgeschlagen"
+
+#: internal/spam/filter.go
+msgid "DMARC failed"
+msgstr "DMARC fehlgeschlagen"
+
+#: internal/spam/filter.go
+msgid "DMARC passed"
+msgstr "DMARC bestanden"
+
+#: internal/spam/filter.go
+msgid "IP %s in %s"
+msgstr "IP %s in %s"
+
+#: internal/spam/filter.go
+msgid "Proton: phishing"
+msgstr "Proton: Phishing"
+
+#: internal/spam/filter.go
+msgid "Proton: spam"
+msgstr "Proton: Spam"
+
+#: internal/spam/filter.go
+msgid "SPF failed"
+msgstr "SPF fehlgeschlagen"
+
+#: internal/spam/filter.go
+msgid "link to %s in %s"
+msgstr "Link zu %s in %s"
+
+#: internal/spam/filter.go
+msgid "sender domain %s in %s"
+msgstr "Absenderdomain %s in %s"
+
+#: internal/ui/about.go
+msgid "An email client for GNOME and Proton Mail with native PGP, an AI assistant and a local AI-driven spam filter."
+msgstr "Ein E-Mail-Programm für GNOME und Proton Mail mit eingebautem PGP, einem KI-Assistenten und einem lokalen, KI-gesteuerten Spamfilter."
+
+#: internal/ui/about.go internal/ui/preferences.go
+msgid "Blocklists"
+msgstr "Sperrlisten"
+
+#: internal/ui/about.go
+msgid "Built With"
+msgstr "Erstellt mit"
+
+#: internal/ui/about.go
+msgid "GTK 4 and libadwaita https://gnome.org"
+msgstr "GTK 4 und libadwaita https://gnome.org"
+
+#: internal/ui/about.go
+msgid "Google Gemini API Privacy Terms"
+msgstr "Datenschutzbestimmungen der Google-Gemini-API"
+
+#: internal/ui/about.go
+msgid "Source Code on GitHub"
+msgstr "Quellcode auf GitHub"
+
+#: internal/ui/about.go
+msgid "The blocklist data is subject to the terms of its providers and is downloaded for personal, non-commercial use."
+msgstr "Die Daten der Sperrlisten unterliegen den Bedingungen ihrer Anbieter und werden für den persönlichen, nicht kommerziellen Gebrauch heruntergeladen."
+
+#: internal/ui/about.go
+msgid "Write to the author: jsem@libormacak.eu"
+msgstr "An den Autor schreiben: jsem@libormacak.eu"
+
+#: internal/ui/about.go
+msgid "go-proton-api and GopenPGP (Proton AG) https://github.com/ProtonMail"
+msgstr "go-proton-api und GopenPGP (Proton AG) https://github.com/ProtonMail"
+
+#: internal/ui/accounts.go
+msgid "Accounts"
+msgstr "Konten"
+
+#: internal/ui/accounts.go
+msgid "Accounts – %s in the other accounts"
+msgstr "Konten – %s in den anderen Konten"
+
+#: internal/ui/accounts.go internal/ui/app.go
+msgid "Add Account…"
+msgstr "Konto hinzufügen …"
+
+#: internal/ui/accounts.go
+msgid "Added: %s"
+msgstr "Hinzugefügt: %s"
+
+#: internal/ui/accounts.go
+msgid "Messages cannot be moved to the folder %s"
+msgstr "Nachrichten können nicht in den Ordner %s verschoben werden"
+
+#: internal/ui/accounts.go
+msgid "Moved to the folder %s"
+msgstr "In den Ordner %s verschoben"
+
+#: internal/ui/accounts.go internal/ui/app.go internal/ui/threadview.go
+msgid "Moving failed: "
+msgstr "Verschieben fehlgeschlagen: "
+
+#: internal/ui/addaccount.go
+msgid "Add Account"
+msgstr "Konto hinzufügen"
+
+#: internal/ui/addaccount.go
+msgid "Any mailbox with IMAP and SMTP"
+msgstr "Jedes Postfach mit IMAP und SMTP"
+
+#: internal/ui/addaccount.go
+msgid "App password (16 characters)"
+msgstr "App-Passwort (16 Zeichen)"
+
+#: internal/ui/addaccount.go
+msgid "Create an App Password"
+msgstr "App-Passwort erstellen"
+
+#: internal/ui/addaccount.go
+msgid "Detected automatically"
+msgstr "Automatisch erkannt"
+
+#: internal/ui/addaccount.go
+msgid "Email address"
+msgstr "E-Mail-Adresse"
+
+#: internal/ui/addaccount.go
+msgid "Encrypted mail, full support"
+msgstr "Verschlüsselte E-Mails, volle Unterstützung"
+
+#: internal/ui/addaccount.go
+msgid "Fill in the address and password"
+msgstr "Geben Sie Adresse und Passwort ein"
+
+#: internal/ui/addaccount.go
+msgid "Gmail does not allow logging in with your normal password. Turn on two-step verification in your Google account and create an app password. IMAP access must be enabled in Gmail (Settings → Forwarding and POP/IMAP)."
+msgstr "Gmail erlaubt keine Anmeldung mit Ihrem normalen Passwort. Schalten Sie in Ihrem Google-Konto die Bestätigung in zwei Schritten ein und erstellen Sie ein App-Passwort. Der IMAP-Zugriff muss in Gmail aktiviert sein (Einstellungen → Weiterleitung und POP/IMAP)."
+
+#: internal/ui/addaccount.go
+msgid "Google rejected the login. Use an app password, not your Google account password, and check that IMAP is enabled in Gmail."
+msgstr "Google hat die Anmeldung abgelehnt. Verwenden Sie ein App-Passwort, nicht das Passwort Ihres Google-Kontos, und prüfen Sie, ob IMAP in Gmail aktiviert ist."
+
+#: internal/ui/addaccount.go
+msgid "IMAP security"
+msgstr "IMAP-Sicherheit"
+
+#: internal/ui/addaccount.go
+msgid "Klient looks up the servers from the address (in the Thunderbird database – only the domain is sent). If that fails, fill them in below."
+msgstr "Klient ermittelt die Server anhand der Adresse (in der Datenbank von Thunderbird – nur die Domain wird gesendet). Gelingt das nicht, tragen Sie sie unten ein."
+
+#: internal/ui/addaccount.go
+msgid "Logging in…"
+msgstr "Anmeldung …"
+
+#: internal/ui/addaccount.go
+msgid "Looking up the settings…"
+msgstr "Einstellungen werden gesucht …"
+
+#: internal/ui/addaccount.go
+msgid "Open the Seznam Account"
+msgstr "Seznam-Konto öffnen"
+
+#: internal/ui/addaccount.go
+msgid "Other Service"
+msgstr "Anderer Dienst"
+
+#: internal/ui/addaccount.go internal/ui/login.go
+msgid "Password"
+msgstr "Passwort"
+
+#: internal/ui/addaccount.go
+msgid "Password (an app password with two-factor authentication)"
+msgstr "Passwort (bei Zwei-Faktor-Authentifizierung ein App-Passwort)"
+
+#: internal/ui/addaccount.go
+msgid "SMTP security"
+msgstr "SMTP-Sicherheit"
+
+#: internal/ui/addaccount.go
+msgid "Server response: %s"
+msgstr "Antwort des Servers: %s"
+
+#: internal/ui/addaccount.go
+msgid "Server settings"
+msgstr "Servereinstellungen"
+
+#: internal/ui/addaccount.go
+msgid "Servers"
+msgstr "Server"
+
+#: internal/ui/addaccount.go
+msgid "Seznam rejected the password. If you have two-factor authentication turned on, enter an app password (Seznam account → Security → Two-factor authentication → App password). After a failed attempt Seznam usually sends you an email with instructions."
+msgstr "Seznam hat das Passwort abgelehnt. Wenn Sie die Zwei-Faktor-Authentifizierung eingeschaltet haben, geben Sie ein App-Passwort ein (Seznam-Konto → Sicherheit → Zwei-Faktor-Authentifizierung → App-Passwort). Nach einem fehlgeschlagenen Versuch schickt Ihnen Seznam meist eine E-Mail mit Anweisungen."
+
+#: internal/ui/addaccount.go
+msgid "The password cannot be saved to the keyring: "
+msgstr "Das Passwort kann nicht im Schlüsselbund gespeichert werden: "
+
+#: internal/ui/addaccount.go
+msgid "Username"
+msgstr "Benutzername"
+
+#: internal/ui/addaccount.go
+msgid "With an app password"
+msgstr "Mit einem App-Passwort"
+
+#: internal/ui/addaccount.go
+msgid "Without two-factor authentication, log in with the same password as on the web. With two-factor authentication turned on, Seznam does not let mail programs in with your normal password: in your Seznam account open Security → Two-factor authentication → App password → Set up and enter that password here (it works for IMAP, SMTP and the calendar and must differ from your login password)."
+msgstr "Ohne Zwei-Faktor-Authentifizierung melden Sie sich mit demselben Passwort an wie im Web. Mit eingeschalteter Zwei-Faktor-Authentifizierung lässt Seznam E-Mail-Programme nicht mit Ihrem normalen Passwort zu: Öffnen Sie in Ihrem Seznam-Konto Sicherheit → Zwei-Faktor-Authentifizierung → App-Passwort → Einrichten und geben Sie dieses Passwort hier ein (es gilt für IMAP, SMTP und den Kalender und muss sich von Ihrem Anmeldepasswort unterscheiden)."
+
+#: internal/ui/addaccount.go
+msgid "Your name (as recipients will see it)"
+msgstr "Ihr Name (wie ihn Empfänger sehen)"
+
+#: internal/ui/addaccount.go
+msgid "receiving works, but sending does not: %w"
+msgstr "Empfangen funktioniert, Senden jedoch nicht: %w"
+
+#: internal/ui/addaccount.go
+msgid "the port must be a number"
+msgstr "der Port muss eine Zahl sein"
+
+#: internal/ui/addaccount.go
+msgid "the settings of account %s are missing"
+msgstr "die Einstellungen des Kontos %s fehlen"
+
+#: internal/ui/aicache.go
+msgid "the thread contains only drafts"
+msgstr "die Unterhaltung enthält nur Entwürfe"
+
+#: internal/ui/app.go
+msgid "AI is not set up – choose local AI or enter an API key"
+msgstr "Die KI ist nicht eingerichtet – wählen Sie die lokale KI oder geben Sie einen API-Schlüssel ein"
+
+#: internal/ui/app.go
+msgid "AI label %s"
+msgstr "KI-Label %s"
+
+#: internal/ui/app.go
+msgid "About Klient"
+msgstr "Info zu Klient"
+
+#: internal/ui/app.go
+msgid "Account %s could not be opened: %s"
+msgstr "Das Konto %s konnte nicht geöffnet werden: %s"
+
+#: internal/ui/app.go
+msgid "Account %s: the server rejected the password"
+msgstr "Konto %s: Der Server hat das Passwort abgelehnt"
+
+#: internal/ui/app.go
+msgid "Account %s: the session has ended; please log in again"
+msgstr "Konto %s: Die Sitzung wurde beendet; bitte melden Sie sich erneut an"
+
+#: internal/ui/app.go
+msgid "Account %s: the session has expired; please log in again"
+msgstr "Konto %s: Die Sitzung ist abgelaufen; bitte melden Sie sich erneut an"
+
+#: internal/ui/app.go
+msgid "Apply Rules to the Inbox"
+msgstr "Regeln auf den Posteingang anwenden"
+
+#: internal/ui/app.go internal/ui/mainview.go internal/ui/selection.go
+msgid "Archived"
+msgstr "Archiviert"
+
+#: internal/ui/app.go internal/ui/assistant.go
+msgid "Ask Your Mail (AI)"
+msgstr "Ihre E-Mails fragen (KI)"
+
+#: internal/ui/app.go
+msgid "Automatic Reply…"
+msgstr "Automatische Antwort …"
+
+#: internal/ui/app.go
+msgid "Blocklist update: "
+msgstr "Aktualisierung der Sperrlisten: "
+
+#: internal/ui/app.go internal/ui/compose.go internal/ui/contacts.go internal/ui/extras.go internal/ui/login.go internal/ui/ownkey.go internal/ui/preferences.go internal/ui/richeditor.go internal/ui/schedule.go
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: internal/ui/app.go
+msgid "Check the Inbox with AI"
+msgstr "Posteingang mit KI prüfen"
+
+#: internal/ui/app.go
+msgid "Connecting…"
+msgstr "Verbindung wird hergestellt …"
+
+#: internal/ui/app.go internal/ui/assistant.go internal/ui/contacts.go internal/ui/mainview.go
+msgid "Contacts"
+msgstr "Kontakte"
+
+#: internal/ui/app.go
+msgid "Enter Password"
+msgstr "Passwort eingeben"
+
+#: internal/ui/app.go internal/ui/assistant.go
+msgid "Help"
+msgstr "Hilfe"
+
+#: internal/ui/app.go internal/ui/assistant.go
+msgid "Keyboard Shortcuts"
+msgstr "Tastenkürzel"
+
+#: internal/ui/app.go
+msgid "Klient Has Been Updated"
+msgstr "Klient wurde aktualisiert"
+
+#: internal/ui/app.go
+msgid "Klient has been updated – restart it to use the new version"
+msgstr "Klient wurde aktualisiert – starten Sie es neu, um die neue Version zu verwenden"
+
+#: internal/ui/app.go
+msgid "Log Out"
+msgstr "Abmelden"
+
+#: internal/ui/app.go
+msgid "Log Out of %s?"
+msgstr "Von %s abmelden?"
+
+#: internal/ui/app.go
+msgid "Log Out of This Account"
+msgstr "Von diesem Konto abmelden"
+
+#: internal/ui/app.go
+msgid "Logging out on the server failed: "
+msgstr "Die Abmeldung auf dem Server ist fehlgeschlagen: "
+
+#: internal/ui/app.go
+msgid "Logging out…"
+msgstr "Abmeldung …"
+
+#: internal/ui/app.go
+msgid "Move Back"
+msgstr "Zurückverschieben"
+
+#: internal/ui/app.go
+msgid "Moved"
+msgstr "Verschoben"
+
+#: internal/ui/app.go internal/ui/mainview.go internal/ui/selection.go
+msgid "Moved to Trash"
+msgstr "In den Papierkorb verschoben"
+
+#: internal/ui/app.go
+msgid "Moved to spam; the sender has been added to the blocked senders"
+msgstr "In den Spam verschoben; der Absender wurde zu den blockierten Absendern hinzugefügt"
+
+#: internal/ui/app.go
+msgid "Moved to the inbox; the sender has been added to the allowed senders"
+msgstr "In den Posteingang verschoben; der Absender wurde zu den erlaubten Absendern hinzugefügt"
+
+#: internal/ui/app.go internal/ui/assistant.go internal/ui/compose.go internal/ui/mainview.go internal/ui/tray.go
+msgid "New Message"
+msgstr "Neue Nachricht"
+
+#: internal/ui/app.go internal/ui/assistant.go internal/ui/preferences.go
+msgid "Preferences"
+msgstr "Einstellungen"
+
+#: internal/ui/app.go internal/ui/assistant.go internal/ui/tray.go
+msgid "Quit"
+msgstr "Beenden"
+
+#: internal/ui/app.go internal/ui/preferences.go
+msgid "Restart"
+msgstr "Neu starten"
+
+#: internal/ui/app.go
+msgid "Restart it to use the new version."
+msgstr "Starten Sie es neu, um die neue Version zu verwenden."
+
+#: internal/ui/app.go
+msgid "Rules: %s – %s"
+msgstr "Regeln: %s – %s"
+
+#: internal/ui/app.go internal/ui/assistant.go internal/ui/mainview.go internal/ui/threadview.go
+msgid "Set Up"
+msgstr "Einrichten"
+
+#: internal/ui/app.go
+msgid "The AI moved to spam: %s"
+msgstr "Die KI hat in den Spam verschoben: %s"
+
+#: internal/ui/app.go
+msgid "The Proton session has ended (for example after logging out on the web or in another app). Please log in again."
+msgstr "Die Proton-Sitzung wurde beendet (zum Beispiel nach einer Abmeldung im Web oder in einer anderen App). Bitte melden Sie sich erneut an."
+
+#: internal/ui/app.go
+msgid "The session has expired; please log in again. (%s)"
+msgstr "Die Sitzung ist abgelaufen; bitte melden Sie sich erneut an. (%s)"
+
+#: internal/ui/app.go
+msgid "The session will be ended on the server and removed from the keyring, and the offline cache of this account will be deleted."
+msgstr "Die Sitzung wird auf dem Server beendet und aus dem Schlüsselbund entfernt, und der Offline-Cache dieses Kontos wird gelöscht."
+
+#: internal/ui/app.go
+msgid "The settings could not be saved: "
+msgstr "Die Einstellungen konnten nicht gespeichert werden: "
+
+#: internal/ui/app.go
+msgid "The system keyring is not available: "
+msgstr "Der Schlüsselbund des Systems ist nicht verfügbar: "
+
+#: internal/ui/app.go
+msgid "Unknown sender"
+msgstr "Unbekannter Absender"
+
+#: internal/ui/app.go
+msgid "Unread Mail Overview (AI)"
+msgstr "Übersicht der ungelesenen E-Mails (KI)"
+
+#: internal/ui/app.go
+msgid "Watching for new mail could not be started: "
+msgstr "Die Überwachung auf neue E-Mails konnte nicht gestartet werden: "
+
+#: internal/ui/app.go
+msgid "the session has ended"
+msgstr "die Sitzung wurde beendet"
+
+#: internal/ui/assistant.go internal/ui/compare.go internal/ui/threadview.go
+msgid "(no subject)"
+msgstr "(kein Betreff)"
+
+#: internal/ui/assistant.go
+msgid "Adding the label failed: "
+msgstr "Das Hinzufügen des Labels ist fehlgeschlagen: "
+
+#: internal/ui/assistant.go
+msgid "Apply"
+msgstr "Anwenden"
+
+#: internal/ui/assistant.go internal/ui/selection.go
+msgctxt "action"
+msgid "Archive"
+msgstr "Archivieren"
+
+#: internal/ui/assistant.go
+msgid "Ask"
+msgstr "Fragen"
+
+#: internal/ui/assistant.go
+msgid "Ask Your Mail"
+msgstr "Ihre E-Mails fragen"
+
+#: internal/ui/assistant.go
+msgid "Attach the files"
+msgstr "Dateien anhängen"
+
+#: internal/ui/assistant.go
+msgid "Bold"
+msgstr "Fett"
+
+#: internal/ui/assistant.go
+msgid "Cancel Selection"
+msgstr "Auswahl aufheben"
+
+#: internal/ui/assistant.go
+msgid "Close (the draft is saved)"
+msgstr "Schließen (der Entwurf wird gespeichert)"
+
+#: internal/ui/assistant.go
+msgid "Ctrl/Shift + click"
+msgstr "Strg/Umschalt + Klick"
+
+#: internal/ui/assistant.go
+msgid "Drag a message onto a folder"
+msgstr "Nachricht auf einen Ordner ziehen"
+
+#: internal/ui/assistant.go
+msgid "Drag files into the message window"
+msgstr "Dateien in das Nachrichtenfenster ziehen"
+
+#: internal/ui/assistant.go
+msgid "E.g. “How much was the last electricity bill?”"
+msgstr "Z. B. „Wie hoch war die letzte Stromrechnung?“"
+
+#: internal/ui/assistant.go
+msgid "Forward"
+msgstr "Weiterleiten"
+
+#: internal/ui/assistant.go internal/ui/preferences.go
+msgid "General"
+msgstr "Allgemein"
+
+#: internal/ui/assistant.go
+msgid "Italic"
+msgstr "Kursiv"
+
+#: internal/ui/assistant.go internal/ui/threadview.go
+msgid "Label %s added"
+msgstr "Label %s hinzugefügt"
+
+#: internal/ui/assistant.go
+msgid "Link"
+msgstr "Link"
+
+#: internal/ui/assistant.go internal/ui/selection.go
+msgid "Mark as Unread"
+msgstr "Als ungelesen markieren"
+
+#: internal/ui/assistant.go internal/ui/preferences.go
+msgid "Message List"
+msgstr "Nachrichtenliste"
+
+#: internal/ui/assistant.go internal/ui/mainview.go internal/ui/preferences.go
+msgid "Messages"
+msgstr "Nachrichten"
+
+#: internal/ui/assistant.go
+msgid "Morning overview: %s"
+msgstr "Morgenübersicht: %s"
+
+#: internal/ui/assistant.go
+msgid "Mouse"
+msgstr "Maus"
+
+#: internal/ui/assistant.go
+msgid "Move to the folder"
+msgstr "In den Ordner verschieben"
+
+#: internal/ui/assistant.go
+msgid "No messages found (searched for: %s). Try rephrasing the question, for example with the sender's name."
+msgstr "Keine Nachrichten gefunden (gesucht nach: %s). Versuchen Sie, die Frage anders zu formulieren, zum Beispiel mit dem Namen des Absenders."
+
+#: internal/ui/assistant.go
+msgid "No unread mail. 🎉"
+msgstr "Keine ungelesenen E-Mails. 🎉"
+
+#: internal/ui/assistant.go
+msgid "Prepare Again"
+msgstr "Erneut erstellen"
+
+#: internal/ui/assistant.go
+msgid "Refresh"
+msgstr "Aktualisieren"
+
+#: internal/ui/assistant.go
+msgid "Reply"
+msgstr "Antworten"
+
+#: internal/ui/assistant.go
+msgid "Reply to All"
+msgstr "Allen antworten"
+
+#: internal/ui/assistant.go
+msgid "Save Draft"
+msgstr "Entwurf speichern"
+
+#: internal/ui/assistant.go
+msgid "Search"
+msgstr "Suchen"
+
+#: internal/ui/assistant.go
+msgid "Searching: %s…"
+msgstr "Suche: %s …"
+
+#: internal/ui/assistant.go
+msgid "Select All Messages"
+msgstr "Alle Nachrichten auswählen"
+
+#: internal/ui/assistant.go
+msgid "Select several messages"
+msgstr "Mehrere Nachrichten auswählen"
+
+#: internal/ui/assistant.go internal/ui/compose.go
+msgid "Send"
+msgstr "Senden"
+
+#: internal/ui/assistant.go
+msgid "Snooze"
+msgstr "Zurückstellen"
+
+#: internal/ui/assistant.go
+msgid "Something went wrong: "
+msgstr "Etwas ist schiefgelaufen: "
+
+#: internal/ui/assistant.go
+msgid "Sources"
+msgstr "Quellen"
+
+#: internal/ui/assistant.go internal/ui/selection.go
+msgid "Star"
+msgstr "Stern"
+
+#: internal/ui/assistant.go
+msgid "Suggesting a label failed: "
+msgstr "Das Vorschlagen eines Labels ist fehlgeschlagen: "
+
+#: internal/ui/assistant.go internal/ui/threadview.go
+msgid "The AI assistant is not set up"
+msgstr "Der KI-Assistent ist nicht eingerichtet"
+
+#: internal/ui/assistant.go
+msgid "The AI found no suitable label: "
+msgstr "Die KI hat kein passendes Label gefunden: "
+
+#: internal/ui/assistant.go
+msgid "The AI is choosing a label…"
+msgstr "Die KI wählt ein Label …"
+
+#: internal/ui/assistant.go
+msgid "The AI suggests the label “%s” – %s"
+msgstr "Die KI schlägt das Label „%s“ vor – %s"
+
+#: internal/ui/assistant.go
+msgid "The AI suggests what to search for, Klient finds and decrypts the messages on your computer, and the AI answers from them. The content of the messages found is sent to the chosen AI provider."
+msgstr "Die KI schlägt vor, wonach gesucht werden soll, Klient findet und entschlüsselt die Nachrichten auf Ihrem Computer, und die KI antwortet anhand dieser Nachrichten. Der Inhalt der gefundenen Nachrichten wird an den gewählten KI-Anbieter gesendet."
+
+#: internal/ui/assistant.go
+msgid "The AI suggests what to search for, Klient finds and decrypts the messages, and the local model answers from them – everything stays on your computer. On a processor this can take several minutes."
+msgstr "Die KI schlägt vor, wonach gesucht werden soll, Klient findet und entschlüsselt die Nachrichten, und das lokale Modell antwortet anhand dieser Nachrichten – alles bleibt auf Ihrem Computer. Auf einem Prozessor kann das mehrere Minuten dauern."
+
+#: internal/ui/assistant.go
+msgid "The message already has the label %s"
+msgstr "Die Nachricht hat das Label %s bereits"
+
+#: internal/ui/assistant.go
+msgid "The overview could not be prepared: "
+msgstr "Die Übersicht konnte nicht erstellt werden: "
+
+#: internal/ui/assistant.go
+msgid "Underline"
+msgstr "Unterstrichen"
+
+#: internal/ui/assistant.go
+msgid "Unread Mail Overview"
+msgstr "Übersicht der ungelesenen E-Mails"
+
+#: internal/ui/assistant.go
+msgid "Working out what to search for…"
+msgstr "Es wird ermittelt, wonach gesucht werden soll …"
+
+#: internal/ui/assistant.go
+msgid "Writing a Message"
+msgstr "Nachricht schreiben"
+
+#: internal/ui/assistant.go
+msgid "Writing the answer…"
+msgstr "Die Antwort wird geschrieben …"
+
+#: internal/ui/assistant.go
+msgid "you have no labels – create them on the Proton website"
+msgstr "Sie haben keine Labels – erstellen Sie sie auf der Proton-Website"
+
+#: internal/ui/compare.go
+msgid "%s is judging message %d of %d…"
+msgstr "%s beurteilt Nachricht %d von %d …"
+
+#: internal/ui/compare.go
+msgid "%s is writing a summary…"
+msgstr "%s schreibt eine Zusammenfassung …"
+
+#: internal/ui/compare.go
+msgid "%s → error: %s"
+msgstr "%s → Fehler: %s"
+
+#: internal/ui/compare.go
+msgid "Choose at least one model"
+msgstr "Wählen Sie mindestens ein Modell"
+
+#: internal/ui/compare.go
+msgid "Correct: %d of %d · %.0f s per message · summary in %.0f s"
+msgstr "Richtig: %d von %d · %.0f s pro Nachricht · Zusammenfassung in %.0f s"
+
+#: internal/ui/compare.go internal/ui/contacts.go
+msgid "Delete"
+msgstr "Löschen"
+
+#: internal/ui/compare.go
+msgid "Delete the other compared models so they do not take up disk space?"
+msgstr "Die anderen verglichenen Modelle löschen, damit sie keinen Speicherplatz belegen?"
+
+#: internal/ui/compare.go
+msgid "Downloading %s: %s"
+msgstr "%s wird heruntergeladen: %s"
+
+#: internal/ui/compare.go
+msgid "Downloading %s: %s of %s"
+msgstr "%s wird heruntergeladen: %s von %s"
+
+#: internal/ui/compare.go
+msgid "Each model judges the 5 newest messages in the inbox and 3 from spam and summarizes one message. Everything runs on this computer; on a processor it takes roughly 5–15 minutes, and the models are downloaded first."
+msgstr "Jedes Modell beurteilt die 5 neuesten Nachrichten im Posteingang und 3 aus dem Spam und fasst eine Nachricht zusammen. Alles läuft auf diesem Computer; auf einem Prozessor dauert es etwa 5–15 Minuten, und zuerst werden die Modelle heruntergeladen."
+
+#: internal/ui/compare.go
+msgid "Error: "
+msgstr "Fehler: "
+
+#: internal/ui/compare.go
+msgid "Installing Ollama…"
+msgstr "Ollama wird installiert …"
+
+#: internal/ui/compare.go
+msgid "Keep"
+msgstr "Behalten"
+
+#: internal/ui/compare.go
+msgid "Local AI now uses %s"
+msgstr "Die lokale KI verwendet jetzt %s"
+
+#: internal/ui/compare.go
+msgid "Local Model Comparison"
+msgstr "Vergleich lokaler Modelle"
+
+#: internal/ui/compare.go
+msgid "Models"
+msgstr "Modelle"
+
+#: internal/ui/compare.go
+msgid "Now Using %s"
+msgstr "Jetzt wird %s verwendet"
+
+#: internal/ui/compare.go
+msgid "Ollama could not be installed"
+msgstr "Ollama konnte nicht installiert werden"
+
+#: internal/ui/compare.go
+msgid "Picking messages from the mailbox…"
+msgstr "Nachrichten werden aus dem Postfach ausgewählt …"
+
+#: internal/ui/compare.go
+msgid "Start"
+msgstr "Starten"
+
+#: internal/ui/compare.go
+msgid "Summary of “%s”"
+msgstr "Zusammenfassung von „%s“"
+
+#: internal/ui/compare.go
+msgid "The comparison failed: "
+msgstr "Der Vergleich ist fehlgeschlagen: "
+
+#: internal/ui/compare.go internal/ui/localai.go
+msgid "Use"
+msgstr "Verwenden"
+
+#: internal/ui/compare.go
+msgid "downloading %s: %w"
+msgstr "%s wird heruntergeladen: %w"
+
+#: internal/ui/compare.go
+msgid "there are no messages in the mailbox to compare on"
+msgstr "im Postfach gibt es keine Nachrichten für den Vergleich"
+
+#: internal/ui/compose.go
+msgid "\n\n---------- Forwarded message ----------\nFrom: %s\nDate: %s\nSubject: %s\nTo: %s\n\n%s"
+msgstr "\n\n---------- Weitergeleitete Nachricht ----------\nVon: %s\nDatum: %s\nBetreff: %s\nAn: %s\n\n%s"
+
+#: internal/ui/compose.go
+msgid "\n\nOn %s, %s wrote:\n"
+msgstr "\n\nAm %s schrieb %s:\n"
+
+#: internal/ui/compose.go
+msgid " · recent correspondence"
+msgstr " · letzte Korrespondenz"
+
+#: internal/ui/compose.go
+msgid "%s in total – exceeds the Proton limit of 25 MB!"
+msgstr "insgesamt %s – überschreitet das Proton-Limit von 25 MB!"
+
+#: internal/ui/compose.go
+msgid "%s in total, encrypted just like the message text"
+msgstr "insgesamt %s, genau wie der Nachrichtentext verschlüsselt"
+
+#: internal/ui/compose.go
+msgid "%s is a folder – only files can be attached"
+msgstr "%s ist ein Ordner – nur Dateien können angehängt werden"
+
+#: internal/ui/compose.go
+msgid "%s: NOT ENCRYPTED (no known key)"
+msgstr "%s: NICHT VERSCHLÜSSELT (kein bekannter Schlüssel)"
+
+#: internal/ui/compose.go
+msgid "%s: encrypted with PGP (%s)"
+msgstr "%s: mit PGP verschlüsselt (%s)"
+
+#: internal/ui/compose.go
+msgid "%s: end-to-end encrypted (Proton)"
+msgstr "%s: Ende-zu-Ende-verschlüsselt (Proton)"
+
+#: internal/ui/compose.go
+msgid "A recipient with PGP can then send you encrypted replies"
+msgstr "Ein Empfänger mit PGP kann Ihnen dann verschlüsselt antworten"
+
+#: internal/ui/compose.go
+msgid "Attach Files"
+msgstr "Dateien anhängen"
+
+#: internal/ui/compose.go
+msgid "Attach my public key"
+msgstr "Meinen öffentlichen Schlüssel anhängen"
+
+#: internal/ui/compose.go
+msgid "Attachments"
+msgstr "Anhänge"
+
+#: internal/ui/compose.go
+msgid "Bcc"
+msgstr "Bcc"
+
+#: internal/ui/compose.go
+msgid "Both the unfinished text and the saved draft will be deleted."
+msgstr "Sowohl der unfertige Text als auch der gespeicherte Entwurf werden gelöscht."
+
+#: internal/ui/compose.go
+msgid "Cc"
+msgstr "Cc"
+
+#: internal/ui/compose.go internal/ui/selfupdate.go
+msgid "Check"
+msgstr "Prüfen"
+
+#: internal/ui/compose.go
+msgid "Discard"
+msgstr "Verwerfen"
+
+#: internal/ui/compose.go
+msgid "Discard the Message?"
+msgstr "Nachricht verwerfen?"
+
+#: internal/ui/compose.go
+msgid "Draft"
+msgstr "Entwurf"
+
+#: internal/ui/compose.go
+msgid "Draft saved"
+msgstr "Entwurf gespeichert"
+
+#: internal/ui/compose.go
+msgid "Enter at least one recipient"
+msgstr "Geben Sie mindestens einen Empfänger ein"
+
+#: internal/ui/compose.go
+msgid "Enter the recipients"
+msgstr "Geben Sie die Empfänger ein"
+
+#: internal/ui/compose.go
+msgctxt "compose-title"
+msgid "Forward"
+msgstr "Weiterleiten"
+
+#: internal/ui/compose.go
+msgid "From"
+msgstr "Von"
+
+#: internal/ui/compose.go
+msgid "Instruction for the AI, e.g. “politely decline” or “translate into German”"
+msgstr "Anweisung für die KI, z. B. „höflich ablehnen“ oder „ins Englische übersetzen“"
+
+#: internal/ui/compose.go
+msgid "Jan 2, 2006 at 15:04"
+msgstr "2.1.2006 um 15:04"
+
+#: internal/ui/compose.go
+msgid "Loading the attachments of the forwarded message…"
+msgstr "Die Anhänge der weitergeleiteten Nachricht werden geladen …"
+
+#: internal/ui/compose.go
+msgid "Looking up the recipients' keys…"
+msgstr "Die Schlüssel der Empfänger werden gesucht …"
+
+#: internal/ui/compose.go
+msgid "Message sent"
+msgstr "Nachricht gesendet"
+
+#: internal/ui/compose.go
+msgid "Recipients with PGP can verify that the message is from you and has not been changed"
+msgstr "Empfänger mit PGP können prüfen, dass die Nachricht von Ihnen stammt und nicht verändert wurde"
+
+#: internal/ui/compose.go
+msgid "Remove"
+msgstr "Entfernen"
+
+#: internal/ui/compose.go
+msgctxt "compose-title"
+msgid "Reply"
+msgstr "Antworten"
+
+#: internal/ui/compose.go
+msgctxt "compose-title"
+msgid "Reply to All"
+msgstr "Allen antworten"
+
+#: internal/ui/compose.go
+msgid "Save Draft (Ctrl+S)"
+msgstr "Entwurf speichern (Strg+S)"
+
+#: internal/ui/compose.go
+msgid "Schedule Sending"
+msgstr "Senden planen"
+
+#: internal/ui/compose.go
+msgid "Scheduled – it will be sent %s (%s)"
+msgstr "Geplant – sie wird %s gesendet (%s)"
+
+#: internal/ui/compose.go
+msgid "Scheduled – it will be sent %s if Klient is running (the background is enough)"
+msgstr "Geplant – sie wird %s gesendet, wenn Klient läuft (im Hintergrund genügt)"
+
+#: internal/ui/compose.go
+msgid "Security"
+msgstr "Sicherheit"
+
+#: internal/ui/compose.go
+msgid "Send (Ctrl+Enter)"
+msgstr "Senden (Strg+Eingabe)"
+
+#: internal/ui/compose.go
+msgid "Send Anyway"
+msgstr "Trotzdem senden"
+
+#: internal/ui/compose.go
+msgid "Send Without Encryption?"
+msgstr "Ohne Verschlüsselung senden?"
+
+#: internal/ui/compose.go
+msgid "Sending…"
+msgstr "Wird gesendet …"
+
+#: internal/ui/compose.go
+msgid "Sign unencrypted messages with PGP too"
+msgstr "Auch unverschlüsselte Nachrichten mit PGP signieren"
+
+#: internal/ui/compose.go
+msgid "Some recipients have no known public key, so the message will reach them unencrypted:"
+msgstr "Für einige Empfänger ist kein öffentlicher Schlüssel bekannt, daher erreicht sie die Nachricht unverschlüsselt:"
+
+#: internal/ui/compose.go
+msgid "Suggest a Reply"
+msgstr "Antwort vorschlagen"
+
+#: internal/ui/compose.go
+msgid "The AI assistant is not set up (Preferences → AI)"
+msgstr "Der KI-Assistent ist nicht eingerichtet (Einstellungen → KI)"
+
+#: internal/ui/compose.go
+msgid "The AI failed: "
+msgstr "Die KI ist fehlgeschlagen: "
+
+#: internal/ui/compose.go
+msgid "The attachments could not be loaded: "
+msgstr "Die Anhänge konnten nicht geladen werden: "
+
+#: internal/ui/compose.go
+msgid "The attachments exceed the 25 MB limit"
+msgstr "Die Anhänge überschreiten das Limit von 25 MB"
+
+#: internal/ui/compose.go
+msgid "The draft could not be opened: "
+msgstr "Der Entwurf konnte nicht geöffnet werden: "
+
+#: internal/ui/compose.go
+msgid "The draft could not be saved: "
+msgstr "Der Entwurf konnte nicht gespeichert werden: "
+
+#: internal/ui/compose.go
+msgid "The earliest possible time is 2 minutes from now"
+msgstr "Der früheste mögliche Zeitpunkt ist in 2 Minuten"
+
+#: internal/ui/compose.go
+msgid "The message will be sent"
+msgstr "Die Nachricht wird gesendet"
+
+#: internal/ui/compose.go
+msgid "To"
+msgstr "An"
+
+#: internal/ui/compose.go
+msgid "Write an instruction for the AI"
+msgstr "Schreiben Sie eine Anweisung für die KI"
+
+#: internal/ui/compose.go
+msgid "Write with AI"
+msgstr "Mit KI schreiben"
+
+#: internal/ui/compose.go
+msgid "Writing…"
+msgstr "Wird geschrieben …"
+
+#: internal/ui/compose.go
+msgid "choose the sender address"
+msgstr "Wählen Sie die Absenderadresse"
+
+#: internal/ui/compose.go
+msgid "invalid address in “%s”"
+msgstr "ungültige Adresse in „%s“"
+
+#: internal/ui/compose.go
+msgid "the file cannot be attached (it is not local)"
+msgstr "die Datei kann nicht angehängt werden (sie ist nicht lokal)"
+
+#: internal/ui/contacts.go
+msgid "%s will be removed from the Proton address book."
+msgstr "%s wird aus dem Proton-Adressbuch entfernt."
+
+#: internal/ui/contacts.go
+msgid "Contact saved"
+msgstr "Kontakt gespeichert"
+
+#: internal/ui/contacts.go
+msgid "Delete Contact"
+msgstr "Kontakt löschen"
+
+#: internal/ui/contacts.go
+msgid "Delete the Contact?"
+msgstr "Kontakt löschen?"
+
+#: internal/ui/contacts.go
+msgid "Deleting failed: "
+msgstr "Löschen fehlgeschlagen: "
+
+#: internal/ui/contacts.go
+msgid "Invalid email address"
+msgstr "Ungültige E-Mail-Adresse"
+
+#: internal/ui/contacts.go
+msgid "Name"
+msgstr "Name"
+
+#: internal/ui/contacts.go
+msgid "New Contact"
+msgstr "Neuer Kontakt"
+
+#: internal/ui/contacts.go
+msgid "No Contacts"
+msgstr "Keine Kontakte"
+
+#: internal/ui/contacts.go internal/ui/extras.go internal/ui/invites.go internal/ui/threadview.go
+msgid "Save"
+msgstr "Speichern"
+
+#: internal/ui/contacts.go
+msgid "Search for a name or address"
+msgstr "Nach einem Namen oder einer Adresse suchen"
+
+#: internal/ui/contacts.go
+msgid "The contact could not be saved: "
+msgstr "Der Kontakt konnte nicht gespeichert werden: "
+
+#: internal/ui/contacts.go
+msgid "The contact is saved to the Proton address book (as a signed vCard)."
+msgstr "Der Kontakt wird im Proton-Adressbuch gespeichert (als signierte vCard)."
+
+#: internal/ui/contacts.go
+msgid "The contacts could not be loaded: "
+msgstr "Die Kontakte konnten nicht geladen werden: "
+
+#: internal/ui/contacts.go
+msgid "Write a Message"
+msgstr "Nachricht schreiben"
+
+#: internal/ui/extras.go
+msgid "%v: %s (install the application with make install)"
+msgstr "%v: %s (installieren Sie die Anwendung mit make install)"
+
+#: internal/ui/extras.go
+msgid "A prefilled unsubscribe request opens for you to send."
+msgstr "Eine vorausgefüllte Abmeldeanfrage wird geöffnet, damit Sie sie senden können."
+
+#: internal/ui/extras.go
+msgid "Add the Sender to Contacts…"
+msgstr "Absender zu den Kontakten hinzufügen …"
+
+#: internal/ui/extras.go
+msgid "Applying the rules to the inbox…"
+msgstr "Die Regeln werden auf den Posteingang angewendet …"
+
+#: internal/ui/extras.go
+msgid "Create a Rule for the Sender…"
+msgstr "Regel für den Absender erstellen …"
+
+#: internal/ui/extras.go
+msgid "Date:"
+msgstr "Datum:"
+
+#: internal/ui/extras.go
+msgid "Export failed: "
+msgstr "Export fehlgeschlagen: "
+
+#: internal/ui/extras.go
+msgid "From %s"
+msgstr "Von %s"
+
+#: internal/ui/extras.go
+msgid "From:"
+msgstr "Von:"
+
+#: internal/ui/extras.go
+msgid "It applies to every new message in the inbox."
+msgstr "Sie gilt für jede neue Nachricht im Posteingang."
+
+#: internal/ui/extras.go
+msgid "Klient sends the sender an unsubscribe request (one click, as defined by RFC 8058). The sender will see your IP address, just as when you click a link."
+msgstr "Klient sendet dem Absender eine Abmeldeanfrage (ein Klick, wie in RFC 8058 festgelegt). Der Absender sieht Ihre IP-Adresse, genau wie beim Klick auf einen Link."
+
+#: internal/ui/extras.go
+msgid "Message saved as %s"
+msgstr "Nachricht als %s gespeichert"
+
+#: internal/ui/extras.go
+msgid "More Actions"
+msgstr "Weitere Aktionen"
+
+#: internal/ui/extras.go
+msgctxt "rule"
+msgid "Name"
+msgstr "Name"
+
+#: internal/ui/extras.go
+msgid "Print"
+msgstr "Drucken"
+
+#: internal/ui/extras.go
+msgctxt "button"
+msgid "Print…"
+msgstr "Drucken …"
+
+#: internal/ui/extras.go
+msgid "Print…"
+msgstr "Drucken …"
+
+#: internal/ui/extras.go internal/ui/preferences.go
+msgid "Rule"
+msgstr "Regel"
+
+#: internal/ui/extras.go
+msgid "Rule saved"
+msgstr "Regel gespeichert"
+
+#: internal/ui/extras.go
+msgid "Save as .eml…"
+msgstr "Als .eml speichern …"
+
+#: internal/ui/extras.go
+msgid "Subject:"
+msgstr "Betreff:"
+
+#: internal/ui/extras.go
+msgid "Suggest a Label (AI)"
+msgstr "Label vorschlagen (KI)"
+
+#: internal/ui/extras.go
+msgid "Target"
+msgstr "Ziel"
+
+#: internal/ui/extras.go
+msgid "The rule needs a condition text and a target"
+msgstr "Die Regel braucht einen Bedingungstext und ein Ziel"
+
+#: internal/ui/extras.go
+msgid "The rules failed: "
+msgstr "Die Regeln sind fehlgeschlagen: "
+
+#: internal/ui/extras.go
+msgid "The sender's unsubscribe page opens in the browser."
+msgstr "Die Abmeldeseite des Absenders wird im Browser geöffnet."
+
+#: internal/ui/extras.go
+msgid "Then"
+msgstr "Dann"
+
+#: internal/ui/extras.go
+msgid "This message comes from a mailing list – you can unsubscribe from it"
+msgstr "Diese Nachricht stammt aus einer Mailingliste – Sie können sich davon abmelden"
+
+#: internal/ui/extras.go
+msgid "To:"
+msgstr "An:"
+
+#: internal/ui/extras.go
+msgid "Unsubscribe"
+msgstr "Abmelden"
+
+#: internal/ui/extras.go
+msgid "Unsubscribe from %s?"
+msgstr "Von %s abmelden?"
+
+#: internal/ui/extras.go
+msgid "Unsubscribe request sent"
+msgstr "Abmeldeanfrage gesendet"
+
+#: internal/ui/extras.go
+msgid "Unsubscribed"
+msgstr "Abgemeldet"
+
+#: internal/ui/extras.go
+msgid "Unsubscribing failed: "
+msgstr "Abmelden fehlgeschlagen: "
+
+#: internal/ui/extras.go
+msgid "When"
+msgstr "Wenn"
+
+#: internal/ui/extras.go
+msgid "You have no rules (Preferences → Rules)"
+msgstr "Sie haben keine Regeln (Einstellungen → Regeln)"
+
+#: internal/ui/extras.go
+msgid "contains"
+msgstr "enthält"
+
+#: internal/ui/extras.go
+msgid "the server responded with %s"
+msgstr "der Server hat mit %s geantwortet"
+
+#: internal/ui/help.go
+msgid "The help could not be prepared: "
+msgstr "Die Hilfe konnte nicht vorbereitet werden: "
+
+#: internal/ui/invites.go
+msgid " (all day)"
+msgstr " (ganztägig)"
+
+#: internal/ui/invites.go
+msgid " (sent to the organizer)"
+msgstr " (an den Organisator gesendet)"
+
+#: internal/ui/invites.go
+msgid "%s has replied to the invitation “%s” (%s): %s."
+msgstr "%s hat auf die Einladung „%s“ (%s) geantwortet: %s."
+
+#: internal/ui/invites.go
+msgid "(untitled)"
+msgstr "(ohne Titel)"
+
+#: internal/ui/invites.go
+msgid "Accept"
+msgstr "Zusagen"
+
+#: internal/ui/invites.go
+msgid "Accepted"
+msgstr "Zugesagt"
+
+#: internal/ui/invites.go
+msgid "Add to Calendar"
+msgstr "Zum Kalender hinzufügen"
+
+#: internal/ui/invites.go
+msgid "Automatic Reply"
+msgstr "Automatische Antwort"
+
+#: internal/ui/invites.go
+msgid "Decline"
+msgstr "Absagen"
+
+#: internal/ui/invites.go
+msgid "Declined"
+msgstr "Abgesagt"
+
+#: internal/ui/invites.go
+msgid "Duration"
+msgstr "Dauer"
+
+#: internal/ui/invites.go
+msgid "End automatically"
+msgstr "Automatisch beenden"
+
+#: internal/ui/invites.go
+msgid "Event invitation"
+msgstr "Termineinladung"
+
+#: internal/ui/invites.go
+msgid "Hello,\n\nI am away until %s and only read email occasionally. I will reply when I am back.\n\nThank you for your understanding."
+msgstr "Guten Tag,\n\nich bin bis %s abwesend und lese E-Mails nur gelegentlich. Ich antworte, sobald ich zurück bin.\n\nVielen Dank für Ihr Verständnis."
+
+#: internal/ui/invites.go
+msgid "Import the public key – messages to this sender will then be encrypted"
+msgstr "Öffentlichen Schlüssel importieren – Nachrichten an diesen Absender werden dann verschlüsselt"
+
+#: internal/ui/invites.go
+msgid "Importing the key failed: "
+msgstr "Das Importieren des Schlüssels ist fehlgeschlagen: "
+
+#: internal/ui/invites.go
+msgid "Key imported for %s"
+msgstr "Schlüssel für %s importiert"
+
+#: internal/ui/invites.go
+msgid "Last day"
+msgstr "Letzter Tag"
+
+#: internal/ui/invites.go
+msgid "Maybe"
+msgstr "Vielleicht"
+
+#: internal/ui/invites.go
+msgid "Opens the event in the default calendar (e.g. GNOME Calendar)"
+msgstr "Öffnet den Termin im Standardkalender (z. B. GNOME Kalender)"
+
+#: internal/ui/invites.go
+msgid "Organized by %s"
+msgstr "Organisiert von %s"
+
+#: internal/ui/invites.go
+msgid "Otherwise it stays on until you turn it off"
+msgstr "Andernfalls bleibt sie eingeschaltet, bis Sie sie ausschalten"
+
+#: internal/ui/invites.go
+msgid "Out of office"
+msgstr "Abwesenheit"
+
+#: internal/ui/invites.go
+msgid "Proton replies on its own on the server, even when your computer is off. Each sender gets the reply at most once in a while. This feature requires a paid Proton plan."
+msgstr "Proton antwortet selbstständig auf dem Server, auch wenn Ihr Computer ausgeschaltet ist. Jeder Absender erhält die Antwort höchstens einmal innerhalb eines bestimmten Zeitraums. Diese Funktion erfordert einen kostenpflichtigen Proton-Tarif."
+
+#: internal/ui/invites.go
+msgid "Reply Text"
+msgstr "Antworttext"
+
+#: internal/ui/invites.go
+msgid "Reply automatically"
+msgstr "Automatisch antworten"
+
+#: internal/ui/invites.go
+msgid "Sending the answer…"
+msgstr "Die Antwort wird gesendet …"
+
+#: internal/ui/invites.go
+msgid "Tentative"
+msgstr "Vorläufig"
+
+#: internal/ui/invites.go
+msgid "The answer could not be sent: "
+msgstr "Die Antwort konnte nicht gesendet werden: "
+
+#: internal/ui/invites.go
+msgid "The automatic reply is off"
+msgstr "Die automatische Antwort ist ausgeschaltet"
+
+#: internal/ui/invites.go
+msgid "The automatic reply is on"
+msgstr "Die automatische Antwort ist eingeschaltet"
+
+#: internal/ui/invites.go
+msgid "The event has been cancelled"
+msgstr "Der Termin wurde abgesagt"
+
+#: internal/ui/invites.go
+msgid "The last day has already passed"
+msgstr "Der letzte Tag ist bereits vorbei"
+
+#: internal/ui/invites.go
+msgid "You have not answered yet"
+msgstr "Sie haben noch nicht geantwortet"
+
+#: internal/ui/invites.go
+msgid "Your answer to the invitation has been sent"
+msgstr "Ihre Antwort auf die Einladung wurde gesendet"
+
+#: internal/ui/invites.go
+msgid "Your answer: accepted"
+msgstr "Ihre Antwort: zugesagt"
+
+#: internal/ui/invites.go
+msgid "Your answer: declined"
+msgstr "Ihre Antwort: abgesagt"
+
+#: internal/ui/invites.go
+msgid "Your answer: maybe"
+msgstr "Ihre Antwort: vielleicht"
+
+#: internal/ui/invites.go
+msgid "the attachment does not contain a public PGP key"
+msgstr "der Anhang enthält keinen öffentlichen PGP-Schlüssel"
+
+#: internal/ui/localai.go
+msgid " · in use"
+msgstr " · in Verwendung"
+
+#: internal/ui/localai.go
+msgid "3.0 GB"
+msgstr "3,0 GB"
+
+#: internal/ui/localai.go
+msgid "3.4 GB"
+msgstr "3,4 GB"
+
+#: internal/ui/localai.go
+msgid "4.3 GB"
+msgstr "4,3 GB"
+
+#: internal/ui/localai.go
+msgid "6.0 GB"
+msgstr "6,0 GB"
+
+#: internal/ui/localai.go
+msgid "6.1 GB"
+msgstr "6,1 GB"
+
+#: internal/ui/localai.go
+msgid "Check for Updates"
+msgstr "Nach Aktualisierungen suchen"
+
+#: internal/ui/localai.go
+msgid "Checking for updates failed: %s"
+msgstr "Die Suche nach Aktualisierungen ist fehlgeschlagen: %s"
+
+#: internal/ui/localai.go
+msgid "Checking model %s for updates…"
+msgstr "Aktualisierungen für das Modell %s werden gesucht …"
+
+#: internal/ui/localai.go
+msgid "Checks for a new version of Ollama and the models once a day (not on a metered connection)"
+msgstr "Sucht einmal täglich nach einer neuen Version von Ollama und den Modellen (nicht bei einer getakteten Verbindung)"
+
+#: internal/ui/localai.go
+msgid "Compare Models on My Mail…"
+msgstr "Modelle anhand meiner E-Mails vergleichen …"
+
+#: internal/ui/localai.go
+msgid "Delete Model"
+msgstr "Modell löschen"
+
+#: internal/ui/localai.go
+msgid "Downloaded models"
+msgstr "Heruntergeladene Modelle"
+
+#: internal/ui/localai.go
+msgid "Downloading Ollama %s: %s of %s"
+msgstr "Ollama %s wird heruntergeladen: %s von %s"
+
+#: internal/ui/localai.go internal/ui/selfupdate.go
+msgid "Finding the latest version…"
+msgstr "Die neueste Version wird ermittelt …"
+
+#: internal/ui/localai.go
+msgid "Gemma 4 E4B (Google) – better at Czech, needs more memory"
+msgstr "Gemma 4 E4B (Google) – besser auf Tschechisch, braucht mehr Arbeitsspeicher"
+
+#: internal/ui/localai.go internal/ui/selfupdate.go
+msgid "Install"
+msgstr "Installieren"
+
+#: internal/ui/localai.go
+msgid "Installation failed: %s"
+msgstr "Installation fehlgeschlagen: %s"
+
+#: internal/ui/localai.go
+msgid "Local AI (Ollama)"
+msgstr "Lokale KI (Ollama)"
+
+#: internal/ui/localai.go
+msgid "Local AI updated to Ollama %s"
+msgstr "Lokale KI auf Ollama %s aktualisiert"
+
+#: internal/ui/localai.go
+msgid "Local only"
+msgstr "Nur lokal"
+
+#: internal/ui/localai.go
+msgid "Ministral 3 8B (Mistral AI) – smarter, slower"
+msgstr "Ministral 3 8B (Mistral AI) – klüger, langsamer"
+
+#: internal/ui/localai.go
+msgid "New mail is summarized in the background, only on mains power and when the model is idle; the summary is ready as soon as you open the message"
+msgstr "Neue E-Mails werden im Hintergrund zusammengefasst, nur am Netzstrom und wenn das Modell untätig ist; die Zusammenfassung ist fertig, sobald Sie die Nachricht öffnen"
+
+#: internal/ui/localai.go
+msgid "None yet – download one with the comparison below"
+msgstr "Noch keine – laden Sie eines mit dem Vergleich unten herunter"
+
+#: internal/ui/localai.go
+msgid "Not installed. The official version is downloaded from GitHub (about 1.4 GB; only the part for the processor stays on disk)."
+msgstr "Nicht installiert. Die offizielle Version wird von GitHub heruntergeladen (etwa 1,4 GB; nur der Teil für den Prozessor bleibt auf der Festplatte)."
+
+#: internal/ui/localai.go
+msgid "Nothing is sent to cloud AI (Gemini, ChatGPT, Claude, Mistral), even if keys are saved"
+msgstr "An Cloud-KI (Gemini, ChatGPT, Claude, Mistral) wird nichts gesendet, auch wenn Schlüssel gespeichert sind"
+
+#: internal/ui/localai.go
+msgid "Ollama %s is installed"
+msgstr "Ollama %s ist installiert"
+
+#: internal/ui/localai.go
+msgid "Ollama %s is up to date"
+msgstr "Ollama %s ist aktuell"
+
+#: internal/ui/localai.go
+msgid "Ollama cannot be started: "
+msgstr "Ollama kann nicht gestartet werden: "
+
+#: internal/ui/localai.go
+msgid "Prepare summaries in advance"
+msgstr "Zusammenfassungen im Voraus erstellen"
+
+#: internal/ui/localai.go
+msgid "The assistant and the spam filter now use %s"
+msgstr "Der Assistent und der Spamfilter verwenden jetzt %s"
+
+#: internal/ui/localai.go
+msgid "The model runs right on this computer; the content of your messages goes nowhere. Without a graphics card it is slower: judging a message takes tens of seconds."
+msgstr "Das Modell läuft direkt auf diesem Computer; der Inhalt Ihrer Nachrichten geht nirgendwohin. Ohne Grafikkarte ist es langsamer: Das Beurteilen einer Nachricht dauert Dutzende Sekunden."
+
+#: internal/ui/localai.go
+msgid "Update automatically"
+msgstr "Automatisch aktualisieren"
+
+#: internal/ui/localai.go
+msgid "Version %s · program %s, models %s"
+msgstr "Version %s · Programm %s, Modelle %s"
+
+#: internal/ui/localai.go
+msgid "the new version %s will be used for the next request"
+msgstr "die neue Version %s wird bei der nächsten Anfrage verwendet"
+
+#: internal/ui/login.go
+msgid "Add a Proton Account"
+msgstr "Proton-Konto hinzufügen"
+
+#: internal/ui/login.go
+msgid "After the verification in the browser succeeds, click “Continue” and the login will be repeated."
+msgstr "Wenn die Überprüfung im Browser erfolgreich war, klicken Sie auf „Weiter“, und die Anmeldung wird wiederholt."
+
+#: internal/ui/login.go
+msgid "Back"
+msgstr "Zurück"
+
+#: internal/ui/login.go
+msgid "Continue"
+msgstr "Weiter"
+
+#: internal/ui/login.go
+msgid "Did the page not open? Its address:"
+msgstr "Hat sich die Seite nicht geöffnet? Ihre Adresse:"
+
+#: internal/ui/login.go
+msgid "Enter the six-digit code from your authenticator app."
+msgstr "Geben Sie den sechsstelligen Code aus Ihrer Authentifizierungs-App ein."
+
+#: internal/ui/login.go
+msgid "Have You Completed the Verification?"
+msgstr "Haben Sie die Überprüfung abgeschlossen?"
+
+#: internal/ui/login.go
+msgid "Log In"
+msgstr "Anmelden"
+
+#: internal/ui/login.go
+msgid "Log in with your Proton account. The password is not stored anywhere; only the session token and a derived mailbox key stay in the system keyring."
+msgstr "Melden Sie sich mit Ihrem Proton-Konto an. Das Passwort wird nirgends gespeichert; nur das Sitzungstoken und ein abgeleiteter Postfachschlüssel bleiben im Schlüsselbund des Systems."
+
+#: internal/ui/login.go
+msgid "Mailbox Password"
+msgstr "Postfach-Passwort"
+
+#: internal/ui/login.go
+msgid "Open Verification"
+msgstr "Überprüfung öffnen"
+
+#: internal/ui/login.go
+msgid "Other Service – Gmail, Seznam, IMAP…"
+msgstr "Anderer Dienst – Gmail, Seznam, IMAP …"
+
+#: internal/ui/login.go
+msgid "Proton Mail"
+msgstr "Proton Mail"
+
+#: internal/ui/login.go
+msgid "Proton wants to verify that a human is logging in. Its page verify.proton.me will open – complete the verification there, then come back and click “Continue”."
+msgstr "Proton möchte überprüfen, dass sich ein Mensch anmeldet. Die Seite verify.proton.me wird geöffnet – schließen Sie dort die Überprüfung ab, kommen Sie dann zurück und klicken Sie auf „Weiter“."
+
+#: internal/ui/login.go
+msgid "Two-Factor Authentication"
+msgstr "Zwei-Faktor-Authentifizierung"
+
+#: internal/ui/login.go
+msgid "Username or email"
+msgstr "Benutzername oder E-Mail"
+
+#: internal/ui/login.go
+msgid "Verification in the Browser"
+msgstr "Überprüfung im Browser"
+
+#: internal/ui/login.go
+msgid "Your account uses a separate password to unlock the mailbox."
+msgstr "Ihr Konto verwendet ein separates Passwort zum Entsperren des Postfachs."
+
+#: internal/ui/login.go
+msgid "invalid code: %w"
+msgstr "ungültiger Code: %w"
+
+#: internal/ui/login.go
+msgid "login cancelled"
+msgstr "Anmeldung abgebrochen"
+
+#: internal/ui/login.go
+msgid "login cancelled – the verification was not completed"
+msgstr "Anmeldung abgebrochen – die Überprüfung wurde nicht abgeschlossen"
+
+#: internal/ui/mainview.go
+msgid "%s of %s (%.0f %%)"
+msgstr "%s von %s (%.0f %%)"
+
+#: internal/ui/mainview.go
+msgid "%s used"
+msgstr "%s belegt"
+
+#: internal/ui/mainview.go
+msgid "AI turned off"
+msgstr "KI ausgeschaltet"
+
+#: internal/ui/mainview.go
+msgid "Archive (Ctrl+E)"
+msgstr "Archivieren (Strg+E)"
+
+#: internal/ui/mainview.go
+msgid "Attachment saved"
+msgstr "Anhang gespeichert"
+
+#: internal/ui/mainview.go
+msgid "Checking the inbox…"
+msgstr "Der Posteingang wird geprüft …"
+
+#: internal/ui/mainview.go
+msgid "Done, moved to spam: %d"
+msgstr "Fertig, in den Spam verschoben: %d"
+
+#: internal/ui/mainview.go
+msgid "Folders"
+msgstr "Ordner"
+
+#: internal/ui/mainview.go
+msgid "Forward (Ctrl+L)"
+msgstr "Weiterleiten (Strg+L)"
+
+#: internal/ui/mainview.go
+msgid "Jan 2 15:04"
+msgstr "2.1. 15:04"
+
+#: internal/ui/mainview.go
+msgid "Labels"
+msgstr "Labels"
+
+#: internal/ui/mainview.go
+msgid "Load Older Messages"
+msgstr "Ältere Nachrichten laden"
+
+#: internal/ui/mainview.go
+msgid "Loading the messages failed: "
+msgstr "Das Laden der Nachrichten ist fehlgeschlagen: "
+
+#: internal/ui/mainview.go
+msgid "Mail takes up %s"
+msgstr "E-Mails belegen %s"
+
+#: internal/ui/mainview.go
+msgid "Main Menu"
+msgstr "Hauptmenü"
+
+#: internal/ui/mainview.go
+msgid "Mark as Unread (Ctrl+Shift+U)"
+msgstr "Als ungelesen markieren (Strg+Umschalt+U)"
+
+#: internal/ui/mainview.go internal/ui/threadview.go
+msgid "Message"
+msgstr "Nachricht"
+
+#: internal/ui/mainview.go internal/ui/selection.go
+msgid "Move to Folder"
+msgstr "In Ordner verschieben"
+
+#: internal/ui/mainview.go
+msgid "Move to Trash"
+msgstr "In den Papierkorb verschieben"
+
+#: internal/ui/mainview.go
+msgid "My Folders"
+msgstr "Meine Ordner"
+
+#: internal/ui/mainview.go
+msgid "New Message (Ctrl+N)"
+msgstr "Neue Nachricht (Strg+N)"
+
+#: internal/ui/mainview.go
+msgid "New mail appears once the spam filter has judged it (this can be turned off in Preferences → Spam Filter)"
+msgstr "Neue E-Mails erscheinen, sobald der Spamfilter sie beurteilt hat (das lässt sich in Einstellungen → Spamfilter ausschalten)"
+
+#: internal/ui/mainview.go
+msgid "No Message Selected"
+msgstr "Keine Nachricht ausgewählt"
+
+#: internal/ui/mainview.go
+msgid "No Messages"
+msgstr "Keine Nachrichten"
+
+#: internal/ui/mainview.go
+msgid "Offline – showing the mail saved in the encrypted cache"
+msgstr "Offline – angezeigt werden die im verschlüsselten Cache gespeicherten E-Mails"
+
+#: internal/ui/mainview.go
+msgid "Refresh (F5)"
+msgstr "Aktualisieren (F5)"
+
+#: internal/ui/mainview.go
+msgid "Reply (Ctrl+R)"
+msgstr "Antworten (Strg+R)"
+
+#: internal/ui/mainview.go
+msgid "Reply to All (Ctrl+Shift+R)"
+msgstr "Allen antworten (Strg+Umschalt+R)"
+
+#: internal/ui/mainview.go
+msgid "Return to the Inbox Now"
+msgstr "Jetzt in den Posteingang zurückholen"
+
+#: internal/ui/mainview.go
+msgid "Saving the attachment failed: "
+msgstr "Das Speichern des Anhangs ist fehlgeschlagen: "
+
+#: internal/ui/mainview.go
+msgid "Search (Ctrl+F)"
+msgstr "Suchen (Strg+F)"
+
+#: internal/ui/mainview.go
+msgid "Search failed: "
+msgstr "Suche fehlgeschlagen: "
+
+#: internal/ui/mainview.go
+msgid "Search the subject, sender and recipients"
+msgstr "Betreff, Absender und Empfänger durchsuchen"
+
+#: internal/ui/mainview.go
+msgid "Search: %s"
+msgstr "Suche: %s"
+
+#: internal/ui/mainview.go
+msgid "AI assistant: %s\nSpam filter: %s\nBlocklists: %s, %s · updated %s"
+msgstr "KI-Assistent: %s\nSpamfilter: %s\nSperrlisten: %s, %s · aktualisiert %s"
+
+#: internal/ui/mainview.go
+msgid "Star (Ctrl+D)"
+msgstr "Stern (Strg+D)"
+
+#: internal/ui/mainview.go
+msgid "Storage for mail, calendar and contacts (without Drive).\nMail: %s\nDrive has its own storage: %s of %s"
+msgstr "Speicher für E-Mail, Kalender und Kontakte (ohne Drive).\nE-Mail: %s\nDrive hat einen eigenen Speicher: %s von %s"
+
+#: internal/ui/mainview.go
+msgid "Storage shared by all Proton services.\nMail: %s\nDrive: %s"
+msgstr "Speicher, den sich alle Proton-Dienste teilen.\nE-Mail: %s\nDrive: %s"
+
+#: internal/ui/mainview.go
+msgid "Summarize"
+msgstr "Zusammenfassen"
+
+#: internal/ui/mainview.go
+msgid "Summarize the message or the whole thread with AI"
+msgstr "Die Nachricht oder die ganze Unterhaltung mit KI zusammenfassen"
+
+#: internal/ui/mainview.go
+msgid "Summary (AI)"
+msgstr "Zusammenfassung (KI)"
+
+#: internal/ui/mainview.go
+msgid "The AI spam filter is not set up"
+msgstr "Der KI-Spamfilter ist nicht eingerichtet"
+
+#: internal/ui/mainview.go
+msgid "The check failed: "
+msgstr "Die Prüfung ist fehlgeschlagen: "
+
+#: internal/ui/mainview.go
+msgid "The total size of the messages in the folders; the server does not report a mailbox limit"
+msgstr "Die Gesamtgröße der Nachrichten in den Ordnern; der Server meldet kein Postfachlimit"
+
+#: internal/ui/mainview.go
+msgid "Unread Only"
+msgstr "Nur ungelesene"
+
+#: internal/ui/mainview.go
+msgid "Updated %s"
+msgstr "Aktualisiert %s"
+
+#: internal/ui/mainview.go
+msgid "blocklists only (AI is not set up)"
+msgstr "nur Sperrlisten (KI ist nicht eingerichtet)"
+
+#: internal/ui/mainview.go
+msgid "in %s"
+msgstr "in %s"
+
+#: internal/ui/mainview.go
+msgid "legitimate"
+msgstr "legitim"
+
+#: internal/ui/mainview.go
+msgid "local AI (%s, nothing leaves the computer)"
+msgstr "lokale KI (%s, nichts verlässt den Computer)"
+
+#: internal/ui/mainview.go
+msgid "scam"
+msgstr "Betrug"
+
+#: internal/ui/ownkey.go
+msgid "Back Up the Private Key…"
+msgstr "Privaten Schlüssel sichern …"
+
+#: internal/ui/ownkey.go
+msgid "Backup Password"
+msgstr "Passwort der Sicherung"
+
+#: internal/ui/ownkey.go
+msgid "Copy the Public Key"
+msgstr "Öffentlichen Schlüssel kopieren"
+
+#: internal/ui/ownkey.go
+msgid "Create a New Key"
+msgstr "Neuen Schlüssel erstellen"
+
+#: internal/ui/ownkey.go
+msgid "Creating the key failed: "
+msgstr "Das Erstellen des Schlüssels ist fehlgeschlagen: "
+
+#: internal/ui/ownkey.go
+msgid "If the key has no passphrase, leave the field empty."
+msgstr "Wenn der Schlüssel keine Passphrase hat, lassen Sie das Feld leer."
+
+#: internal/ui/ownkey.go
+msgid "Import a Private Key…"
+msgstr "Privaten Schlüssel importieren …"
+
+#: internal/ui/ownkey.go
+msgid "Key Passphrase"
+msgstr "Passphrase des Schlüssels"
+
+#: internal/ui/ownkey.go
+msgid "Key created – from now on your mail is encrypted and signed"
+msgstr "Schlüssel erstellt – ab jetzt werden Ihre E-Mails verschlüsselt und signiert"
+
+#: internal/ui/ownkey.go
+msgid "Key fingerprint"
+msgstr "Fingerabdruck des Schlüssels"
+
+#: internal/ui/ownkey.go
+msgid "Key imported"
+msgstr "Schlüssel importiert"
+
+#: internal/ui/ownkey.go
+msgid "Messages to people with a known key are encrypted; the others are signed. Send your public key to your contacts (Klient also adds it to the Autocrypt header)."
+msgstr "Nachrichten an Personen mit bekanntem Schlüssel werden verschlüsselt, die übrigen signiert. Senden Sie Ihren öffentlichen Schlüssel an Ihre Kontakte (Klient fügt ihn auch in den Autocrypt-Header ein)."
+
+#: internal/ui/ownkey.go
+msgid "My Key – %s"
+msgstr "Mein Schlüssel – %s"
+
+#: internal/ui/ownkey.go
+msgid "Private Key (.asc)"
+msgstr "Privater Schlüssel (.asc)"
+
+#: internal/ui/ownkey.go internal/ui/preferences.go
+msgid "Public key copied"
+msgstr "Öffentlicher Schlüssel kopiert"
+
+#: internal/ui/ownkey.go
+msgctxt "key"
+msgid "Remove"
+msgstr "Entfernen"
+
+#: internal/ui/ownkey.go internal/ui/preferences.go
+msgid "Remove Key"
+msgstr "Schlüssel entfernen"
+
+#: internal/ui/ownkey.go
+msgid "Remove the Key?"
+msgstr "Schlüssel entfernen?"
+
+#: internal/ui/ownkey.go
+msgid "Save the Public Key"
+msgstr "Öffentlichen Schlüssel speichern"
+
+#: internal/ui/ownkey.go
+msgid "Saved"
+msgstr "Gespeichert"
+
+#: internal/ui/ownkey.go
+msgid "The backup is encrypted with this password. It cannot be restored without it."
+msgstr "Die Sicherung wird mit diesem Passwort verschlüsselt. Ohne es lässt sie sich nicht wiederherstellen."
+
+#: internal/ui/ownkey.go
+msgid "Without a backup of the key, Klient will no longer open messages encrypted with it (including your drafts and sent mail)."
+msgstr "Ohne eine Sicherung des Schlüssels kann Klient damit verschlüsselte Nachrichten nicht mehr öffnen (auch nicht Ihre Entwürfe und gesendeten E-Mails)."
+
+#: internal/ui/ownkey.go
+msgid "Without a key, mail from this account goes out unencrypted and unsigned. With a key, Klient encrypts messages to everyone whose key it knows (WKD, Autocrypt, imported keys) and signs them for everyone else. Drafts and copies in Sent are stored encrypted on the server."
+msgstr "Ohne Schlüssel gehen E-Mails dieses Kontos unverschlüsselt und unsigniert hinaus. Mit Schlüssel verschlüsselt Klient Nachrichten an alle, deren Schlüssel es kennt (WKD, Autocrypt, importierte Schlüssel), und signiert sie für alle anderen. Entwürfe und Kopien in „Gesendet“ werden verschlüsselt auf dem Server gespeichert."
+
+#: internal/ui/preferences.go
+msgid "%s contains “%s” → %s"
+msgstr "%s enthält „%s“ → %s"
+
+#: internal/ui/preferences.go
+msgid "%s key removed"
+msgstr "Schlüssel für %s entfernt"
+
+#: internal/ui/preferences.go
+msgid "%s key saved"
+msgstr "Schlüssel für %s gespeichert"
+
+#: internal/ui/preferences.go
+msgid "%s works (model %s)"
+msgstr "%s funktioniert (Modell %s)"
+
+#: internal/ui/preferences.go
+msgid "%s – saved"
+msgstr "%s – gespeichert"
+
+#: internal/ui/preferences.go
+msgid "%s, %s · last updated %s"
+msgstr "%s, %s · zuletzt aktualisiert %s"
+
+#: internal/ui/preferences.go
+msgid "%s: Test Failed"
+msgstr "%s: Test fehlgeschlagen"
+
+#: internal/ui/preferences.go
+msgid "0 = cache turned off"
+msgstr "0 = Cache ausgeschaltet"
+
+#: internal/ui/preferences.go
+msgid "A daily notification summarizing the unread mail of all accounts"
+msgstr "Eine tägliche Benachrichtigung mit einer Zusammenfassung der ungelesenen E-Mails aller Konten"
+
+#: internal/ui/preferences.go
+msgid "A new message appears in the inbox once the spam filter has judged it, so spam never flashes up. Mail is delayed by the time the check takes (about a minute with local AI, at most 6 minutes)."
+msgstr "Eine neue Nachricht erscheint im Posteingang, sobald der Spamfilter sie beurteilt hat, sodass Spam nie kurz aufblitzt. E-Mails verzögern sich um die Dauer der Prüfung (etwa eine Minute mit lokaler KI, höchstens 6 Minuten)."
+
+#: internal/ui/preferences.go
+msgid "AI Decisions"
+msgstr "KI-Entscheidungen"
+
+#: internal/ui/preferences.go
+msgid "AI answers, summaries and suggested replies follow it too"
+msgstr "Auch KI-Antworten, Zusammenfassungen und Antwortvorschläge richten sich danach"
+
+#: internal/ui/preferences.go
+msgid "API Keys"
+msgstr "API-Schlüssel"
+
+#: internal/ui/preferences.go
+msgid "Add Rule"
+msgstr "Regel hinzufügen"
+
+#: internal/ui/preferences.go
+msgid "Added below new messages, replies and forwards."
+msgstr "Wird unter neuen Nachrichten, Antworten und Weiterleitungen eingefügt."
+
+#: internal/ui/preferences.go
+msgid "Also search keys.openpgp.org"
+msgstr "Auch auf keys.openpgp.org suchen"
+
+#: internal/ui/preferences.go
+msgid "Always attach my public key"
+msgstr "Meinen öffentlichen Schlüssel immer anhängen"
+
+#: internal/ui/preferences.go
+msgid "Another application opens mailto: links"
+msgstr "Eine andere Anwendung öffnet mailto:-Links"
+
+#: internal/ui/preferences.go
+msgid "Assistant"
+msgstr "Assistent"
+
+#: internal/ui/preferences.go
+msgid "Automatic Features"
+msgstr "Automatische Funktionen"
+
+#: internal/ui/preferences.go
+msgid "Background"
+msgstr "Hintergrund"
+
+#: internal/ui/preferences.go
+msgid "Blocklists updated"
+msgstr "Sperrlisten aktualisiert"
+
+#: internal/ui/preferences.go
+msgid "Choose a Model"
+msgstr "Modell wählen"
+
+#: internal/ui/preferences.go
+msgid "Choose from the models available for your account"
+msgstr "Aus den Modellen wählen, die für Ihr Konto verfügbar sind"
+
+#: internal/ui/preferences.go
+msgid "Clear"
+msgstr "Leeren"
+
+#: internal/ui/preferences.go
+msgid "Close"
+msgstr "Schließen"
+
+#: internal/ui/preferences.go
+msgid "Contact Keys"
+msgstr "Schlüssel der Kontakte"
+
+#: internal/ui/preferences.go
+msgid "Copy to Clipboard"
+msgstr "In die Zwischenablage kopieren"
+
+#: internal/ui/preferences.go
+msgid "Default email application"
+msgstr "Standard-E-Mail-Anwendung"
+
+#: internal/ui/preferences.go
+msgid "Details"
+msgstr "Details"
+
+#: internal/ui/preferences.go
+msgid "Downloading…"
+msgstr "Wird heruntergeladen …"
+
+#: internal/ui/preferences.go
+msgid "During this time sending can be undone with the Undo button; 0 = send immediately"
+msgstr "In dieser Zeit lässt sich das Senden mit der Schaltfläche „Rückgängig“ zurücknehmen; 0 = sofort senden"
+
+#: internal/ui/preferences.go
+msgid "Filter incoming mail with AI"
+msgstr "Eingehende E-Mails mit KI filtern"
+
+#: internal/ui/preferences.go
+msgid "Finding Recipients' Keys"
+msgstr "Schlüssel der Empfänger finden"
+
+#: internal/ui/preferences.go
+msgid "Finds more keys, but the server learns the addresses you write to"
+msgstr "Findet mehr Schlüssel, aber der Server erfährt, an welche Adressen Sie schreiben"
+
+#: internal/ui/preferences.go
+msgid "Get a key: "
+msgstr "Schlüssel erhalten: "
+
+#: internal/ui/preferences.go
+msgid "Group messages into threads"
+msgstr "Nachrichten zu Unterhaltungen gruppieren"
+
+#: internal/ui/preferences.go
+msgid "Hour"
+msgstr "Uhrzeit"
+
+#: internal/ui/preferences.go
+msgid "Import Public Key"
+msgstr "Öffentlichen Schlüssel importieren"
+
+#: internal/ui/preferences.go
+msgid "Import Public Key…"
+msgstr "Öffentlichen Schlüssel importieren …"
+
+#: internal/ui/preferences.go
+msgid "Imported for: "
+msgstr "Importiert für: "
+
+#: internal/ui/preferences.go
+msgid "In GNOME, the icon in the top bar requires the AppIndicator extension (the gnome-shell-extension-appindicator package)."
+msgstr "In GNOME benötigt das Symbol in der oberen Leiste die Erweiterung AppIndicator (Paket gnome-shell-extension-appindicator)."
+
+#: internal/ui/preferences.go
+msgid "Interface language"
+msgstr "Sprache der Oberfläche"
+
+#: internal/ui/preferences.go
+msgid "Jan 2, 2006 15:04"
+msgstr "2.1.2006 15:04"
+
+#: internal/ui/preferences.go
+msgid "Judges every new message – a cheaper and faster model is usually enough here."
+msgstr "Beurteilt jede neue Nachricht – hier genügt meist ein günstigeres und schnelleres Modell."
+
+#: internal/ui/preferences.go
+msgid "Klient always asks the recipient's domain (Web Key Directory) and learns keys from the Autocrypt header of received mail."
+msgstr "Klient fragt immer die Domain des Empfängers (Web Key Directory) und lernt Schlüssel aus dem Autocrypt-Header empfangener E-Mails."
+
+#: internal/ui/preferences.go
+msgid "Klient is the default email application"
+msgstr "Klient ist die Standard-E-Mail-Anwendung"
+
+#: internal/ui/preferences.go
+msgid "Klient keeps watching your mail, filtering spam and showing notifications; the icon in the top bar opens the window again"
+msgstr "Klient überwacht weiter Ihre E-Mails, filtert Spam und zeigt Benachrichtigungen an; das Symbol in der oberen Leiste öffnet das Fenster wieder"
+
+#: internal/ui/preferences.go
+msgid "Klient opens mailto: links throughout the system"
+msgstr "Klient öffnet mailto:-Links im ganzen System"
+
+#: internal/ui/preferences.go
+msgid "Klient starts hidden in the background, with just the icon in the top bar"
+msgstr "Klient startet verborgen im Hintergrund, nur mit dem Symbol in der oberen Leiste"
+
+#: internal/ui/preferences.go
+msgid "Language"
+msgstr "Sprache"
+
+#: internal/ui/preferences.go
+msgid "Make Default"
+msgstr "Als Standard festlegen"
+
+#: internal/ui/preferences.go
+msgid "Message summaries, reply suggestions and text editing."
+msgstr "Zusammenfassungen von Nachrichten, Antwortvorschläge und Textbearbeitung."
+
+#: internal/ui/preferences.go
+msgid "Messages kept for offline reading"
+msgstr "Für das Offline-Lesen behaltene Nachrichten"
+
+#: internal/ui/preferences.go
+msgid "Model"
+msgstr "Modell"
+
+#: internal/ui/preferences.go
+msgid "Model %s"
+msgstr "Modell %s"
+
+#: internal/ui/preferences.go
+msgid "Model %s saved"
+msgstr "Modell %s gespeichert"
+
+#: internal/ui/preferences.go
+msgid "Model list: "
+msgstr "Modellliste: "
+
+#: internal/ui/preferences.go
+msgid "Model saved"
+msgstr "Modell gespeichert"
+
+#: internal/ui/preferences.go
+msgid "Morning mail overview"
+msgstr "Morgenübersicht der E-Mails"
+
+#: internal/ui/preferences.go
+msgid "My Public Keys"
+msgstr "Meine öffentlichen Schlüssel"
+
+#: internal/ui/preferences.go
+msgid "No key is saved for %s"
+msgstr "Für %s ist kein Schlüssel gespeichert"
+
+#: internal/ui/preferences.go
+msgid "No local model is downloaded – download one in the Local AI section"
+msgstr "Kein lokales Modell ist heruntergeladen – laden Sie eines im Bereich „Lokale KI“ herunter"
+
+#: internal/ui/preferences.go
+msgid "No rules yet"
+msgstr "Noch keine Regeln"
+
+#: internal/ui/preferences.go
+msgid "Offline"
+msgstr "Offline"
+
+#: internal/ui/preferences.go
+msgid "Offline cache cleared"
+msgstr "Offline-Cache geleert"
+
+#: internal/ui/preferences.go
+msgid "Open Page"
+msgstr "Seite öffnen"
+
+#: internal/ui/preferences.go
+msgid "Provider"
+msgstr "Anbieter"
+
+#: internal/ui/preferences.go
+msgid "Replies are shown together as a conversation, just like on the Proton website"
+msgstr "Antworten werden zusammen als Unterhaltung angezeigt, genau wie auf der Proton-Website"
+
+#: internal/ui/preferences.go
+msgid "Rules"
+msgstr "Regeln"
+
+#: internal/ui/preferences.go
+msgid "Rules for Incoming Mail"
+msgstr "Regeln für eingehende E-Mails"
+
+#: internal/ui/preferences.go
+msgid "Run in the background after closing the window"
+msgstr "Nach dem Schließen des Fensters im Hintergrund laufen"
+
+#: internal/ui/preferences.go
+msgid "Save Signature"
+msgstr "Signatur speichern"
+
+#: internal/ui/preferences.go
+msgid "Save this provider's API key first"
+msgstr "Speichern Sie zuerst den API-Schlüssel dieses Anbieters"
+
+#: internal/ui/preferences.go
+msgid "Save to File"
+msgstr "In Datei speichern"
+
+#: internal/ui/preferences.go
+msgid "Saving failed: "
+msgstr "Speichern fehlgeschlagen: "
+
+#: internal/ui/preferences.go
+msgid "Send delay (s)"
+msgstr "Sendeverzögerung (s)"
+
+#: internal/ui/preferences.go
+msgid "Send them to contacts outside Proton so they can send you encrypted mail."
+msgstr "Senden Sie sie an Kontakte außerhalb von Proton, damit diese Ihnen verschlüsselte E-Mails schicken können."
+
+#: internal/ui/preferences.go
+msgid "Sending"
+msgstr "Senden"
+
+#: internal/ui/preferences.go
+msgid "Sends a short test request"
+msgstr "Sendet eine kurze Testanfrage"
+
+#: internal/ui/preferences.go
+msgid "Setting up automatic start failed: "
+msgstr "Das Einrichten des automatischen Starts ist fehlgeschlagen: "
+
+#: internal/ui/preferences.go
+msgid "Show new mail only after it is checked"
+msgstr "Neue E-Mails erst nach der Prüfung anzeigen"
+
+#: internal/ui/preferences.go
+msgid "Signature"
+msgstr "Signatur"
+
+#: internal/ui/preferences.go
+msgid "Signature saved"
+msgstr "Signatur gespeichert"
+
+#: internal/ui/preferences.go
+msgid "Sort new mail into labels"
+msgstr "Neue E-Mails in Labels einsortieren"
+
+#: internal/ui/preferences.go
+msgid "Spam Filter"
+msgstr "Spamfilter"
+
+#: internal/ui/preferences.go
+msgid "Start after login"
+msgstr "Nach der Anmeldung starten"
+
+#: internal/ui/preferences.go
+msgid "Status"
+msgstr "Status"
+
+#: internal/ui/preferences.go
+msgid "Stored"
+msgstr "Gespeichert"
+
+#: internal/ui/preferences.go
+msgid "System language"
+msgstr "Systemsprache"
+
+#: internal/ui/preferences.go
+msgid "Test"
+msgstr "Testen"
+
+#: internal/ui/preferences.go
+msgid "Testing…"
+msgstr "Wird getestet …"
+
+#: internal/ui/preferences.go
+msgid "The AI adds the best matching of your labels to a new message (only when it is confident and no rule has applied)"
+msgstr "Die KI versieht eine neue Nachricht mit dem am besten passenden Ihrer Labels (nur wenn sie sich sicher ist und keine Regel gegriffen hat)"
+
+#: internal/ui/preferences.go
+msgid "The AI judges every new message in the inbox. As evidence it gets the SPF/DKIM/DMARC results, blocklist hits and your lists of allowed and blocked senders."
+msgstr "Die KI beurteilt jede neue Nachricht im Posteingang. Als Anhaltspunkte erhält sie die Ergebnisse von SPF/DKIM/DMARC, Treffer in Sperrlisten und Ihre Listen erlaubter und blockierter Absender."
+
+#: internal/ui/preferences.go
+msgid "The default state of the switch in the message window; recipients with PGP can then send you encrypted mail"
+msgstr "Der Standardzustand des Schalters im Nachrichtenfenster; Empfänger mit PGP können Ihnen dann verschlüsselte E-Mails senden"
+
+#: internal/ui/preferences.go
+msgid "The icon disappears from the top bar after Klient restarts"
+msgstr "Das Symbol verschwindet aus der oberen Leiste, nachdem Klient neu gestartet wurde"
+
+#: internal/ui/preferences.go
+msgid "The keys are stored in the system keyring. The content of the messages the AI processes is sent to the chosen provider."
+msgstr "Die Schlüssel werden im Schlüsselbund des Systems gespeichert. Der Inhalt der Nachrichten, die die KI verarbeitet, wird an den gewählten Anbieter gesendet."
+
+#: internal/ui/preferences.go
+msgid "The language changes after Klient restarts"
+msgstr "Die Sprache ändert sich nach einem Neustart von Klient"
+
+#: internal/ui/preferences.go
+msgid "The newest messages are stored in an encrypted cache (AES-256 with the key in the keyring, bodies also PGP-encrypted as on the server), so you can read them without a connection."
+msgstr "Die neuesten Nachrichten werden in einem verschlüsselten Cache gespeichert (AES-256 mit dem Schlüssel im Schlüsselbund, Nachrichtentexte zusätzlich mit PGP verschlüsselt wie auf dem Server), sodass Sie sie ohne Verbindung lesen können."
+
+#: internal/ui/preferences.go
+msgid "The overview arrives in the first minute after this hour (Klient must be running, for example in the background)"
+msgstr "Die Übersicht kommt in der ersten Minute nach dieser Uhrzeit (Klient muss laufen, zum Beispiel im Hintergrund)"
+
+#: internal/ui/preferences.go
+msgid "The spam probability at which the AI moves a message"
+msgstr "Die Spam-Wahrscheinlichkeit, ab der die KI eine Nachricht verschiebt"
+
+#: internal/ui/preferences.go
+msgid "They apply to every new message in the inbox (after the spam filter). You can also create a rule for a sender from the ⋯ menu of a message."
+msgstr "Sie gelten für jede neue Nachricht im Posteingang (nach dem Spamfilter). Eine Regel für einen Absender können Sie auch im Menü ⋯ einer Nachricht erstellen."
+
+#: internal/ui/preferences.go
+msgid "They are downloaded automatically every %s."
+msgstr "Sie werden automatisch alle %s heruntergeladen."
+
+#: internal/ui/preferences.go
+msgid "They use the assistant model. With local AI the content of messages stays on this computer; with cloud AI it is sent to the provider."
+msgstr "Sie verwenden das Modell des Assistenten. Mit lokaler KI bleibt der Inhalt der Nachrichten auf diesem Computer; mit Cloud-KI wird er an den Anbieter gesendet."
+
+#: internal/ui/preferences.go
+msgid "Threshold for moving to spam"
+msgstr "Schwelle für das Verschieben in den Spam"
+
+#: internal/ui/preferences.go
+msgid "Update Now"
+msgstr "Jetzt aktualisieren"
+
+#: internal/ui/preferences.go
+msgid "never"
+msgstr "nie"
+
+#: internal/ui/preferences.go
+msgid "the cache is not available"
+msgstr "der Cache ist nicht verfügbar"
+
+#: internal/ui/preferences.go
+msgid "“Local only” mode is on – cloud AI cannot be selected"
+msgstr "Der Modus „Nur lokal“ ist eingeschaltet – Cloud-KI kann nicht ausgewählt werden"
+
+#: internal/ui/richeditor.go
+msgid "Bold (Ctrl+B)"
+msgstr "Fett (Strg+B)"
+
+#: internal/ui/richeditor.go
+msgid "Bulleted List"
+msgstr "Aufzählung"
+
+#: internal/ui/richeditor.go
+msgid "Clear Formatting"
+msgstr "Formatierung entfernen"
+
+#: internal/ui/richeditor.go
+msgid "Insert"
+msgstr "Einfügen"
+
+#: internal/ui/richeditor.go
+msgid "Insert Link"
+msgstr "Link einfügen"
+
+#: internal/ui/richeditor.go
+msgid "Italic (Ctrl+I)"
+msgstr "Kursiv (Strg+I)"
+
+#: internal/ui/richeditor.go
+msgid "Link (Ctrl+K)"
+msgstr "Link (Strg+K)"
+
+#: internal/ui/richeditor.go
+msgid "Link text"
+msgstr "Linktext"
+
+#: internal/ui/richeditor.go
+msgid "Strikethrough"
+msgstr "Durchgestrichen"
+
+#: internal/ui/richeditor.go
+msgid "Underline (Ctrl+U)"
+msgstr "Unterstrichen (Strg+U)"
+
+#: internal/ui/schedule.go
+msgid " (if Klient is running)"
+msgstr " (wenn Klient läuft)"
+
+#: internal/ui/schedule.go
+msgid "%s at %s"
+msgstr "%s um %s"
+
+#: internal/ui/schedule.go
+msgid "Cancel Sending"
+msgstr "Senden abbrechen"
+
+#: internal/ui/schedule.go
+msgid "Confirm"
+msgstr "Bestätigen"
+
+#: internal/ui/schedule.go
+msgid "Custom date and time…"
+msgstr "Eigenes Datum und eigene Uhrzeit …"
+
+#: internal/ui/schedule.go
+msgid "Jan 2"
+msgstr "2.1."
+
+#: internal/ui/schedule.go
+msgid "Jan 2, 2006"
+msgstr "2.1.2006"
+
+#: internal/ui/schedule.go
+msgid "Later today"
+msgstr "Später heute"
+
+#: internal/ui/schedule.go
+msgid "Monday morning"
+msgstr "Montagmorgen"
+
+#: internal/ui/schedule.go
+msgid "Next week"
+msgstr "Nächste Woche"
+
+#: internal/ui/schedule.go
+msgid "Returned to the inbox"
+msgstr "In den Posteingang zurückgekehrt"
+
+#: internal/ui/schedule.go
+msgid "Scheduled: it will be sent %s (%s)"
+msgstr "Geplant: sie wird %s gesendet (%s)"
+
+#: internal/ui/schedule.go
+msgid "Sending cancelled; the message is in Drafts"
+msgstr "Senden abgebrochen; die Nachricht liegt in „Entwürfe“"
+
+#: internal/ui/schedule.go
+msgid "Snooze (Ctrl+H) – the message returns to the inbox at the chosen time"
+msgstr "Zurückstellen (Strg+H) – die Nachricht kehrt zur gewählten Zeit in den Posteingang zurück"
+
+#: internal/ui/schedule.go
+msgid "Snooze Until"
+msgstr "Zurückstellen bis"
+
+#: internal/ui/schedule.go
+msgid "Snoozed – it returns %s"
+msgstr "Zurückgestellt – sie kehrt %s zurück"
+
+#: internal/ui/schedule.go
+msgid "The chosen time has already passed"
+msgstr "Der gewählte Zeitpunkt ist bereits vorbei"
+
+#: internal/ui/schedule.go
+msgid "This evening"
+msgstr "Heute Abend"
+
+#: internal/ui/schedule.go
+msgid "This message cannot be snoozed"
+msgstr "Diese Nachricht kann nicht zurückgestellt werden"
+
+#: internal/ui/schedule.go
+msgid "This weekend"
+msgstr "Dieses Wochenende"
+
+#: internal/ui/schedule.go
+msgid "Tomorrow afternoon"
+msgstr "Morgen Nachmittag"
+
+#: internal/ui/schedule.go
+msgid "Tomorrow morning"
+msgstr "Morgen früh"
+
+#: internal/ui/schedule.go
+msgid "Undo"
+msgstr "Rückgängig"
+
+#: internal/ui/schedule.go
+msgid "in %d h"
+msgstr "in %d h"
+
+#: internal/ui/schedule.go
+msgid "in %d h %d min"
+msgstr "in %d h %d min"
+
+#: internal/ui/schedule.go
+msgid "in %d min"
+msgstr "in %d min"
+
+#: internal/ui/schedule.go
+msgid "in %d s"
+msgstr "in %d s"
+
+#: internal/ui/schedule.go
+msgid "right now"
+msgstr "jetzt gleich"
+
+#: internal/ui/schedule.go
+msgid "today at %s"
+msgstr "heute um %s"
+
+#: internal/ui/schedule.go
+msgid "tomorrow at %s"
+msgstr "morgen um %s"
+
+#: internal/ui/selection.go
+msgid "All"
+msgstr "Alle"
+
+#: internal/ui/selection.go
+msgid "Mark as Read"
+msgstr "Als gelesen markieren"
+
+#: internal/ui/selection.go internal/ui/threadview.go
+msgid "Marking failed: "
+msgstr "Markieren fehlgeschlagen: "
+
+#: internal/ui/selection.go
+msgid "Select All"
+msgstr "Alle auswählen"
+
+#: internal/ui/selection.go
+msgid "Select Several Messages"
+msgstr "Mehrere Nachrichten auswählen"
+
+#: internal/ui/selection.go
+msgid "Selected: %d"
+msgstr "Ausgewählt: %d"
+
+#: internal/ui/selection.go
+msgid "Spam / Not Spam"
+msgstr "Spam / Kein Spam"
+
+#: internal/ui/selfupdate.go
+msgid "A New Version of Klient Is Ready"
+msgstr "Eine neue Version von Klient ist bereit"
+
+#: internal/ui/selfupdate.go
+msgid "A check is already running…"
+msgstr "Eine Prüfung läuft bereits …"
+
+#: internal/ui/selfupdate.go
+msgid "Check for updates automatically"
+msgstr "Automatisch nach Aktualisierungen suchen"
+
+#: internal/ui/selfupdate.go
+msgid "Downloading version %s…"
+msgstr "Version %s wird heruntergeladen …"
+
+#: internal/ui/selfupdate.go
+msgid "Installed version %s"
+msgstr "Installierte Version %s"
+
+#: internal/ui/selfupdate.go
+msgid "Installing version %s…"
+msgstr "Version %s wird installiert …"
+
+#: internal/ui/selfupdate.go
+msgid "Last checked %s"
+msgstr "Zuletzt geprüft %s"
+
+#: internal/ui/selfupdate.go
+msgid "New versions are downloaded from GitHub (%s). The package is verified by its checksum before installation, and installing asks for the administrator password."
+msgstr "Neue Versionen werden von GitHub heruntergeladen (%s). Das Paket wird vor der Installation anhand seiner Prüfsumme überprüft, und die Installation fragt nach dem Administratorpasswort."
+
+#: internal/ui/selfupdate.go
+msgid "Once a day, not on a metered connection; a new version is downloaded right away"
+msgstr "Einmal täglich, nicht bei einer getakteten Verbindung; eine neue Version wird sofort heruntergeladen"
+
+#: internal/ui/selfupdate.go
+msgid "The download failed: "
+msgstr "Der Download ist fehlgeschlagen: "
+
+#: internal/ui/selfupdate.go
+msgid "The update check failed: "
+msgstr "Die Suche nach Aktualisierungen ist fehlgeschlagen: "
+
+#: internal/ui/selfupdate.go
+msgid "Try Again"
+msgstr "Erneut versuchen"
+
+#: internal/ui/selfupdate.go
+msgid "Updates"
+msgstr "Aktualisierungen"
+
+#: internal/ui/selfupdate.go
+msgid "Version %s has been downloaded from GitHub and verified. Installing it will ask for the administrator password."
+msgstr "Version %s wurde von GitHub heruntergeladen und überprüft. Die Installation fragt nach dem Administratorpasswort."
+
+#: internal/ui/selfupdate.go
+msgid "Version %s is available – this Klient was not installed from the package, so download it from GitHub"
+msgstr "Version %s ist verfügbar – dieser Klient wurde nicht aus dem Paket installiert, laden Sie sie daher von GitHub herunter"
+
+#: internal/ui/selfupdate.go
+msgid "Version %s is downloaded and verified"
+msgstr "Version %s ist heruntergeladen und überprüft"
+
+#: internal/ui/selfupdate.go
+msgid "Version %s is ready"
+msgstr "Version %s ist bereit"
+
+#: internal/ui/selfupdate.go
+msgid "You have the latest version, %s"
+msgstr "Sie haben die neueste Version, %s"
+
+#: internal/ui/threadview.go
+msgid " (cc)"
+msgstr " (Cc)"
+
+#: internal/ui/threadview.go
+msgid " (me)"
+msgstr " (ich)"
+
+#: internal/ui/threadview.go
+msgid "%s (key %s)"
+msgstr "%s (Schlüssel %s)"
+
+#: internal/ui/threadview.go
+msgid "(no sender)"
+msgstr "(kein Absender)"
+
+#: internal/ui/threadview.go
+msgid "AI spam filter: "
+msgstr "KI-Spamfilter: "
+
+#: internal/ui/threadview.go
+msgid "AI spam filter: %s (%.0f %%) – %s"
+msgstr "KI-Spamfilter: %s (%.0f %%) – %s"
+
+#: internal/ui/threadview.go
+msgid "Add Star (Ctrl+D)"
+msgstr "Stern hinzufügen (Strg+D)"
+
+#: internal/ui/threadview.go
+msgid "Always From This Sender"
+msgstr "Immer von diesem Absender"
+
+#: internal/ui/threadview.go
+msgid "Changing the label failed: "
+msgstr "Das Ändern des Labels ist fehlgeschlagen: "
+
+#: internal/ui/threadview.go
+msgid "Draft – click to open"
+msgstr "Entwurf – zum Öffnen klicken"
+
+#: internal/ui/threadview.go
+msgid "Forward (This Message)"
+msgstr "Weiterleiten (diese Nachricht)"
+
+#: internal/ui/threadview.go
+msgid "From: "
+msgstr "Von: "
+
+#: internal/ui/threadview.go
+msgid "Label %s removed"
+msgstr "Label %s entfernt"
+
+#: internal/ui/threadview.go
+msgid "Mark as Spam"
+msgstr "Als Spam markieren"
+
+#: internal/ui/threadview.go
+msgid "Me"
+msgstr "Ich"
+
+#: internal/ui/threadview.go
+msgid "Not Spam"
+msgstr "Kein Spam"
+
+#: internal/ui/threadview.go
+msgid "Open %s"
+msgstr "%s öffnen"
+
+#: internal/ui/threadview.go
+msgid "Preparing the summary…"
+msgstr "Die Zusammenfassung wird erstellt …"
+
+#: internal/ui/threadview.go
+msgid "Remote images are blocked for privacy."
+msgstr "Bilder aus dem Internet sind zum Schutz der Privatsphäre blockiert."
+
+#: internal/ui/threadview.go
+msgid "Remove Star (Ctrl+D)"
+msgstr "Stern entfernen (Strg+D)"
+
+#: internal/ui/threadview.go
+msgid "Reply (This Message)"
+msgstr "Antworten (diese Nachricht)"
+
+#: internal/ui/threadview.go
+msgid "Reply to All (This Message)"
+msgstr "Allen antworten (diese Nachricht)"
+
+#: internal/ui/threadview.go
+msgid "Save…"
+msgstr "Speichern …"
+
+#: internal/ui/threadview.go
+msgid "Show"
+msgstr "Anzeigen"
+
+#: internal/ui/threadview.go
+msgid "Show as Plain Text"
+msgstr "Als reinen Text anzeigen"
+
+#: internal/ui/threadview.go
+msgid "Spam filter (%s): %s"
+msgstr "Spamfilter (%s): %s"
+
+#: internal/ui/threadview.go
+msgid "The attachment cannot be opened: "
+msgstr "Der Anhang kann nicht geöffnet werden: "
+
+#: internal/ui/threadview.go
+msgid "The message could not be loaded: "
+msgstr "Die Nachricht konnte nicht geladen werden: "
+
+#: internal/ui/threadview.go
+msgid "The message could not be opened: "
+msgstr "Die Nachricht konnte nicht geöffnet werden: "
+
+#: internal/ui/threadview.go
+msgid "The summary failed: "
+msgstr "Die Zusammenfassung ist fehlgeschlagen: "
+
+#: internal/ui/threadview.go
+msgid "To: "
+msgstr "An: "
+
+#: internal/ui/threadview.go
+msgid "Will be sent %s"
+msgstr "Wird %s gesendet"
+
+#: internal/ui/threadview.go
+msgid "You marked this as legitimate"
+msgstr "Sie haben dies als legitim markiert"
+
+#: internal/ui/threadview.go
+msgid "You marked this as spam"
+msgstr "Sie haben dies als Spam markiert"
+
+#: internal/ui/threadview.go
+msgid "attachment"
+msgstr "Anhang"
+
+#: internal/ui/threadview.go
+msgid "returns %s"
+msgstr "kehrt %s zurück"
+
+#: internal/ui/threadview.go
+msgid "the attachment"
+msgstr "den Anhang"
+
+#: internal/ui/tray.go
+msgid "Klient – no unread mail"
+msgstr "Klient – keine ungelesenen E-Mails"
+
+#: internal/ui/tray.go
+msgid "Open Klient"
+msgstr "Klient öffnen"
+
+#: internal/ui/whatsnew.go
+msgid "Click to see what's new."
+msgstr "Klicken Sie, um die Neuerungen zu sehen."
+
+#: internal/ui/whatsnew.go
+msgid "Klient has been updated to version %s"
+msgstr "Klient wurde auf Version %s aktualisiert"
+
+#: internal/ui/whatsnew.go
+msgid "Version %s"
+msgstr "Version %s"
+
+#: internal/ui/whatsnew.go
+msgid "What's New"
+msgstr "Neuerungen"
+
+#: internal/ui/whatsnew.go
+msgid "What's New in Klient %s"
+msgstr "Neuerungen in Klient %s"
+
+#: internal/ui/whatsnew.go
+msgid "What's New in Version %s"
+msgstr "Neuerungen in Version %s"
+
+#: internal/update/update.go
+msgid "SHA256SUMS does not contain %s"
+msgstr "SHA256SUMS enthält %s nicht"
+
+#: internal/update/update.go
+msgid "download: %s"
+msgstr "Download: %s"
+
+#: internal/update/update.go
+msgid "installation failed: %s"
+msgstr "Installation fehlgeschlagen: %s"
+
+#: internal/update/update.go
+msgid "release %s does not contain a package for this system"
+msgstr "die Version %s enthält kein Paket für dieses System"
+
+#: internal/update/update.go
+msgid "the downloaded package has a wrong checksum – it will not be installed"
+msgstr "das heruntergeladene Paket hat eine falsche Prüfsumme – es wird nicht installiert"
+
+#: internal/update/update.go
+msgid "the installation was cancelled"
+msgstr "die Installation wurde abgebrochen"
+
+#: internal/update/update.go
+msgid "the release checksums do not match"
+msgstr "die Prüfsummen der Version stimmen nicht überein"
+
+#: internal/update/update.go
+msgid "the release has no checksum – for security reasons it will not be downloaded"
+msgstr "die Version hat keine Prüfsumme – aus Sicherheitsgründen wird sie nicht heruntergeladen"
+
+#: internal/update/update.go
+msgid "there is no release on GitHub yet"
+msgstr "auf GitHub gibt es noch keine Version"
+
+#: internal/ui/preferences.go
+msgid "%d model is available for your account"
+msgid_plural "%d models are available for your account"
+msgstr[0] "Für Ihr Konto ist %d Modell verfügbar"
+msgstr[1] "Für Ihr Konto sind %d Modelle verfügbar"
+
+#: internal/ui/preferences.go
+msgid "%d message, %d of them with content"
+msgid_plural "%d messages, %d of them with content"
+msgstr[0] "%d Nachricht, davon %d mit Inhalt"
+msgstr[1] "%d Nachrichten, davon %d mit Inhalt"
+
+#: internal/ui/preferences.go
+msgid "%d IP range"
+msgid_plural "%d IP ranges"
+msgstr[0] "%d IP-Bereich"
+msgstr[1] "%d IP-Bereiche"
+
+#: internal/ui/preferences.go
+msgid "%d domain"
+msgid_plural "%d domains"
+msgstr[0] "%d Domain"
+msgstr[1] "%d Domains"
+
+#: internal/ui/assistant.go
+msgid "Reading %d message…"
+msgid_plural "Reading %d messages…"
+msgstr[0] "%d Nachricht wird gelesen …"
+msgstr[1] "%d Nachrichten werden gelesen …"
+
+#: internal/ui/assistant.go
+msgid "Answer from %d message found"
+msgid_plural "Answer from %d messages found"
+msgstr[0] "Antwort aus %d gefundenen Nachricht"
+msgstr[1] "Antwort aus %d gefundenen Nachrichten"
+
+#: internal/ui/mainview.go
+msgid "%d network"
+msgid_plural "%d networks"
+msgstr[0] "%d Netz"
+msgstr[1] "%d Netze"
+
+#: internal/ui/mainview.go
+msgid "%d unread"
+msgid_plural "%d unread"
+msgstr[0] "%d ungelesen"
+msgstr[1] "%d ungelesen"
+
+#: internal/ui/mainview.go
+msgid "%d result in %s"
+msgid_plural "%d results in %s"
+msgstr[0] "%d Ergebnis in %s"
+msgstr[1] "%d Ergebnisse in %s"
+
+#: internal/ui/threadview.go
+msgid "The spam filter is checking %d new message…"
+msgid_plural "The spam filter is checking %d new messages…"
+msgstr[0] "Der Spamfilter prüft %d neue Nachricht …"
+msgstr[1] "Der Spamfilter prüft %d neue Nachrichten …"
+
+#: internal/ui/threadview.go
+msgid "%d attachment"
+msgid_plural "%d attachments"
+msgstr[0] "%d Anhang"
+msgstr[1] "%d Anhänge"
+
+#: internal/ui/threadview.go
+msgid "%d conversation is loaded in this folder"
+msgid_plural "%d conversations are loaded in this folder"
+msgstr[0] "In diesem Ordner ist %d Unterhaltung geladen"
+msgstr[1] "In diesem Ordner sind %d Unterhaltungen geladen"
+
+#: internal/ui/threadview.go
+msgid "%d message in the thread"
+msgid_plural "%d messages in the thread"
+msgstr[0] "%d Nachricht in der Unterhaltung"
+msgstr[1] "%d Nachrichten in der Unterhaltung"
+
+#: internal/ui/schedule.go
+msgid "in %d day"
+msgid_plural "in %d days"
+msgstr[0] "in %d Tag"
+msgstr[1] "in %d Tagen"
+
+#: internal/ui/invites.go
+msgid "%d person invited"
+msgid_plural "%d people invited"
+msgstr[0] "%d Person eingeladen"
+msgstr[1] "%d Personen eingeladen"
+
+#: internal/ui/extras.go
+msgid "Rules applied to %d message"
+msgid_plural "Rules applied to %d messages"
+msgstr[0] "Regeln auf %d Nachricht angewendet"
+msgstr[1] "Regeln auf %d Nachrichten angewendet"
+
+#: internal/ui/localai.go
+msgid "%d downloaded"
+msgid_plural "%d downloaded"
+msgstr[0] "%d heruntergeladen"
+msgstr[1] "%d heruntergeladen"
+
+#: internal/ui/compare.go
+msgid "Done. %d message judged; choose a model with the Use button. (“Correct” means the verdict matches the folder the message is in.)"
+msgid_plural "Done. %d messages judged; choose a model with the Use button. (“Correct” means the verdict matches the folder the message is in.)"
+msgstr[0] "Fertig. %d Nachricht beurteilt; wählen Sie ein Modell mit der Schaltfläche „Verwenden“. („Richtig“ bedeutet, dass das Urteil zu dem Ordner passt, in dem die Nachricht liegt.)"
+msgstr[1] "Fertig. %d Nachrichten beurteilt; wählen Sie ein Modell mit der Schaltfläche „Verwenden“. („Richtig“ bedeutet, dass das Urteil zu dem Ordner passt, in dem die Nachricht liegt.)"
+
+#: internal/ui/tray.go
+msgid "%d unread message"
+msgid_plural "%d unread messages"
+msgstr[0] "%d ungelesene Nachricht"
+msgstr[1] "%d ungelesene Nachrichten"
+
+#: internal/ui/preferences.go
+msgid "Desktop Integration"
+msgstr "Desktop-Integration"
+
+#: internal/imapmail/certs.go
+msgid "the certificate of %s is not trusted: %s"
+msgstr "das Zertifikat von %s ist nicht vertrauenswürdig: %s"
+
+#: internal/imapmail/certs.go
+msgid "it expired on %s"
+msgstr "es ist am %s abgelaufen"
+
+#: internal/imapmail/certs.go
+msgid "it is valid only from %s"
+msgstr "es ist erst ab %s gültig"
+
+#: internal/imapmail/certs.go
+msgid "it was issued for a different server (%s)"
+msgstr "es wurde für einen anderen Server ausgestellt (%s)"
+
+#: internal/imapmail/certs.go
+msgid "it is self-signed"
+msgstr "es ist selbstsigniert"
+
+#: internal/imapmail/certs.go
+msgid "it was issued by an unknown certificate authority"
+msgstr "es wurde von einer unbekannten Zertifizierungsstelle ausgestellt"
+
+#: internal/imapmail/certs.go
+msgid "the server sent no certificate"
+msgstr "der Server hat kein Zertifikat gesendet"
+
+#: internal/ui/app.go
+msgid "Account %s: the server certificate is not trusted"
+msgstr "Konto %s: Das Zertifikat des Servers ist nicht vertrauenswürdig"
+
+#: internal/ui/app.go
+msgid "Show Certificate"
+msgstr "Zertifikat anzeigen"
+
+#: internal/ui/certtrust.go
+msgid "Untrusted Certificate"
+msgstr "Nicht vertrauenswürdiges Zertifikat"
+
+#: internal/ui/certtrust.go
+msgid "The certificate of the server %s cannot be verified: %s.\n\nThis happens when a certificate has expired or is self-signed, but also when someone intercepts the connection. Trust it only if you know the server and expect this certificate. Klient will accept this one certificate for the server; if it changes, you will be asked again."
+msgstr "Das Zertifikat des Servers %s kann nicht überprüft werden: %s.\n\nDas passiert, wenn ein Zertifikat abgelaufen oder selbstsigniert ist, aber auch, wenn jemand die Verbindung abfängt. Vertrauen Sie ihm nur, wenn Sie den Server kennen und dieses Zertifikat erwarten. Klient akzeptiert dieses eine Zertifikat für den Server; ändert es sich, werden Sie erneut gefragt."
+
+#: internal/ui/certtrust.go
+msgid "Issued to"
+msgstr "Ausgestellt für"
+
+#: internal/ui/certtrust.go
+msgid "Issued by"
+msgstr "Ausgestellt von"
+
+#: internal/ui/certtrust.go
+msgid "Valid"
+msgstr "Gültig"
+
+#: internal/ui/certtrust.go
+msgid "Trust This Certificate"
+msgstr "Diesem Zertifikat vertrauen"
+
+#: internal/ui/preferences.go
+msgid "After %d day"
+msgid_plural "After %d days"
+msgstr[0] "Nach %d Tag"
+msgstr[1] "Nach %d Tagen"
+
+#: internal/ui/folders.go
+msgid "%d message deleted permanently"
+msgid_plural "%d messages deleted permanently"
+msgstr[0] "%d Nachricht endgültig gelöscht"
+msgstr[1] "%d Nachrichten endgültig gelöscht"
+
+#: internal
+msgid "All Accounts"
+msgstr "Alle Konten"
+
+#: internal
+msgid "All messages in the folder will be deleted permanently in every account. This cannot be undone."
+msgstr "Alle Nachrichten im Ordner werden in jedem Konto endgültig gelöscht. Das lässt sich nicht rückgängig machen."
+
+#: internal
+msgid "All messages in the folder will be deleted permanently. This cannot be undone."
+msgstr "Alle Nachrichten im Ordner werden endgültig gelöscht. Das lässt sich nicht rückgängig machen."
+
+#: internal
+msgid "A message can have several labels but be in only one folder"
+msgstr "Eine Nachricht kann mehrere Labels haben, aber nur in einem Ordner liegen"
+
+#: internal
+msgid "A slash nests it in another folder, e.g. “Work/Projects”."
+msgstr "Ein Schrägstrich legt ihn in einen anderen Ordner, z. B. „Arbeit/Projekte“."
+
+#: internal
+msgid "Buttons in the new-mail notification (at most %d)"
+msgstr "Schaltflächen in der Benachrichtigung über neue E-Mails (höchstens %d)"
+
+#: internal
+msgid "Create"
+msgstr "Erstellen"
+
+#: internal
+msgid "Delete…"
+msgstr "Löschen …"
+
+#: internal
+msgid "Delete old messages automatically"
+msgstr "Alte Nachrichten automatisch löschen"
+
+#: internal
+msgid "Delete %s?"
+msgstr "%s löschen?"
+
+#: internal
+msgid "Delete the Message?"
+msgstr "Nachricht löschen?"
+
+#: internal
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#: internal
+msgid "Empty"
+msgstr "Leeren"
+
+#: internal
+msgid "Emptying failed: "
+msgstr "Leeren fehlgeschlagen: "
+
+#: internal
+msgid "Empty Spam?"
+msgstr "Spam leeren?"
+
+#: internal
+msgid "Empty Spam…"
+msgstr "Spam leeren …"
+
+#: internal
+msgid "Empty the Trash?"
+msgstr "Papierkorb leeren?"
+
+#: internal
+msgid "Empty Trash…"
+msgstr "Papierkorb leeren …"
+
+#: internal
+msgid "enter a name"
+msgstr "geben Sie einen Namen ein"
+
+#: internal
+msgctxt "folder"
+msgid "Name"
+msgstr "Name"
+
+#: internal
+msgid "Folder %s created"
+msgstr "Ordner %s erstellt"
+
+#: internal
+msgid "GNOME shows at most %d buttons – turn another one off first"
+msgstr "GNOME zeigt höchstens %d Schaltflächen an – schalten Sie zuerst eine andere aus"
+
+#: internal
+msgid "Hide from the Sidebar"
+msgstr "In der Seitenleiste ausblenden"
+
+#: internal
+msgid "Inbox, Sent, Archive, Spam and Trash of every account together"
+msgstr "Posteingang, Gesendet, Archiv, Spam und Papierkorb aller Konten zusammen"
+
+#: internal
+msgid "Label instead of a folder"
+msgstr "Label statt eines Ordners"
+
+#: internal
+msgid "Leave Hidden Folders Out"
+msgstr "Ausgeblendete Ordner weglassen"
+
+#: internal
+msgid "Messages in the folder go back to the inbox; with a label, only the label is removed from the messages."
+msgstr "Nachrichten im Ordner kehren in den Posteingang zurück; bei einem Label wird nur das Label von den Nachrichten entfernt."
+
+#: internal
+msgid "Messages in Trash and Spam older than this are deleted permanently, in every account"
+msgstr "Nachrichten im Papierkorb und im Spam, die älter sind, werden in jedem Konto endgültig gelöscht"
+
+#: internal
+msgid "Messages that could not be sent"
+msgstr "Nachrichten, die nicht gesendet werden konnten"
+
+#: internal
+msgid "Messages that could not be sent. After a connection failure they are sent again automatically every minute; otherwise send them again, edit them or delete them."
+msgstr "Nachrichten, die nicht gesendet werden konnten. Nach einem Verbindungsfehler werden sie jede Minute automatisch erneut gesendet; andernfalls senden Sie sie erneut, bearbeiten oder löschen Sie sie."
+
+#: internal
+msgid "Never"
+msgstr "Nie"
+
+#: internal
+msgid "New Folder"
+msgstr "Neuer Ordner"
+
+#: internal
+msgid "New Folder…"
+msgstr "Neuer Ordner …"
+
+#: internal
+msgid "No connection – the message waits in the Outbox and will be sent automatically"
+msgstr "Keine Verbindung – die Nachricht wartet im Postausgang und wird automatisch gesendet"
+
+#: internal
+msgid "Notifications"
+msgstr "Benachrichtigungen"
+
+#: internal
+msgid "Only the label is removed; the messages stay in All Mail."
+msgstr "Nur das Label wird entfernt; die Nachrichten bleiben in „Alle Nachrichten“."
+
+#: internal
+msgid "only Trash and Spam can be emptied"
+msgstr "nur der Papierkorb und der Spam können geleert werden"
+
+#: internal
+msgid "Outbox"
+msgstr "Postausgang"
+
+#: internal
+msgid "Outbox (%d)"
+msgstr "Postausgang (%d)"
+
+#: internal
+msgid "Rename"
+msgstr "Umbenennen"
+
+#: internal
+msgid "Rename…"
+msgstr "Umbenennen …"
+
+#: internal
+msgid "Renamed to %s"
+msgstr "In %s umbenannt"
+
+#: internal
+msgid "Rename %s"
+msgstr "%s umbenennen"
+
+#: internal
+msgid "%s deleted"
+msgstr "%s gelöscht"
+
+#: internal
+msgid "Send Again"
+msgstr "Erneut senden"
+
+#: internal
+msgid "Sending failed: "
+msgstr "Senden fehlgeschlagen: "
+
+#: internal
+msgid "Sending failed – the message waits in the Outbox"
+msgstr "Senden fehlgeschlagen – die Nachricht wartet im Postausgang"
+
+#: internal
+msgid "Sent from the Outbox: %s"
+msgstr "Aus dem Postausgang gesendet: %s"
+
+#: internal
+msgid "Show Hidden Folders (%d)"
+msgstr "Ausgeblendete Ordner anzeigen (%d)"
+
+#: internal
+msgid "Show in the Sidebar"
+msgstr "In der Seitenleiste anzeigen"
+
+#: internal
+msgid "%s is hidden – right-click a folder and choose Show Hidden Folders to get it back"
+msgstr "%s ist ausgeblendet – klicken Sie mit der rechten Maustaste auf einen Ordner und wählen Sie „Ausgeblendete Ordner anzeigen“, um ihn zurückzuholen"
+
+#: internal
+msgid "Switch to the account you want to log out of first"
+msgstr "Wechseln Sie zuerst zu dem Konto, von dem Sie sich abmelden möchten"
+
+#: internal
+msgid "system folders cannot be changed"
+msgstr "Systemordner können nicht geändert werden"
+
+#: internal
+msgid "the account of this message is no longer open"
+msgstr "das Konto dieser Nachricht ist nicht mehr geöffnet"
+
+#: internal
+msgid "The action failed"
+msgstr "Die Aktion ist fehlgeschlagen"
+
+#: internal
+msgid "The folder and the messages in it will be deleted from the server."
+msgstr "Der Ordner und die Nachrichten darin werden vom Server gelöscht."
+
+#: internal
+msgid "The folder could not be deleted: "
+msgstr "Der Ordner konnte nicht gelöscht werden: "
+
+#: internal
+msgid "The folder could not be saved: "
+msgstr "Der Ordner konnte nicht gespeichert werden: "
+
+#: internal
+msgid "The message will not be sent and cannot be recovered."
+msgstr "Die Nachricht wird nicht gesendet und lässt sich nicht wiederherstellen."
+
+#: internal
+msgid "the name contains a character the server does not allow"
+msgstr "der Name enthält ein Zeichen, das der Server nicht erlaubt"
+
+#: internal
+msgid "The Outbox could not be saved: "
+msgstr "Der Postausgang konnte nicht gespeichert werden: "
+
+#: internal
+msgid "The Outbox Is Empty"
+msgstr "Der Postausgang ist leer"
+
+#: internal
+msgid "Trash and Spam"
+msgstr "Papierkorb und Spam"
+
+#: internal
+msgid "Waiting for the connection – "
+msgstr "Warten auf die Verbindung – "
+
+#: internal
+msgctxt "action"
+msgid "Delete"
+msgstr "Löschen"
+
+#: internal/ui/accounts.go
+msgid "%d account"
+msgid_plural "%d accounts"
+msgstr[0] "%d Konto"
+msgstr[1] "%d Konten"
+
+#: internal
+msgid "Emptying the Trash…"
+msgstr "Der Papierkorb wird geleert …"
+
+#: internal
+msgid "Emptying Spam…"
+msgstr "Der Spam wird geleert …"
+
+#: internal
+msgid "%d of %d"
+msgstr "%d von %d"
+
+#: internal
+msgid "Add to Dictionary"
+msgstr "Zum Wörterbuch hinzufügen"
+
+#: internal
+msgid "Czech"
+msgstr "Tschechisch"
+
+#: internal
+msgid "English (UK)"
+msgstr "Englisch (UK)"
+
+#: internal
+msgid "English (US)"
+msgstr "Englisch (US)"
+
+#: internal
+msgid "German"
+msgstr "Deutsch"
+
+#: internal
+msgid "Check spelling"
+msgstr "Rechtschreibung prüfen"
+
+#: internal
+msgid "Ignore"
+msgstr "Ignorieren"
+
+#: internal
+msgid "Misspelled words are underlined; right-click one for corrections. Dictionaries: "
+msgstr "Falsch geschriebene Wörter werden unterstrichen; ein Rechtsklick darauf zeigt Korrekturen. Wörterbücher: "
+
+#: internal
+msgid "No dictionary is installed (packages hunspell-cs and hunspell-en-US)"
+msgstr "Es ist kein Wörterbuch installiert (Pakete hunspell-de und hunspell-en-US)"
+
+#: internal
+msgid "(no suggestions)"
+msgstr "(keine Vorschläge)"
+
+#: internal
+msgid "Slovak"
+msgstr "Slowakisch"
+
+#: internal
+msgid "%d link"
+msgid_plural "%d links"
+msgstr[0] "%d Link"
+msgstr[1] "%d Links"
+
+#: internal
+msgid "Spam filter: a link leads to a known phishing or malware page – %s"
+msgstr "Spamfilter: Ein Link führt zu einer bekannten Phishing- oder Schadsoftware-Seite – %s"
+
+#: internal
+msgid "not set up"
+msgstr "nicht eingerichtet"
+
+#: internal
+msgid "Remove Signature"
+msgstr "Signatur entfernen"
+
+#: internal
+msgid "Format"
+msgstr "Format"
+
+#: internal
+msgid "Plain Text"
+msgstr "Reiner Text"
+
+#: internal
+msgid "HTML"
+msgstr "HTML"
+
+#: internal
+msgid "Images from the internet are blocked by many recipients' mail apps until they allow them."
+msgstr "Bilder aus dem Internet werden von den E-Mail-Programmen vieler Empfänger blockiert, bis diese sie erlauben."
+
+#: internal
+msgid "Open File…"
+msgstr "Datei öffnen …"
+
+#: internal
+msgid "HTML Signature"
+msgstr "HTML-Signatur"
+
+#: internal
+msgid "Web Pages"
+msgstr "Webseiten"
+
+#: internal
+msgid "Use a Template"
+msgstr "Vorlage verwenden"
+
+#: internal
+msgid "Preview"
+msgstr "Vorschau"
+
+#: internal
+msgid "Your Name"
+msgstr "Ihr Name"
+
+#: internal
+msgid "no new key is waiting"
+msgstr "es wartet kein neuer Schlüssel"
+
+#: internal
+msgid "keys.openpgp.org: %s"
+msgstr "keys.openpgp.org: %s"
+
+#: internal
+msgid "keys.openpgp.org: HTTP %d"
+msgstr "keys.openpgp.org: HTTP %d"
+
+#: internal
+msgid "downloading attachment %s failed"
+msgstr "das Herunterladen des Anhangs %s ist fehlgeschlagen"
+
+#: internal
+msgid "Send only encrypted"
+msgstr "Nur verschlüsselt senden"
+
+#: internal
+msgid "Do not send while some recipient has no key"
+msgstr "Nicht senden, solange ein Empfänger keinen Schlüssel hat"
+
+#: internal
+msgid "The Message Cannot Be Sent Encrypted"
+msgstr "Die Nachricht kann nicht verschlüsselt gesendet werden"
+
+#: internal
+msgid "Some recipients have no known public key:"
+msgstr "Für einige Empfänger ist kein öffentlicher Schlüssel bekannt:"
+
+#: internal
+msgid "Remove them, import their keys (Preferences → PGP), or turn off “Send only encrypted” for this message."
+msgstr "Entfernen Sie sie, importieren Sie ihre Schlüssel (Einstellungen → PGP) oder schalten Sie „Nur verschlüsselt senden“ für diese Nachricht aus."
+
+#: internal
+msgid "OK"
+msgstr "OK"
+
+#: internal
+msgid "Validity of a new key"
+msgstr "Gültigkeit eines neuen Schlüssels"
+
+#: internal
+msgid "An expiring key stops being used by itself if you lose it; you can extend it any time before"
+msgstr "Ein ablaufender Schlüssel wird von selbst nicht mehr verwendet, wenn Sie ihn verlieren; Sie können ihn jederzeit vorher verlängern"
+
+#: internal
+msgid "Valid until"
+msgstr "Gültig bis"
+
+#: internal
+msgid "no expiry"
+msgstr "kein Ablauf"
+
+#: internal
+msgid "expired"
+msgstr "abgelaufen"
+
+#: internal
+msgid "expires soon, extend it"
+msgstr "läuft bald ab, verlängern Sie ihn"
+
+#: internal
+msgid "Extend…"
+msgstr "Verlängern …"
+
+#: internal
+msgid "Extend the Key"
+msgstr "Schlüssel verlängern"
+
+#: internal
+msgid "How long should the key be valid from today? Contacts learn the new date from your next message (Autocrypt) or a new copy of your public key."
+msgstr "Wie lange soll der Schlüssel ab heute gültig sein? Kontakte erfahren das neue Datum aus Ihrer nächsten Nachricht (Autocrypt) oder aus einer neuen Kopie Ihres öffentlichen Schlüssels."
+
+#: internal
+msgid "The key validity was changed"
+msgstr "Die Gültigkeit des Schlüssels wurde geändert"
+
+#: internal
+msgid "Publish on keys.openpgp.org…"
+msgstr "Auf keys.openpgp.org veröffentlichen …"
+
+#: internal
+msgid "Publish the Public Key?"
+msgstr "Öffentlichen Schlüssel veröffentlichen?"
+
+#: internal
+msgid "Klient uploads your public key to keys.openpgp.org and the server sends a confirmation e-mail to %s. After you click the link in it, anyone can find your key by your address and send you encrypted mail. Only the public key leaves the computer; you can remove it there any time."
+msgstr "Klient lädt Ihren öffentlichen Schlüssel auf keys.openpgp.org hoch, und der Server sendet eine Bestätigungs-E-Mail an %s. Nachdem Sie auf den Link darin geklickt haben, kann jeder Ihren Schlüssel anhand Ihrer Adresse finden und Ihnen verschlüsselte E-Mails senden. Nur der öffentliche Schlüssel verlässt den Computer; Sie können ihn dort jederzeit entfernen."
+
+#: internal
+msgid "Publish"
+msgstr "Veröffentlichen"
+
+#: internal
+msgid "The key is already published for this address"
+msgstr "Der Schlüssel ist für diese Adresse bereits veröffentlicht"
+
+#: internal
+msgid "Check your mail: keys.openpgp.org sent a confirmation link to %s"
+msgstr "Prüfen Sie Ihre E-Mails: keys.openpgp.org hat einen Bestätigungslink an %s gesendet"
+
+#: internal
+msgid "The key was uploaded, but the address could not be confirmed"
+msgstr "Der Schlüssel wurde hochgeladen, aber die Adresse konnte nicht bestätigt werden"
+
+#: internal
+msgid "Save a Revocation Certificate…"
+msgstr "Widerrufszertifikat speichern …"
+
+#: internal
+msgid "Revocation Certificate"
+msgstr "Widerrufszertifikat"
+
+#: internal
+msgid "If your key is lost or stolen, publish this certificate (keys.openpgp.org) or send it to your contacts: their apps then stop using the key. Keep it somewhere safe – anyone who has it can revoke your key. Saving it does not revoke anything."
+msgstr "Wenn Ihr Schlüssel verloren geht oder gestohlen wird, veröffentlichen Sie dieses Zertifikat (keys.openpgp.org) oder senden Sie es an Ihre Kontakte: Deren Programme verwenden den Schlüssel dann nicht mehr. Bewahren Sie es sicher auf – wer es besitzt, kann Ihren Schlüssel widerrufen. Das Speichern selbst widerruft nichts."
+
+#: internal
+msgid "revocation"
+msgstr "widerruf"
+
+#: internal
+msgid "No expiry"
+msgstr "Kein Ablauf"
+
+#: internal
+msgid "from the Autocrypt header of their mail"
+msgstr "aus dem Autocrypt-Header ihrer E-Mails"
+
+#: internal
+msgid "from their domain (Web Key Directory)"
+msgstr "von ihrer Domain (Web Key Directory)"
+
+#: internal
+msgid "imported by you"
+msgstr "von Ihnen importiert"
+
+#: internal
+msgid "verified"
+msgstr "überprüft"
+
+#: internal
+msgid "a new key is waiting"
+msgstr "ein neuer Schlüssel wartet"
+
+#: internal
+msgid "Fingerprint"
+msgstr "Fingerabdruck"
+
+#: internal
+msgid "User IDs"
+msgstr "Benutzerkennungen"
+
+#: internal
+msgid "Algorithm"
+msgstr "Algorithmus"
+
+#: internal
+msgid "Created"
+msgstr "Erstellt"
+
+#: internal
+msgid "revoked"
+msgstr "widerrufen"
+
+#: internal
+msgid "Expires"
+msgstr "Läuft ab"
+
+#: internal
+msgid "New Key Waiting"
+msgstr "Neuer Schlüssel wartet"
+
+#: internal
+msgid "On %s Klient saw a different key for this address (%s). Contacts get a new key when they set up a new computer or lose the old key – but a forged message can bring a key too. Accept it only if you expect the change, best after checking the fingerprint with the contact."
+msgstr "Am %s hat Klient für diese Adresse einen anderen Schlüssel gesehen (%s). Kontakte erhalten einen neuen Schlüssel, wenn sie einen neuen Computer einrichten oder den alten Schlüssel verlieren – aber auch eine gefälschte Nachricht kann einen Schlüssel mitbringen. Akzeptieren Sie ihn nur, wenn Sie die Änderung erwarten, am besten nachdem Sie den Fingerabdruck mit dem Kontakt verglichen haben."
+
+#: internal
+msgid "Keep the Old Key"
+msgstr "Alten Schlüssel behalten"
+
+#: internal
+msgid "Use the New Key"
+msgstr "Neuen Schlüssel verwenden"
+
+#: internal
+msgid "Key in Use"
+msgstr "Verwendeter Schlüssel"
+
+#: internal
+msgid "Added %s, %s."
+msgstr "Hinzugefügt %s, %s."
+
+#: internal
+msgid "Previous key"
+msgstr "Vorheriger Schlüssel"
+
+#: internal
+msgid "%s, replaced %s"
+msgstr "%s, ersetzt %s"
+
+#: internal
+msgid "Verified"
+msgstr "Überprüft"
+
+#: internal
+msgid "You compared the fingerprint with the contact (in person, by phone). A verified key is never replaced automatically."
+msgstr "Sie haben den Fingerabdruck mit dem Kontakt verglichen (persönlich, telefonisch). Ein überprüfter Schlüssel wird nie automatisch ersetzt."
+
+#: internal
+msgid "The sender uses a new key that Klient has not accepted yet."
+msgstr "Der Absender verwendet einen neuen Schlüssel, den Klient noch nicht akzeptiert hat."
+
+#: internal
+msgid "The sender's key changed on %s."
+msgstr "Der Schlüssel des Absenders hat sich am %s geändert."
+
+#: internal
+msgid "Show Key…"
+msgstr "Schlüssel anzeigen …"
+
+#: internal
+msgid "Keys of people outside Proton: imported by you or learned from their mail (Autocrypt). Click a key to compare its fingerprint with the contact, mark it as verified, or decide about a new key."
+msgstr "Schlüssel von Personen außerhalb von Proton: von Ihnen importiert oder aus ihren E-Mails gelernt (Autocrypt). Klicken Sie auf einen Schlüssel, um seinen Fingerabdruck mit dem Kontakt zu vergleichen, ihn als überprüft zu markieren oder über einen neuen Schlüssel zu entscheiden."
+
+#: internal
+msgid "A message is not sent while some recipient has no key; it can be turned off for one message in the compose window"
+msgstr "Eine Nachricht wird nicht gesendet, solange ein Empfänger keinen Schlüssel hat; für eine einzelne Nachricht lässt sich das im Nachrichtenfenster ausschalten"
+
+#: internal
+msgid "Encrypt the subject too"
+msgstr "Auch den Betreff verschlüsseln"
+
+#: internal
+msgid "Recipients' mail apps show the real subject from inside the encryption (protected headers, e.g. Thunderbird); outside it reads “...”. Older apps show only “...”."
+msgstr "Die E-Mail-Programme der Empfänger zeigen den echten Betreff aus dem Inneren der Verschlüsselung (geschützte Header, z. B. Thunderbird); außen steht „...“. Ältere Programme zeigen nur „...“."
+
+#: internal
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] "%d Jahr"
+msgstr[1] "%d Jahre"
+
+#: internal
+msgid "The morning overview could not be prepared"
+msgstr "Die Morgenübersicht konnte nicht erstellt werden"
+
+#: internal
+msgid "Morning overview: no unread mail"
+msgstr "Morgenübersicht: keine ungelesenen E-Mails"
+
+#: internal
+msgid "%d request"
+msgid_plural "%d requests"
+msgstr[0] "%d Anfrage"
+msgstr[1] "%d Anfragen"
+
+#: internal
+msgid "< $0.01"
+msgstr "< 0,01 $"
+
+#: internal
+msgid "Spam filter"
+msgstr "Spamfilter"
+
+#: internal
+msgid "Summaries"
+msgstr "Zusammenfassungen"
+
+#: internal
+msgid "Reply suggestions"
+msgstr "Antwortvorschläge"
+
+#: internal
+msgid "Writing with AI"
+msgstr "Schreiben mit KI"
+
+#: internal
+msgid "AI labels"
+msgstr "KI-Labels"
+
+#: internal
+msgid "Questions about mail"
+msgstr "Fragen zu E-Mails"
+
+#: internal
+msgid "Morning overview"
+msgstr "Morgenübersicht"
+
+#: internal
+msgid "Connection tests"
+msgstr "Verbindungstests"
+
+#: internal
+msgid "AI assistant"
+msgstr "KI-Assistent"
+
+#: internal
+msgid "AI spending this month: %s (today %s)"
+msgstr "KI-Ausgaben in diesem Monat: %s (heute %s)"
+
+#: internal
+msgid "AI Spending"
+msgstr "KI-Ausgaben"
+
+#: internal
+msgid "This month"
+msgstr "Dieser Monat"
+
+#: internal
+msgid "Last month"
+msgstr "Letzter Monat"
+
+#: internal
+msgid "Today"
+msgstr "Heute"
+
+#: internal
+msgid "All time"
+msgstr "Gesamter Zeitraum"
+
+#: internal
+msgid "Period"
+msgstr "Zeitraum"
+
+#: internal
+msgid "Total"
+msgstr "Gesamt"
+
+#: internal
+msgid "%s tokens"
+msgstr "%s Tokens"
+
+#: internal
+msgid "An estimate from the providers' price lists (without VAT), counted from the tokens each provider reports. The exact amount is in your account with the provider. Klient counts from version 0.11.0."
+msgstr "Eine Schätzung anhand der Preislisten der Anbieter (ohne MwSt.), berechnet aus den Tokens, die jeder Anbieter meldet. Den genauen Betrag finden Sie in Ihrem Konto beim Anbieter. Klient zählt seit Version 0.11.0."
+
+#: internal
+msgid "By Model and Task"
+msgstr "Nach Modell und Aufgabe"
+
+#: internal
+msgid "No AI requests in this period."
+msgstr "In diesem Zeitraum gab es keine KI-Anfragen."
+
+#: internal
+msgid "%s in, %s out"
+msgstr "%s ein, %s aus"
+
+#: internal
+msgid "on this computer, free"
+msgstr "auf diesem Computer, kostenlos"
+
+#: internal
+msgid "Set Price…"
+msgstr "Preis festlegen …"
+
+#: internal
+msgid "Klient does not know the price of this model"
+msgstr "Klient kennt den Preis dieses Modells nicht"
+
+#: internal
+msgid "Price of %s"
+msgstr "Preis von %s"
+
+#: internal
+msgid "USD per million tokens, as in the provider's price list."
+msgstr "USD pro Million Tokens, wie in der Preisliste des Anbieters."
+
+#: internal
+msgid "Input"
+msgstr "Eingabe"
+
+#: internal
+msgid "Cached input"
+msgstr "Eingabe aus dem Cache"
+
+#: internal
+msgid "Output"
+msgstr "Ausgabe"
+
+#: internal
+msgid "no address to store the shared data under"
+msgstr "keine Adresse, unter der die gemeinsamen Daten gespeichert werden können"
+
+#: internal
+msgid "Klient keeps the data it shares between your computers here (spam verdicts, sender lists, rules, settings). Klient replaces this message itself; please do not change or delete it."
+msgstr "Hier speichert Klient die Daten, die es zwischen Ihren Computern teilt (Spam-Urteile, Absenderlisten, Regeln, Einstellungen). Klient ersetzt diese Nachricht selbst; bitte ändern oder löschen Sie sie nicht."
+
+#: internal
+msgid "Sync is off"
+msgstr "Die Synchronisierung ist ausgeschaltet"
+
+#: internal
+msgid "A newer Klient changed the shared data – update Klient on this computer"
+msgstr "Ein neuerer Klient hat die gemeinsamen Daten geändert – aktualisieren Sie Klient auf diesem Computer"
+
+#: internal
+msgid "Waiting for the Proton account"
+msgstr "Warten auf das Proton-Konto"
+
+#: internal
+msgid "Sync failed: %s"
+msgstr "Synchronisierung fehlgeschlagen: %s"
+
+#: internal
+msgid "Last synced %s"
+msgstr "Zuletzt synchronisiert %s"
+
+#: internal
+msgid " – changes are waiting to be sent"
+msgstr " – Änderungen warten auf das Senden"
+
+#: internal
+msgid "Sync"
+msgstr "Synchronisierung"
+
+#: internal
+msgid "Sync Between Computers"
+msgstr "Synchronisierung zwischen Computern"
+
+#: internal
+msgid "Klient on your other computers shares spam verdicts, sender lists, rules, signatures, AI settings and spending through your Proton account (a folder “Klient”, encrypted by Proton). API keys and passwords stay on each computer."
+msgstr "Klient auf Ihren anderen Computern teilt Spam-Urteile, Absenderlisten, Regeln, Signaturen, KI-Einstellungen und -Ausgaben über Ihr Proton-Konto (ein Ordner „Klient“, von Proton verschlüsselt). API-Schlüssel und Passwörter bleiben auf jedem Computer."
+
+#: internal
+msgid "Sync this computer"
+msgstr "Diesen Computer synchronisieren"
+
+#: internal
+msgid "Needs a Proton account – the shared data is kept there"
+msgstr "Benötigt ein Proton-Konto – dort werden die gemeinsamen Daten gespeichert"
+
+#: internal
+msgid "Name of this computer"
+msgstr "Name dieses Computers"
+
+#: internal
+msgid "Sync status"
+msgstr "Status der Synchronisierung"
+
+#: internal
+msgid "Sync Now"
+msgstr "Jetzt synchronisieren"
+
+#: internal
+msgid "Syncing…"
+msgstr "Wird synchronisiert …"
+
+#: internal
+msgid "Your Computers"
+msgstr "Ihre Computer"
+
+#: internal
+msgid "The main computer does the AI work: the spam filter, the morning overview and summaries. The others wait for its results and do the work themselves only when it is switched off."
+msgstr "Der Hauptcomputer erledigt die KI-Arbeit: den Spamfilter, die Morgenübersicht und Zusammenfassungen. Die anderen warten auf seine Ergebnisse und erledigen die Arbeit nur selbst, wenn er ausgeschaltet ist."
+
+#: internal
+msgid "Restore an Earlier Version…"
+msgstr "Frühere Version wiederherstellen …"
+
+#: internal
+msgid "%s (this computer)"
+msgstr "%s (dieser Computer)"
+
+#: internal
+msgid "main computer"
+msgstr "Hauptcomputer"
+
+#: internal
+msgid "last seen %s"
+msgstr "zuletzt gesehen %s"
+
+#: internal
+msgid "Make Main"
+msgstr "Zum Hauptcomputer machen"
+
+#: internal
+msgid "Remove Computer"
+msgstr "Computer entfernen"
+
+#: internal
+msgid "No other computer yet – switch sync on in Klient on the other computer too"
+msgstr "Noch kein anderer Computer – schalten Sie die Synchronisierung auch in Klient auf dem anderen Computer ein"
+
+#: internal
+msgid "No earlier version is stored"
+msgstr "Es ist keine frühere Version gespeichert"
+
+#: internal
+msgid "Earlier Versions"
+msgstr "Frühere Versionen"
+
+#: internal
+msgid "Restore This Version"
+msgstr "Diese Version wiederherstellen"
+
+#: internal
+msgid "The shared data as it was %s comes back on all computers. Changes made since then are undone."
+msgstr "Die gemeinsamen Daten, wie sie %s waren, kehren auf allen Computern zurück. Seitdem vorgenommene Änderungen werden rückgängig gemacht."
+
+#: internal
+msgid "The earlier version was restored"
+msgstr "Die frühere Version wurde wiederhergestellt"
+
+#: internal
+msgid "Computer for AI Work"
+msgstr "Computer für die KI-Arbeit"
+
+#: internal
+msgid "The spam filter, the morning overview and summaries run on this computer; the others wait for the results, so you do not pay twice."
+msgstr "Der Spamfilter, die Morgenübersicht und Zusammenfassungen laufen auf diesem Computer; die anderen warten auf die Ergebnisse, sodass Sie nicht doppelt bezahlen."
+
+#: internal
+msgid "AI tasks are done by"
+msgstr "KI-Aufgaben übernimmt"

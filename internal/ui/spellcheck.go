@@ -34,9 +34,12 @@ func (a *App) spellChecker() *spell.Checker {
 	if a.spell == nil && !a.spellTried {
 		a.spellTried = true
 		langs := []string{"en_US", "en_GB"}
-		if i18n.Lang() == "cs" {
+		switch i18n.Lang() {
+		case "cs":
 			langs = append([]string{"cs_CZ"}, langs...)
-		} else {
+		case "de":
+			langs = append([]string{"de_DE"}, langs...)
+		default:
 			langs = append(langs, "cs_CZ")
 		}
 		a.spell = spell.New(langs)

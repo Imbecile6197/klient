@@ -15,17 +15,21 @@ import (
 
 // ---- Time helpers -------------------------------------------------------------
 
-var czDays = []string{"ne", "po", "út", "st", "čt", "pá", "so"}
+var shortDays = map[string][]string{
+	"cs": {"ne", "po", "út", "st", "čt", "pá", "so"},
+	"de": {"So.", "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa."},
+}
 
 // weekdayShort is the abbreviated day name in the interface language.
 func weekdayShort(t time.Time) string {
-	if i18n.Lang() == "cs" {
-		return czDays[t.Weekday()]
+	if days, ok := shortDays[i18n.Lang()]; ok {
+		return days[t.Weekday()]
 	}
 	return t.Format("Mon")
 }
 
-// dayDate is "Mon Oct 5, 2026" (in Czech "po 5. 10. 2026").
+// dayDate is "Mon Oct 5, 2026" (in Czech "po 5. 10. 2026", in German
+// "Mo. 5.10.2026").
 func dayDate(t time.Time) string {
 	return weekdayShort(t) + " " + t.Format(i18n.T("Jan 2, 2006"))
 }

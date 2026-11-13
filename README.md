@@ -2,7 +2,7 @@
 
 **A mail client for GNOME with native Proton Mail support, PGP and an AI spam filter.**
 
-[Česky](README.cs.md) · [Documentation](docs/index.html) · [Releases](https://github.com/Imbecile6197/klient/releases) · GPL-3.0
+[Česky](README.cs.md) · [Deutsch](README.de.md) · [Documentation](docs/index.html) · [Releases](https://github.com/Imbecile6197/klient/releases) · GPL-3.0
 
 ![The main window of Klient](docs/screenshots/en/main.png)
 
@@ -13,7 +13,7 @@
 
 <sub>Screenshots of the demo mode – all people and messages are made up. You can try it yourself: `KLIENT_DEMO=1 klient`.</sub>
 
-Klient is written in Go with GTK4 and libadwaita. It connects directly to Proton Mail (no Proton Bridge needed), to Gmail, to Seznam.cz and to any IMAP/SMTP mailbox. Every new message is judged by the spam filter first; only then is it shown and announced. The interface is available in English and Czech.
+Klient is written in Go with GTK4 and libadwaita. It connects directly to Proton Mail (no Proton Bridge needed), to Gmail, to Seznam.cz and to any IMAP/SMTP mailbox. Every new message is judged by the spam filter first; only then is it shown and announced. The interface is available in English, Czech and German.
 
 ## Features
 
@@ -79,7 +79,7 @@ flatpak install --user ./klient.flatpak
 flatpak run eu.libormacak.Klient
 ```
 
-Publishing a release (needs `gh` and a committed tree): write the notes to `packaging/release-notes/X.Y.Z.md` (an “## English” and a “## Česky” section – they are shown in Klient as What's New and published on GitHub), then `git tag -a vX.Y.Z -m "Klient X.Y.Z" && make release VERSION=X.Y.Z`.
+Publishing a release (needs `gh` and a committed tree): write the notes to `packaging/release-notes/X.Y.Z.md` (an “## English”, a “## Česky” and a “## Deutsch” section – they are shown in Klient as What's New and published on GitHub), then `git tag -a vX.Y.Z -m "Klient X.Y.Z" && make release VERSION=X.Y.Z`.
 
 ## First start
 
@@ -87,7 +87,7 @@ Publishing a release (needs `gh` and a committed tree): write the notes to `pack
 2. In **Preferences → AI**, choose a provider for the assistant and for the spam filter and paste its API key – or install the local AI and let it run on your computer.
 3. Optionally run **Check the Inbox with AI** from the menu to filter your latest 50 messages.
 
-The complete user documentation is in [`docs/index.html`](docs/index.html) (Czech: [`docs/index.cs.html`](docs/index.cs.html)); in the application, press F1.
+The complete user documentation is in [`docs/index.html`](docs/index.html) (Czech: [`docs/index.cs.html`](docs/index.cs.html), German: [`docs/index.de.html`](docs/index.de.html)); in the application, press F1.
 
 ## Translations
 

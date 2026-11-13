@@ -7,7 +7,7 @@ import (
 	"github.com/Imbecile6197/klient/internal/update"
 )
 
-const sample = "## English\n\nKlient now speaks **English**.\n\n- First `item`\n- Second item\n  continues here\n\n**Install:** `sudo dnf install x`\n\n## Česky\n\nKlient mluví **česky**.\n\n- První bod\n"
+const sample = "## English\n\nKlient now speaks **English**.\n\n- First `item`\n- Second item\n  continues here\n\n**Install:** `sudo dnf install x`\n\n## Česky\n\nKlient mluví **česky**.\n\n- První bod\n\n## Deutsch\n\nKlient spricht **Deutsch**.\n"
 
 func TestParse(t *testing.T) {
 	en := Parse(sample, "en")
@@ -17,6 +17,13 @@ func TestParse(t *testing.T) {
 	cs := Parse(sample, "cs")
 	if len(cs) != 2 || cs[1].Text != "První bod" {
 		t.Fatalf("cs = %+v", cs)
+	}
+	if de := Parse(sample, "de"); len(de) != 1 || de[0].Text != "Klient spricht **Deutsch**." {
+		t.Fatalf("de = %+v", de)
+	}
+	// An older release without German falls back to English.
+	if de := Parse(sample[:strings.Index(sample, "## Deutsch")], "de"); len(de) != 3 {
+		t.Fatalf("de fallback = %+v", de)
 	}
 	if got := Markup("a **b** `c` <d>"); got != "a <b>b</b> <tt>c</tt> &lt;d&gt;" {
 		t.Errorf("Markup = %q", got)

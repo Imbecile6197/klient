@@ -292,7 +292,7 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
       <rect x="4" y="12" width="56" height="40" rx="9" fill="#1c71d8"/>
       <path d="M10 20l22 16 22-16" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <div><b>Klient</b><span>Documentation · version 0.12.2 · <a href="index.cs.html" hreflang="cs" lang="cs">Česky</a></span></div>
+    <div><b>Klient</b><span>Documentation · version 0.12.3 · <a href="index.cs.html" hreflang="cs" lang="cs">Česky</a> · <a href="index.de.html" hreflang="de" lang="de">Deutsch</a></span></div>
   </div>
   <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc">Contents</button>
   <ol>
@@ -364,7 +364,7 @@ sudo apt install ./klient_amd64.deb</code></pre>
   <p>Klient downloads later versions by itself – see <a href="#updates">Automatic updates</a>.</p>
   <p>You can open this documentation from Klient at any time: main menu → <b>Help</b>, or the <kbd>F1</kbd> key.</p>
   <h3 id="language">Language</h3>
-  <p>Klient speaks English and Czech. The language follows your system settings; you can change it in Preferences → General → <b>Interface language</b>, and it takes effect after a restart. The AI answers in the same language – summaries, reply suggestions, “Ask Your Mail” and the spam filter's reasons.</p>
+  <p>Klient speaks English, Czech and German. The language follows your system settings; you can change it in Preferences → General → <b>Interface language</b>, and it takes effect after a restart. The AI answers in the same language – summaries, reply suggestions, “Ask Your Mail” and the spam filter's reasons.</p>
   <p>The package recommends the <code>gnome-shell-extension-appindicator</code> extension; without it, GNOME does not show the icon in the top bar.</p>
   <h3 id="updates">Automatic updates</h3>
   <p>Once a day, Klient checks the <a href="https://github.com/Imbecile6197/klient/releases">releases on GitHub</a> (not on a metered connection). It downloads a new version in the background and verifies its SHA-256 checksum, which must match both the <code>SHA256SUMS</code> file and the digest that GitHub reports. You then get the notification <b>A New Version of Klient Is Ready</b>; the <b>Install</b> button asks for the administrator password, installs the package and restarts Klient. The <b>What's New</b> button shows the changes before you install.</p>
@@ -461,7 +461,7 @@ packaging/deb.sh 0.7.3   # Ubuntu package, built in a podman container</code></p
   </ul>
 
   <h3 id="spelling">Spell checking</h3>
-  <p>Misspelled words are underlined in red while you write; a right click offers corrections, <b>Add to Dictionary</b> and <b>Ignore</b>. Czech and English are checked together – a word is right in either – and the closest corrections come first. Quoted lines (“&gt; …”), links, addresses and abbreviations are left alone. Klient uses the system dictionaries (packages <code>hunspell-cs</code> and <code>hunspell-en-US</code>); the personal dictionary is shared with other applications. It can be turned off in Preferences → Messages → <b>Check spelling</b>.</p>
+  <p>Misspelled words are underlined in red while you write; a right click offers corrections, <b>Add to Dictionary</b> and <b>Ignore</b>. Czech and English are checked together – a word is right in either (with the German interface, German and English) – and the closest corrections come first. Quoted lines (“&gt; …”), links, addresses and abbreviations are left alone. Klient uses the system dictionaries (packages <code>hunspell-cs</code>, <code>hunspell-de</code> and <code>hunspell-en-US</code>); the personal dictionary is shared with other applications. It can be turned off in Preferences → Messages → <b>Check spelling</b>.</p>
 
   <h3>Send delay</h3>
   <p>After you send a message, it waits a moment (10 s by default) while a notification counts down with an <b>Undo</b> button. You set the length in Preferences → Messages.</p>
@@ -774,7 +774,7 @@ packaging/deb.sh 0.7.3   # Ubuntu package, built in a podman container</code></p
   <p>Built with GTK4, libadwaita, WebKitGTK, go-proton-api, GopenPGP and the go-imap/go-smtp libraries.</p>
 </section>
 
-<footer>Documentation for version 0.12.2 · October 2026 · <a href="index.cs.html" hreflang="cs" lang="cs">Česká verze</a></footer>
+<footer>Documentation for version 0.12.3 · November 2026 · <a href="index.cs.html" hreflang="cs" lang="cs">Česká verze</a> · <a href="index.de.html" hreflang="de" lang="de">Deutsche Version</a></footer>
 
 </div>
 </main>

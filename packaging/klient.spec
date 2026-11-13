@@ -9,6 +9,7 @@ Version:        %{klient_version}
 Release:        1%{?dist}
 Summary:        Mail client with PGP, an AI assistant and an AI spam filter
 Summary(cs):    E-mailový klient s PGP, AI asistentem a AI spamfiltrem
+Summary(de):    E-Mail-Programm mit PGP, einem KI-Assistenten und einem KI-Spamfilter
 
 License:        GPL-3.0-or-later AND MIT AND MPL-2.0 AND Apache-2.0 AND BSD-3-Clause
 URL:            https://github.com/Imbecile6197/klient
@@ -36,7 +37,7 @@ Bridge), Gmail, Seznam.cz and any IMAP/SMTP mailbox: end-to-end encryption
 and PGP/MIME, conversations, safe HTML mail, a rich-text editor, an AI
 assistant and an AI-driven spam filter with block lists (cloud providers or a
 local model), an encrypted offline cache, rules, undo send and scheduled
-sending. In English and Czech.
+sending. In English, Czech and German.
 
 %description -l cs
 E-mailový klient pro GNOME pro Proton Mail (přímo přes jeho API, bez Proton
@@ -44,7 +45,16 @@ Bridge), Gmail, Seznam.cz a libovolnou schránku IMAP/SMTP: end-to-end
 šifrování a PGP/MIME, vlákna, bezpečné HTML zprávy, formátovaný editor, AI
 asistent a spamfiltr řízený AI s blocklisty (cloudoví poskytovatelé nebo
 lokální model), šifrovaná offline cache, pravidla, zpoždění odeslání
-a naplánované odeslání. Česky a anglicky.
+a naplánované odeslání. Česky, anglicky a německy.
+
+%description -l de
+Ein E-Mail-Programm für GNOME für Proton Mail (direkt über seine API, ohne
+Proton Bridge), Gmail, Seznam.cz und jedes IMAP/SMTP-Postfach:
+Ende-zu-Ende-Verschlüsselung und PGP/MIME, Unterhaltungen, sichere
+HTML-E-Mails, ein Editor für formatierten Text, ein KI-Assistent und ein
+KI-gesteuerter Spamfilter mit Sperrlisten (Cloud-Anbieter oder ein lokales
+Modell), ein verschlüsselter Offline-Cache, Regeln, Senden rückgängig machen
+und geplantes Senden. Auf Englisch, Tschechisch und Deutsch.
 
 %prep
 %setup -q
@@ -70,6 +80,12 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Fri Nov 13 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.12.3-1
+- German interface (po/de.po), help (docs/index.de.html), README.de.md,
+  release notes, metainfo, desktop file and demo mode; AI answers in German
+- German dates, amounts and spell checking (de_DE + English)
+- The catalog test checks every language
+
 * Sun Oct 25 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.12.2-1
 - mailto: links handed over as file URIs (mailto:///addr) no longer put a
   slash before the address

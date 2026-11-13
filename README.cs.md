@@ -2,7 +2,7 @@
 
 **E-mailový klient pro GNOME s nativní podporou Proton Mailu, PGP a spamfiltrem řízeným AI.**
 
-[English](README.md) · [Dokumentace](docs/index.cs.html) · [Vydání](https://github.com/Imbecile6197/klient/releases) · GPL-3.0
+[English](README.md) · [Deutsch](README.de.md) · [Dokumentace](docs/index.cs.html) · [Vydání](https://github.com/Imbecile6197/klient/releases) · GPL-3.0
 
 ![Hlavní okno Klienta](docs/screenshots/cs/main.png)
 
@@ -13,7 +13,7 @@
 
 <sub>Snímky ukázkového režimu – všichni lidé i zprávy jsou vymyšlení. Vyzkoušet ho můžete sami: `KLIENT_DEMO=1 klient`.</sub>
 
-Klient je napsaný v Go s GTK4 a libadwaita. Připojuje se přímo k Proton Mailu (bez Proton Bridge), ke Gmailu, k Seznam.cz a k libovolné schránce IMAP/SMTP. Každou novou zprávu nejdřív posoudí spamfiltr a teprve potom ji ukáže a ohlásí. Rozhraní je česky a anglicky.
+Klient je napsaný v Go s GTK4 a libadwaita. Připojuje se přímo k Proton Mailu (bez Proton Bridge), ke Gmailu, k Seznam.cz a k libovolné schránce IMAP/SMTP. Každou novou zprávu nejdřív posoudí spamfiltr a teprve potom ji ukáže a ohlásí. Rozhraní je česky, anglicky a německy.
 
 ## Funkce
 
@@ -79,7 +79,7 @@ flatpak install --user ./klient.flatpak
 flatpak run eu.libormacak.Klient
 ```
 
-Vydání nové verze (potřebuje `gh` a commitnutý strom): poznámky zapište do `packaging/release-notes/X.Y.Z.md` (oddíly „## English“ a „## Česky“ – Klient je ukáže v okně Co je nového a zveřejní se na GitHubu), pak `git tag -a vX.Y.Z -m "Klient X.Y.Z" && make release VERSION=X.Y.Z`.
+Vydání nové verze (potřebuje `gh` a commitnutý strom): poznámky zapište do `packaging/release-notes/X.Y.Z.md` (oddíly „## English“, „## Česky“ a „## Deutsch“ – Klient je ukáže v okně Co je nového a zveřejní se na GitHubu), pak `git tag -a vX.Y.Z -m "Klient X.Y.Z" && make release VERSION=X.Y.Z`.
 
 ## První spuštění
 
@@ -87,7 +87,7 @@ Vydání nové verze (potřebuje `gh` a commitnutý strom): poznámky zapište d
 2. V **Předvolbách → AI** zvolte poskytovatele pro asistenta a pro spamfiltr a vložte jeho API klíč – nebo nainstalujte lokální AI, která poběží ve vašem počítači.
 3. Volitelně spusťte z nabídky **Prověřit doručenou poštu pomocí AI** – filtr posoudí posledních 50 zpráv.
 
-Kompletní uživatelská dokumentace je v [`docs/index.cs.html`](docs/index.cs.html) (anglicky [`docs/index.html`](docs/index.html)); v aplikaci ji otevře klávesa F1.
+Kompletní uživatelská dokumentace je v [`docs/index.cs.html`](docs/index.cs.html) (anglicky [`docs/index.html`](docs/index.html), německy [`docs/index.de.html`](docs/index.de.html)); v aplikaci ji otevře klávesa F1.
 
 ## Překlady
 

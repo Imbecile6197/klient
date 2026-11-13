@@ -18,6 +18,7 @@ import (
 var Languages = []struct{ Code, Name string }{
 	{"en", "English"},
 	{"cs", "Čeština"},
+	{"de", "Deutsch"},
 }
 
 var (
@@ -31,7 +32,7 @@ type key struct{ ctx, id string }
 func init() { Set(detect()) }
 
 // detect picks the language: the "language" setting of Klient, then the
-// usual locale variables. Anything that is not Czech gets English.
+// usual locale variables. A language without a catalog gets English.
 func detect() string {
 	if l := os.Getenv("KLIENT_LANGUAGE"); l != "" {
 		return normalize(l)
@@ -81,7 +82,7 @@ func configured() string {
 	return c.Language
 }
 
-// Set switches the language ("en", "cs"). Strings already shown keep their
+// Set switches the language ("en", "cs", "de"). Strings already shown keep their
 // language until they are built again, so the UI asks for a restart.
 func Set(l string) {
 	l = normalize(l)
@@ -106,8 +107,11 @@ func Lang() string {
 // LanguageName is the English name of the current language, for telling an
 // AI model which language to answer in.
 func LanguageName() string {
-	if Lang() == "cs" {
+	switch Lang() {
+	case "cs":
 		return "Czech"
+	case "de":
+		return "German"
 	}
 	return "English"
 }
@@ -135,8 +139,8 @@ func C(ctx, msgid string) string {
 	return msgid
 }
 
-// N translates a string with a number: English has two forms, Czech three
-// ("1 zpráva", "2 zprávy", "5 zpráv"). The result is usually a format with %d.
+// N translates a string with a number: English and German have two forms,
+// Czech three ("1 zpráva", "2 zprávy", "5 zpráv"). The result is usually a format with %d.
 func N(singular, plural string, n int) string {
 	forms := lookup("", singular)
 	i := pluralIndex(Lang(), n)

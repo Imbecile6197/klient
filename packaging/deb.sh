@@ -61,7 +61,7 @@ Description: Mail client with PGP, an AI assistant and an AI spam filter
  and PGP/MIME, conversations, safe HTML mail, a rich-text editor, an AI
  assistant and an AI-driven spam filter with block lists (cloud providers or
  a local model), an encrypted offline cache, rules, undo send and scheduled
- sending. In English and Czech.
+ sending. In English, Czech and German.
 CONTROL
 		dpkg-deb --root-owner-group --build $R build/deb/klient_${VERSION}_amd64.deb
 		rm -rf $R build/deb/debian build/deb/klient

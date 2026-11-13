@@ -6,6 +6,7 @@
   <name>Klient</name>
   <summary>Mail client with PGP, an AI assistant and an AI spam filter</summary>
   <summary xml:lang="cs">E-mailový klient s PGP, AI asistentem a AI spamfiltrem</summary>
+  <summary xml:lang="de">E-Mail-Programm mit PGP, einem KI-Assistenten und einem KI-Spamfilter</summary>
   <developer id="eu.libormacak">
     <name>Imbecile6197</name>
   </developer>
@@ -16,47 +17,59 @@
   <description>
     <p>A GNOME mail client for Proton Mail (directly over its API, without Proton Bridge), Gmail, Seznam.cz and any IMAP/SMTP mailbox.</p>
     <p xml:lang="cs">E-mailový klient pro GNOME pro Proton Mail (přímo přes jeho API, bez Proton Bridge), Gmail, Seznam.cz a libovolnou schránku IMAP/SMTP.</p>
+    <p xml:lang="de">Ein E-Mail-Programm für GNOME für Proton Mail (direkt über seine API, ohne Proton Bridge), Gmail, Seznam.cz und jedes IMAP/SMTP-Postfach.</p>
     <ul>
       <li>End-to-end encryption on Proton and PGP/MIME for the other services, with automatic key discovery</li>
       <li xml:lang="cs">End-to-end šifrování u Protonu a PGP/MIME u ostatních služeb s automatickým hledáním klíčů</li>
+      <li xml:lang="de">Ende-zu-Ende-Verschlüsselung bei Proton und PGP/MIME bei den übrigen Diensten, mit automatischer Schlüsselsuche</li>
       <li>AI assistant and AI-driven spam filter with Claude, ChatGPT, Gemini, Mistral or a local model (Ollama); new mail appears only after the spam check</li>
       <li xml:lang="cs">AI asistent a spamfiltr řízený AI s Claude, ChatGPT, Gemini, Mistralem nebo lokálním modelem (Ollama); nová pošta se ukáže až po kontrole spamu</li>
+      <li xml:lang="de">KI-Assistent und KI-gesteuerter Spamfilter mit Claude, ChatGPT, Gemini, Mistral oder einem lokalen Modell (Ollama); neue E-Mails erscheinen erst nach der Spamprüfung</li>
       <li>Conversations, safe HTML mail with remote content blocked, rich-text editor, scheduled sending and snoozing</li>
       <li xml:lang="cs">Vlákna, bezpečné HTML zprávy s blokovaným vzdáleným obsahem, formátovaný editor, naplánované odeslání a odkládání</li>
+      <li xml:lang="de">Unterhaltungen, sichere HTML-E-Mails mit blockierten externen Inhalten, Editor für formatierten Text, geplantes Senden und Zurückstellen</li>
       <li>Encrypted offline cache, rules, undo send, calendar invitations, background mode with a tray icon</li>
       <li xml:lang="cs">Šifrovaná offline cache, pravidla, zpoždění odeslání, pozvánky do kalendáře, běh na pozadí s ikonou v liště</li>
-      <li>Available in English and Czech; updates itself from GitHub</li>
+      <li xml:lang="de">Verschlüsselter Offline-Cache, Regeln, Senden rückgängig machen, Kalendereinladungen, Betrieb im Hintergrund mit Symbol in der oberen Leiste</li>
+      <li>Available in English, Czech and German; updates itself from GitHub</li>
       <li xml:lang="cs">Česky a anglicky; aktualizuje se sám z GitHubu</li>
+      <li xml:lang="de">Auf Englisch, Tschechisch und Deutsch; aktualisiert sich selbst von GitHub</li>
     </ul>
   </description>
   <screenshots>
     <screenshot type="default">
       <caption>The main window with a conversation</caption>
       <caption xml:lang="cs">Hlavní okno s konverzací</caption>
+      <caption xml:lang="de">Das Hauptfenster mit einer Unterhaltung</caption>
       <image>https://raw.githubusercontent.com/Imbecile6197/klient/main/docs/screenshots/en/main.png</image>
       <image xml:lang="cs">https://raw.githubusercontent.com/Imbecile6197/klient/main/docs/screenshots/cs/main.png</image>
+      <image xml:lang="de">https://raw.githubusercontent.com/Imbecile6197/klient/main/docs/screenshots/de/main.png</image>
     </screenshot>
     <screenshot>
       <caption>The AI spam filter moved a scam to Spam</caption>
       <caption xml:lang="cs">Spamfiltr s AI přesunul podvod do Spamu</caption>
+      <caption xml:lang="de">Der KI-Spamfilter hat einen Betrugsversuch in den Spam verschoben</caption>
       <image>https://raw.githubusercontent.com/Imbecile6197/klient/main/docs/screenshots/en/spam.png</image>
       <image xml:lang="cs">https://raw.githubusercontent.com/Imbecile6197/klient/main/docs/screenshots/cs/spam.png</image>
     </screenshot>
     <screenshot>
       <caption>Writing a reply</caption>
       <caption xml:lang="cs">Psaní odpovědi</caption>
+      <caption xml:lang="de">Eine Antwort schreiben</caption>
       <image>https://raw.githubusercontent.com/Imbecile6197/klient/main/docs/screenshots/en/compose.png</image>
       <image xml:lang="cs">https://raw.githubusercontent.com/Imbecile6197/klient/main/docs/screenshots/cs/compose.png</image>
     </screenshot>
     <screenshot>
       <caption>Preferences with local AI</caption>
       <caption xml:lang="cs">Předvolby s lokální AI</caption>
+      <caption xml:lang="de">Einstellungen mit lokaler KI</caption>
       <image>https://raw.githubusercontent.com/Imbecile6197/klient/main/docs/screenshots/en/preferences.png</image>
       <image xml:lang="cs">https://raw.githubusercontent.com/Imbecile6197/klient/main/docs/screenshots/cs/preferences.png</image>
     </screenshot>
     <screenshot>
       <caption>Dark style</caption>
       <caption xml:lang="cs">Tmavý vzhled</caption>
+      <caption xml:lang="de">Dunkler Stil</caption>
       <image>https://raw.githubusercontent.com/Imbecile6197/klient/main/docs/screenshots/en/main-dark.png</image>
       <image xml:lang="cs">https://raw.githubusercontent.com/Imbecile6197/klient/main/docs/screenshots/cs/main-dark.png</image>
     </screenshot>
@@ -82,6 +95,13 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.12.3" date="2026-11-13">
+      <description>
+        <p>Klient speaks German: the interface, the help and the AI answers.</p>
+        <p xml:lang="cs">Klient umí německy: rozhraní, nápověda i odpovědi AI.</p>
+        <p xml:lang="de">Klient spricht Deutsch: die Oberfläche, die Hilfe und die Antworten der KI.</p>
+      </description>
+    </release>
     <release version="0.12.2" date="2026-10-25">
       <description>
         <p>mailto: links fill in the address without a leading slash.</p>

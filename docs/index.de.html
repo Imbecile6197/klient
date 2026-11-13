@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Klient – Dokumentation</title>
+<meta name="description" content="Vollständige Dokumentation von Klient, einem E-Mail-Programm für GNOME: Konten, E-Mails lesen und schreiben, PGP, der Spamfilter, KI und lokale KI.">
+<style>
+:root {
+  --bg: #fafafb;
+  --surface: #ffffff;
+  --surface-2: #f2f2f4;
+  --text: #1e1e22;
+  --muted: #5e5e66;
+  --border: #dedee3;
+  --accent: #1c71d8;
+  --accent-soft: #e3eefc;
+  --ok: #26a269;
+  --ok-soft: #e1f5ea;
+  --warn: #9c6500;
+  --warn-soft: #fdf1d8;
+  --no: #c01c28;
+  --no-soft: #fbe4e6;
+  --code: #f0f0f3;
+  --radius: 12px;
+  --sidebar: 260px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1d1d20;
+    --surface: #26262a;
+    --surface-2: #2e2e33;
+    --text: #ececef;
+    --muted: #a3a3ab;
+    --border: #3a3a40;
+    --accent: #78aeed;
+    --accent-soft: #1f3552;
+    --ok: #57d18e;
+    --ok-soft: #1c3a2a;
+    --warn: #f0c060;
+    --warn-soft: #3d3220;
+    --no: #ff7b85;
+    --no-soft: #43232a;
+    --code: #323237;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1d1d20;
+  --surface: #26262a;
+  --surface-2: #2e2e33;
+  --text: #ececef;
+  --muted: #a3a3ab;
+  --border: #3a3a40;
+  --accent: #78aeed;
+  --accent-soft: #1f3552;
+  --ok: #57d18e;
+  --ok-soft: #1c3a2a;
+  --warn: #f0c060;
+  --warn-soft: #3d3220;
+  --no: #ff7b85;
+  --no-soft: #43232a;
+  --code: #323237;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.6 "Adwaita Sans", Cantarell, "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); text-underline-offset: 2px; }
+code, kbd {
+  font-family: "Adwaita Mono", "Source Code Pro", ui-monospace, monospace;
+  font-size: .88em;
+}
+code { background: var(--code); padding: .1em .35em; border-radius: 5px; overflow-wrap: anywhere; }
+kbd {
+  display: inline-block;
+  min-width: 1.6em;
+  text-align: center;
+  padding: .05em .45em;
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  background: var(--surface);
+  white-space: nowrap;
+}
+pre {
+  background: var(--code);
+  padding: 12px 14px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: .9em;
+}
+pre code { background: none; padding: 0; }
+
+/* ---- Layout ---- */
+.layout { display: flex; min-height: 100vh; }
+nav.toc {
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  width: var(--sidebar);
+  flex: none;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 24px 12px 24px 20px;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+}
+.brand { display: flex; align-items: center; gap: 10px; margin: 0 0 18px 6px; }
+.brand svg { width: 34px; height: 34px; flex: none; }
+.brand b { font-size: 1.15rem; }
+.brand span { display: block; font-size: .8rem; color: var(--muted); }
+nav.toc .brand span a { display: inline; padding: 0; color: var(--accent); }
+nav.toc ol { list-style: none; margin: 0; padding: 0; }
+nav.toc a {
+  display: block;
+  padding: 5px 10px;
+  border-radius: 8px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: .93rem;
+}
+nav.toc a:hover { background: var(--surface-2); }
+nav.toc a.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.theme-switch { margin: 20px 6px 0; display: flex; gap: 4px; }
+.theme-switch button {
+  flex: 1;
+  font: inherit;
+  font-size: .8rem;
+  padding: 5px 0;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.theme-switch button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+
+main { flex: 1; min-width: 0; padding: 40px 48px 80px; }
+.content { max-width: 860px; margin: 0 auto; }
+
+header.hero { margin-bottom: 36px; }
+header.hero h1 { font-size: 2.3rem; line-height: 1.15; margin: 0 0 10px; letter-spacing: -.01em; }
+header.hero p { font-size: 1.1rem; color: var(--muted); margin: 0 0 18px; }
+.badges { display: flex; flex-wrap: wrap; gap: 8px; }
+.badge {
+  font-size: .82rem;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+section { padding-top: 12px; margin-bottom: 44px; }
+h2 {
+  font-size: 1.55rem;
+  margin: 0 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+h3 { font-size: 1.12rem; margin: 26px 0 8px; }
+p, ul, ol { margin: 0 0 12px; }
+li { margin-bottom: 4px; }
+.lead { color: var(--muted); }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin: 16px 0; }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+.card h4 { margin: 0 0 4px; font-size: 1rem; }
+.card p { margin: 0; font-size: .92rem; color: var(--muted); }
+.card a { text-decoration: none; }
+
+.note {
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin: 14px 0;
+  background: var(--accent-soft);
+  border-left: 4px solid var(--accent);
+}
+.note.warn { background: var(--warn-soft); border-left-color: var(--warn); }
+.note b:first-child { display: block; margin-bottom: 2px; }
+.note p:last-child, .note ul:last-child { margin-bottom: 0; }
+
+.table-wrap { overflow-x: auto; margin: 14px 0; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: .93rem; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+th { background: var(--surface-2); font-weight: 600; white-space: nowrap; }
+td.c, th.c { text-align: center; }
+.y, .n, .p {
+  display: inline-block;
+  font-size: .78rem;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.y { background: var(--ok-soft); color: var(--ok); }
+.n { background: var(--no-soft); color: var(--no); }
+.p { background: var(--warn-soft); color: var(--warn); }
+
+.steps { counter-reset: s; list-style: none; padding: 0; }
+.steps > li { counter-increment: s; position: relative; padding-left: 40px; margin-bottom: 12px; }
+.steps > li::before {
+  content: counter(s);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--surface);
+  font-weight: 700;
+  font-size: .9rem;
+  display: grid;
+  place-items: center;
+}
+
+.flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 14px 0; }
+.flow span {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: .9rem;
+}
+.flow i { font-style: normal; color: var(--muted); }
+
+.shot { margin: 18px 0 8px; }
+.shot img { width: 100%; height: auto; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: 0 6px 24px rgba(0,0,0,.08); }
+.shot figcaption { font-size: .85rem; color: var(--muted); margin-top: 6px; }
+footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--border); padding-top: 18px; }
+
+/* ---- Mobile ---- */
+.toc-toggle { display: none; }
+@media (max-width: 900px) {
+  .layout { display: block; }
+  nav.toc {
+    position: static;
+    width: auto;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+  }
+  .brand { margin: 0; }
+  .toc-toggle {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    font: inherit;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+    cursor: pointer;
+  }
+  nav.toc ol, .theme-switch { display: none; }
+  nav.toc.open ol { display: block; margin-top: 8px; }
+  nav.toc.open .theme-switch { display: flex; }
+  main { padding: 24px 16px 60px; }
+  header.hero h1 { font-size: 1.8rem; }
+}
+@media print {
+  nav.toc { display: none; }
+  main { padding: 0; }
+  section { break-inside: avoid-page; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="toc" id="toc" aria-label="Inhalt">
+  <div class="brand">
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <rect x="4" y="12" width="56" height="40" rx="9" fill="#1c71d8"/>
+      <path d="M10 20l22 16 22-16" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div><b>Klient</b><span>Dokumentation · Version 0.12.3 · <a href="index.html" hreflang="en" lang="en">English</a> · <a href="index.cs.html" hreflang="cs" lang="cs">Česky</a></span></div>
+  </div>
+  <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="toc">Inhalt</button>
+  <ol>
+    <li><a href="#overview">Überblick</a></li>
+    <li><a href="#installation">Installation</a></li>
+    <li><a href="#accounts">Konten und Dienste</a></li>
+    <li><a href="#reading">E-Mails lesen</a></li>
+    <li><a href="#writing">Schreiben und Senden</a></li>
+    <li><a href="#organizing">E-Mails ordnen</a></li>
+    <li><a href="#pgp">Verschlüsselung und PGP</a></li>
+    <li><a href="#spam">Spamfilter</a></li>
+    <li><a href="#ai">KI-Assistent</a></li>
+    <li><a href="#local-ai">Lokale KI</a></li>
+    <li><a href="#calendar">Einladungen und Abwesenheitsnotizen</a></li>
+    <li><a href="#sync">Synchronisierung</a></li>
+    <li><a href="#background">Betrieb im Hintergrund</a></li>
+    <li><a href="#shortcuts">Tastenkürzel</a></li>
+    <li><a href="#preferences">Einstellungen</a></li>
+    <li><a href="#privacy">Datenschutz und Daten</a></li>
+    <li><a href="#limitations">Bekannte Einschränkungen</a></li>
+    <li><a href="#about">Info</a></li>
+  </ol>
+  <div class="theme-switch" role="group" aria-label="Erscheinungsbild">
+    <button type="button" data-theme-set="auto">Automatisch</button>
+    <button type="button" data-theme-set="light">Hell</button>
+    <button type="button" data-theme-set="dark">Dunkel</button>
+  </div>
+</nav>
+
+<main>
+<div class="content">
+
+<header class="hero">
+  <h1>Klient</h1>
+  <p>Ein E-Mail-Programm für GNOME mit eingebauter Unterstützung für Proton Mail, PGP-Verschlüsselung und einem Spamfilter, der von künstlicher Intelligenz gesteuert wird – in der Cloud oder direkt auf Ihrem Computer.</p>
+  <div class="badges">
+    <span class="badge">GTK4 + libadwaita</span>
+    <span class="badge">Go</span>
+    <span class="badge">Proton · Gmail · Seznam · IMAP</span>
+    <span class="badge">PGP / PGP/MIME</span>
+    <span class="badge">Claude · ChatGPT · Gemini · Mistral · Ollama</span>
+  </div>
+</header>
+
+<!-- ============================================================ -->
+<section id="overview">
+  <h2>Überblick</h2>
+  <figure class="shot"><img src="screenshots/de/main.png" alt="Das Hauptfenster von Klient" loading="lazy"><figcaption>Der Demomodus – alle Personen und Nachrichten sind erfunden. Probieren Sie ihn mit <code>KLIENT_DEMO=1 klient</code> aus.</figcaption></figure>
+  <p>Klient ist ein E-Mail-Programm für Linux mit der GNOME-Arbeitsumgebung. Es verbindet sich direkt mit Proton Mail (ohne Proton Bridge) und mit gewöhnlichen Postfächern über IMAP und SMTP. Jede neue Nachricht wird zuerst vom Spamfilter beurteilt; erst danach wird sie angezeigt und gemeldet.</p>
+  <div class="cards">
+    <div class="card"><a href="#accounts"><h4>Mehrere Dienste in einem Fenster</h4></a><p>Proton Mail, Gmail, Seznam.cz und jedes IMAP/SMTP-Postfach, umgeschaltet in der Seitenleiste.</p></div>
+    <div class="card"><a href="#pgp"><h4>Verschlüsselung überall</h4></a><p>Die Ende-zu-Ende-Verschlüsselung von Proton und PGP/MIME für die übrigen Dienste, mit automatischer Suche nach den Schlüsseln der Empfänger.</p></div>
+    <div class="card"><a href="#spam"><h4>KI-Spamfilter</h4></a><p>SPF/DKIM/DMARC, Sperrlisten und Ihre eigenen Listen als Anhaltspunkte für die Entscheidung der KI.</p></div>
+    <div class="card"><a href="#ai"><h4>KI-Assistent</h4></a><p>Zusammenfassungen, Antwortvorschläge, „Ihre E-Mails fragen“, Einsortieren in Labels und eine Morgenübersicht.</p></div>
+    <div class="card"><a href="#local-ai"><h4>Lokale KI</h4></a><p>Das Modell läuft über ein verwaltetes Ollama auf Ihrem Computer – der Inhalt Ihrer Nachrichten geht nirgendwohin.</p></div>
+    <div class="card"><a href="#writing"><h4>Bequemes Senden</h4></a><p>Senden rückgängig machen, geplantes Senden, ein Editor für formatierten Text und Anhänge.</p></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="installation">
+  <h2>Installation</h2>
+  <h3>Von GitHub</h3>
+  <p>Unter <b>Fedora</b> (44 und neuer) installieren Sie die neueste Version mit einem einzigen Befehl direkt von GitHub:</p>
+<pre><code>sudo dnf install https://github.com/Imbecile6197/klient/releases/latest/download/klient.x86_64.rpm</code></pre>
+  <p>Unter <b>Ubuntu</b> (26.04 LTS und neuer) laden Sie das Paket herunter und installieren es:</p>
+<pre><code>wget https://github.com/Imbecile6197/klient/releases/latest/download/klient_amd64.deb
+sudo apt install ./klient_amd64.deb</code></pre>
+  <p>Spätere Versionen lädt Klient selbst herunter – siehe <a href="#updates">Automatische Aktualisierungen</a>.</p>
+  <p>Diese Dokumentation können Sie jederzeit aus Klient öffnen: Hauptmenü → <b>Hilfe</b> oder die Taste <kbd>F1</kbd>.</p>
+  <h3 id="language">Sprache</h3>
+  <p>Klient spricht Englisch, Tschechisch und Deutsch. Die Sprache richtet sich nach Ihren Systemeinstellungen; Sie können sie in Einstellungen → Allgemein → <b>Sprache der Oberfläche</b> ändern, sie gilt nach einem Neustart. Die KI antwortet in derselben Sprache – Zusammenfassungen, Antwortvorschläge, „Ihre E-Mails fragen“ und die Begründungen des Spamfilters.</p>
+  <p>Das Paket empfiehlt die Erweiterung <code>gnome-shell-extension-appindicator</code>; ohne sie zeigt GNOME das Symbol in der oberen Leiste nicht an.</p>
+  <h3 id="updates">Automatische Aktualisierungen</h3>
+  <p>Einmal täglich prüft Klient die <a href="https://github.com/Imbecile6197/klient/releases">Versionen auf GitHub</a> (nicht bei einer getakteten Verbindung). Eine neue Version lädt es im Hintergrund herunter und überprüft ihre SHA-256-Prüfsumme, die sowohl mit der Datei <code>SHA256SUMS</code> als auch mit dem von GitHub gemeldeten Digest übereinstimmen muss. Danach erhalten Sie die Benachrichtigung <b>Eine neue Version von Klient ist bereit</b>; die Schaltfläche <b>Installieren</b> fragt nach dem Administratorpasswort, installiert das Paket und startet Klient neu. Die Schaltfläche <b>Neuerungen</b> zeigt die Änderungen vor der Installation.</p>
+  <p>Nach einer Aktualisierung zeigt Klient, was sich seit der zuletzt verwendeten Version geändert hat. Die Liste können Sie jederzeit über das Hauptmenü → <b>Neuerungen</b> wieder öffnen.</p>
+  <p>Die Prüfung können Sie in Einstellungen → Allgemein → <b>Aktualisierungen</b> ausschalten oder von Hand starten. Ein aus dem Quellcode gebauter Klient meldet eine neue Version nur.</p>
+  <div class="note">
+    <b>Aktualisieren während des Betriebs</b>
+    <p>Läuft Klient (zum Beispiel im Hintergrund), während Sie eine neue Version von Hand installieren, bemerkt es das innerhalb einer Minute und bietet einen Neustart an. Sie müssen es nicht selbst suchen und beenden.</p>
+  </div>
+  <h3>Aus dem Quellcode bauen</h3>
+<pre><code>sudo dnf install golang gcc gtk4-devel libadwaita-devel gobject-introspection-devel webkitgtk6.0-devel
+make build      # der erste Build dauert eine Weile (CGo-Bindungen von GTK)
+make run
+make install    # nach ~/.local, samt .desktop-Datei und Symbol
+make rpm VERSION=0.7.3
+packaging/deb.sh 0.7.3   # Ubuntu-Paket, gebaut in einem podman-Container</code></pre>
+</section>
+
+<!-- ============================================================ -->
+<section id="accounts">
+  <h2>Konten und Dienste</h2>
+  <p>Das erste Konto fügen Sie im Anmeldebildschirm hinzu, weitere Konten in der Seitenleiste über den Kontowechsler → <b>Konto hinzufügen</b>. Neue E-Mails, der Spamfilter und Benachrichtigungen funktionieren für alle Konten gleichzeitig, auch für die gerade nicht geöffneten.</p>
+  <h3 id="all-accounts">Alle Konten zusammen</h3>
+  <p>Bei zwei oder mehr Konten bietet der Kontowechsler <b>Alle Konten</b>: Posteingang, Mit Stern, Gesendet, Archiv, Spam und Papierkorb aller Konten in einer Liste, nach Zeit sortiert. Jede Nachricht zeigt die Adresse ihres Kontos, und alles, was Sie damit tun – lesen, antworten, verschieben, löschen –, geschieht in diesem Konto; eine Antwort wird von dort geschrieben. Eine neue Nachricht wird vom ersten Konto geschrieben. Labels, Zurückstellen, Kontakte und Kontoeinstellungen bleiben in den einzelnen Konten. Klient merkt sich die Ansicht für den nächsten Start.</p>
+
+  <h3>Proton Mail</h3>
+  <p>Klient meldet sich direkt über die Proton-API an, einschließlich Zwei-Faktor-Authentifizierung und Zwei-Passwort-Modus. Das Passwort wird nicht gespeichert – nur das Sitzungstoken und ein abgeleiteter Schlüssel zum Entsperren des Postfachs bleiben im Schlüsselbund.</p>
+
+  <h3>Gmail</h3>
+  <ol class="steps">
+    <li>Schalten Sie in Ihrem Google-Konto die Bestätigung in zwei Schritten ein (ohne sie bietet Google keine App-Passwörter an).</li>
+    <li>Erstellen Sie ein <b>App-Passwort</b> – eine Schaltfläche im Anmeldefenster von Klient öffnet direkt <a href="https://myaccount.google.com/apppasswords">myaccount.google.com/apppasswords</a>.</li>
+    <li>In den Gmail-Einstellungen muss IMAP aktiviert sein.</li>
+    <li>Wählen Sie in Klient <b>Anderer Dienst → Gmail</b> und geben Sie Ihre Adresse und das App-Passwort ein.</li>
+  </ol>
+  <p>Gmail-Labels verhalten sich wie im Web: Ein hinzugefügtes Label markiert die Nachricht nur (sie bleibt im Posteingang), und beim Entfernen verschwindet nur das Label. Archivieren verschiebt eine Nachricht nach „Alle Nachrichten“, der Ordner „Markiert“ entspricht dem Stern, und der Ordner „Wichtig“ ist ausgeblendet.</p>
+
+  <h3>Seznam.cz</h3>
+  <p>Unterstützte Domains: <code>seznam.cz</code>, <code>email.cz</code>, <code>post.cz</code>, <code>spoluzaci.cz</code> und eigene Domains, die bei Seznam gehostet werden. Wenn Sie die Zwei-Faktor-Authentifizierung eingeschaltet haben, erstellen Sie in den <a href="https://ucet.seznam.cz/">Einstellungen Ihres Seznam-Kontos</a> ein App-Passwort und melden Sie sich damit an.</p>
+
+  <h3>Anderes Postfach (IMAP/SMTP)</h3>
+  <p>Klient findet die Server selbst – bei bekannten Anbietern, in der Datenbank von Thunderbird (ISPDB) und anhand der MX-Einträge der Domain. Gelingt das nicht, tragen Sie sie von Hand ein. Schlägt eine Anmeldung fehl, wird die vollständige Meldung des Servers angezeigt.</p>
+  <p><b>Nicht vertrauenswürdige Zertifikate.</b> Lässt sich das Zertifikat eines Servers nicht überprüfen (es ist abgelaufen, selbstsigniert oder für einen anderen Namen ausgestellt), zeigt Klient seine Details – den Grund, für wen und von wem es ausgestellt wurde, seine Gültigkeit und den SHA-256-Fingerabdruck – und lässt Sie <b>diesem Zertifikat vertrauen</b>. Klient akzeptiert dann genau dieses Zertifikat für den Server; ändert es sich, werden Sie erneut gefragt. Die Überprüfung wird nie ganz ausgeschaltet, denn eine nicht überprüfte Verbindung könnte ohne jede Warnung abgefangen werden.</p>
+
+  <h3>Was die einzelnen Dienste unterstützen</h3>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Funktion</th><th class="c">Proton</th><th class="c">Gmail</th><th class="c">Seznam / IMAP</th></tr></thead>
+    <tbody>
+      <tr><td>Neue E-Mails sofort</td><td class="c"><span class="y">ja</span></td><td class="c"><span class="y">IMAP IDLE</span></td><td class="c"><span class="y">IMAP IDLE</span></td></tr>
+      <tr><td>Ordner</td><td class="c"><span class="y">ja</span></td><td class="c"><span class="y">ja</span></td><td class="c"><span class="y">ja</span></td></tr>
+      <tr><td>Labels</td><td class="c"><span class="y">ja</span></td><td class="c"><span class="y">ja</span></td><td class="c"><span class="n">nein</span></td></tr>
+      <tr><td>Unterhaltungen</td><td class="c"><span class="y">Server</span></td><td class="c"><span class="y">References</span></td><td class="c"><span class="y">References</span></td></tr>
+      <tr><td>Suche im Nachrichtentext</td><td class="c"><span class="n">nein</span></td><td class="c"><span class="y">ja</span></td><td class="c"><span class="y">ja</span></td></tr>
+      <tr><td>Unterhaltungen zurückstellen</td><td class="c"><span class="y">Server</span></td><td class="c"><span class="p">Klient</span></td><td class="c"><span class="p">Klient</span></td></tr>
+      <tr><td>Geplantes Senden</td><td class="c"><span class="y">Server</span></td><td class="c"><span class="p">Klient</span></td><td class="c"><span class="p">Klient</span></td></tr>
+      <tr><td>Verschlüsselung</td><td class="c"><span class="y">Proton E2E</span></td><td class="c"><span class="y">PGP/MIME</span></td><td class="c"><span class="y">PGP/MIME</span></td></tr>
+      <tr><td>Adressvorschläge aus</td><td class="c"><span class="y">Proton-Kontakten</span></td><td class="c"><span class="p">letzten Adressen</span></td><td class="c"><span class="p">letzten Adressen</span></td></tr>
+      <tr><td>Automatische Antwort</td><td class="c"><span class="y">bezahlter Tarif</span></td><td class="c"><span class="n">nein</span></td><td class="c"><span class="n">nein</span></td></tr>
+      <tr><td>Belegung des Postfachs</td><td class="c"><span class="y">ja</span></td><td class="c"><span class="y">Kontingent</span></td><td class="c"><span class="p">Kontingent oder belegter Platz</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="lead">„Klient“ bedeutet, dass die Anwendung die Funktion selbst über die Ordner <b>Zurückgestellt</b> und <b>Geplant</b> auf dem Server bereitstellt. Das funktioniert, solange Klient läuft (im Hintergrund genügt); was in der Zwischenzeit verpasst wurde, wird gleich nach dem Start erledigt.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="reading">
+  <h2>E-Mails lesen</h2>
+  <ul>
+    <li>Eine <b>dreispaltige Ansicht</b> (Ordner – Liste – Nachricht), die sich an ein schmales Fenster anpasst.</li>
+    <li><b>Unterhaltungen</b> – Nachrichten werden zu Unterhaltungen gruppiert; bei Proton werden ältere Nachrichten einer Unterhaltung erst entschlüsselt, wenn Sie sie aufklappen. Das lässt sich in Einstellungen → Nachrichten ausschalten.</li>
+    <li><b>HTML-E-Mails</b> werden über WebKitGTK ohne JavaScript angezeigt. Externe Bilder und Zählpixel sind blockiert; Sie können sie für eine Nachricht oder dauerhaft für einen Absender erlauben.</li>
+    <li><b>Anhänge</b> erscheinen als Chips oben in der Nachricht – ein Klick öffnet den Anhang, der Pfeil speichert ihn.</li>
+    <li><b>Suche</b> (<kbd>Strg</kbd>+<kbd>F</kbd>) – bei Proton in Betreff, Absender und Empfängern; bei IMAP-Diensten auch im Nachrichtentext.</li>
+    <li><b>Offline lesen</b> – die letzten 500 Nachrichten (einstellbar) werden in einem verschlüsselten Cache aufbewahrt (AES-256-GCM mit dem Schlüssel im Schlüsselbund; die Texte von Proton-Nachrichten bleiben zusätzlich mit PGP verschlüsselt).</li>
+    <li>Eine <b>Anzeige der Postfachbelegung</b> unten links. Meldet der Server kein Limit (Seznam), wird zumindest der belegte Platz angezeigt.</li>
+    <li><b>Abmelden</b> – eine Schaltfläche für Nachrichten aus Mailinglisten, die mit einem Klick abmeldet (RFC 8058).</li>
+    <li>Drucken und Exportieren einer Nachricht in eine <code>.eml</code>-Datei.</li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="writing">
+  <h2>Schreiben und Senden</h2>
+  <ul>
+    <li>Ein <b>Editor für formatierten Text</b> – fett, kursiv, unterstrichen, Listen, Links. Empfänger mit PGP erhalten eine Version als reinen Text.</li>
+    <li><b>Antworten, Allen antworten, Weiterleiten</b> (samt Anhängen).</li>
+    <li><b>Anhänge</b> bis 25 MB – genauso verschlüsselt wie der Text. Sie können Dateien in die Nachricht ziehen.</li>
+    <li><b>Entwürfe</b> werden automatisch gespeichert, wenn Sie das Fenster schließen (<kbd>Esc</kbd>), oder von Hand mit <kbd>Strg</kbd>+<kbd>S</kbd>.</li>
+    <li>Eine <b>Signatur</b> – reiner Text oder <b>HTML</b> (Einstellungen → Nachrichten → Signatur → Format). Fügen Sie Ihr HTML ein, öffnen Sie eine .html-Datei oder beginnen Sie mit einer Vorlage; die Vorschau zeigt sie so, wie Empfänger sie sehen. In einer neuen Nachricht erscheint die Signatur als Vorschau, die Sie mit × entfernen können; Empfänger ohne HTML erhalten eine Version als reinen Text.</li>
+    <li><b>Adressvorschläge</b> aus Ihren Kontakten.</li>
+    <li><b>Die Standardanwendung für <code>mailto:</code>-Links</b> – festzulegen in Einstellungen → Allgemein.</li>
+  </ul>
+
+  <h3 id="spelling">Rechtschreibprüfung</h3>
+  <p>Falsch geschriebene Wörter werden beim Schreiben rot unterstrichen; ein Rechtsklick bietet Korrekturen, <b>Zum Wörterbuch hinzufügen</b> und <b>Ignorieren</b>. Mit deutscher Oberfläche werden Deutsch und Englisch gemeinsam geprüft – ein Wort ist richtig, wenn es in einer der Sprachen stimmt –, und die nächstliegenden Korrekturen stehen vorn. Zitierte Zeilen („&gt; …“), Links, Adressen und Abkürzungen bleiben unberührt. Klient verwendet die Wörterbücher des Systems (Pakete <code>hunspell-de</code> und <code>hunspell-en-US</code>); das persönliche Wörterbuch teilt es mit anderen Anwendungen. Ausschalten lässt sich die Prüfung in Einstellungen → Nachrichten → <b>Rechtschreibung prüfen</b>.</p>
+
+  <h3>Sendeverzögerung</h3>
+  <p>Nach dem Senden wartet eine Nachricht einen Moment (standardmäßig 10 s), während eine Benachrichtigung mit der Schaltfläche <b>Rückgängig</b> herunterzählt. Die Dauer stellen Sie in Einstellungen → Nachrichten ein.</p>
+
+  <h3 id="outbox">Postausgang</h3>
+  <p>Eine Nachricht, die sich nicht senden lässt, geht nie verloren: Sie landet im <b>Postausgang</b>, der unter den Ordnern erscheint, solange er Nachrichten enthält. Nach einem Verbindungsfehler sendet Klient sie jede Minute selbst erneut; nach einem anderen Fehler (zum Beispiel einem abgelehnten Empfänger) wählen Sie <b>Erneut senden</b>, <b>Bearbeiten</b> oder <b>Löschen</b>. Der Postausgang liegt im verschlüsselten Cache des jeweiligen Kontos und übersteht einen Neustart.</p>
+
+  <h3>Geplantes Senden</h3>
+  <p>Der Pfeil neben der Schaltfläche „Senden“ bietet Vorgaben (morgen früh, morgen Nachmittag, Montagmorgen) oder ein eigenes Datum mit Uhrzeit. Bei Proton sendet der Server die Nachricht auch dann, wenn Ihr Computer ausgeschaltet ist; bei den übrigen Diensten sendet Klient sie. Geplante Nachrichten zeigen eine Leiste mit Countdown und einer Schaltfläche zum Abbrechen des Sendens.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="organizing">
+  <h2>E-Mails ordnen</h2>
+  <ul>
+    <li><b>Ordner und Labels</b> – Ihre eigenen Proton-Ordner und -Labels, IMAP-Ordner und Gmail-Labels. Nachrichten können Sie auf Ordner und Labels ziehen.</li>
+    <li><b>Ordner verwalten</b> – Rechtsklick (oder langes Drücken) auf einen Ordner in der Seitenleiste: <b>Neuer Ordner</b> (ein Schrägstrich legt ihn in einen anderen, z. B. „Arbeit/Projekte“; bei Proton kann es ein Label sein), <b>Umbenennen</b>, <b>Löschen</b> und <b>In der Seitenleiste ausblenden</b>. Ausgeblendete Ordner holen Sie mit <b>Ausgeblendete Ordner anzeigen</b> im selben Menü zurück.</li>
+    <li><b>Papierkorb und Spam leeren</b> – Rechtsklick auf Papierkorb oder Spam → <b>Leeren</b> löscht die Nachrichten darin endgültig. Einstellungen → Allgemein → <b>Papierkorb und Spam</b> erledigt das automatisch für Nachrichten, die älter als 7 bis 90 Tage sind, in jedem Konto.</li>
+    <li><b>Stern, ungelesen, archivieren, Papierkorb.</b></li>
+    <li><b>Mehrere Nachrichten auswählen</b> – mit der Schaltfläche, <kbd>Strg</kbd>/<kbd>Umschalt</kbd>+Klick oder <kbd>Strg</kbd>+<kbd>A</kbd>.</li>
+    <li><b>Zurückstellen</b> (<kbd>Strg</kbd>+<kbd>H</kbd>) – die Unterhaltung verschwindet und kehrt zur gewählten Zeit in den Posteingang zurück.</li>
+  </ul>
+  <h3>Regeln für eingehende E-Mails</h3>
+  <p>In Einstellungen → Regeln erstellen Sie Regeln wie <i>„wenn Absender / Empfänger / Betreff einen Text enthält, dann …“</i> mit den Aktionen <b>in einen Ordner verschieben</b>, <b>ein Label hinzufügen</b>, <b>als gelesen markieren</b> oder <b>einen Stern hinzufügen</b>. Regeln werden nach der Spamprüfung auf neue E-Mails angewendet; der Menüpunkt <b>Regeln auf den Posteingang anwenden</b> wendet sie auch auf vorhandene E-Mails an.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="pgp">
+  <h2>Verschlüsselung und PGP</h2>
+  <h3>Proton Mail</h3>
+  <p>Jede Nachricht wird entschlüsselt und ihre Signatur überprüft. Beim Senden wird für jeden Empfänger der stärkste verfügbare Schutz gewählt:</p>
+  <ul>
+    <li>Proton-Adressen – die Ende-zu-Ende-Verschlüsselung von Proton,</li>
+    <li>externe Adressen mit bekanntem Schlüssel – <b>PGP/MIME</b>, das Formatierung, HTML-Signatur und Anhänge in einem verschlüsselten Teil zusammenhält. Klient verwendet den vom Empfänger veröffentlichten Schlüssel (WKD), den Schlüssel und die Einstellungen, die in Ihrem <b>Proton-Kontakt</b> hinterlegt sind (wie im Web), oder einen in Klient importierten Schlüssel,</li>
+    <li>alle übrigen – unverschlüsselt, auf Wunsch mit einer PGP/MIME-Signatur (die Formatierung bleibt erhalten), und vor dem Senden erscheint eine Warnung.</li>
+  </ul>
+
+  <h3>Gmail, Seznam und IMAP</h3>
+  <p>In Einstellungen → PGP erstellen Sie einen neuen Schlüssel für das Konto oder importieren Ihren privaten Schlüssel. Die Schlüsseldatei ist mit einer zufälligen Passphrase gesperrt, die im Schlüsselbund liegt. Danach gilt:</p>
+  <ul>
+    <li>Nachrichten an Personen mit bekanntem Schlüssel werden als <b>PGP/MIME</b> verschlüsselt, Nachrichten an alle anderen signiert,</li>
+    <li>gemischte Empfänger erhalten zwei Versionen – eine verschlüsselte und eine signierte,</li>
+    <li>mit <b>Auch den Betreff verschlüsseln</b> reist der Betreff innerhalb der Verschlüsselung (geschützte Header, wie in Thunderbird) und außen steht „...“; Ihre Kopie in „Gesendet“ behält den Betreff,</li>
+    <li>Entwürfe, geplante Nachrichten und Kopien in „Gesendet“ werden auf dem Server nur für Sie verschlüsselt gespeichert,</li>
+    <li>eingehende PGP/MIME-Nachrichten werden entschlüsselt und überprüft, auch mit geschütztem Betreff.</li>
+  </ul>
+  <p>Ihr Schlüssel:</p>
+  <ul>
+    <li>ein neuer Schlüssel erhält eine <b>Gültigkeit</b> (1, 2 oder 5 Jahre oder keine) – ein ablaufender Schlüssel wird von selbst nicht mehr verwendet, wenn Sie ihn verlieren; <b>Verlängern …</b> erneuert ihn jederzeit,</li>
+    <li><b>Auf keys.openpgp.org veröffentlichen …</b> lädt Ihren öffentlichen Schlüssel hoch; nachdem Sie den Link bestätigt haben, den Ihnen der Server per E-Mail schickt, kann ihn jeder anhand Ihrer Adresse finden,</li>
+    <li><b>Widerrufszertifikat speichern …</b> – bewahren Sie es sicher auf; geht der Schlüssel verloren oder wird er gestohlen, veröffentlichen Sie es oder senden Sie es an Ihre Kontakte, und deren Programme verwenden den Schlüssel nicht mehr,</li>
+    <li>der Schlüssel lässt sich sichern und entfernen.</li>
+  </ul>
+
+  <h3>Inline-PGP</h3>
+  <p>Nachrichten, die direkt im Text verschlüsselt sind (<code>-----BEGIN PGP MESSAGE-----</code>, z. B. aus Mailvelope), werden entschlüsselt und ihre Signatur geprüft, auch wenn der Block in einer Antwort zitiert ist.</p>
+
+  <h3>Wo Klient nach den Schlüsseln der Empfänger sucht</h3>
+  <ul>
+    <li>im <b>Web Key Directory</b> der Domain des Empfängers – für gespeicherte Schlüssel einmal pro Woche erneut, um einen neueren Schlüssel zu bemerken,</li>
+    <li>im <b>Autocrypt</b>-Header empfangener Nachrichten (Klient fügt ihn auch in eigene Nachrichten ein),</li>
+    <li>bei von Hand <b>importierten Schlüsseln</b> – auch direkt aus einem <code>.asc</code>-Anhang über eine Schaltfläche in der Nachricht,</li>
+    <li>optional auf <b>keys.openpgp.org</b> (Einstellungen → PGP).</li>
+  </ul>
+
+  <h3>Schlüssel der Kontakte und Schlüsselwechsel</h3>
+  <p>Einstellungen → PGP → Schlüssel der Kontakte listet die gespeicherten Schlüssel auf. Ein Klick zeigt den vollständigen <b>Fingerabdruck</b> (vergleichen Sie ihn persönlich oder telefonisch mit dem Kontakt), die Benutzerkennungen, die Gültigkeit und die Herkunft, und Sie können ihn als <b>Überprüft</b> markieren.</p>
+  <p>Taucht für einen Kontakt ein anderer Schlüssel auf, ersetzt Klient den gespeicherten nur, wenn dieser automatisch gelernt wurde, nicht überprüft ist und der neue Schlüssel neuer ist. Andernfalls <b>wartet</b> der neue Schlüssel: Die Nachricht zeigt „Der Absender verwendet einen neuen Schlüssel …“, und im Detail des Schlüssels wählen Sie <b>Neuen Schlüssel verwenden</b> oder <b>Alten Schlüssel behalten</b>. Eine gefälschte Nachricht kann daher keinen Schlüssel austauschen, auf den Sie sich verlassen.</p>
+
+  <h3>Nur verschlüsselt senden</h3>
+  <p>Mit Einstellungen → PGP → <b>Nur verschlüsselt senden</b> (oder demselben Schalter im Nachrichtenfenster für eine einzelne Nachricht) wird eine Nachricht nicht gesendet, solange ein Empfänger keinen Schlüssel hat.</p>
+  <p>Ihren eigenen öffentlichen Schlüssel kann Klient ausgehenden Nachrichten automatisch anhängen (Einstellungen → Nachrichten).</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="spam">
+  <h2>Spamfilter</h2>
+  <p>Die KI beurteilt jede neue Nachricht im Posteingang. Als Anhaltspunkte erhält sie:</p>
+  <ul>
+    <li>die Ergebnisse von SPF, DKIM und DMARC,</li>
+    <li>die Markierungen von Proton,</li>
+    <li>Treffer in Sperrlisten für IP-Adressen, Domains und Links,</li>
+    <li>Ihre Listen erlaubter und blockierter Absender.</li>
+  </ul>
+  <p>Eine Nachricht, deren Spam-Wahrscheinlichkeit die Schwelle erreicht (standardmäßig 0,7), wird in den Spam verschoben. Die Schwelle stellen Sie in Einstellungen → Spamfilter ein.</p>
+
+  <h3>Erst prüfen, dann melden</h3>
+  <div class="flow">
+    <span>Neue Nachricht</span><i>→</i><span>in der Liste verborgen</span><i>→</i><span>Spamfilter</span><i>→</i><span>Regeln und Labels</span><i>→</i><span>angezeigt und gemeldet</span>
+  </div>
+  <p>Das gilt für alle Dienste. Während die Prüfung läuft, steht oben in der Liste „Der Spamfilter prüft N neue Nachrichten …“. Bleibt die Prüfung hängen, erscheint die Nachricht spätestens nach 6 Minuten. Dieses Verhalten schalten Sie mit dem Schalter <b>Neue E-Mails erst nach der Prüfung anzeigen</b> aus.</p>
+
+  <h3>Sperrlisten</h3>
+  <p>Sie werden automatisch alle 12 Stunden heruntergeladen: Spamhaus DROP (IPv4 und IPv6), URLhaus und OpenPhish. Ihren Status finden Sie in Einstellungen → Spamfilter.</p>
+  <p>OpenPhish führt einzelne Phishing-Seiten auf, daher vergleicht Klient ganze Links, nicht Domains: Eine schädliche Seite bei einem Linkverkürzer oder einem gemeinsam genutzten Hosting sperrt nicht die ganze Website. Ein Link zu einer Seite auf OpenPhish oder zu einem Host auf URLhaus macht die Nachricht zu Spam, egal was die KI sagt, auch von einem erlaubten Absender – auch dessen Konto kann gestohlen werden.</p>
+
+  <h3>Vorhandene E-Mails prüfen</h3>
+  <p>Der Menüpunkt <b>Posteingang mit KI prüfen</b> wendet den Filter auf die letzten 50 Nachrichten an.</p>
+  <div class="note">
+    <b>Ohne KI</b>
+    <p>Wenn Sie den KI-Filter ausschalten, erkennt Klient Spam nur anhand der Sperrlisten und Ihrer Listen.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="ai">
+  <h2>KI-Assistent</h2>
+  <h3>Funktionen</h3>
+  <ul>
+    <li><b>Zusammenfassung einer Nachricht</b> und <b>Antwortvorschlag</b>.</li>
+    <li><b>Bearbeiten und Übersetzen eines Entwurfs</b> direkt im Editor.</li>
+    <li><b>Ihre E-Mails fragen</b> (<kbd>Strg</kbd>+<kbd>J</kbd>) – eine Frage in normaler Sprache; die KI findet die passenden Nachrichten und antwortet mit Verweisen auf ihre Quellen.</li>
+    <li><b>Einsortieren in Labels</b> – neue E-Mails erhalten ein passendes Label (Einstellungen → KI → Automatische Funktionen).</li>
+    <li>Eine <b>Morgenübersicht</b> der ungelesenen E-Mails zu einer festgelegten Uhrzeit (standardmäßig 7:00); jederzeit öffnen lässt sie sich mit <b>Übersicht der ungelesenen E-Mails (KI)</b>.</li>
+  </ul>
+
+  <h3>Anbieter</h3>
+  <p>Der Assistent und der Spamfilter haben jeweils einen eigenen Anbieter und ein eigenes Modell – für den Spamfilter genügt meist ein günstigeres und schnelleres Modell. Die Listen-Schaltfläche neben dem Modell bietet die Modelle an, die für Ihr Konto verfügbar sind.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Anbieter</th><th>Standardmodell des Assistenten</th><th>Standardmodell des Spamfilters</th><th>Schlüssel</th></tr></thead>
+    <tbody>
+      <tr><td>Claude (Anthropic)</td><td><code>claude-opus-5</code></td><td><code>claude-opus-5</code></td><td><a href="https://platform.claude.com">platform.claude.com</a></td></tr>
+      <tr><td>ChatGPT (OpenAI)</td><td><code>gpt-5.5</code></td><td><code>gpt-5.4-mini</code></td><td><a href="https://platform.openai.com/api-keys">platform.openai.com</a></td></tr>
+      <tr><td>Gemini (Google)</td><td><code>gemini-3.1-pro-preview</code></td><td><code>gemini-3-flash-preview</code></td><td><a href="https://aistudio.google.com/apikey">aistudio.google.com</a></td></tr>
+      <tr><td>Mistral (EU-Server)</td><td><code>mistral-medium-latest</code></td><td><code>mistral-small-latest</code></td><td><a href="https://console.mistral.ai/api-keys">console.mistral.ai</a></td></tr>
+      <tr><td>Lokale KI (Ollama)</td><td><code>qwen3.5:4b</code></td><td><code>qwen3.5:4b</code></td><td>nicht nötig</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>API-Schlüssel werden im Schlüsselbund des Systems gespeichert. Meldet ein Anbieter einen Fehler (kein Guthaben, ein ungültiger Schlüssel, ein eingestelltes Modell), erklärt Klient ihn in einfachen Worten und bietet einen Link, über den Sie ihn beheben können.</p>
+
+  <h3>Was die KI kostet</h3>
+  <p>Unten links im Hauptfenster stehen die KI-Ausgaben dieses Monats und des heutigen Tages. <b>Details</b> schlüsselt sie nach Modell und Aufgabe auf (Spamfilter, Zusammenfassungen, Morgenübersicht …) – für diesen Monat, den letzten Monat, heute oder den gesamten Zeitraum. Klient zählt die Tokens, die jeder Anbieter meldet, und bewertet sie nach den Preislisten der Anbieter (in USD, ohne MwSt.); den genauen Betrag finden Sie in Ihrem Konto beim Anbieter. Für ein Modell, das die Preisliste nicht kennt (z. B. Mistral), klicken Sie auf <b>Preis festlegen …</b>. Lokale KI ist kostenlos. Gespeichert werden nur die Zählerstände (<code>~/.local/share/klient/ai-usage.json</code>), nie Inhalte.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="local-ai">
+  <h2>Lokale KI</h2>
+  <p>Mit lokaler KI läuft das Modell direkt auf Ihrem Computer, und der Inhalt Ihrer Nachrichten geht nirgendwohin. Die Einstellungen finden Sie in Einstellungen → KI → Lokale KI (Ollama).</p>
+  <ol class="steps">
+    <li><b>Ollama installieren</b> – Klient lädt die offizielle Version von GitHub herunter, überprüft ihre Prüfsumme und entpackt nur den Teil für den Prozessor nach <code>~/.local/share/klient/ollama</code>. Sudo ist nicht nötig.</li>
+    <li><b>Modelle anhand meiner E-Mails vergleichen</b> – jedes gewählte Modell beurteilt mehrere Ihrer Nachrichten und fasst eine zusammen, sodass Sie Geschwindigkeit und Qualität nebeneinander sehen. Alles läuft auf Ihrem Computer.</li>
+    <li>Wählen Sie für die Rollen Assistent und Spamfilter <b>Lokale KI</b> und das ausgesuchte Modell.</li>
+  </ol>
+
+  <h3>Angebotene Modelle</h3>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Modell</th><th>Download</th><th>Hinweis</th></tr></thead>
+    <tbody>
+      <tr><td>Qwen 3.5 4B (Alibaba)</td><td>3,4 GB</td><td>Standard</td></tr>
+      <tr><td>Gemma 4 E2B (Google)</td><td>4,3 GB</td><td></td></tr>
+      <tr><td>Gemma 4 E4B (Google)</td><td>6,1 GB</td><td>besser auf Tschechisch, braucht mehr Arbeitsspeicher</td></tr>
+      <tr><td>Ministral 3 3B (Mistral AI)</td><td>3,0 GB</td><td></td></tr>
+      <tr><td>Ministral 3 8B (Mistral AI)</td><td>6,0 GB</td><td>klüger, langsamer</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Weitere Optionen</h3>
+  <ul>
+    <li><b>Nur lokal</b> – an Cloud-KI wird nichts gesendet, auch wenn Schlüssel gespeichert sind.</li>
+    <li><b>Automatisch aktualisieren</b> – sucht einmal täglich nach einer neuen Version von Ollama und den Modellen (nicht bei einer getakteten Verbindung).</li>
+    <li><b>Zusammenfassungen im Voraus erstellen</b> – neue E-Mails werden im Hintergrund zusammengefasst, nur am Netzstrom und wenn das Modell untätig ist. Die Zusammenfassung ist fertig, sobald Sie die Nachricht öffnen.</li>
+    <li>KI-Ergebnisse werden zwischengespeichert, sodass eine erneute Zusammenfassung derselben Nachricht sofort da ist. Am Netzstrom bleibt das Modell 30 Minuten im Arbeitsspeicher geladen, im Akkubetrieb 5 Minuten.</li>
+  </ul>
+  <div class="note warn">
+    <b>Geschwindigkeit</b>
+    <p>Ohne Grafikkarte ist ein lokales Modell langsam: Das Beurteilen einer Nachricht dauert Dutzende Sekunden (etwa eine Minute mit Qwen 3.5 4B auf einem Laptop mit einem Intel i5 der 10. Generation).</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="calendar">
+  <h2>Einladungen und Abwesenheitsnotizen</h2>
+  <h3>Kalendereinladungen</h3>
+  <p>Eine Nachricht mit einer Einladung (<code>.ics</code>) zeigt eine Karte mit Zeit und Ort. Die Schaltflächen <b>Zusagen</b>, <b>Vielleicht</b> und <b>Absagen</b> senden Ihre Antwort an den Organisator; der Termin lässt sich zu Ihrem Kalender hinzufügen.</p>
+  <h3>Automatische Antwort</h3>
+  <p>Nur bei Proton Mail mit einem bezahlten Tarif. Der Server antwortet auch, wenn Ihr Computer ausgeschaltet ist; jeder Absender erhält die Antwort höchstens einmal innerhalb eines bestimmten Zeitraums. Sie legen den Betreff, den Text und optional den letzten Tag fest.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="sync">
+  <h2>Synchronisierung zwischen Computern</h2>
+  <p>Wenn Sie Klient auf mehreren Computern verwenden, können diese ihre Arbeit und Einstellungen teilen. Schalten Sie das auf jedem Computer in Einstellungen → <b>Synchronisierung</b> ein. Dafür ist ein Proton-Konto nötig: Die gemeinsamen Daten liegen in einem Ordner <b>Klient</b> in Ihrem Konto, von Proton verschlüsselt, sodass nur Ihr Klient sie lesen kann. Klient zeigt diesen Ordner in seiner eigenen Ordnerliste nicht an; bitte ändern oder löschen Sie ihn nicht auf der Proton-Website.</p>
+  <ul>
+    <li><b>Geteilt werden:</b> Urteile des Spamfilters, erlaubte und blockierte Absender, bekannte Kontakte, Regeln, Signaturen, KI-Einstellungen (Anbieter, Modelle, Spamschwelle), KI-Ausgaben (über alle Computer summiert) und die Morgenübersicht.</li>
+    <li><b>Nicht geteilt werden:</b> Konten und Passwörter, API-Schlüssel (Sie geben sie auf jedem Computer ein), der Offline-Cache, die Sprache und die lokale KI.</li>
+    <li>Der <b>Hauptcomputer</b> erledigt die KI-Arbeit – den Spamfilter, die Morgenübersicht und Zusammenfassungen. Die anderen warten kurz auf sein Urteil (höchstens 3 Minuten) und beurteilen E-Mails nur dann selbst, wenn der Hauptcomputer das betreffende Konto nicht hat oder ausgeschaltet ist. Der erste Computer, auf dem Sie die Synchronisierung einschalten, wird zum Hauptcomputer; ändern lässt sich das in Einstellungen → Synchronisierung oder KI.</li>
+    <li>Der Hauptcomputer erstellt die Morgenübersicht einmal; die anderen zeigen sie nur an.</li>
+    <li>Bei IMAP-Konten werden auch zurückgestellte und geplante E-Mails geteilt. Nur ein Computer holt sie zurück bzw. sendet sie, und vor dem Senden prüft er auf dem Server, dass kein anderer Computer die Nachricht bereits gesendet hat.</li>
+    <li>Ohne Verbindung arbeitet jeder Computer wie bisher allein und sendet seine Änderungen, sobald er verbunden ist. Die Synchronisierung hält E-Mails nie länger als ein paar Minuten auf.</li>
+    <li>Klient bewahrt die letzten Versionen der gemeinsamen Daten auf; Einstellungen → Synchronisierung → <b>Frühere Version wiederherstellen</b> bringt Sie zu einer davon zurück.</li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="background">
+  <h2>Betrieb im Hintergrund</h2>
+  <ul>
+    <li>Nachdem Sie das Fenster geschlossen haben, läuft Klient weiter, achtet auf neue E-Mails und zeigt ein einfarbiges Symbol in der oberen Leiste (GNOME braucht dafür die Erweiterung AppIndicator). Bei ungelesenen E-Mails wird der Umschlag blau; sind sie gelesen, ist er wieder einfarbig. Das Menü des Symbols bietet „Klient öffnen“, „Neue Nachricht“ und „Beenden“; beenden können Sie auch mit <kbd>Strg</kbd>+<kbd>Q</kbd>.</li>
+    <li><b>Nach der Anmeldung starten</b> – Klient startet direkt im Hintergrund.</li>
+    <li>Beides schalten Sie in Einstellungen → Allgemein → <b>Hintergrund</b> ein oder aus.</li>
+    <li>Die Benachrichtigung über neue E-Mails kommt erst nach der Spamprüfung. Sie hat bis zu drei Schaltflächen – standardmäßig <b>Als gelesen markieren</b>, <b>Archivieren</b> und <b>Löschen</b>; <b>Spam</b> ist die vierte Wahl. Sie wählen sie in Einstellungen → Allgemein → <b>Benachrichtigungen</b>.</li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="shortcuts">
+  <h2>Tastenkürzel</h2>
+  <p>Die Liste gibt es auch in der Anwendung: <kbd>Strg</kbd>+<kbd>?</kbd>.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Kürzel</th><th>Aktion</th></tr></thead>
+    <tbody>
+      <tr><th colspan="2">Allgemein</th></tr>
+      <tr><td><kbd>Strg</kbd>+<kbd>N</kbd></td><td>Neue Nachricht</td></tr>
+      <tr><td><kbd>Strg</kbd>+<kbd>F</kbd></td><td>Suchen</td></tr>
+      <tr><td><kbd>Strg</kbd>+<kbd>J</kbd></td><td>Ihre E-Mails fragen (KI)</td></tr>
+      <tr><td><kbd>Strg</kbd>+<kbd>Umschalt</kbd>+<kbd>K</kbd></td><td>Kontakte</td></tr>
+      <tr><td><kbd>F5</kbd></td><td>Aktualisieren</td></tr>
+      <tr><td><kbd>Strg</kbd>+<kbd>,</kbd></td><td>Einstellungen</td></tr>
+      <tr><td><kbd>F1</kbd></td><td>Hilfe (diese Dokumentation)</td></tr>
+      <tr><td><kbd>Strg</kbd>+<kbd>?</kbd></td><td>Tastenkürzel</td></tr>
+      <tr><td><kbd>Strg</kbd>+<kbd>Q</kbd></td><td>Beenden</td></tr>
+      <tr><th colspan="2">Nachrichten</th></tr>
+      <tr><td><kbd>Strg</kbd>+<kbd>R</kbd></td><td>Antworten</td></tr>
+      <tr><td><kbd>Strg</kbd>+<kbd>Umschalt</kbd>+<kbd>R</kbd></td><td>Allen antworten</td></tr>
+      <tr><td><kbd>Strg</kbd>+<kbd>L</kbd></td><td>Weiterleiten</td></tr>
+      <tr><td><kbd>Strg</kbd>+<kbd>E</kbd></td><td>Archivieren</td></tr>
+      <tr><td><kbd>Entf</kbd></td><td>In den Papierkorb verschieben</td></tr>
+      <tr><td><kbd>Strg</kbd>+<kbd>D</kbd></td><td>Stern</td></tr>
+      <tr><td><kbd>Strg</kbd>+<kbd>H</kbd></td><td>Zurückstellen</td></tr>
+      <tr><td><kbd>Strg</kbd>+<kbd>Umschalt</kbd>+<kbd>U</kbd></td><td>Als ungelesen markieren</td></tr>
+      <tr><th colspan="2">Nachrichtenliste</th></tr>
+      <tr><td><kbd>Strg</kbd>+<kbd>A</kbd></td><td>Alle Nachrichten auswählen</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>Auswahl aufheben</td></tr>
+      <tr><th colspan="2">Nachricht schreiben</th></tr>
+      <tr><td><kbd>Strg</kbd>+<kbd>Eingabe</kbd></td><td>Senden</td></tr>
+      <tr><td><kbd>Strg</kbd>+<kbd>S</kbd></td><td>Entwurf speichern</td></tr>
+      <tr><td><kbd>Strg</kbd>+<kbd>B</kbd> / <kbd>I</kbd> / <kbd>U</kbd></td><td>Fett / kursiv / unterstrichen</td></tr>
+      <tr><td><kbd>Strg</kbd>+<kbd>K</kbd></td><td>Link</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>Schließen (der Entwurf wird gespeichert)</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="preferences">
+  <h2>Einstellungen</h2>
+  <p>Sie öffnen sie mit <kbd>Strg</kbd>+<kbd>,</kbd>. Die Seiten stehen bei allen Konten in derselben Reihenfolge.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Seite</th><th>Inhalt</th></tr></thead>
+    <tbody>
+      <tr><td><b>Allgemein</b></td><td>Sprache der Oberfläche, Standard-E-Mail-Anwendung, Betrieb im Hintergrund und Start nach der Anmeldung, automatisches Leeren von Papierkorb und Spam, Schaltflächen der Benachrichtigungen, Aktualisierungen</td></tr>
+      <tr><td><b>KI</b></td><td>Lokale KI (Ollama, Nur lokal, Aktualisierungen, Zusammenfassungen im Voraus, Modellvergleich), Anbieter und Modell für den Assistenten und den Spamfilter, API-Schlüssel, automatische Funktionen (Einsortieren in Labels, Morgenübersicht)</td></tr>
+      <tr><td><b>Spamfilter</b></td><td>Einschalten des KI-Filters, Schwelle für das Verschieben in den Spam, Anzeige von E-Mails erst nach der Prüfung, Status der Sperrlisten</td></tr>
+      <tr><td><b>Nachrichten</b></td><td>Unterhaltungen, Sendeverzögerung, Anhängen Ihres öffentlichen Schlüssels, Rechtschreibprüfung, Offline-Cache, Signatur</td></tr>
+      <tr><td><b>Regeln</b></td><td>Regeln für eingehende E-Mails</td></tr>
+      <tr><td><b>PGP</b></td><td>Eigene Schlüssel (erstellen, importieren, sichern, entfernen), Schlüssel der Kontakte, Suche auf keys.openpgp.org</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="privacy">
+  <h2>Datenschutz und Daten</h2>
+  <h3>Was an die KI gesendet wird</h3>
+  <ul>
+    <li>Bei einem Cloud-Anbieter wird ihm der Inhalt der Nachrichten gesendet, die die KI verarbeitet (Spamfilter, Zusammenfassungen, Vorschläge). Der Spamfilter sendet nur die ersten 6.000 Zeichen des Textes.</li>
+    <li>Anfragen an OpenAI werden mit <code>store: false</code> gesendet. Mistral verarbeitet Daten in der EU.</li>
+    <li>Mit lokaler KI oder im Modus <b>Nur lokal</b> verlässt nichts Ihren Computer.</li>
+    <li>Jede KI-Anfrage wird im Systemprotokoll mit Anbieter, Modell, Größe, Dauer und Ergebnis festgehalten – nie mit ihrem Inhalt. So sehen Sie, welche Modelle Klient wirklich aufruft: <code>journalctl --user -g "AI request"</code>.</li>
+  </ul>
+  <h3>Wo die Daten liegen</h3>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Was</th><th>Wo</th></tr></thead>
+    <tbody>
+      <tr><td>Einstellungen</td><td><code>~/.config/klient/config.json</code></td></tr>
+      <tr><td>Sperrlisten, Entscheidungen des Filters, Schlüssel, Cache, Ollama</td><td><code>~/.local/share/klient/</code></td></tr>
+      <tr><td>Sitzungen, IMAP-Passwörter, API-Schlüssel, Schlüssel für Cache und PGP</td><td>Schlüsselbund des Systems (Secret Service)</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="limitations">
+  <h2>Bekannte Einschränkungen</h2>
+  <ul>
+    <li>Die Proton-API ist für Anwendungen von Drittanbietern nicht offiziell dokumentiert und kann sich ändern. Proton kann eine Anmeldung ablehnen oder ein CAPTCHA verlangen – melden Sie sich dann einmal aus demselben Netz im Web an.</li>
+    <li>Bei Proton durchsucht die Suche nicht den Nachrichtentext (die Texte sind auf dem Server verschlüsselt).</li>
+    <li>Bei IMAP-Diensten funktionieren Zurückstellen und geplantes Senden nur, solange Klient läuft.</li>
+    <li>Bei Gmail weiß Klient beim Lesen des Posteingangs nicht, welche Labels eine Nachricht bereits hat – das erfährt es erst im Ordner des Labels.</li>
+    <li>Outlook / Hotmail wird nicht unterstützt.</li>
+    <li>Anhänge werden nicht im Offline-Cache gespeichert.</li>
+    <li>Regeln gelten für alle Konten gemeinsam (ihre Zielordner und Labels gehören zu dem Konto, in dem sie erstellt wurden).</li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="about">
+  <h2>Info</h2>
+  <p>Der Quellcode ist öffentlich auf GitHub: <a href="https://github.com/Imbecile6197/klient">github.com/Imbecile6197/klient</a> (Lizenz GPL-3.0). Fehlerberichte und Ideen sind in den <a href="https://github.com/Imbecile6197/klient/issues">Issues</a> willkommen.</p>
+  <p>Erstellt mit GTK4, libadwaita, WebKitGTK, go-proton-api, GopenPGP und den Bibliotheken go-imap/go-smtp.</p>
+</section>
+
+<footer>Dokumentation für Version 0.12.3 · November 2026 · <a href="index.html" hreflang="en" lang="en">English version</a> · <a href="index.cs.html" hreflang="cs" lang="cs">Česká verze</a></footer>
+
+</div>
+</main>
+</div>
+
+<script>
+(function () {
+  // Theme switch (remembered per browser when storage is available).
+  var root = document.documentElement;
+  var buttons = document.querySelectorAll('[data-theme-set]');
+  function apply(mode) {
+    if (mode === 'light' || mode === 'dark') root.setAttribute('data-theme', mode);
+    else root.removeAttribute('data-theme');
+    buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.themeSet === mode)); });
+  }
+  var saved = 'auto';
+  try { saved = localStorage.getItem('klient-docs-theme') || 'auto'; } catch (e) {}
+  apply(saved);
+  buttons.forEach(function (b) {
+    b.addEventListener('click', function () {
+      apply(b.dataset.themeSet);
+      try { localStorage.setItem('klient-docs-theme', b.dataset.themeSet); } catch (e) {}
+    });
+  });
+
+  // Mobile table of contents.
+  var toc = document.getElementById('toc');
+  var toggle = toc.querySelector('.toc-toggle');
+  toggle.addEventListener('click', function () {
+    var open = toc.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(open));
+  });
+  toc.querySelectorAll('ol a').forEach(function (a) {
+    a.addEventListener('click', function () {
+      toc.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // Highlight the section in view.
+  var links = {};
+  toc.querySelectorAll('ol a').forEach(function (a) { links[a.getAttribute('href').slice(1)] = a; });
+  if ('IntersectionObserver' in window) {
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting && links[e.target.id]) {
+          Object.values(links).forEach(function (l) { l.classList.remove('active'); });
+          links[e.target.id].classList.add('active');
+        }
+      });
+    }, { rootMargin: '-10% 0px -80% 0px' });
+    document.querySelectorAll('main section[id]').forEach(function (s) { obs.observe(s); });
+  }
+})();
+</script>
+</body>
+</html>

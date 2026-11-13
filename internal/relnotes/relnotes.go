@@ -1,6 +1,7 @@
 // Package relnotes reads release notes: the Markdown files embedded from
 // packaging/release-notes, or the body of a GitHub release. A file has an
-// "## English" and an "## Česky" section with paragraphs and "- " bullets;
+// "## English", an "## Česky" and a "## Deutsch" section with paragraphs and
+// "- " bullets;
 // inline **bold** and `code` are supported.
 package relnotes
 
@@ -26,11 +27,12 @@ type Release struct {
 	Blocks  []Block
 }
 
-var sectionNames = map[string]string{"english": "en", "česky": "cs", "cesky": "cs", "čeština": "cs"}
+var sectionNames = map[string]string{"english": "en", "česky": "cs", "cesky": "cs", "čeština": "cs", "deutsch": "de"}
 
-// Parse returns the blocks of the section in lang ("en", "cs"); text without
-// sections is taken whole. The installation hint is left out: it is for
-// the GitHub page, not for a running Klient.
+// Parse returns the blocks of the section in lang ("en", "cs", "de"); text
+// without sections is taken whole, and a missing language falls back to
+// English. The installation hint is left out: it is for the GitHub page, not
+// for a running Klient.
 func Parse(md, lang string) []Block {
 	sections := map[string][]string{}
 	cur := ""

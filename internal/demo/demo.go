@@ -53,27 +53,31 @@ const (
 
 func addr(name, email string) *mail.Address { return &mail.Address{Name: name, Address: email} }
 
+// pick chooses the made-up text in the interface language.
+func pick(en, cs, de string) string {
+	switch i18n.Lang() {
+	case "cs":
+		return cs
+	case "de":
+		return de
+	}
+	return en
+}
+
 // New builds the account in the interface language.
 func New() *Account {
-	cs := i18n.Lang() == "cs"
-	pick := func(en, czech string) string {
-		if cs {
-			return czech
-		}
-		return en
-	}
-	a := &Account{me: addr(pick("Alex Carter", "Petra Svobodová"), pick("alex@example.com", "petra@example.com")), user: "demo", kind: mailbox.KindProton}
+	a := &Account{me: addr(pick("Alex Carter", "Petra Svobodová", "Lena Fischer"), pick("alex@example.com", "petra@example.com", "lena@example.com")), user: "demo", kind: mailbox.KindProton}
 	a.labels = []protonmail.UserLabel{
-		{ID: LabelWork, Name: pick("Work", "Práce"), Color: "#1c71d8"},
-		{ID: LabelFamily, Name: pick("Family", "Rodina"), Color: "#2ec27e"},
-		{ID: FolderBills, Name: pick("Bills", "Faktury"), Color: "#e5a50a", Folder: true},
+		{ID: LabelWork, Name: pick("Work", "Práce", "Arbeit"), Color: "#1c71d8"},
+		{ID: LabelFamily, Name: pick("Family", "Rodina", "Familie"), Color: "#2ec27e"},
+		{ID: FolderBills, Name: pick("Bills", "Faktury", "Rechnungen"), Color: "#e5a50a", Folder: true},
 	}
-	emma := addr(pick("Emma Walker", "Jana Nováková"), pick("emma.walker@example.org", "jana.novakova@example.org"))
-	tom := addr(pick("Tom Harris", "Tomáš Dvořák"), pick("tom@example.org", "tomas@example.org"))
-	mia := addr(pick("Mia Carter", "Eva Svobodová"), pick("mia@example.net", "eva@example.net"))
-	shop := addr(pick("Northwind Energy", "Energie Sever"), "billing@example.net")
+	emma := addr(pick("Emma Walker", "Jana Nováková", "Julia Wagner"), pick("emma.walker@example.org", "jana.novakova@example.org", "julia.wagner@example.org"))
+	tom := addr(pick("Tom Harris", "Tomáš Dvořák", "Thomas Becker"), pick("tom@example.org", "tomas@example.org", "thomas@example.org"))
+	mia := addr(pick("Mia Carter", "Eva Svobodová", "Anna Fischer"), pick("mia@example.net", "eva@example.net", "anna@example.net"))
+	shop := addr(pick("Northwind Energy", "Energie Sever", "Energie Nord"), "billing@example.net")
 	news := addr("GNOME Weekly", "news@example.org")
-	spammer := addr(pick("Prize Center", "Centrum výher"), "winner@example.net")
+	spammer := addr(pick("Prize Center", "Centrum výher", "Gewinnzentrale"), "winner@example.net")
 
 	now := time.Now()
 	day := func(d, h, m int) int64 {
@@ -104,47 +108,47 @@ func New() *Account {
 	inbox := []string{protonmail.InboxID}
 
 	// A thread with the latest message unread.
-	add("c-kickoff", emma, me, pick("Project kickoff – agenda", "Zahájení projektu – program"),
+	add("c-kickoff", emma, me, pick("Project kickoff – agenda", "Zahájení projektu – program", "Projektstart – Tagesordnung"),
 		pick("Hi Alex,\n\nthanks for joining the kickoff on Monday. Here is the agenda for next week:\n\n1. Goals for the first release\n2. Timeline and milestones\n3. Who does what\n\nCould you prepare a short overview of the design so far? Ten minutes is plenty.\n\nBest,\nEmma",
-			"Ahoj Petro,\n\ndíky, že ses v pondělí připojila k zahájení. Posílám program na příští týden:\n\n1. Cíle prvního vydání\n2. Harmonogram a milníky\n3. Kdo co dělá\n\nMohla bys připravit krátký přehled dosavadního návrhu? Deset minut bohatě stačí.\n\nDíky,\nJana"),
+			"Ahoj Petro,\n\ndíky, že ses v pondělí připojila k zahájení. Posílám program na příští týden:\n\n1. Cíle prvního vydání\n2. Harmonogram a milníky\n3. Kdo co dělá\n\nMohla bys připravit krátký přehled dosavadního návrhu? Deset minut bohatě stačí.\n\nDíky,\nJana", "Hallo Lena,\n\ndanke, dass du am Montag beim Projektstart dabei warst. Hier ist die Tagesordnung für nächste Woche:\n\n1. Ziele für die erste Version\n2. Zeitplan und Meilensteine\n3. Wer macht was\n\nKönntest du einen kurzen Überblick über den bisherigen Entwurf vorbereiten? Zehn Minuten reichen völlig.\n\nViele Grüße\nJulia"),
 		day(4, 9, 12), false, append(inbox, LabelWork))
-	add("c-kickoff", a.me, []*mail.Address{emma}, pick("Re: Project kickoff – agenda", "Re: Zahájení projektu – program"),
-		pick("Sure, I will bring the overview. Should I also cover the open questions?\n\nAlex", "Jasně, přehled připravím. Mám zmínit i otevřené otázky?\n\nPetra"),
+	add("c-kickoff", a.me, []*mail.Address{emma}, pick("Re: Project kickoff – agenda", "Re: Zahájení projektu – program", "Re: Projektstart – Tagesordnung"),
+		pick("Sure, I will bring the overview. Should I also cover the open questions?\n\nAlex", "Jasně, přehled připravím. Mám zmínit i otevřené otázky?\n\nPetra", "Klar, ich bringe den Überblick mit. Soll ich auch auf die offenen Fragen eingehen?\n\nLena"),
 		day(3, 14, 40), false, []string{protonmail.SentID, LabelWork})
-	add("c-kickoff", emma, me, pick("Re: Project kickoff – agenda", "Re: Zahájení projektu – program"),
+	add("c-kickoff", emma, me, pick("Re: Project kickoff – agenda", "Re: Zahájení projektu – program", "Re: Projektstart – Tagesordnung"),
 		pick("Yes please – the open questions are exactly what we should agree on first. I have attached the draft plan so you can check the dates.\n\nSee you Monday!\nEmma",
-			"Ano, prosím – právě na otevřených otázkách bychom se měli shodnout nejdřív. Přikládám návrh plánu, ať si můžeš zkontrolovat termíny.\n\nUvidíme se v pondělí!\nJana"),
+			"Ano, prosím – právě na otevřených otázkách bychom se měli shodnout nejdřív. Přikládám návrh plánu, ať si můžeš zkontrolovat termíny.\n\nUvidíme se v pondělí!\nJana", "Ja, bitte – genau über die offenen Fragen sollten wir uns zuerst einigen. Ich habe den Entwurf des Plans angehängt, damit du die Termine prüfen kannst.\n\nBis Montag!\nJulia"),
 		day(0, 8, 47), true, append(inbox, LabelWork),
-		protonmail.InlineAttachment(pick("project-plan.pdf", "plan-projektu.pdf"), "application/pdf", "", make([]byte, 184320)))
+		protonmail.InlineAttachment(pick("project-plan.pdf", "plan-projektu.pdf", "projektplan.pdf"), "application/pdf", "", make([]byte, 184320)))
 
 	// A calendar invitation.
 	start := time.Date(now.Year(), now.Month(), now.Day(), 10, 0, 0, 0, time.Local).AddDate(0, 0, 3)
-	add("c-review", tom, me, pick("Invitation: Design review", "Pozvánka: Kontrola návrhu"),
-		pick("Tom Harris invites you to “Design review”.", "Tomáš Dvořák vás zve na „Kontrola návrhu“."),
+	add("c-review", tom, me, pick("Invitation: Design review", "Pozvánka: Kontrola návrhu", "Einladung: Entwurfsbesprechung"),
+		pick("Tom Harris invites you to “Design review”.", "Tomáš Dvořák vás zve na „Kontrola návrhu“.", "Thomas Becker lädt Sie zu „Entwurfsbesprechung“ ein."),
 		day(0, 7, 55), true, inbox,
-		protonmail.InlineAttachment("invite.ics", "text/calendar", "", invite(start, pick("Design review", "Kontrola návrhu"), pick("Meeting room 2", "Zasedačka 2"), tom, a.me)))
+		protonmail.InlineAttachment("invite.ics", "text/calendar", "", invite(start, pick("Design review", "Kontrola návrhu", "Entwurfsbesprechung"), pick("Meeting room 2", "Zasedačka 2", "Besprechungsraum 2"), tom, a.me)))
 
-	add("c-photos", mia, me, pick("Photos from the weekend", "Fotky z víkendu"),
-		pick("Here are the photos from Saturday – the one by the lake came out great!\n\nMia", "Posílám fotky ze soboty – ta u jezera se moc povedla!\n\nEva"),
+	add("c-photos", mia, me, pick("Photos from the weekend", "Fotky z víkendu", "Fotos vom Wochenende"),
+		pick("Here are the photos from Saturday – the one by the lake came out great!\n\nMia", "Posílám fotky ze soboty – ta u jezera se moc povedla!\n\nEva", "Hier sind die Fotos von Samstag – das am See ist richtig toll geworden!\n\nAnna"),
 		day(1, 19, 20), false, append(inbox, LabelFamily, protonmail.StarredID),
 		protonmail.InlineAttachment("lake.jpg", "image/jpeg", "", make([]byte, 2_300_000)),
 		protonmail.InlineAttachment("picnic.jpg", "image/jpeg", "", make([]byte, 1_900_000)))
 
-	add("c-invoice", shop, me, pick("Your invoice for September", "Vaše faktura za září"),
-		pick("Hello,\n\nyour invoice for September is ready. The amount of $42.10 will be paid by direct debit on the 15th.\n\nNorthwind Energy", "Dobrý den,\n\nvaše faktura za září je připravená. Částka 1 042 Kč bude stržena inkasem 15. dne v měsíci.\n\nEnergie Sever"),
+	add("c-invoice", shop, me, pick("Your invoice for September", "Vaše faktura za září", "Ihre Rechnung für September"),
+		pick("Hello,\n\nyour invoice for September is ready. The amount of $42.10 will be paid by direct debit on the 15th.\n\nNorthwind Energy", "Dobrý den,\n\nvaše faktura za září je připravená. Částka 1 042 Kč bude stržena inkasem 15. dne v měsíci.\n\nEnergie Sever", "Guten Tag,\n\nIhre Rechnung für September ist fertig. Der Betrag von 42,10 € wird am 15. per Lastschrift eingezogen.\n\nEnergie Nord"),
 		day(2, 6, 30), false, inbox,
-		protonmail.InlineAttachment(pick("invoice-2026-09.pdf", "faktura-2026-09.pdf"), "application/pdf", "", make([]byte, 96000)))
+		protonmail.InlineAttachment(pick("invoice-2026-09.pdf", "faktura-2026-09.pdf", "rechnung-2026-09.pdf"), "application/pdf", "", make([]byte, 96000)))
 
-	add("c-lunch", tom, me, pick("Lunch on Friday?", "Oběd v pátek?"),
-		pick("Shall we try the new place around the corner on Friday at noon?\n\nTom", "Nezkusíme v pátek v poledne to nové bistro za rohem?\n\nTomáš"),
+	add("c-lunch", tom, me, pick("Lunch on Friday?", "Oběd v pátek?", "Mittagessen am Freitag?"),
+		pick("Shall we try the new place around the corner on Friday at noon?\n\nTom", "Nezkusíme v pátek v poledne to nové bistro za rohem?\n\nTomáš", "Wollen wir am Freitag um zwölf das neue Lokal um die Ecke ausprobieren?\n\nThomas"),
 		day(2, 11, 5), false, inbox)
 
-	add("c-news", news, me, pick("This week: five apps worth trying", "Tento týden: pět aplikací, které stojí za to"),
-		pick("A short tour of new and updated apps from the GNOME ecosystem, plus tips for keeping your inbox tidy.", "Krátká prohlídka nových a aktualizovaných aplikací pro GNOME a tipy, jak udržet pořádek v poště."),
+	add("c-news", news, me, pick("This week: five apps worth trying", "Tento týden: pět aplikací, které stojí za to", "Diese Woche: fünf Apps, die sich lohnen"),
+		pick("A short tour of new and updated apps from the GNOME ecosystem, plus tips for keeping your inbox tidy.", "Krátká prohlídka nových a aktualizovaných aplikací pro GNOME a tipy, jak udržet pořádek v poště.", "Ein kurzer Rundgang durch neue und aktualisierte Apps aus dem GNOME-Ökosystem, dazu Tipps für ein aufgeräumtes Postfach."),
 		day(3, 7, 0), false, inbox)
 
-	add("c-spam", spammer, me, pick("Congratulations!!! You have won a prize", "Gratulujeme!!! Vyhráli jste cenu"),
-		pick("Click here within 24 hours to claim your reward. Enter your card details to pay the small handling fee.", "Klikněte do 24 hodin a vyzvedněte si výhru. Zadejte údaje karty kvůli malému manipulačnímu poplatku."),
+	add("c-spam", spammer, me, pick("Congratulations!!! You have won a prize", "Gratulujeme!!! Vyhráli jste cenu", "Herzlichen Glückwunsch!!! Sie haben einen Preis gewonnen"),
+		pick("Click here within 24 hours to claim your reward. Enter your card details to pay the small handling fee.", "Klikněte do 24 hodin a vyzvedněte si výhru. Zadejte údaje karty kvůli malému manipulačnímu poplatku.", "Klicken Sie innerhalb von 24 Stunden hier, um Ihren Gewinn abzuholen. Geben Sie Ihre Kartendaten ein, um die kleine Bearbeitungsgebühr zu bezahlen."),
 		day(0, 3, 14), true, []string{protonmail.SpamID})
 
 	for _, m := range a.msgs {
@@ -158,14 +162,7 @@ func New() *Account {
 // NewSecond is a second, smaller account (KLIENT_DEMO=2), to show all
 // accounts together.
 func NewSecond() *Account {
-	cs := i18n.Lang() == "cs"
-	pick := func(en, czech string) string {
-		if cs {
-			return czech
-		}
-		return en
-	}
-	a := &Account{me: addr(pick("Alex Carter", "Petra Svobodová"), pick("alex.carter@example.net", "petra.svobodova@example.net")), user: "demo-2", kind: mailbox.KindSeznam}
+	a := &Account{me: addr(pick("Alex Carter", "Petra Svobodová", "Lena Fischer"), pick("alex.carter@example.net", "petra.svobodova@example.net", "lena.fischer@example.net")), user: "demo-2", kind: mailbox.KindSeznam}
 	now := time.Now()
 	at := func(d, h, m int) int64 {
 		y, mo, dd := now.AddDate(0, 0, -d).Date()
@@ -181,12 +178,12 @@ func NewSecond() *Account {
 			Text: text, Encryption: i18n.T("Not end-to-end encrypted – the provider stores the message readably (TLS protects it in transit)"),
 		})
 	}
-	add("demo2-1", addr(pick("City Library", "Městská knihovna"), "library@example.org"), pick("Your book is ready for pickup", "Kniha je připravená k vyzvednutí"),
-		pick("The book you reserved is waiting for you at the front desk until Friday.", "Rezervovaná kniha na vás čeká u pultu do pátku."), at(0, 10, 30), true)
-	add("demo2-2", addr(pick("Running Club", "Běžecký klub"), "club@example.org"), pick("Saturday run: new route", "Sobotní běh: nová trasa"),
-		pick("This Saturday we start at the park gate at 8:00 and run along the river.", "V sobotu startujeme v 8:00 u brány parku a poběžíme podél řeky."), at(1, 18, 5), false)
-	add("demo2-3", addr(pick("Mia Carter", "Eva Svobodová"), pick("mia@example.net", "eva@example.net")), pick("Dinner on Sunday?", "Večeře v neděli?"),
-		pick("Would you like to come over for dinner on Sunday? Bring nothing but a good mood.", "Nepřijdeš v neděli na večeři? Stačí dobrá nálada."), at(2, 20, 15), false)
+	add("demo2-1", addr(pick("City Library", "Městská knihovna", "Stadtbibliothek"), "library@example.org"), pick("Your book is ready for pickup", "Kniha je připravená k vyzvednutí", "Ihr Buch liegt zur Abholung bereit"),
+		pick("The book you reserved is waiting for you at the front desk until Friday.", "Rezervovaná kniha na vás čeká u pultu do pátku.", "Das von Ihnen vorgemerkte Buch wartet bis Freitag an der Ausleihtheke auf Sie."), at(0, 10, 30), true)
+	add("demo2-2", addr(pick("Running Club", "Běžecký klub", "Laufverein"), "club@example.org"), pick("Saturday run: new route", "Sobotní běh: nová trasa", "Samstagslauf: neue Strecke"),
+		pick("This Saturday we start at the park gate at 8:00 and run along the river.", "V sobotu startujeme v 8:00 u brány parku a poběžíme podél řeky.", "Diesen Samstag starten wir um 8:00 am Parktor und laufen am Fluss entlang."), at(1, 18, 5), false)
+	add("demo2-3", addr(pick("Mia Carter", "Eva Svobodová", "Anna Fischer"), pick("mia@example.net", "eva@example.net", "anna@example.net")), pick("Dinner on Sunday?", "Večeře v neděli?", "Abendessen am Sonntag?"),
+		pick("Would you like to come over for dinner on Sunday? Bring nothing but a good mood.", "Nepřijdeš v neděli na večeři? Stačí dobrá nálada.", "Hast du Lust, am Sonntag zum Abendessen zu kommen? Bring nur gute Laune mit."), at(2, 20, 15), false)
 	return a
 }
 
@@ -486,7 +483,6 @@ type Verdict struct {
 // Verdicts are the AI decisions shown in the demo (reasons in the
 // interface language, as the real filter writes them).
 func (a *Account) Verdicts() []Verdict {
-	cs := i18n.Lang() == "cs"
 	var out []Verdict
 	for _, m := range a.msgs {
 		s := m.Meta
@@ -494,16 +490,14 @@ func (a *Account) Verdicts() []Verdict {
 			continue
 		}
 		v := Verdict{ID: s.ID, From: s.Sender.Address, Subject: s.Subject, Probability: 0.03, Category: "ham",
-			Reason: "A known contact in an ongoing conversation; DMARC passed."}
-		if cs {
-			v.Reason = "Známý kontakt v probíhající konverzaci; DMARC v pořádku."
-		}
+			Reason: pick("A known contact in an ongoing conversation; DMARC passed.",
+				"Známý kontakt v probíhající konverzaci; DMARC v pořádku.",
+				"Bekannter Kontakt in einer laufenden Unterhaltung; DMARC bestanden.")}
 		if slices.Contains(s.LabelIDs, protonmail.SpamID) {
 			v.Spam, v.Probability, v.Category = true, 0.97, "scam"
-			v.Reason = "Promises a prize and asks for card details; the sender is unknown and pushes for a quick reaction."
-			if cs {
-				v.Reason = "Slibuje výhru a žádá údaje o kartě; odesílatel je neznámý a tlačí na rychlou reakci."
-			}
+			v.Reason = pick("Promises a prize and asks for card details; the sender is unknown and pushes for a quick reaction.",
+				"Slibuje výhru a žádá údaje o kartě; odesílatel je neznámý a tlačí na rychlou reakci.",
+				"Verspricht einen Gewinn und verlangt Kartendaten; der Absender ist unbekannt und drängt zu einer schnellen Reaktion.")
 		}
 		out = append(out, v)
 	}

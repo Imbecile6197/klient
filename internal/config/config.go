@@ -107,7 +107,7 @@ type Config struct {
 	// Version that ran last, to show "What's New" after an update.
 	LastRunVersion string `json:"last_run_version"`
 
-	// Interface language: "" follows the system, or "en", "cs".
+	// Interface language: "" follows the system, or "en", "cs", "de".
 	Language string `json:"language"`
 
 	// Klient updates from the GitHub releases.

@@ -21,8 +21,10 @@ func TestPlurals(t *testing.T) {
 			t.Errorf("cs plural(%d) = %d, want %d", n, got, want)
 		}
 	}
-	if pluralIndex("en", 1) != 0 || pluralIndex("en", 0) != 1 || pluralIndex("en", 7) != 1 {
-		t.Error("en plural forms")
+	for _, l := range []string{"en", "de"} {
+		if pluralIndex(l, 1) != 0 || pluralIndex(l, 0) != 1 || pluralIndex(l, 7) != 1 {
+			t.Errorf("%s plural forms", l)
+		}
 	}
 }
 
@@ -77,7 +79,13 @@ func TestSetAndLookup(t *testing.T) {
 	if T("Inbox") != "Inbox" || N("%d unread message", "%d unread messages", 3) != "%d unread messages" {
 		t.Fatal("en falls back to the msgid")
 	}
-	if normalize("cs_CZ.UTF-8") != "cs" || normalize("de_DE") != "en" {
+	Set("de")
+	if T("Inbox") != "Posteingang" || N("%d unread message", "%d unread messages", 1) != "%d ungelesene Nachricht" ||
+		N("%d unread message", "%d unread messages", 0) != "%d ungelesene Nachrichten" {
+		t.Fatalf("de lookup: %q %q", T("Inbox"), N("%d unread message", "%d unread messages", 0))
+	}
+	Set("en")
+	if normalize("cs_CZ.UTF-8") != "cs" || normalize("de_AT.UTF-8") != "de" || normalize("fr_FR") != "en" {
 		t.Fatal("normalize")
 	}
 }
@@ -93,12 +101,27 @@ func verbList(s string) []string {
 	return v
 }
 
+// pluralForms is the number of plural forms in each catalog.
+var pluralForms = map[string]int{"cs": 3, "de": 2}
+
 // TestCatalogComplete finds every i18n.T/C/N call in the code and checks
-// that the Czech catalog translates it with the same format verbs.
+// that each catalog translates it with the same format verbs.
 func TestCatalogComplete(t *testing.T) {
-	b, err := po.Files.ReadFile("cs.po")
+	for _, l := range Languages {
+		if l.Code == "en" {
+			continue
+		}
+		t.Run(l.Code, func(t *testing.T) { checkCatalog(t, l.Code) })
+	}
+}
+
+func checkCatalog(t *testing.T, lang string) {
+	b, err := po.Files.ReadFile(lang + ".po")
 	if err != nil {
 		t.Fatal(err)
+	}
+	if pluralIndex(lang, 2) >= pluralForms[lang] || pluralForms[lang] == 0 {
+		t.Fatalf("%s: plural forms not known", lang)
 	}
 	cat := parse(string(b))
 	used := map[key]bool{}
@@ -170,14 +193,14 @@ func TestCatalogComplete(t *testing.T) {
 				if !slices.Equal(verbList(one), verbList(other)) {
 					t.Errorf("%s: singular and plural have different verbs", pos)
 				}
-				k, forms = key{"", one}, 3
+				k, forms = key{"", one}, pluralForms[lang]
 			default:
 				return true
 			}
 			used[k] = true
 			tr := cat[k]
 			if len(tr) != forms {
-				t.Errorf("%s: %q (context %q) has %d Czech forms, want %d", pos, k.id, k.ctx, len(tr), forms)
+				t.Errorf("%s: %q (context %q) has %d %s forms, want %d", pos, k.id, k.ctx, len(tr), lang, forms)
 				return true
 			}
 			for _, s := range tr {
