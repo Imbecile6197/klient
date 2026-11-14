@@ -95,6 +95,13 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.12.4" date="2026-11-14">
+      <description>
+        <p>Messages are no longer hidden under the Preferences window, and the All Mail folder no longer looks greyed out.</p>
+        <p xml:lang="cs">Oznámení se už neschovávají pod okno Předvoleb a složka Všechna pošta už nevypadá zašedle.</p>
+        <p xml:lang="de">Meldungen verschwinden nicht mehr unter dem Einstellungsfenster, und der Ordner Alle Nachrichten wirkt nicht mehr ausgegraut.</p>
+      </description>
+    </release>
     <release version="0.12.3" date="2026-11-13">
       <description>
         <p>Klient speaks German: the interface, the help and the AI answers.</p>

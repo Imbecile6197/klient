@@ -80,6 +80,11 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Sat Nov 14 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.12.4-1
+- Messages such as "a new version is ready" appear in the Preferences window
+  while it is open instead of under it
+- All Mail has a full envelope icon (the Papirus theme drew it dimmed)
+
 * Fri Nov 13 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.12.3-1
 - German interface (po/de.po), help (docs/index.de.html), README.de.md,
   release notes, metainfo, desktop file and demo mode; AI answers in German
