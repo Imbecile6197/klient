@@ -39,6 +39,10 @@ push() {
 	git -C "$tmp" -c credential.helper= -c credential.helper='!gh auth git-credential' \
 		push -q --force "$(git remote get-url origin)" gh-pages
 	rm -rf "$tmp"
+	# The first publication also switches GitHub Pages on for gh-pages.
+	repo=$(gh repo view --json nameWithOwner -q .nameWithOwner)
+	gh api "repos/$repo/pages" >/dev/null 2>&1 ||
+		gh api -X POST "repos/$repo/pages" -f 'source[branch]=gh-pages' -f 'source[path]=/' >/dev/null
 	echo "published: $BASE/"
 }
 if [ "$PUSH" = "--push" ]; then
@@ -54,7 +58,7 @@ flatpak repo --branches "$SRC" | grep -q "$REF" || { echo "$SRC has no $REF" >&2
 
 rm -rf "$SITE" && mkdir -p "$SITE"
 cp -a "$SRC" "$SITE/repo"
-for ref in $(flatpak repo --branches "$SRC" | awk 'NR>1 || $1 ~ /\//{print $1}' | grep /); do
+for ref in $(flatpak repo --branches "$SRC" | awk '{print $1}' | grep -E '^(app|runtime)/'); do
 	flatpak build-sign --gpg-sign="$KEY" "$SITE/repo" "$(cut -d/ -f2 <<<"$ref")" "$(cut -d/ -f4 <<<"$ref")" \
 		$( [ "${ref%%/*}" = runtime ] && echo --runtime )
 done

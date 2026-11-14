@@ -19,8 +19,11 @@
 # SDK golang extension. This keeps the build offline and independent of the
 # runtime's freedesktop base version.
 #
+# Releases publish this build in Klient's own signed Flatpak repository on
+# GitHub Pages (packaging/flatpak-repo.sh). Inside the sandbox the in-app
+# self-updater is off; autostart goes through the Background portal.
 # For a Flathub submission: replace the `dir` source with a tagged
-# `git`/`archive` source containing vendor/, and drop the in-app self-updater.
+# `git`/`archive` source containing vendor/.
 app-id: eu.libormacak.Klient
 runtime: org.gnome.Platform
 runtime-version: '51'

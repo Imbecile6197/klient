@@ -45,7 +45,15 @@ sudo apt install ./klient_amd64.deb
 
 Debian 13 is too old for Klient (it needs GLib 2.86 and libadwaita 1.6).
 
-After that, Klient checks for new releases once a day, downloads them in the background, verifies their SHA-256 checksum and installs them after one click and the administrator password. A What's New window shows the changes before and after each update.
+**Flatpak** (any distribution, including those whose system libraries are too old):
+
+```bash
+flatpak install --user https://imbecile6197.github.io/klient/eu.libormacak.Klient.flatpakref
+```
+
+or download `klient.flatpak` from the [latest release](https://github.com/Imbecile6197/klient/releases/latest) and open it in GNOME Software (or run `flatpak install --user ./klient.flatpak`). Both add Klient's own signed Flatpak repository, and the GNOME 51 runtime comes from Flathub. Updates then arrive through GNOME Software or `flatpak update`; Klient's built-in updater is switched off in the Flatpak.
+
+With the RPM or deb, Klient checks for new releases once a day, downloads them in the background, verifies their SHA-256 checksum and installs them after one click and the administrator password. A What's New window shows the changes before and after each update.
 
 For the tray icon, GNOME needs the AppIndicator extension (`gnome-shell-extension-appindicator`).
 
@@ -62,22 +70,15 @@ packaging/arch.sh 0.7.3  # an Arch/Manjaro package in build/arch/, built in a po
 packaging/flatpak.sh 0.7.3  # a Flatpak, built offline and installed with --user
 ```
 
-The Arch and Flatpak builds are community-maintained and untested by the author; the official packages are only the RPM and deb in the releases. Please report problems with them in Issues.
+The Arch build is community-maintained and untested by the author; the official packages are the RPM, the deb and the Flatpak in the releases. Please report problems with them in Issues.
 
 The Arch package needs GLib ≥ 2.89.3 (for the GTK bindings), which currently lives in Arch's `core-testing`/`extra-testing`; `packaging/arch/Containerfile` enables them. Manjaro stable lags Arch, so it may not have a new enough GLib to install the package yet.
 
 The Flatpak sidesteps that: it runs against the GNOME runtime's own GLib, GTK 4, libadwaita and WebKitGTK, so it works even where the system libraries are too old for the native package (for example Manjaro with GLib 2.88). It needs `flatpak` and `flatpak-builder`; `packaging/flatpak.sh` installs the runtime and SDK, vendors the Go modules into a clean checkout, then builds in flatpak-builder's sandbox with no network (`-mod=vendor`, `GOPROXY=off`). Pass `--bundle` to also export `build/flatpak/klient.flatpak`. The manifest is `packaging/flatpak/eu.libormacak.Klient.yml`.
 
-The GTK bindings need GLib ≥ 2.89.3 and WebKitGTK 6.0; the stable **GNOME 51** runtime provides them (GLib 2.90.1, WebKitGTK 2.54, libadwaita 1.10), so that is the target. Earlier runtimes were too old (GNOME 49 had GLib 2.86.5, GNOME 50 had 2.88.1). The Go toolchain is bundled from go.dev (pinned by sha256) rather than the SDK extension, which keeps the build offline and independent of the runtime base. For a Flathub submission, replace the `dir` source with a tagged `git`/`archive` source whose tree contains `vendor/`, and disable Klient's built-in GitHub updater (Flatpak handles updates, and self-updating apps are not accepted).
+The GTK bindings need GLib ≥ 2.89.3 and WebKitGTK 6.0; the stable **GNOME 51** runtime provides them (GLib 2.90.1, WebKitGTK 2.54, libadwaita 1.10), so that is the target. Earlier runtimes were too old (GNOME 49 had GLib 2.86.5, GNOME 50 had 2.88.1). The Go toolchain is bundled from go.dev (pinned by sha256) rather than the SDK extension, which keeps the build offline and independent of the runtime base. For a Flathub submission, replace the `dir` source with a tagged `git`/`archive` source whose tree contains `vendor/`, and Klient's built-in GitHub updater is already off inside a Flatpak.
 
-Installing the `klient.flatpak` bundle on another computer: a bundle contains only the app, not its runtime, so the GNOME 51 runtime has to be installed there first (from Flathub).
-
-```bash
-flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-flatpak install --user flathub org.gnome.Platform//51   # once
-flatpak install --user ./klient.flatpak
-flatpak run eu.libormacak.Klient
-```
+For a release, `make release` also runs `packaging/flatpak-repo.sh`: it signs the build into an OSTree repository with the key in `packaging/flatpak/repo-key.fpr` (public part: `packaging/flatpak/klient-repo.gpg`), exports `klient.flatpak` (which registers that repository) and publishes the repository on GitHub Pages (`gh-pages`, one commit holding only the newest build).
 
 Publishing a release (needs `gh` and a committed tree): write the notes to `packaging/release-notes/X.Y.Z.md` (an “## English”, a “## Česky” and a “## Deutsch” section – they are shown in Klient as What's New and published on GitHub), then `git tag -a vX.Y.Z -m "Klient X.Y.Z" && make release VERSION=X.Y.Z`.
 

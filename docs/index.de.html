@@ -361,12 +361,16 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
   <p>Unter <b>Ubuntu</b> (26.04 LTS und neuer) laden Sie das Paket herunter und installieren es:</p>
 <pre><code>wget https://github.com/Imbecile6197/klient/releases/latest/download/klient_amd64.deb
 sudo apt install ./klient_amd64.deb</code></pre>
+  <p>Auf <b>jeder anderen Distribution</b> (oder wo die Systembibliotheken zu alt sind) installieren Sie das <b>Flatpak</b>:</p>
+<pre><code>flatpak install --user https://imbecile6197.github.io/klient/eu.libormacak.Klient.flatpakref</code></pre>
+  <p>Oder laden Sie <code>klient.flatpak</code> aus der <a href="https://github.com/Imbecile6197/klient/releases/latest">neuesten Version</a> herunter und öffnen Sie es in GNOME Software. Beides fügt Klients eigenes signiertes Flatpak-Repository hinzu; die Laufzeitumgebung GNOME 51 kommt von Flathub.</p>
   <p>Spätere Versionen lädt Klient selbst herunter – siehe <a href="#updates">Automatische Aktualisierungen</a>.</p>
   <p>Diese Dokumentation können Sie jederzeit aus Klient öffnen: Hauptmenü → <b>Hilfe</b> oder die Taste <kbd>F1</kbd>.</p>
   <h3 id="language">Sprache</h3>
   <p>Klient spricht Englisch, Tschechisch und Deutsch. Die Sprache richtet sich nach Ihren Systemeinstellungen; Sie können sie in Einstellungen → Allgemein → <b>Sprache der Oberfläche</b> ändern, sie gilt nach einem Neustart. Die KI antwortet in derselben Sprache – Zusammenfassungen, Antwortvorschläge, „Ihre E-Mails fragen“ und die Begründungen des Spamfilters.</p>
   <p>Das Paket empfiehlt die Erweiterung <code>gnome-shell-extension-appindicator</code>; ohne sie zeigt GNOME das Symbol in der oberen Leiste nicht an.</p>
   <h3 id="updates">Automatische Aktualisierungen</h3>
+  <p>Im <b>Flatpak</b> kommen Aktualisierungen stattdessen aus Klients Flatpak-Repository: GNOME Software installiert sie, oder führen Sie <code>flatpak update</code> aus. Der Rest dieses Abschnitts gilt für die Pakete RPM und deb.</p>
   <p>Einmal täglich prüft Klient die <a href="https://github.com/Imbecile6197/klient/releases">Versionen auf GitHub</a> (nicht bei einer getakteten Verbindung). Eine neue Version lädt es im Hintergrund herunter und überprüft ihre SHA-256-Prüfsumme, die sowohl mit der Datei <code>SHA256SUMS</code> als auch mit dem von GitHub gemeldeten Digest übereinstimmen muss. Danach erhalten Sie die Benachrichtigung <b>Eine neue Version von Klient ist bereit</b>; die Schaltfläche <b>Installieren</b> fragt nach dem Administratorpasswort, installiert das Paket und startet Klient neu. Die Schaltfläche <b>Neuerungen</b> zeigt die Änderungen vor der Installation.</p>
   <p>Nach einer Aktualisierung zeigt Klient, was sich seit der zuletzt verwendeten Version geändert hat. Die Liste können Sie jederzeit über das Hauptmenü → <b>Neuerungen</b> wieder öffnen.</p>
   <p>Die Prüfung können Sie in Einstellungen → Allgemein → <b>Aktualisierungen</b> ausschalten oder von Hand starten. Ein aus dem Quellcode gebauter Klient meldet eine neue Version nur.</p>

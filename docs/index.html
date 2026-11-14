@@ -361,12 +361,16 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
   <p>On <b>Ubuntu</b> (26.04 LTS and newer), download the package and install it:</p>
 <pre><code>wget https://github.com/Imbecile6197/klient/releases/latest/download/klient_amd64.deb
 sudo apt install ./klient_amd64.deb</code></pre>
+  <p>On <b>any other distribution</b> (or where the system libraries are too old), install the <b>Flatpak</b>:</p>
+<pre><code>flatpak install --user https://imbecile6197.github.io/klient/eu.libormacak.Klient.flatpakref</code></pre>
+  <p>Or download <code>klient.flatpak</code> from the <a href="https://github.com/Imbecile6197/klient/releases/latest">latest release</a> and open it in GNOME Software. Both add Klient's own signed Flatpak repository; the GNOME 51 runtime comes from Flathub.</p>
   <p>Klient downloads later versions by itself – see <a href="#updates">Automatic updates</a>.</p>
   <p>You can open this documentation from Klient at any time: main menu → <b>Help</b>, or the <kbd>F1</kbd> key.</p>
   <h3 id="language">Language</h3>
   <p>Klient speaks English, Czech and German. The language follows your system settings; you can change it in Preferences → General → <b>Interface language</b>, and it takes effect after a restart. The AI answers in the same language – summaries, reply suggestions, “Ask Your Mail” and the spam filter's reasons.</p>
   <p>The package recommends the <code>gnome-shell-extension-appindicator</code> extension; without it, GNOME does not show the icon in the top bar.</p>
   <h3 id="updates">Automatic updates</h3>
+  <p>In the <b>Flatpak</b>, updates come from Klient's Flatpak repository instead: GNOME Software installs them, or run <code>flatpak update</code>. The rest of this section applies to the RPM and deb packages.</p>
   <p>Once a day, Klient checks the <a href="https://github.com/Imbecile6197/klient/releases">releases on GitHub</a> (not on a metered connection). It downloads a new version in the background and verifies its SHA-256 checksum, which must match both the <code>SHA256SUMS</code> file and the digest that GitHub reports. You then get the notification <b>A New Version of Klient Is Ready</b>; the <b>Install</b> button asks for the administrator password, installs the package and restarts Klient. The <b>What's New</b> button shows the changes before you install.</p>
   <p>After an update, Klient shows what has changed since the version you used last. You can open the list again at any time from the main menu → <b>What's New</b>.</p>
   <p>You can turn the check off or run it by hand in Preferences → General → <b>Updates</b>. A Klient built from source only announces a new version.</p>

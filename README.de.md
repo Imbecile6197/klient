@@ -45,7 +45,15 @@ sudo apt install ./klient_amd64.deb
 
 Debian 13 ist für Klient zu alt (es braucht GLib 2.86 und libadwaita 1.6).
 
-Danach sucht Klient einmal täglich nach neuen Versionen, lädt sie im Hintergrund herunter, überprüft ihre SHA-256-Prüfsumme und installiert sie nach einem Klick und dem Administratorpasswort. Ein Fenster „Neuerungen“ zeigt die Änderungen vor und nach jeder Aktualisierung.
+**Flatpak** (jede Distribution, auch solche mit zu alten Systembibliotheken):
+
+```bash
+flatpak install --user https://imbecile6197.github.io/klient/eu.libormacak.Klient.flatpakref
+```
+
+oder laden Sie `klient.flatpak` aus der [neuesten Version](https://github.com/Imbecile6197/klient/releases/latest) herunter und öffnen Sie es in GNOME Software (oder `flatpak install --user ./klient.flatpak`). Beides fügt Klients eigenes signiertes Flatpak-Repository hinzu, und die Laufzeitumgebung GNOME 51 kommt von Flathub. Aktualisierungen kommen dann über GNOME Software oder `flatpak update`; der eingebaute Updater von Klient ist im Flatpak ausgeschaltet.
+
+Mit RPM oder deb sucht Klient einmal täglich nach neuen Versionen, lädt sie im Hintergrund herunter, überprüft ihre SHA-256-Prüfsumme und installiert sie nach einem Klick und dem Administratorpasswort. Ein Fenster „Neuerungen“ zeigt die Änderungen vor und nach jeder Aktualisierung.
 
 Für das Symbol in der oberen Leiste braucht GNOME die Erweiterung AppIndicator (`gnome-shell-extension-appindicator`).
 
@@ -62,22 +70,15 @@ packaging/arch.sh 0.7.3  # ein Arch/Manjaro-Paket in build/arch/, gebaut in eine
 packaging/flatpak.sh 0.7.3  # ein Flatpak, offline gebaut und mit --user installiert
 ```
 
-Die Builds für Arch und Flatpak werden von der Community gepflegt und vom Autor nicht getestet; offizielle Pakete sind nur RPM und deb in den Versionen. Probleme damit melden Sie bitte in den Issues.
+Der Build für Arch wird von der Community gepflegt und vom Autor nicht getestet; offizielle Pakete sind RPM, deb und Flatpak in den Versionen. Probleme damit melden Sie bitte in den Issues.
 
 Das Arch-Paket braucht GLib ≥ 2.89.3 (für die GTK-Bindungen), die derzeit in Archs `core-testing`/`extra-testing` liegt; `packaging/arch/Containerfile` aktiviert diese. Manjaro stable hinkt Arch hinterher und hat daher möglicherweise noch keine ausreichend neue GLib, um das Paket zu installieren.
 
 Das Flatpak umgeht das: Es läuft mit der eigenen GLib, GTK 4, libadwaita und WebKitGTK der GNOME-Laufzeitumgebung und funktioniert daher auch dort, wo die Systembibliotheken für das native Paket zu alt sind (zum Beispiel Manjaro mit GLib 2.88). Es braucht `flatpak` und `flatpak-builder`; `packaging/flatpak.sh` installiert Laufzeitumgebung und SDK, legt die Go-Module in einen sauberen Export des Checkouts und baut dann in der Sandbox von flatpak-builder ohne Netz (`-mod=vendor`, `GOPROXY=off`). Mit `--bundle` wird zusätzlich `build/flatpak/klient.flatpak` exportiert. Das Manifest ist `packaging/flatpak/eu.libormacak.Klient.yml`.
 
-Die GTK-Bindungen brauchen GLib ≥ 2.89.3 und WebKitGTK 6.0; die stabile Laufzeitumgebung **GNOME 51** bietet beides (GLib 2.90.1, WebKitGTK 2.54, libadwaita 1.10) und ist daher das Ziel. Frühere Laufzeitumgebungen waren zu alt (GNOME 49 hatte GLib 2.86.5, GNOME 50 hatte 2.88.1). Die Go-Toolchain kommt von go.dev (per sha256 festgelegt) statt aus der SDK-Erweiterung, was den Build offline und unabhängig von der Basis der Laufzeitumgebung hält. Für eine Einreichung bei Flathub ersetzen Sie die Quelle `dir` durch eine getaggte `git`/`archive`-Quelle, deren Baum `vendor/` enthält, und schalten den eingebauten GitHub-Updater von Klient aus (Flatpak übernimmt die Aktualisierungen, und Apps, die sich selbst aktualisieren, werden nicht angenommen).
+Die GTK-Bindungen brauchen GLib ≥ 2.89.3 und WebKitGTK 6.0; die stabile Laufzeitumgebung **GNOME 51** bietet beides (GLib 2.90.1, WebKitGTK 2.54, libadwaita 1.10) und ist daher das Ziel. Frühere Laufzeitumgebungen waren zu alt (GNOME 49 hatte GLib 2.86.5, GNOME 50 hatte 2.88.1). Die Go-Toolchain kommt von go.dev (per sha256 festgelegt) statt aus der SDK-Erweiterung, was den Build offline und unabhängig von der Basis der Laufzeitumgebung hält. Für eine Einreichung bei Flathub ersetzen Sie die Quelle `dir` durch eine getaggte `git`/`archive`-Quelle, deren Baum `vendor/` enthält, der eingebaute GitHub-Updater von Klient ist im Flatpak bereits ausgeschaltet.
 
-Das Bundle `klient.flatpak` auf einem anderen Computer installieren: Ein Bundle enthält nur die App, nicht ihre Laufzeitumgebung, daher muss dort zuerst die Laufzeitumgebung GNOME 51 installiert werden (von Flathub).
-
-```bash
-flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-flatpak install --user flathub org.gnome.Platform//51   # einmalig
-flatpak install --user ./klient.flatpak
-flatpak run eu.libormacak.Klient
-```
+Bei einer Veröffentlichung führt `make release` auch `packaging/flatpak-repo.sh` aus: Es signiert den Build mit dem Schlüssel aus `packaging/flatpak/repo-key.fpr` (öffentlicher Teil: `packaging/flatpak/klient-repo.gpg`) in ein OSTree-Repository, exportiert `klient.flatpak` (das dieses Repository registriert) und veröffentlicht das Repository auf GitHub Pages (`gh-pages`, ein Commit nur mit dem neuesten Build).
 
 Eine Version veröffentlichen (braucht `gh` und einen committeten Baum): Schreiben Sie die Hinweise nach `packaging/release-notes/X.Y.Z.md` (Abschnitte „## English“, „## Česky“ und „## Deutsch“ – Klient zeigt sie unter „Neuerungen“ an, und sie werden auf GitHub veröffentlicht), dann `git tag -a vX.Y.Z -m "Klient X.Y.Z" && make release VERSION=X.Y.Z`.
 

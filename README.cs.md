@@ -45,7 +45,15 @@ sudo apt install ./klient_amd64.deb
 
 Debian 13 je pro Klienta příliš starý (potřebuje GLib 2.86 a libadwaita 1.6).
 
-Potom Klient jednou denně zkontroluje nová vydání, stáhne je na pozadí, ověří kontrolní součet SHA-256 a nainstaluje je po jednom kliknutí a zadání hesla správce. Okno Co je nového ukáže změny před aktualizací i po ní.
+**Flatpak** (jakákoli distribuce, i ta, jejíž systémové knihovny jsou příliš staré):
+
+```bash
+flatpak install --user https://imbecile6197.github.io/klient/eu.libormacak.Klient.flatpakref
+```
+
+nebo si stáhněte `klient.flatpak` z [posledního vydání](https://github.com/Imbecile6197/klient/releases/latest) a otevřete ho v GNOME Software (případně `flatpak install --user ./klient.flatpak`). Obojí přidá vlastní podepsaný Flatpak repozitář Klienta a běhové prostředí GNOME 51 se stáhne z Flathubu. Aktualizace pak přicházejí přes GNOME Software nebo `flatpak update`; vestavěný aktualizátor Klienta je ve Flatpaku vypnutý.
+
+S RPM nebo deb Klient jednou denně zkontroluje nová vydání, stáhne je na pozadí, ověří kontrolní součet SHA-256 a nainstaluje je po jednom kliknutí a zadání hesla správce. Okno Co je nového ukáže změny před aktualizací i po ní.
 
 Ikona v horní liště potřebuje v GNOME rozšíření AppIndicator (`gnome-shell-extension-appindicator`).
 
@@ -62,22 +70,15 @@ packaging/arch.sh 0.7.3  # balíček pro Arch/Manjaro do build/arch/, sestaví s
 packaging/flatpak.sh 0.7.3  # Flatpak, sestaví se offline a nainstaluje přes --user
 ```
 
-Sestavení pro Arch a Flatpak udržuje komunita a autor je netestuje; oficiální balíčky jsou jen RPM a deb ve vydáních. Potíže s nimi hlaste v Issues.
+Sestavení pro Arch udržuje komunita a autor ho netestuje; oficiální balíčky jsou RPM, deb a Flatpak ve vydáních. Potíže s nimi hlaste v Issues.
 
 Balíček pro Arch potřebuje GLib ≥ 2.89.3 (kvůli vazbám na GTK), která je zatím v repozitářích `core-testing`/`extra-testing`; `packaging/arch/Containerfile` je zapíná. Manjaro za Archem zaostává, takže nemusí mít dost novou GLib k instalaci balíčku.
 
 Flatpak tenhle problém obchází: běží proti běhovému prostředí GNOME s vlastní GLib, GTK 4, libadwaitou a WebKitGTK, takže funguje i tam, kde jsou systémové knihovny pro nativní balíček příliš staré (třeba Manjaro s GLib 2.88). Potřebuje `flatpak` a `flatpak-builder`; `packaging/flatpak.sh` nainstaluje běhové prostředí a SDK, zavendoruje Go moduly do čistého exportu a pak sestaví v sandboxu flatpak-builderu bez sítě (`-mod=vendor`, `GOPROXY=off`). Přepínač `--bundle` navíc vyexportuje `build/flatpak/klient.flatpak`. Manifest je `packaging/flatpak/eu.libormacak.Klient.yml`.
 
-Vazby na GTK potřebují GLib ≥ 2.89.3 a WebKitGTK 6.0; stabilní běhové prostředí **GNOME 51** je poskytuje (GLib 2.90.1, WebKitGTK 2.54, libadwaita 1.10), takže je cílem. Starší prostředí byla příliš stará (GNOME 49 mělo GLib 2.86.5, GNOME 50 mělo 2.88.1). Go toolchain se stahuje z go.dev (ověřený přes sha256) místo rozšíření SDK, což drží sestavení offline a nezávislé na základu prostředí. Pro odeslání na Flathub nahraďte zdroj `dir` taggovaným zdrojem `git`/`archive`, jehož strom obsahuje `vendor/`, a vypněte vestavěný aktualizátor Klienta z GitHubu (aktualizace řeší Flatpak a aplikace aktualizující se samy Flathub nepřijímá).
+Vazby na GTK potřebují GLib ≥ 2.89.3 a WebKitGTK 6.0; stabilní běhové prostředí **GNOME 51** je poskytuje (GLib 2.90.1, WebKitGTK 2.54, libadwaita 1.10), takže je cílem. Starší prostředí byla příliš stará (GNOME 49 mělo GLib 2.86.5, GNOME 50 mělo 2.88.1). Go toolchain se stahuje z go.dev (ověřený přes sha256) místo rozšíření SDK, což drží sestavení offline a nezávislé na základu prostředí. Pro odeslání na Flathub nahraďte zdroj `dir` taggovaným zdrojem `git`/`archive`, jehož strom obsahuje `vendor/`, vestavěný aktualizátor Klienta z GitHubu je ve Flatpaku už vypnutý.
 
-Instalace balíčku `klient.flatpak` na jiném počítači: balíček obsahuje jen aplikaci, ne běhové prostředí, takže je tam potřeba nejdřív nainstalovat prostředí GNOME 51 (z Flathubu).
-
-```bash
-flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-flatpak install --user flathub org.gnome.Platform//51   # jednou
-flatpak install --user ./klient.flatpak
-flatpak run eu.libormacak.Klient
-```
+Při vydání spustí `make release` i `packaging/flatpak-repo.sh`: ten sestavení podepíše do repozitáře OSTree klíčem z `packaging/flatpak/repo-key.fpr` (veřejná část: `packaging/flatpak/klient-repo.gpg`), vyexportuje `klient.flatpak` (který ten repozitář zaregistruje) a zveřejní repozitář na GitHub Pages (`gh-pages`, jeden commit jen s nejnovějším sestavením).
 
 Vydání nové verze (potřebuje `gh` a commitnutý strom): poznámky zapište do `packaging/release-notes/X.Y.Z.md` (oddíly „## English“, „## Česky“ a „## Deutsch“ – Klient je ukáže v okně Co je nového a zveřejní se na GitHubu), pak `git tag -a vX.Y.Z -m "Klient X.Y.Z" && make release VERSION=X.Y.Z`.
 

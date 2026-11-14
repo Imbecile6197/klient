@@ -361,12 +361,16 @@ footer { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--bord
   <p>Na <b>Ubuntu</b> (26.04 LTS a novější) balíček stáhněte a nainstalujte:</p>
 <pre><code>wget https://github.com/Imbecile6197/klient/releases/latest/download/klient_amd64.deb
 sudo apt install ./klient_amd64.deb</code></pre>
+  <p>Na <b>jiné distribuci</b> (nebo tam, kde jsou systémové knihovny příliš staré) nainstalujte <b>Flatpak</b>:</p>
+<pre><code>flatpak install --user https://imbecile6197.github.io/klient/eu.libormacak.Klient.flatpakref</code></pre>
+  <p>Nebo si stáhněte <code>klient.flatpak</code> z <a href="https://github.com/Imbecile6197/klient/releases/latest">posledního vydání</a> a otevřete ho v GNOME Software. Obojí přidá vlastní podepsaný Flatpak repozitář Klienta; běhové prostředí GNOME 51 se stáhne z Flathubu.</p>
   <p>Další verze si Klient stáhne sám – viz <a href="#aktualizace">Automatické aktualizace</a>.</p>
   <p>Tuto dokumentaci otevřete kdykoli z Klienta: hlavní nabídka → <b>Nápověda</b> nebo klávesa <kbd>F1</kbd>.</p>
   <h3 id="jazyk">Jazyk</h3>
   <p>Klient mluví česky, anglicky a německy. Jazyk se řídí nastavením systému; změnit ho jde v Předvolbách → Obecné → <b>Jazyk rozhraní</b> a projeví se po restartu. Stejným jazykem odpovídá i AI – shrnutí, návrhy odpovědí, „Zeptat se pošty“ a zdůvodnění spamfiltru.</p>
   <p>Balíček doporučuje rozšíření <code>gnome-shell-extension-appindicator</code>, bez kterého GNOME nezobrazí ikonu v horní liště.</p>
   <h3 id="aktualizace">Automatické aktualizace</h3>
+  <p>Ve <b>Flatpaku</b> přicházejí aktualizace z Flatpak repozitáře Klienta: nainstaluje je GNOME Software, nebo spusťte <code>flatpak update</code>. Zbytek tohoto oddílu platí pro balíčky RPM a deb.</p>
   <p>Klient jednou denně zkontroluje <a href="https://github.com/Imbecile6197/klient/releases">vydání na GitHubu</a> (ne na měřeném připojení). Novou verzi na pozadí stáhne a ověří kontrolním součtem SHA-256 – musí souhlasit se souborem <code>SHA256SUMS</code> i s otiskem, který uvádí GitHub. Pak přijde oznámení <b>Je připravená nová verze Klienta</b>; tlačítko <b>Nainstalovat</b> si vyžádá heslo správce, balíček nainstaluje a Klient se sám restartuje. Tlačítko <b>Co je nového</b> ukáže změny ještě před instalací.</p>
   <p>Po aktualizaci Klient ukáže, co se změnilo od verze, kterou jste používali naposledy. Seznam kdykoli znovu otevřete z hlavní nabídky → <b>Co je nového</b>.</p>
   <p>Kontrolu jde vypnout nebo spustit ručně v Předvolbách → Obecné → <b>Aktualizace</b>. Klient sestavený ze zdrojového kódu novou verzi jen ohlásí.</p>
