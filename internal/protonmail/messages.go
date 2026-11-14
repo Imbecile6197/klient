@@ -45,7 +45,7 @@ var Folders = []Folder{
 	{proton.ArchiveLabel, i18n.T("Archive"), "folder-documents-symbolic"},
 	{proton.SpamLabel, i18n.T("Spam"), "mail-mark-junk-symbolic"},
 	{proton.TrashLabel, i18n.T("Trash"), "user-trash-symbolic"},
-	{proton.AllMailLabel, i18n.T("All Mail"), "mail-read-symbolic"},
+	{proton.AllMailLabel, i18n.T("All Mail"), "mail-unread-symbolic"}, // Papirus dims mail-read (35 % opacity)
 }
 
 const (
