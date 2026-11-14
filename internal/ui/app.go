@@ -29,6 +29,7 @@ import (
 	"github.com/Imbecile6197/klient/internal/ollama"
 	"github.com/Imbecile6197/klient/internal/protonmail"
 	"github.com/Imbecile6197/klient/internal/relnotes"
+	"github.com/Imbecile6197/klient/internal/sandbox"
 	"github.com/Imbecile6197/klient/internal/secrets"
 	"github.com/Imbecile6197/klient/internal/spam"
 	"github.com/Imbecile6197/klient/internal/spell"
@@ -299,7 +300,9 @@ func (a *App) activate() {
 	a.startSync()
 	go a.digestLoop()
 	go a.ollamaUpdateLoop()
-	go a.selfUpdateLoop()
+	if !sandbox.Flatpak() { // the Flatpak repository delivers updates
+		go a.selfUpdateLoop()
+	}
 	go a.watchUpgrade()
 	go a.precomputeLoop()
 	go a.outboxLoop()

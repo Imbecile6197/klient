@@ -12,6 +12,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 
 	"github.com/Imbecile6197/klient/internal/i18n"
+	"github.com/Imbecile6197/klient/internal/sandbox"
 	"github.com/Imbecile6197/klient/internal/update"
 )
 
@@ -147,6 +148,16 @@ func (a *App) installUpdate() {
 func (a *App) updateGroup() *adw.PreferencesGroup {
 	g := adw.NewPreferencesGroup()
 	g.SetTitle(i18n.T("Updates"))
+	if sandbox.Flatpak() {
+		// The Flatpak repository delivers updates; the built-in updater
+		// is off.
+		g.SetDescription(i18n.T("Updates come from the Klient Flatpak repository: GNOME Software installs them, or run “flatpak update”."))
+		row := adw.NewActionRow()
+		row.SetUseMarkup(false)
+		row.SetTitle(fmt.Sprintf(i18n.T("Installed version %s"), Version))
+		g.Add(row)
+		return g
+	}
 	g.SetDescription(fmt.Sprintf(i18n.T("New versions are downloaded from GitHub (%s). The package is verified by its checksum before installation, and installing asks for the administrator password."), update.Repo))
 	auto := adw.NewSwitchRow()
 	auto.SetUseMarkup(false) // names and addresses may contain & or <

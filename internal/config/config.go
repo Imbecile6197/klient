@@ -77,6 +77,9 @@ type Config struct {
 
 	// Keep running (tray icon, notifications) after the window is closed.
 	RunInBackground bool `json:"run_in_background"`
+	// Autostart remembers the Background portal's answer in a Flatpak,
+	// which cannot read the host's autostart entries.
+	Autostart bool `json:"autostart,omitempty"`
 
 	// Attach the sender's public key to outgoing mail by default.
 	AttachPublicKey bool `json:"attach_public_key"`

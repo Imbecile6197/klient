@@ -2,6 +2,7 @@ package ui
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -18,6 +19,7 @@ import (
 	"github.com/Imbecile6197/klient/internal/ollama"
 	"github.com/Imbecile6197/klient/internal/pgp"
 	"github.com/Imbecile6197/klient/internal/rules"
+	"github.com/Imbecile6197/klient/internal/sandbox"
 	"github.com/Imbecile6197/klient/internal/secrets"
 	"github.com/Imbecile6197/klient/internal/spell"
 )
@@ -407,18 +409,24 @@ func (a *App) generalPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 			defRow.SetSubtitle(i18n.T("Another application opens mailto: links"))
 		}
 	}
-	setDef()
-	defBtn := gtk.NewButtonWithLabel(i18n.T("Make Default"))
-	defBtn.SetVAlign(gtk.AlignCenter)
-	defBtn.ConnectClicked(func() {
-		if err := setDefaultMailApp(); err != nil {
-			d.AddToast(newToast(err.Error()))
-			return
-		}
+	if sandbox.Flatpak() {
+		// A Flatpak can neither see nor change the host's default
+		// applications.
+		defRow.SetSubtitle(i18n.T("Choose Klient for Mail in GNOME Settings → Apps → Default Apps"))
+	} else {
 		setDef()
-		d.AddToast(newToast(i18n.T("Klient is the default email application")))
-	})
-	defRow.AddSuffix(defBtn)
+		defBtn := gtk.NewButtonWithLabel(i18n.T("Make Default"))
+		defBtn.SetVAlign(gtk.AlignCenter)
+		defBtn.ConnectClicked(func() {
+			if err := setDefaultMailApp(); err != nil {
+				d.AddToast(newToast(err.Error()))
+				return
+			}
+			setDef()
+			d.AddToast(newToast(i18n.T("Klient is the default email application")))
+		})
+		defRow.AddSuffix(defBtn)
+	}
 	ig.Add(defRow)
 	p.Add(ig)
 
@@ -444,15 +452,56 @@ func (a *App) generalPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 	autostart.SetUseMarkup(false) // names and addresses may contain & or <
 	autostart.SetTitle(i18n.T("Start after login"))
 	autostart.SetSubtitle(i18n.T("Klient starts hidden in the background, with just the icon in the top bar"))
-	autostart.SetActive(autostartEnabled())
+	if sandbox.Flatpak() {
+		autostart.SetActive(a.cfg.Autostart)
+	} else {
+		autostart.SetActive(autostartEnabled())
+	}
+	reverting := false
 	autostart.NotifyProperty("active", func() {
-		if err := setAutostart(autostart.Active()); err != nil {
-			d.AddToast(newToast(i18n.T("Setting up automatic start failed: ") + err.Error()))
+		if reverting {
 			return
 		}
-		if autostart.Active() && !background.Active() {
-			background.SetActive(true)
+		on := autostart.Active()
+		if !sandbox.Flatpak() {
+			if err := setAutostart(on); err != nil {
+				d.AddToast(newToast(i18n.T("Setting up automatic start failed: ") + err.Error()))
+				return
+			}
+			if on && !background.Active() {
+				background.SetActive(true)
+			}
+			return
 		}
+		// In a Flatpak the Background portal writes the autostart entry;
+		// GNOME may ask the user first.
+		autostart.SetSensitive(false)
+		go func() {
+			ctx, cancel := context.WithTimeout(a.ctx, 2*time.Minute)
+			defer cancel()
+			got, err := sandbox.RequestAutostart(ctx, on, i18n.T("Klient keeps watching your mail in the background after login"))
+			ui(func() {
+				autostart.SetSensitive(true)
+				if err == nil {
+					a.cfg.Autostart = got
+					a.saveConfig()
+				}
+				if err != nil || got != on {
+					reverting = true
+					autostart.SetActive(a.cfg.Autostart)
+					reverting = false
+					msg := i18n.T("The system did not allow Klient to start after login")
+					if err != nil && !errors.Is(err, sandbox.ErrDenied) {
+						msg = i18n.T("Setting up automatic start failed: ") + err.Error()
+					}
+					d.AddToast(newToast(msg))
+					return
+				}
+				if on && !background.Active() {
+					background.SetActive(true)
+				}
+			})
+		}()
 	})
 	bg.Add(autostart)
 	p.Add(bg)

@@ -4503,3 +4503,15 @@ msgstr "Spam filtr, ranní přehled a shrnutí běží na tomto počítači; ost
 #: internal
 msgid "AI tasks are done by"
 msgstr "Úlohy AI provádí"
+
+msgid "Choose Klient for Mail in GNOME Settings → Apps → Default Apps"
+msgstr "V Nastavení GNOME → Aplikace → Výchozí aplikace vyberte Klienta pro Poštu"
+
+msgid "Klient keeps watching your mail in the background after login"
+msgstr "Klient po přihlášení hlídá poštu na pozadí"
+
+msgid "The system did not allow Klient to start after login"
+msgstr "Systém nepovolil spouštění Klienta po přihlášení"
+
+msgid "Updates come from the Klient Flatpak repository: GNOME Software installs them, or run “flatpak update”."
+msgstr "Aktualizace přicházejí z Flatpak repozitáře Klienta: nainstaluje je GNOME Software, nebo spusťte „flatpak update“."

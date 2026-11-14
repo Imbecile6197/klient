@@ -1,6 +1,7 @@
 #!/bin/bash
-# Publish a Klient release on GitHub: builds the RPM (Fedora) and the DEB
-# (Ubuntu, in a container) and uploads them with a SHA256SUMS file. Klient's updater installs only packages whose checksum
+# Publish a Klient release on GitHub: builds the RPM (Fedora), the DEB
+# (Ubuntu, in a container) and the Flatpak, uploads them with a SHA256SUMS
+# file and publishes the Flatpak repository on GitHub Pages. Klient's updater installs only packages whose checksum
 # matches both SHA256SUMS and GitHub's own asset digest.
 #
 # Usage: packaging/release.sh 0.6.8   (the tree must be committed and tagged v0.6.8)
@@ -21,8 +22,11 @@ fi
 
 make rpm VERSION="$VERSION"
 packaging/deb.sh "$VERSION"
+packaging/flatpak.sh "$VERSION" --no-install
 OUT=build/release
 rm -rf "$OUT" && mkdir -p "$OUT"
+# The signed Flatpak repository for GitHub Pages and klient.flatpak.
+packaging/flatpak-repo.sh "$VERSION"
 cp build/rpm/RPMS/x86_64/klient-"$VERSION"-*.x86_64.rpm build/deb/klient_"$VERSION"_amd64.deb "$OUT"/
 # Copies with a fixed name give stable links for the first installation:
 # https://github.com/Imbecile6197/klient/releases/latest/download/klient.x86_64.rpm
@@ -43,6 +47,7 @@ Install on Fedora: \`sudo dnf install https://github.com/Imbecile6197/klient/rel
 fi
 
 git -c credential.helper= -c credential.helper='!gh auth git-credential' push origin main "$TAG"
+packaging/flatpak-repo.sh "$VERSION" --push
 gh release create "$TAG" "$OUT"/* \
 	--title "Klient $VERSION" \
 	--notes "$NOTES"

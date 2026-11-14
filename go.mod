@@ -69,7 +69,7 @@ require (
 	github.com/emersion/go-smtp v0.25.0
 	github.com/emersion/go-vcard v0.0.0-20230331202150-f3d26859ccd3
 	github.com/go-resty/resty/v2 v2.17.2 // indirect
-	github.com/godbus/dbus/v5 v5.2.2 // indirect
+	github.com/godbus/dbus/v5 v5.2.2
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/s2a-go v0.1.8 // indirect

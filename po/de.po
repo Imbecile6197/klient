@@ -4474,3 +4474,15 @@ msgstr "Der Spamfilter, die Morgenübersicht und Zusammenfassungen laufen auf di
 #: internal
 msgid "AI tasks are done by"
 msgstr "KI-Aufgaben übernimmt"
+
+msgid "Choose Klient for Mail in GNOME Settings → Apps → Default Apps"
+msgstr "Wählen Sie Klient für E-Mail unter GNOME-Einstellungen → Apps → Standard-Apps"
+
+msgid "Klient keeps watching your mail in the background after login"
+msgstr "Klient überwacht nach der Anmeldung Ihre E-Mails im Hintergrund"
+
+msgid "The system did not allow Klient to start after login"
+msgstr "Das System hat den Start von Klient nach der Anmeldung nicht erlaubt"
+
+msgid "Updates come from the Klient Flatpak repository: GNOME Software installs them, or run “flatpak update”."
+msgstr "Aktualisierungen kommen aus dem Flatpak-Repository von Klient: GNOME Software installiert sie, oder führen Sie „flatpak update“ aus."
