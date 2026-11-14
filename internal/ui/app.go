@@ -112,6 +112,9 @@ type App struct {
 	app    *adw.Application
 	win    *adw.ApplicationWindow
 	toasts *adw.ToastOverlay
+	// prefs is the open Preferences dialog; toasts go into it while it
+	// covers the window, or they would be hidden underneath.
+	prefs *adw.PreferencesDialog
 
 	cfg    config.Config
 	usage  *usage.Store // AI requests and tokens, for the spending overview
@@ -461,7 +464,7 @@ func (a *App) saveConfig() {
 func (a *App) toast(msg string) {
 	t := newToast(msg)
 	t.SetTimeout(5)
-	a.toasts.AddToast(t)
+	a.addToast(t)
 }
 
 func (a *App) toastWithAction(msg, button string, action func()) {
@@ -469,6 +472,16 @@ func (a *App) toastWithAction(msg, button string, action func()) {
 	t.SetTimeout(8)
 	t.SetButtonLabel(button)
 	t.ConnectButtonClicked(action)
+	a.addToast(t)
+}
+
+// addToast shows a toast in the open Preferences dialog, if there is one, so
+// that it is not hidden under the dialog, otherwise in the main window.
+func (a *App) addToast(t *adw.Toast) {
+	if a.prefs != nil {
+		a.prefs.AddToast(t)
+		return
+	}
 	a.toasts.AddToast(t)
 }
 

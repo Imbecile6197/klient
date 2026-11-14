@@ -40,6 +40,12 @@ func (a *App) preferencesDialog() *adw.PreferencesDialog {
 	if a.acc != nil && !a.isUnified() {
 		d.Add(a.pgpPage(d))
 	}
+	a.prefs = d
+	d.ConnectClosed(func() {
+		if a.prefs == d {
+			a.prefs = nil
+		}
+	})
 	d.Present(a.win)
 	return d
 }
