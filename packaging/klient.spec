@@ -80,6 +80,10 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{app_id}.meta
 %{_metainfodir}/%{app_id}.metainfo.xml
 
 %changelog
+* Sat Nov 14 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.12.5-1
+- Flatpak from Klient's own signed repository on GitHub Pages; inside it
+  the built-in updater is off and autostart uses the Background portal
+
 * Sat Nov 14 2026 Imbecile6197 <Imbecile6197@users.noreply.github.com> - 0.12.4-1
 - Messages such as "a new version is ready" appear in the Preferences window
   while it is open instead of under it

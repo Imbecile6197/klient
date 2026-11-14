@@ -95,6 +95,13 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.12.5" date="2026-11-14">
+      <description>
+        <p>Klient is now also available as a Flatpak from its own signed repository, with updates through GNOME Software.</p>
+        <p xml:lang="cs">Klient je teď k dispozici i jako Flatpak z vlastního podepsaného repozitáře, s aktualizacemi přes GNOME Software.</p>
+        <p xml:lang="de">Klient gibt es jetzt auch als Flatpak aus einem eigenen signierten Repository, mit Aktualisierungen über GNOME Software.</p>
+      </description>
+    </release>
     <release version="0.12.4" date="2026-11-14">
       <description>
         <p>Messages are no longer hidden under the Preferences window, and the All Mail folder no longer looks greyed out.</p>
