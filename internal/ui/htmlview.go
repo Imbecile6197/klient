@@ -7,6 +7,7 @@ import (
 
 	"github.com/diamondburned/gotk4-webkitgtk/pkg/javascriptcore/v6"
 	webkit "github.com/diamondburned/gotk4-webkitgtk/pkg/webkit/v6"
+	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
 
@@ -37,11 +38,60 @@ const heightJS = `(function () {
   document.addEventListener('load', send, true); // images loading later
 })();`
 
+// darkJS gives a message designed for a light background dark colors, for
+// the dark style. Like heightJS it runs in the isolated script world. It
+// keeps each colour's hue and saturation and only flips its lightness:
+// light backgrounds become dark, dark text becomes light, and colours that
+// already fit (white text on a dark banner, dark backgrounds) stay as they
+// are. Images are left alone. Transparent backgrounds stay transparent, so
+// the window's own background shows through.
+const darkJS = `(function () {
+  function parse(c) {
+    var m = /rgba?\(([^)]+)\)/.exec(c);
+    if (!m) return null;
+    var p = m[1].split(/[\s,\/]+/).filter(Boolean).map(parseFloat);
+    return { r: p[0] / 255, g: p[1] / 255, b: p[2] / 255, a: p.length > 3 ? p[3] : 1 };
+  }
+  function hsl(c) {
+    var max = Math.max(c.r, c.g, c.b), min = Math.min(c.r, c.g, c.b);
+    var h = 0, s = 0, l = (max + min) / 2, d = max - min;
+    if (d > 0) {
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      if (max === c.r) h = (c.g - c.b) / d + (c.g < c.b ? 6 : 0);
+      else if (max === c.g) h = (c.b - c.r) / d + 2;
+      else h = (c.r - c.g) / d + 4;
+      h *= 60;
+    }
+    return { h: h, s: s, l: l, a: c.a };
+  }
+  function css(x, l) {
+    return 'hsla(' + x.h.toFixed(1) + ',' + (x.s * 100).toFixed(1) + '%,' +
+      (l * 100).toFixed(1) + '%,' + x.a + ')';
+  }
+  var root = document.documentElement;
+  root.style.setProperty('color-scheme', 'dark');
+  var els = [root].concat(Array.prototype.slice.call(document.querySelectorAll('*')));
+  // Read every computed style first, then write, so the page is laid out
+  // only once.
+  var todo = [];
+  els.forEach(function (el) {
+    var cs = getComputedStyle(el);
+    var fg = parse(cs.color), bg = parse(cs.backgroundColor);
+    todo.push([el, fg && hsl(fg), bg && bg.a > 0 ? hsl(bg) : null]);
+  });
+  todo.forEach(function (t) {
+    var el = t[0], fg = t[1], bg = t[2];
+    if (fg && fg.l < 0.6) el.style.setProperty('color', css(fg, 0.9 - fg.l * 0.45), 'important');
+    if (bg && bg.l > 0.4) el.style.setProperty('background-color', css(bg, 0.1 + (1 - bg.l) * 0.3), 'important');
+  });
+})();`
+
 const scriptWorld = "klient"
 
 // newHTMLView renders a prepared (CSP-protected) HTML document. Page scripts,
-// plugins and navigation are disabled; clicked links go to onLink.
-func newHTMLView(doc string, onLink func(uri string)) *webkit.WebView {
+// plugins and navigation are disabled; clicked links go to onLink. With dark
+// set, the message gets dark colours (darkJS) on a transparent background.
+func newHTMLView(doc string, onLink func(uri string), dark bool) *webkit.WebView {
 	view := webkit.NewWebView()
 	s := view.Settings()
 	s.SetEnableJavascript(true)        // needed for our isolated height script only
@@ -54,6 +104,12 @@ func newHTMLView(doc string, onLink func(uri string)) *webkit.WebView {
 	ucm.RegisterScriptMessageHandler("height", scriptWorld)
 	ucm.AddScript(webkit.NewUserScriptForWorld(heightJS, webkit.UserContentInjectTopFrame,
 		webkit.UserScriptInjectAtDocumentEnd, scriptWorld, nil, nil))
+	if dark {
+		ucm.AddScript(webkit.NewUserScriptForWorld(darkJS, webkit.UserContentInjectTopFrame,
+			webkit.UserScriptInjectAtDocumentEnd, scriptWorld, nil, nil))
+		transparent := gdk.NewRGBA(0, 0, 0, 0)
+		view.SetBackgroundColor(&transparent)
+	}
 	ucm.ConnectScriptMessageReceived(func(v *javascriptcore.Value) {
 		h := int(v.ToInt32())
 		if h < 40 {

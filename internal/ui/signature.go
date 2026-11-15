@@ -47,7 +47,7 @@ func (a *App) htmlSignatureOf() (html, plain string) {
 // signaturePreview renders a signature as the recipients will see it.
 // Remote images are shown: it is the user's own content.
 func signaturePreview(html string) gtk.Widgetter {
-	view := newHTMLView(mailparse.PrepareHTML(html, nil, true), func(string) {})
+	view := newHTMLView(mailparse.PrepareHTML(html, nil, true), func(string) {}, false)
 	view.SetCanTarget(false) // links are not followed from the preview
 	return view
 }
@@ -114,7 +114,7 @@ func (a *App) signatureGroup(d *adw.PreferencesDialog) *adw.PreferencesGroup {
 	htmlView := sourceView(a.cfg.SignatureHTML, true)
 
 	// HTML: the source, buttons, and the preview below.
-	preview := newHTMLView(mailparse.PrepareHTML("", nil, true), func(string) {})
+	preview := newHTMLView(mailparse.PrepareHTML("", nil, true), func(string) {}, false)
 	preview.SetCanTarget(false)
 	remoteNote := gtk.NewLabel(i18n.T("Images from the internet are blocked by many recipients' mail apps until they allow them."))
 	remoteNote.AddCSSClass("dim-label")

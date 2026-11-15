@@ -147,7 +147,7 @@ func (a *App) printMessage(msg *protonmail.Message) {
 	printBtn.AddCSSClass("suggested-action")
 	hb.PackEnd(printBtn)
 	tv.AddTopBar(hb)
-	view := newHTMLView(doc, func(string) {})
+	view := newHTMLView(doc, func(string) {}, false)
 	sw := gtk.NewScrolledWindow()
 	sw.SetChild(view)
 	sw.SetVExpand(true)

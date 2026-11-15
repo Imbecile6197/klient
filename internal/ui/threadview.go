@@ -696,13 +696,18 @@ func (m *mainView) messageBody(msg *protonmail.Message) gtk.Widgetter {
 	inline := map[string]string{}
 	allow := m.a.remoteAllowed(sender)
 	hasRemote := mailparse.HasRemoteContent(msg.HTML)
+	// In the dark style a message designed for a light background gets dark
+	// colours, unless that is switched off or the reader asks for the
+	// message's own colours.
+	canDarken := adw.StyleManagerGetDefault().Dark() && !m.a.cfg.MailOriginalColors
+	dark := canDarken
 
 	var view gtk.Widgetter
 	render := func() {
 		if view != nil {
 			stack.Remove(view)
 		}
-		view = newHTMLView(mailparse.PrepareHTML(msg.HTML, inline, allow), m.a.openLink)
+		view = newHTMLView(mailparse.PrepareHTML(msg.HTML, inline, allow), m.a.openLink, dark)
 		stack.AddNamed(view, "html")
 		stack.SetVisibleChildName("html")
 	}
@@ -741,7 +746,6 @@ func (m *mainView) messageBody(msg *protonmail.Message) gtk.Widgetter {
 	asText.SetIconName("text-x-generic-symbolic")
 	asText.SetTooltipText(i18n.T("Show as Plain Text"))
 	asText.AddCSSClass("flat")
-	asText.SetHAlign(gtk.AlignEnd)
 	asText.ConnectToggled(func() {
 		if asText.Active() {
 			stack.SetVisibleChildName("text")
@@ -750,9 +754,23 @@ func (m *mainView) messageBody(msg *protonmail.Message) gtk.Widgetter {
 		}
 	})
 
+	original := gtk.NewToggleButton()
+	original.SetIconName("display-brightness-symbolic")
+	original.SetTooltipText(i18n.T("Show Original Colors"))
+	original.AddCSSClass("flat")
+	original.SetVisible(canDarken)
+	original.ConnectToggled(func() {
+		dark = !original.Active()
+		render()
+	})
+	tools := gtk.NewBox(gtk.OrientationHorizontal, 0)
+	tools.SetHAlign(gtk.AlignEnd)
+	tools.Append(original)
+	tools.Append(asText)
+
 	box.Append(bar)
 	box.Append(stack)
-	box.Append(asText)
+	box.Append(tools)
 	render()
 
 	// Inline images (cid:) are separate encrypted attachments; fetch and

@@ -4486,3 +4486,12 @@ msgstr "Das System hat den Start von Klient nach der Anmeldung nicht erlaubt"
 
 msgid "Updates come from the Klient Flatpak repository: GNOME Software installs them, or run “flatpak update”."
 msgstr "Aktualisierungen kommen aus dem Flatpak-Repository von Klient: GNOME Software installiert sie, oder führen Sie „flatpak update“ aus."
+
+msgid "Show Original Colors"
+msgstr "Originalfarben anzeigen"
+
+msgid "Dark messages in the dark style"
+msgstr "Dunkle Nachrichten im dunklen Stil"
+
+msgid "Messages designed with a light background are shown in dark colors. Each message can still be shown in its original colors."
+msgstr "Nachrichten mit hellem Hintergrund werden in dunklen Farben angezeigt. Jede Nachricht lässt sich trotzdem in ihren Originalfarben anzeigen."

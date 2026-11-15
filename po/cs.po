@@ -4515,3 +4515,12 @@ msgstr "Systém nepovolil spouštění Klienta po přihlášení"
 
 msgid "Updates come from the Klient Flatpak repository: GNOME Software installs them, or run “flatpak update”."
 msgstr "Aktualizace přicházejí z Flatpak repozitáře Klienta: nainstaluje je GNOME Software, nebo spusťte „flatpak update“."
+
+msgid "Show Original Colors"
+msgstr "Zobrazit původní barvy"
+
+msgid "Dark messages in the dark style"
+msgstr "Tmavé zprávy v tmavém vzhledu"
+
+msgid "Messages designed with a light background are shown in dark colors. Each message can still be shown in its original colors."
+msgstr "Zprávy navržené se světlým pozadím se zobrazí v tmavých barvách. Každou zprávu lze přesto zobrazit v původních barvách."

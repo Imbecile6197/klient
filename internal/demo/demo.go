@@ -6,6 +6,7 @@ package demo
 import (
 	"context"
 	"fmt"
+	"html"
 	"net"
 	"net/mail"
 	"slices"
@@ -146,6 +147,11 @@ func New() *Account {
 	add("c-news", news, me, pick("This week: five apps worth trying", "Tento týden: pět aplikací, které stojí za to", "Diese Woche: fünf Apps, die sich lohnen"),
 		pick("A short tour of new and updated apps from the GNOME ecosystem, plus tips for keeping your inbox tidy.", "Krátká prohlídka nových a aktualizovaných aplikací pro GNOME a tipy, jak udržet pořádek v poště.", "Ein kurzer Rundgang durch neue und aktualisierte Apps aus dem GNOME-Ökosystem, dazu Tipps für ein aufgeräumtes Postfach."),
 		day(3, 7, 0), false, inbox)
+	// The newsletter is HTML designed for a light background, like most
+	// newsletters (it shows how Klient darkens such mail in the dark style).
+	a.msgs[len(a.msgs)-1].HTML = newsletterHTML(a.msgs[len(a.msgs)-1].Text,
+		pick("Read online", "Číst online", "Online lesen"),
+		pick("You receive GNOME Weekly because you subscribed to it.", "GNOME Weekly dostáváte, protože jste se k odběru přihlásili.", "Sie erhalten GNOME Weekly, weil Sie es abonniert haben."))
 
 	add("c-spam", spammer, me, pick("Congratulations!!! You have won a prize", "Gratulujeme!!! Vyhráli jste cenu", "Herzlichen Glückwunsch!!! Sie haben einen Preis gewonnen"),
 		pick("Click here within 24 hours to claim your reward. Enter your card details to pay the small handling fee.", "Klikněte do 24 hodin a vyzvedněte si výhru. Zadejte údaje karty kvůli malému manipulačnímu poplatku.", "Klicken Sie innerhalb von 24 Stunden hier, um Ihren Gewinn abzuholen. Geben Sie Ihre Kartendaten ein, um die kleine Bearbeitungsgebühr zu bezahlen."),
@@ -502,4 +508,19 @@ func (a *Account) Verdicts() []Verdict {
 		out = append(out, v)
 	}
 	return out
+}
+
+// newsletterHTML is the demo newsletter's HTML body: a coloured banner, a
+// white card with dark text, a button and a grey footer.
+func newsletterHTML(intro, button, footer string) string {
+	esc := html.EscapeString
+	return `<table width="100%" cellpadding="0" cellspacing="0" style="background:#f2f4f7;font-family:sans-serif">` +
+		`<tr><td style="padding:24px">` +
+		`<table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:8px">` +
+		`<tr><td style="background:#3584e4;color:#ffffff;padding:20px 24px;font-size:22px;font-weight:bold;border-radius:8px 8px 0 0">GNOME Weekly</td></tr>` +
+		`<tr><td style="padding:24px;color:#222222;font-size:15px;line-height:1.5">` + esc(intro) +
+		`<p style="color:#c01c28;font-weight:bold">Issue 42</p>` +
+		`<p><a href="https://example.org/" style="display:inline-block;background:#2ec27e;color:#ffffff;padding:10px 18px;border-radius:6px;text-decoration:none">` + esc(button) + `</a></p></td></tr>` +
+		`<tr><td style="background:#eeeeee;color:#666666;padding:16px 24px;font-size:12px;border-radius:0 0 8px 8px">` + esc(footer) + `</td></tr>` +
+		`</table></td></tr></table>`
 }

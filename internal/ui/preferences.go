@@ -558,6 +558,15 @@ func (a *App) messagesPage(d *adw.PreferencesDialog) *adw.PreferencesPage {
 		}
 	})
 	lg.Add(threads)
+	darken := adw.NewSwitchRow()
+	darken.SetTitle(i18n.T("Dark messages in the dark style"))
+	darken.SetSubtitle(i18n.T("Messages designed with a light background are shown in dark colors. Each message can still be shown in its original colors."))
+	darken.SetActive(!a.cfg.MailOriginalColors)
+	darken.NotifyProperty("active", func() {
+		a.cfg.MailOriginalColors = !darken.Active()
+		a.saveConfig()
+	})
+	lg.Add(darken)
 	p.Add(lg)
 
 	sg := adw.NewPreferencesGroup()

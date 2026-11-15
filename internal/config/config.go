@@ -45,6 +45,10 @@ type Config struct {
 	// Senders (addresses or "@domain") whose remote images load automatically.
 	RemoteContentSenders []string `json:"remote_content_senders"`
 
+	// Show HTML messages in their own colours in the dark style too (by
+	// default they are darkened).
+	MailOriginalColors bool `json:"mail_original_colors,omitempty"`
+
 	// Seconds a sent message waits (with an "Undo" button) before it is sent.
 	SendDelay int `json:"send_delay"`
 
