@@ -95,6 +95,13 @@
   </recommends>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.12.6" date="2026-11-15">
+      <description>
+        <p>In the dark style, HTML mail designed for a light background is shown in dark colors, and the Flatpak no longer crashes when the system language is missing from the runtime.</p>
+        <p xml:lang="cs">V tmavém vzhledu se HTML zprávy navržené pro světlé pozadí zobrazují v tmavých barvách a Flatpak už nepadá, když běhové prostředí nemá jazyk systému.</p>
+        <p xml:lang="de">Im dunklen Stil werden HTML-E-Mails mit hellem Hintergrund in dunklen Farben angezeigt, und das Flatpak stürzt nicht mehr ab, wenn der Laufzeitumgebung die Systemsprache fehlt.</p>
+      </description>
+    </release>
     <release version="0.12.5" date="2026-11-14">
       <description>
         <p>Klient is now also available as a Flatpak from its own signed repository, with updates through GNOME Software.</p>
