@@ -62,6 +62,11 @@ for ref in $(flatpak repo --branches "$SRC" | awk '{print $1}' | grep -E '^(app|
 	flatpak build-sign --gpg-sign="$KEY" "$SITE/repo" "$(cut -d/ -f2 <<<"$ref")" "$(cut -d/ -f4 <<<"$ref")" \
 		$( [ "${ref%%/*}" = runtime ] && echo --runtime )
 done
+# flatpak-builder exported unsigned appstream branches. build-update-repo
+# signs only appstream commits it creates and keeps an unchanged one as it
+# is, so drop them and let it create them again, signed (flatpak refuses
+# unsigned appstream from a GPG-verified remote).
+rm -f "$SITE"/repo/refs/heads/appstream/* "$SITE"/repo/refs/heads/appstream2/*
 flatpak build-update-repo --gpg-sign="$KEY" --title="Klient" --comment="Klient mail client" \
 	--homepage=https://github.com/Imbecile6197/klient --default-branch=stable \
 	--prune "$SITE/repo"
